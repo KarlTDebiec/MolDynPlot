@@ -19,13 +19,56 @@ if __name__ == "__main__":
     __package__ = str("myplotspec_sim")
     import myplotspec_sim
 from .myplotspec.FigureManager import FigureManager
-from .myplotspec.manage_defaults_presets import manage_defaults_presets
-from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
 class PDistFigureManager(FigureManager):
     """
     Manages the generation of pdist figures using matplotlib.
+
+    Attributes:
+      defaults (str, dict): Default arguments to :func:`draw_report`,
+        :func:`draw_figure`, :func:`draw_subplot`, and
+        :func:`draw_dataset` functions, in yaml format. Outer level (of
+        indentation or keys) provides function names, and inner level
+        provides default arguments to each function::
+
+          defaults = \"\"\"
+              method_1:
+                method_1_arg_1: 1000
+                method_1_arg_2: abcd
+              method_2
+                method_2_arg_1: 2000
+                method_2_arg_2: efgh
+              ...
+          \"\"\"
+
+      presets (str, dict): Available sets of preset arguments to
+        :func:`draw_report`, :func:`draw_figure`, :func:`draw_subplot`,
+        and :func:`draw_dataset` functions, in yaml format. Outer level
+        (of indentation or keys) provides preset names, middle level
+        provides function names, and inner level provides arguments to
+        pass to each function when preset is active::
+
+          presets = \"\"\"
+            preset_1:
+              method_1:
+                method_1_arg_1: 1001
+                method_1_arg_2: abcde
+              method_2
+                method_2_arg_1: 2001
+                method_2_arg_2: efghi
+            preset_2:
+              method_1:
+                method_1_arg_1: 1002
+                method_1_arg_2: abcdef
+              method_2
+                method_2_arg_1: 2002
+                method_2_arg_2: efghij
+          \"\"\"
     """
+
+    from .myplotspec.manage_defaults_presets import manage_defaults_presets
+    from .myplotspec.manage_kwargs import manage_kwargs
+
     defaults = """
         draw_figure:
           fig_width:    10.00
@@ -107,22 +150,25 @@ class PDistFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, xkey = "x", ykey = "pmf", label = "",
-        xoffset = 0, yoffset = 0, handles = None, debug = False, **kwargs):
+    def draw_dataset(self, subplot, xkey="x", ykey="pmf", label="", xoffset=0,
+        yoffset=0, handles=None, debug=False, **kwargs):
         """
-        Draws a dataset
+        Draws a dataset.
 
-        **Arguments:**
-            :*subplot*: <Axes> on which to act
-            :*handles*: Nascent OrderedDict of [labels]:handles on
-                        subplot
-            :*xkey*:    Numpy record array key from which to load x
-            :*ykey*:    Numpy record array key from which to load y
-            :*xoffset*: Offset to be added to x coordinates
-            :*yoffset*: Offset to be added to y coordinates
-            :*label*:   Dataset label
-            :*color*:   Dataset color
-            :*plot_kw*: Keyword arguments to pass to subplot.plot()
+        Arguments:
+          subplot (Axes): Axes on which to draw
+          xkey (str): Name of field in dataset from which to load x
+          ykey (str): Name of field in dataset from which to load y
+          label (str, optional): Dataset label
+          color (str, list, ndarray, float, optional): Dataset color
+          plot_kw (dict, optional): Additional keyword arguments passed
+            to subplot.plot()
+          handles (OrderedDict, optional): Nascent OrderedDict of
+            [labels]: handles on subplot
+          zero_line (bool): Draw a horizontal line at y=0; really a
+            subplot setting, but placed here to avoid needing to
+            override draw_subplot
+          kwargs (dict): Additional keyword arguments
         """
         from .myplotspec import get_color
         from .H5Dataset import H5Dataset

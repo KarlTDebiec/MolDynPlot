@@ -20,11 +20,11 @@ class H5Dataset(object):
 
     def __init__(self, **kwargs):
         """
-        Initializes dataset
+        Initializes dataset.
 
-        **Arguments:**
-            :*infiles*: List of infiles
-            :*infile*:  Alternatively, single infile
+        Arguments:
+          infiles (list): List of infiles
+          infile (str): Alternatively, single infile
         """
         self.default_address = kwargs.get("default_address", "")
         self.default_key     = kwargs.get("default_key",     "key")
@@ -38,10 +38,10 @@ class H5Dataset(object):
 
     def load(self, infiles, **kwargs):
         """
-        Loads data from h5 files
+        Loads data from h5 files.
 
-        **Arguments:**
-            :*infiles*: infiles
+        Arguments:
+          infiles (list): infiles
         """
         from os.path import expandvars, isfile
         from h5py import File as h5
