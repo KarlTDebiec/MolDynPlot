@@ -67,37 +67,28 @@ class StateProbFigureManager(FigureManager):
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
     from .myplotspec.manage_kwargs import manage_kwargs
 
+#          fig_width:     5.00
+#          left:          1.20
+#          sub_width:     3.25
+#          right:         0.55
+#          fig_height:    7.50
+#          top:           1.35
+#          sub_height:    3.25
+#          bottom:        2.90
+#          shared_legend:
+#            left:       1.20
+#            sub_width:  3.25
+#            sub_height: 2.30
+#            bottom:     0.50
+#            legend_kw:
+#              frameon:      False
+#              labelspacing: 0.5
+#              loc:          9
+#            legend_lw:  5
     defaults = """
         draw_figure:
-          fig_width:     5.00
-          left:          1.20
-          sub_width:     3.25
-          right:         0.55
-          fig_height:    7.50
-          top:           1.35
-          sub_height:    3.25
-          bottom:        2.90
           subplot_kw:
             autoscale_on: False
-          shared_legend:
-            left:       1.20
-            sub_width:  3.25
-            sub_height: 2.30
-            bottom:     0.50
-            legend_kw:
-              frameon:      False
-              labelspacing: 0.5
-              loc:          9
-            legend_lw:  5
-        draw_subplot:
-          ylabel:       $P_{bound}$
-          xticklabels:  []
-          yticks:       [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
-          yticklabels:  [0.0,"",0.2,"",0.4,"",0.6,"",0.8,"",1.0]
-          tick_params:
-            bottom:     off
-            top:        off
-          lw:           2
         draw_dataset:
           plot_kw:
             lw:         2.0
@@ -109,73 +100,124 @@ class StateProbFigureManager(FigureManager):
               elinewidth: 2.0
               capthick:   2.0
     """
+#      presentation:
+#        draw_figure:
+#          fig_width:     5.00
+#          left:          1.20
+#          sub_width:     3.25
+#          right:         0.55
+#          fig_height:    7.50
+#          top:           1.35
+#          sub_height:    3.25
+#          bottom:        2.90
+#          title_fp:     24r
+#          label_fp:     24r
+#          shared_legend:
+#            left:       1.20
+#            sub_width:  3.24
+#            sub_height: 2.30
+#            bottom:     0.50
+#            legend_fp:  14r
+#            legend_kw:
+#              frameon:      False
+#              labelspacing: 0.5
+#              loc:          9
+#        draw_subplot:
+#          title_fp:     24r
+#          label_fp:     24r
+#          tick_fp:      18r
+#          legend_fp:    18r
+#          lw:           2
+#        draw_dataset:
+#          plot_kw:
+#              lw:       2
+#      presentation_three:
+#        draw_figure:
+#          ncols:      3
+#          fig_width:  10.00
+#          left:        1.00
+#          sub_width:   2.50
+#          wspace:      0.50
+#          right:       0.50
+#          fig_height:  7.50
+#          bottom:      3.00
+#          sub_height:  2.50
+#          top:         2.00
+#          subplots:
+#            1:
+#              ylabel: ""
+#            2:
+#              ylabel: ""
+#          shared_legend:
+#            left:       6.80
+#            sub_width:  2.50
+#            sub_height: 2.50
+#            bottom:     0.50
+#            legend_fp:  14r
+#            legend_kw:
+#              loc:          2
+#              labelspacing: 0.5
+#        draw_subplot:
+#          title_fp:     16r
+#          label_fp:     24r
+#          tick_fp:      16r
+#          legend_fp:    18r
+#          lw:           2
+#        draw_dataset:
+#          plot_kw:
+#            lw:         2
+
     presets  = """
-      presentation:
-        draw_figure:
-          fig_width:     5.00
-          left:          1.20
-          sub_width:     3.25
-          right:         0.55
-          fig_height:    7.50
-          top:           1.35
-          sub_height:    3.25
-          bottom:        2.90
-          title_fp:     24r
-          label_fp:     24r
-          shared_legend:
-            left:       1.20
-            sub_width:  3.24
-            sub_height: 2.30
-            bottom:     0.50
-            legend_fp:  14r
-            legend_kw:
-              frameon:      False
-              labelspacing: 0.5
-              loc:          9
+      pbound:
         draw_subplot:
-          title_fp:     24r
-          label_fp:     24r
-          tick_fp:      18r
-          legend_fp:    18r
-          lw:           2
-        draw_dataset:
-          plot_kw:
-              lw:       2
-      presentation_three:
+          ylabel:       $P_{bound}$
+          xticklabels:  []
+          yticks:       [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+          yticklabels:  [0.0,"",0.2,"",0.4,"",0.6,"",0.8,"",1.0]
+          tick_params:
+            bottom:     off
+            top:        off
+      presentation_wide_three:
         draw_figure:
-          ncols:      3
-          fig_width:  10.00
-          left:        1.00
-          sub_width:   2.50
-          wspace:      0.50
-          right:       0.50
-          fig_height:  7.50
-          bottom:      3.00
-          sub_height:  2.50
-          top:         2.00
+          ncols:        3
+          fig_width:   19.2
+          fig_height:  10.8
+          left:         1.5
+          sub_width:    4.0
+          wspace:       0.3
+          bottom:       4.3
+          sub_height:   4.0
           subplots:
             1:
               ylabel: ""
+              yticklabels: []
             2:
               ylabel: ""
+              yticklabels: []
           shared_legend:
-            left:       6.80
-            sub_width:  2.50
-            sub_height: 2.50
-            bottom:     0.50
-            legend_fp:  14r
+            left:       14.1
+            sub_width:   4.0
+            sub_height:  4.0
+            bottom:      4.3
+            legend_lw:   10
             legend_kw:
-              loc:          2
+              frameon:      False
               labelspacing: 0.5
+              legend_fp:    24r
+              loc:          2
         draw_subplot:
-          title_fp:     16r
-          label_fp:     24r
+          title_fp:     24b
+          label_fp:     24b
           tick_fp:      16r
-          legend_fp:    18r
-          lw:           2
+          legend:       False
+          tick_params:
+            length:     5
+            width:      2
+            pad:        6
+          lw:           3
         draw_dataset:
           plot_kw:
-            lw:         2
+            lw:         3
     """
 
     @manage_defaults_presets()
@@ -273,9 +315,9 @@ class StateProbFigureManager(FigureManager):
               **out_kwargs)
 
         # Draw legend
-        if str(legend) != "None":
+        if legend is not None and legend is not False:
             set_legend(subplot, handles = handles, **in_kwargs)
-        if str(shared_handles) != "None":
+        if shared_handles is not None:
             for label, handle in handles.items():
                 if label not in shared_handles:
                     shared_handles[label] = handle
@@ -301,11 +343,26 @@ class StateProbFigureManager(FigureManager):
         from .myplotspec import get_color
         from .H5Dataset import H5Dataset
 
+        # Handle missing input gracefully
+        if  ("infile" not in kwargs
+        and ("P unbound" not in kwargs or "P unbound se" not in kwargs)):
+            return
+        elif ("path" not in kwargs["infile"]
+        and  ("P unbound" not in kwargs or "P unbound se" not in kwargs)):
+            return
+
+        # Configure plot settings
         plot_kw = kwargs.get("plot_kw", {})
         if "color" in plot_kw:
             plot_kw["color"] = get_color(plot_kw["color"])
         elif "color" in kwargs:
             plot_kw["color"] = get_color(kwargs.pop("color"))
+        if "ecolor" in plot_kw:
+            plot_kw["ecolor"] = get_color(plot_kw["ecolor"])
+        elif "color" in kwargs:
+            plot_kw["ecolor"] = get_color(kwargs.pop("ecolor"))
+        elif "color" in plot_kw:
+            plot_kw["ecolor"] = plot_kw["color"]
 
         # Load dataset, x, and y
         if x is None:
