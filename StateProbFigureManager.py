@@ -131,41 +131,6 @@ class StateProbFigureManager(FigureManager):
 #        draw_dataset:
 #          plot_kw:
 #              lw:       2
-#      presentation_three:
-#        draw_figure:
-#          ncols:      3
-#          fig_width:  10.00
-#          left:        1.00
-#          sub_width:   2.50
-#          wspace:      0.50
-#          right:       0.50
-#          fig_height:  7.50
-#          bottom:      3.00
-#          sub_height:  2.50
-#          top:         2.00
-#          subplots:
-#            1:
-#              ylabel: ""
-#            2:
-#              ylabel: ""
-#          shared_legend:
-#            left:       6.80
-#            sub_width:  2.50
-#            sub_height: 2.50
-#            bottom:     0.50
-#            legend_fp:  14r
-#            legend_kw:
-#              loc:          2
-#              labelspacing: 0.5
-#        draw_subplot:
-#          title_fp:     16r
-#          label_fp:     24r
-#          tick_fp:      16r
-#          legend_fp:    18r
-#          lw:           2
-#        draw_dataset:
-#          plot_kw:
-#            lw:         2
 
     presets  = """
       pbound:
@@ -177,14 +142,99 @@ class StateProbFigureManager(FigureManager):
           tick_params:
             bottom:     off
             top:        off
+      notebook_three:
+        draw_figure:
+          ncols:       3
+          fig_width:  6.5
+          left:       0.5
+          sub_width:  1.8
+          wspace:     0.2
+          bottom:     0.5
+          sub_height: 1.8
+          top:        0.3
+          subplots:
+            1:
+              ylabel: ""
+              yticklabels: []
+            2:
+              ylabel: ""
+              yticklabels: []
+          shared_legend:
+            left:       0.5
+            sub_width:  6.0
+            sub_height: 0.5
+            bottom:     0.0
+            legend_lw:  3
+            legend_kw:
+              frameon:      False
+              labelspacing: 0.5
+              legend_fp:    8r
+              loc:          9
+              ncol:         4
+        draw_subplot:
+          title_fp:     10b
+          label_fp:     10b
+          tick_fp:      8r
+          legend_fp:    8r
+          tick_params:
+            length:     2
+            pad:        6
+        draw_dataset:
+          plot_kw:
+            lw:         1
+            error_kw:
+              elinewidth: 1
+              capthick:   1
+              capsize:    3
+      presentation_three:
+        draw_figure:
+          ncols:       3
+          fig_width:  10.0
+          left:        1.0
+          sub_width:   2.5
+          wspace:      0.5
+          fig_height:  7.5
+          bottom:      3.0
+          sub_height:  2.5
+          subplots:
+            1:
+              ylabel: ""
+              yticklabels: []
+            2:
+              ylabel: ""
+              yticklabels: []
+          shared_legend:
+            left:       6.8
+            sub_width:  2.5
+            sub_height: 2.5
+            bottom:     0.5
+            legend_lw:  5
+            legend_kw:
+              frameon:      False
+              labelspacing: 0.5
+              legend_fp:    14r
+              loc:          2
+        draw_subplot:
+          title_fp:     16r
+          label_fp:     24r
+          tick_fp:      16r
+          legend_fp:    18r
+          tick_params:
+            length:     5
+            width:      2
+            pad:        6
+          lw:           2
+        draw_dataset:
+          plot_kw:
+            lw:         2
       presentation_wide_three:
         draw_figure:
           ncols:        3
           fig_width:   19.2
-          fig_height:  10.8
           left:         1.5
           sub_width:    4.0
           wspace:       0.3
+          fig_height:  10.8
           bottom:       4.3
           sub_height:   4.0
           subplots:
