@@ -146,9 +146,9 @@ class StateProbFigureManager(FigureManager):
         draw_figure:
           ncols:       3
           fig_width:  6.5
-          left:       0.5
+          left:       0.6
           sub_width:  1.8
-          wspace:     0.2
+          wspace:     0.1
           bottom:     0.5
           sub_height: 1.8
           top:        0.3
@@ -162,7 +162,7 @@ class StateProbFigureManager(FigureManager):
           shared_legend:
             left:       0.5
             sub_width:  6.0
-            sub_height: 0.5
+            sub_height: 0.4
             bottom:     0.0
             legend_lw:  3
             legend_kw:
