@@ -67,81 +67,37 @@ class StateProbFigureManager(FigureManager):
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
     from .myplotspec.manage_kwargs import manage_kwargs
 
-#          fig_width:     5.00
-#          left:          1.20
-#          sub_width:     3.25
-#          right:         0.55
-#          fig_height:    7.50
-#          top:           1.35
-#          sub_height:    3.25
-#          bottom:        2.90
-#          shared_legend:
-#            left:       1.20
-#            sub_width:  3.25
-#            sub_height: 2.30
-#            bottom:     0.50
-#            legend_kw:
-#              frameon:      False
-#              labelspacing: 0.5
-#              loc:          9
-#            legend_lw:  5
     defaults = """
         draw_figure:
           subplot_kw:
             autoscale_on: False
-        draw_dataset:
-          plot_kw:
-            lw:         2.0
-            align:      center
-            width:      0.6
-            ecolor:     black
-            capsize:    4
-            error_kw:
-              elinewidth: 2.0
-              capthick:   2.0
-    """
-#      presentation:
-#        draw_figure:
-#          fig_width:     5.00
-#          left:          1.20
-#          sub_width:     3.25
-#          right:         0.55
-#          fig_height:    7.50
-#          top:           1.35
-#          sub_height:    3.25
-#          bottom:        2.90
-#          title_fp:     24r
-#          label_fp:     24r
-#          shared_legend:
-#            left:       1.20
-#            sub_width:  3.24
-#            sub_height: 2.30
-#            bottom:     0.50
-#            legend_fp:  14r
-#            legend_kw:
-#              frameon:      False
-#              labelspacing: 0.5
-#              loc:          9
-#        draw_subplot:
-#          title_fp:     24r
-#          label_fp:     24r
-#          tick_fp:      18r
-#          legend_fp:    18r
-#          lw:           2
-#        draw_dataset:
-#          plot_kw:
-#              lw:       2
-
-    presets  = """
-      pbound:
         draw_subplot:
-          ylabel:       $P_{bound}$
           xticklabels:  []
           yticks:       [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
           yticklabels:  [0.0,"",0.2,"",0.4,"",0.6,"",0.8,"",1.0]
           tick_params:
             bottom:     off
             top:        off
+          ylabel:       $P_{state}$
+          ylabel_kw:
+            va:         center
+            rotation:   vertical
+        draw_dataset:
+          plot_kw:
+            lw:         2
+            align:      center
+            width:      0.6
+            ecolor:     black
+            capsize:    4
+            error_kw:
+              elinewidth: 2
+              capthick:   2
+    """
+
+    presets  = """
+      pbound:
+        draw_subplot:
+          ylabel:       $P_{bound}$
       notebook_three:
         draw_figure:
           ncols:       3
@@ -188,14 +144,14 @@ class StateProbFigureManager(FigureManager):
               capsize:    3
       presentation_three:
         draw_figure:
-          ncols:       3
-          fig_width:  10.0
-          left:        1.0
-          sub_width:   2.5
-          wspace:      0.5
-          fig_height:  7.5
-          bottom:      3.0
-          sub_height:  2.5
+          ncols:         3
+          fig_width:    10.24
+          fig_height:    7.68
+          left:          1.00
+          sub_width:     2.05
+          wspace:        0.20
+          bottom:        3.50
+          sub_height:    2.05
           subplots:
             1:
               ylabel: ""
@@ -204,10 +160,10 @@ class StateProbFigureManager(FigureManager):
               ylabel: ""
               yticklabels: []
           shared_legend:
-            left:       6.8
-            sub_width:  2.5
-            sub_height: 2.5
-            bottom:     0.5
+            left:       7.60
+            sub_width:  2.50
+            sub_height: 2.00
+            bottom:     3.75
             legend_lw:  5
             legend_kw:
               frameon:      False
@@ -215,18 +171,23 @@ class StateProbFigureManager(FigureManager):
               legend_fp:    14r
               loc:          2
         draw_subplot:
-          title_fp:     16r
-          label_fp:     24r
-          tick_fp:      16r
-          legend_fp:    18r
+          title_fp:     18r
+          label_fp:     18r
+          tick_fp:      14r
+          ylabel_kw:
+            labelpad:   20
           tick_params:
-            length:     5
-            width:      2
+            length:     3
+            width:      1
             pad:        6
           lw:           2
         draw_dataset:
           plot_kw:
             lw:         2
+            error_kw:
+              capsize:    3
+              elinewidth: 1
+              capthick:   1
       presentation_wide_three:
         draw_figure:
           ncols:        3
@@ -345,10 +306,10 @@ class StateProbFigureManager(FigureManager):
 
         # Plot experimental data
         if experiment is not None:
-            subplot.axhspan(experiment[0], experiment[1], lw = 0,
-              color = [0.7, 0.7, 0.7])
+            subplot.axhspan(experiment[0], experiment[1], lw=0,
+              color=[0.7, 0.7, 0.7])
             handles["Experiment"] = subplot.plot([-10, -10], [-10, -10],
-              color = [0.7, 0.7, 0.7], lw = 5)[0]
+              color=[0.7, 0.7, 0.7], lw=5)[0]
 
         for i in dataset_indexes:
             out_kwargs              = {}
@@ -422,8 +383,8 @@ class StateProbFigureManager(FigureManager):
                 x = 1
         if not ("P unbound" in kwargs and "P unbound se" in kwargs):
             dataset = H5Dataset(
-                        default_address = "assign/stateprobs",
-                        default_key = "pbound", **kwargs)
+                        default_address="assign/stateprobs",
+                        default_key="pbound", **kwargs)
             y    = 1.0 - dataset.datasets["pbound"]["P unbound"][0]
             yerr = dataset.datasets["pbound"]["P unbound se"][0] * 1.96
         else:
