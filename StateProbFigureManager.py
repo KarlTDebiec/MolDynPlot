@@ -107,7 +107,6 @@ class StateProbFigureManager(FigureManager):
           wspace:     0.1
           bottom:     0.5
           sub_height: 1.8
-          top:        0.3
           subplots:
             1:
               ylabel: ""
