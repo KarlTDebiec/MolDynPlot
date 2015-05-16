@@ -107,13 +107,14 @@ class StateProbFigureManager(FigureManager):
               capsize:    4
       notebook_three:
         draw_figure:
-          ncols:       3
-          fig_width:  6.5
-          left:       0.6
-          sub_width:  1.8
-          wspace:     0.1
-          bottom:     0.5
-          sub_height: 1.8
+          ncols:        3
+          left:          0.60
+          sub_width:     1.80
+          wspace:        0.10
+          right:         0.20
+          top:           0.40
+          sub_height:    1.80
+          bottom:        0.55
           subplots:
             1:
               ylabel: ""
@@ -122,10 +123,10 @@ class StateProbFigureManager(FigureManager):
               ylabel: ""
               yticklabels: []
           shared_legend:
-            left:       0.5
-            sub_width:  6.0
-            sub_height: 0.4
-            bottom:     0.0
+            left:        0.60
+            sub_width:   5.70
+            sub_height:  0.50
+            bottom:      0.00
             legend_lw:  3
             legend_kw:
               frameon:      False
