@@ -23,47 +23,6 @@ from .myplotspec.FigureManager import FigureManager
 class PDistFigureManager(FigureManager):
     """
     Manages the generation of pdist figures using matplotlib.
-
-    Attributes:
-      defaults (str, dict): Default arguments to :func:`draw_report`,
-        :func:`draw_figure`, :func:`draw_subplot`, and
-        :func:`draw_dataset` functions, in yaml format. Outer level (of
-        indentation or keys) provides function names, and inner level
-        provides default arguments to each function::
-
-          defaults = \"\"\"
-              method_1:
-                method_1_arg_1: 1000
-                method_1_arg_2: abcd
-              method_2
-                method_2_arg_1: 2000
-                method_2_arg_2: efgh
-              ...
-          \"\"\"
-
-      presets (str, dict): Available sets of preset arguments to
-        :func:`draw_report`, :func:`draw_figure`, :func:`draw_subplot`,
-        and :func:`draw_dataset` functions, in yaml format. Outer level
-        (of indentation or keys) provides preset names, middle level
-        provides function names, and inner level provides arguments to
-        pass to each function when preset is active::
-
-          presets = \"\"\"
-            preset_1:
-              method_1:
-                method_1_arg_1: 1001
-                method_1_arg_2: abcde
-              method_2
-                method_2_arg_1: 2001
-                method_2_arg_2: efghi
-            preset_2:
-              method_1:
-                method_1_arg_1: 1002
-                method_1_arg_2: abcdef
-              method_2
-                method_2_arg_1: 2002
-                method_2_arg_2: efghij
-          \"\"\"
     """
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
