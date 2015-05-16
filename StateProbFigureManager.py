@@ -21,47 +21,6 @@ from .myplotspec.FigureManager import FigureManager
 class StateProbFigureManager(FigureManager):
     """
     Class to manage the generation of probability distribution figures
-
-    Attributes:
-      defaults (str, dict): Default arguments to :func:`draw_report`,
-        :func:`draw_figure`, :func:`draw_subplot`, and
-        :func:`draw_dataset` functions, in yaml format. Outer level (of
-        indentation or keys) provides function names, and inner level
-        provides default arguments to each function::
-
-          defaults = \"\"\"
-              method_1:
-                method_1_arg_1: 1000
-                method_1_arg_2: abcd
-              method_2
-                method_2_arg_1: 2000
-                method_2_arg_2: efgh
-              ...
-          \"\"\"
-
-      presets (str, dict): Available sets of preset arguments to
-        :func:`draw_report`, :func:`draw_figure`, :func:`draw_subplot`,
-        and :func:`draw_dataset` functions, in yaml format. Outer level
-        (of indentation or keys) provides preset names, middle level
-        provides function names, and inner level provides arguments to
-        pass to each function when preset is active::
-
-          presets = \"\"\"
-            preset_1:
-              method_1:
-                method_1_arg_1: 1001
-                method_1_arg_2: abcde
-              method_2
-                method_2_arg_1: 2001
-                method_2_arg_2: efghi
-            preset_2:
-              method_1:
-                method_1_arg_1: 1002
-                method_1_arg_2: abcdef
-              method_2
-                method_2_arg_1: 2002
-                method_2_arg_2: efghij
-          \"\"\"
     """
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
@@ -98,6 +57,54 @@ class StateProbFigureManager(FigureManager):
       pbound:
         draw_subplot:
           ylabel:       $P_{bound}$
+      poster_three:
+        draw_figure:
+          ncols:        3
+          fig_width:    15.00
+          left:          2.60
+          sub_width:     3.50
+          wspace:        0.20
+          bottom:        3.00
+          sub_height:    3.50
+          top:           0.50
+          subplots:
+            1:
+              ylabel: ""
+              yticklabels: []
+            2:
+              ylabel: ""
+              yticklabels: []
+          shared_legend:
+            left:        1.00
+            sub_width:  14.00
+            sub_height:  1.70
+            bottom:      0.00
+            legend_lw:  10
+            legend_kw:
+              frameon:      False
+              labelspacing: 0.5
+              legend_fp:    24r
+              loc:          9
+              ncol:         3
+        draw_subplot:
+          title_fp:     36r
+          label_fp:     36r
+          ylabel_kw:
+            rotation:   horizontal
+            labelpad:   70
+          tick_fp:      24r
+          tick_params:
+            length:     3
+            width:      1
+            pad:        10
+          lw:           2
+        draw_dataset:
+          plot_kw:
+            lw:         2
+            error_kw:
+              elinewidth: 2
+              capthick:   2
+              capsize:    4
       notebook_three:
         draw_figure:
           ncols:       3
