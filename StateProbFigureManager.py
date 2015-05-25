@@ -55,9 +55,12 @@ class StateProbFigureManager(FigureManager):
 
     presets  = """
       pbound:
+        help: Probability of bound state
         draw_subplot:
           ylabel:       $P_{bound}$
       poster_three:
+        help: Three adjacent plots for poster (width = 15.0", height = 8.0")
+        inherits: poster
         draw_figure:
           ncols:        3
           fig_width:    15.00
@@ -87,25 +90,18 @@ class StateProbFigureManager(FigureManager):
               loc:          9
               ncol:         3
         draw_subplot:
-          title_fp:     36r
-          label_fp:     36r
           ylabel_kw:
             rotation:   horizontal
             labelpad:   70
-          tick_fp:      24r
-          tick_params:
-            length:     3
-            width:      1
-            pad:        10
-          lw:           2
         draw_dataset:
           plot_kw:
-            lw:         2
             error_kw:
               elinewidth: 2
               capthick:   2
               capsize:    4
       notebook_three:
+        help: Three adjacent plots for notebook (width ≤ 6.5", height ≤ 8")
+        inherits: notebook
         draw_figure:
           ncols:        3
           left:          0.60
@@ -135,25 +131,20 @@ class StateProbFigureManager(FigureManager):
               loc:          9
               ncol:         4
         draw_subplot:
-          title_fp:     10b
-          label_fp:     10b
-          tick_fp:      8r
-          legend_fp:    8r
-          tick_params:
-            length:     2
-            pad:        6
+          ylabel_kw:
+            labelpad:   10
         draw_dataset:
           plot_kw:
-            lw:         1
             error_kw:
               elinewidth: 1
               capthick:   1
               capsize:    3
       presentation_three:
+        help: Three adjacent plots for 4:3 presentation (width = 10.24",
+              height = 7.68")
+        inherits: presentation
         draw_figure:
           ncols:         3
-          fig_width:    10.24
-          fig_height:    7.68
           left:          1.00
           sub_width:     2.05
           wspace:        0.20
@@ -178,31 +169,23 @@ class StateProbFigureManager(FigureManager):
               legend_fp:    14r
               loc:          2
         draw_subplot:
-          title_fp:     18r
-          label_fp:     18r
-          tick_fp:      14r
           ylabel_kw:
             labelpad:   20
-          tick_params:
-            length:     3
-            width:      1
-            pad:        6
-          lw:           2
         draw_dataset:
           plot_kw:
-            lw:         2
             error_kw:
               capsize:    3
               elinewidth: 1
               capthick:   1
       presentation_wide_three:
+        help: Three adjacent plots for 16:9 presentation (width = 19.20",
+              height = 10.80")
+        inherits: presentation_wide
         draw_figure:
           ncols:        3
-          fig_width:   19.2
           left:         1.5
           sub_width:    4.0
           wspace:       0.3
-          fig_height:  10.8
           bottom:       4.3
           sub_height:   4.0
           subplots:
@@ -224,18 +207,7 @@ class StateProbFigureManager(FigureManager):
               legend_fp:    24r
               loc:          2
         draw_subplot:
-          title_fp:     24b
-          label_fp:     24b
-          tick_fp:      16r
           legend:       False
-          tick_params:
-            length:     5
-            width:      2
-            pad:        6
-          lw:           3
-        draw_dataset:
-          plot_kw:
-            lw:         3
     """
 
     @manage_defaults_presets()
