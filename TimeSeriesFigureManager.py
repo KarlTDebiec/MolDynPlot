@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   myplotspec_sim.RMSDFigureManager.py
+#   myplotspec_sim.TimeSeriesFigureManager.py
 #
 #   Copyright (C) 2015 Karl T Debiec
 #   All rights reserved.
@@ -8,7 +8,8 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Generates one or more RMSD figures to specifications in a YAML file.
+Generates one or more time series figures to specifications in a YAML
+file.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
@@ -17,9 +18,9 @@ if __name__ == "__main__":
     import myplotspec_sim
 from .myplotspec.FigureManager import FigureManager
 ################################### CLASSES ###################################
-class RMSDFigureManager(FigureManager):
+class TimeSeriesFigureManager(FigureManager):
     """
-    Class to manage the generation of RMSD figures
+    Class to manage the generation of time series figures
     """
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
@@ -31,64 +32,108 @@ class RMSDFigureManager(FigureManager):
           subplot_kw:
             autoscale_on: False
         draw_subplot:
-          xticks:       [0,200,400,600,800,1000]
-          xlabel:       Time (ns)
-          yticks:       [0,1,2,3,4,5]
-          ylabel:       RMSD ($\\AA$)
+          xticks: [0,200,400,600,800,1000]
+          xlabel: Time (ns)
+          yticks: [0,1,2,3,4,5,6,7,8,9,10]
           ylabel_kw:
-            va:         center
-            rotation:   vertical
-        draw_dataset:
-          xscale:       0.001
+            va: center
+            rotation: vertical
     """
 
     presets  = """
-      notebook:
-        inherits: notebook
+      rmsd:
+        draw_subplot:
+          yticks: [0,1,2,3,4,5]
+          ylabel: RMSD ($\\AA$)
+          subplot2_kw:
+            xticks: [0.00,0.05,0.10,0.15,0.20]
+            xticklabels: ["0.00","0.05","0.10","0.15","0.20"]
+            yticks: [0,1,2,3,4,5]
+            y2ticks: [0,1,2,3,4,5]
+        draw_dataset:
+          load_kw:
+            comment: "@"
+            delim_whitespace: True
+            names: ["time", "RMSD"]
+          xscale: 0.001
+          xkey: time
+          ykey: RMSD
+          grid: !!python/object/apply:numpy.linspace [0,5,100]
+      radgyr:
+        draw_subplot:
+          yticks: [10,11,12,13,14,15]
+          ylabel: Radius of Gyration ($\\AA$)
+          subplot2_kw:
+            xticks: [0.00,0.05,0.10,0.15,0.20]
+            xticklabels: ["0.00","0.05","0.10","0.15","0.20"]
+            yticks: [10,11,12,13,14,15]
+            y2ticks: [10,11,12,13,14,15]
+        draw_dataset:
+          load_kw:
+            sequential_ds: True
+            comment: "@"
+            names: ["radgyr", "maxdist"]
+          xscale: 0.1
+          xkey: time
+          ykey: radgyr
+          grid: !!python/object/apply:numpy.linspace [10,15,100]
+      notebook_pdist:
+        extends: notebook
         draw_figure:
-          left:          0.50
-          sub_width:     4.40
           right:         1.60
-          bottom:        0.90
-          sub_height:    1.80
-          top:           0.40
           subplot2:
             left:        5.00
             sub_width:   1.20
             bottom:      0.90
             sub_height:  1.80
           shared_legend:
-            left:        0.50
             sub_width:   5.70
+        draw_subplot:
+          subplot2_kw:
+            xticks: [0.0,0.2,0.4,0.6,0.8,1.0]
+            xticklabels: ["0.0","0.2","0.4","0.6","0.8","1.0"]
+            xlabel: Probability
+            yticks: [0,1,2,3,4,5,6,7,8,9,10]
+            yticklabels: []
+            title_fp:  10b
+            label_fp:  10b
+            tick_fp:   8r
+            legend_fp: 8r
+            tick_params:
+              length: 2
+              pad: 6
+        draw_dataset:
+          plot2_kw:
+            lw: 1.0
+          bandwidth: 0.1
+          grid: !!python/object/apply:numpy.linspace [0,10,1000]
+      notebook:
+        inherits: notebook
+        draw_figure:
+          left:          0.50
+          sub_width:     4.40
+          right:         0.20
+          bottom:        0.90
+          sub_height:    1.80
+          top:           0.40
+          shared_legend:
+            left:        0.50
+            sub_width:   4.30
             sub_height:  0.50
             bottom:      0.00
-            legend_lw:  3
+            legend_lw: 3
             legend_kw:
-              frameon:      False
+              frameon: False
               labelspacing: 0.5
-              legend_fp:    8r
-              loc:          9
-              ncol:         2
+              legend_fp: 8r
+              loc: 9
+              ncol: 2
         draw_subplot:
           ylabel_kw:
-            labelpad:   10
-          subplot2_kw:
-            xticks: [0.00,0.04,0.08,0.12,0.16]
-            xlabel: Probability
-            yticks: [0,1,2,3,4,5]
-            yticklabels: []
-            title_fp:     10b
-            label_fp:     10b
-            tick_fp:      8r
-            legend_fp:    8r
-            tick_params:
-              length:     2
-              pad:        6
+            labelpad: 10
         draw_dataset:
           plot_kw:
-            lw:         0.5
-          plot2_kw:
-            lw:         1.0
+            lw: 0.5
     """
 
     @manage_defaults_presets()
@@ -138,7 +183,7 @@ class RMSDFigureManager(FigureManager):
             if shared_legend is not None:
                 out_kwargs["shared_handles"] = shared_handles
             if i in subplots:
-                if i in subplot2s:
+                if subplot2 is not None and i in subplot2s:
                     self.draw_subplot(subplot=subplots[i],
                       subplot2=subplot2s[i], **out_kwargs)
                 else:
@@ -203,9 +248,11 @@ class RMSDFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, subplot2=None, infile=None, label="",
-        xscale=1, handles=None, verbose=False, debug=False, **kwargs):
+    def draw_dataset(self, subplot, xkey, ykey, subplot2=None,
+        infile=None, label="", xscale=None, handles=None, verbose=False,
+        debug=False, **kwargs):
         from .myplotspec import get_color
+        import numpy as np
         import pandas
         from os.path import expandvars
 
@@ -214,9 +261,33 @@ class RMSDFigureManager(FigureManager):
             return
         if verbose >= 1:
             print("Loading {0}".format(expandvars(infile)))
-        data = pandas.read_csv(expandvars(infile), delim_whitespace=True,
-          comment="@", names=["time", "RMSD"])
-        data["time"] *= xscale
+        load_kw = kwargs.get("load_kw", {}).copy()
+        if load_kw.get("sequential_ds", False):
+            names = load_kw.pop("names")
+            lines_per_block = load_kw.get("lines_per_block", 10000)
+            col_i = 0
+            data = pandas.DataFrame(columns=names,
+              index=range(lines_per_block))
+            with open(expandvars(infile)) as f:
+                for line in f:
+                    if line.startswith("@"):
+                        continue
+                    else:
+                        line = np.array(line.split(), np.float)
+                        index = int(line[0])
+                        if index not in data.index:
+                            data = pandas.concat((data,
+                              pandas.DataFrame(columns=names, 
+                              index= range(index, index+lines_per_block))))
+                        if not np.isnan(data.loc[index][names[col_i]]):
+                            col_i += 1
+                        data.loc[index][names[col_i]] = line[1]
+            data.insert(0, "time", data.index)
+            data = data.dropna()
+        else:
+            data = pandas.read_csv(expandvars(infile), **load_kw)
+        if xscale is not None:
+            data[xkey] *= xscale
 
         # Configure plot settings
         plot_kw = kwargs.get("plot_kw", {}).copy()
@@ -226,23 +297,22 @@ class RMSDFigureManager(FigureManager):
             plot_kw["color"] = get_color(kwargs.pop("color"))
 
         # Plot
-        handle = subplot.plot(data["time"], data["RMSD"], **plot_kw)[0]
+        handle = subplot.plot(data[xkey], data[ykey], **plot_kw)[0]
         if handles is not None:
             handles[label] = handle
         if subplot2 is not None:
-            import numpy as np
             from sklearn.neighbors import KernelDensity
-            plot2_kw = plot_kw.copy()
-            plot2_kw.update(kwargs.get("plot2_kw", {}))
 
-            bandwidth   = 0.1
-            grid        = np.linspace(0,5,100)
+            bandwidth = kwargs.get("bandwidth", 0.1)
+            grid = kwargs.get("grid", np.linspace(0,10,100))
             kde = KernelDensity(bandwidth=bandwidth)
-            kde.fit(data["RMSD"][:, np.newaxis])
+            kde.fit(data[ykey][:, np.newaxis])
             pdf = np.exp(kde.score_samples(grid[:, np.newaxis]))
             pdf /= pdf.sum()
+            plot2_kw = plot_kw.copy()
+            plot2_kw.update(kwargs.get("plot2_kw", {}))
             subplot2.plot(pdf, grid, **plot2_kw)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
-    RMSDFigureManager().main()
+    TimeSeriesFigureManager().main()
