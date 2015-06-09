@@ -42,6 +42,7 @@ class TimeSeriesFigureManager(FigureManager):
 
     presets  = """
       rmsd:
+        help: Root Mean Standard Deviation (RMSD) vs. time
         draw_subplot:
           yticks: [0,1,2,3,4,5]
           ylabel: RMSD ($\\AA$)
@@ -60,6 +61,7 @@ class TimeSeriesFigureManager(FigureManager):
           ykey: RMSD
           grid: !!python/object/apply:numpy.linspace [0,5,100]
       radgyr:
+        help: Radius of gyration vs. time
         draw_subplot:
           yticks: [10,11,12,13,14,15]
           ylabel: Radius of Gyration ($\\AA$)
@@ -78,6 +80,7 @@ class TimeSeriesFigureManager(FigureManager):
           ykey: radgyr
           grid: !!python/object/apply:numpy.linspace [10,15,100]
       notebook_pdist:
+        help: Second plot including probability density
         extends: notebook
         draw_figure:
           right:         1.60
@@ -108,6 +111,7 @@ class TimeSeriesFigureManager(FigureManager):
           bandwidth: 0.1
           grid: !!python/object/apply:numpy.linspace [0,10,1000]
       notebook:
+        help: Single plot for notebook (width ≤ 6.5", height ≤ 8")
         inherits: notebook
         draw_figure:
           left:          0.50
