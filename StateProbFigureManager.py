@@ -58,7 +58,7 @@ class StateProbFigureManager(FigureManager):
         help: Probability of bound state
         draw_subplot:
           ylabel:       $P_{bound}$
-      poster_three:
+      poster_3:
         help: Three adjacent plots for poster (width = 15.0", height = 8.0")
         inherits: poster
         draw_figure:
@@ -99,7 +99,7 @@ class StateProbFigureManager(FigureManager):
               elinewidth: 2
               capthick:   2
               capsize:    4
-      notebook_three:
+      notebook_3:
         help: Three adjacent plots for notebook (width ≤ 6.5", height ≤ 8")
         inherits: notebook
         draw_figure:
@@ -139,17 +139,17 @@ class StateProbFigureManager(FigureManager):
               elinewidth: 1
               capthick:   1
               capsize:    3
-      presentation_three:
+      presentation_3:
         help: Three adjacent plots for 4:3 presentation (width = 10.24",
               height = 7.68")
         inherits: presentation
         draw_figure:
-          ncols:         3
-          left:          1.00
-          sub_width:     2.05
-          wspace:        0.20
-          bottom:        3.50
-          sub_height:    2.05
+          ncols:      3
+          left:       1.00
+          sub_width:  2.05
+          wspace:     0.20
+          bottom:     3.50
+          sub_height: 2.05
           subplots:
             1:
               ylabel: ""
@@ -164,30 +164,61 @@ class StateProbFigureManager(FigureManager):
             bottom:     3.75
             legend_lw:  5
             legend_kw:
-              frameon:      False
+              frameon: False
               labelspacing: 0.5
-              legend_fp:    14r
-              loc:          2
+              legend_fp: 14r
+              loc: 2
         draw_subplot:
           ylabel_kw:
-            labelpad:   20
+            labelpad: 20
         draw_dataset:
           plot_kw:
             error_kw:
-              capsize:    3
+              capsize: 3
               elinewidth: 1
-              capthick:   1
-      presentation_wide_three:
+              capthick: 1
+      presentation_wide:
+        help: Single plot for 16:9 presentation (width = 19.20",
+              height = 10.80")
+        inherits: presentation_wide
+        draw_figure:
+          left:       13.30
+          sub_width:   4.00
+          wspace:      0.30
+          bottom:      4.50
+          sub_height:  4.00
+          shared_legend:
+            left:       13.30
+            sub_width:   4.00
+            sub_height:  4.00
+            bottom:      0.48
+            legend_lw:   10
+            legend_kw:
+              frameon:      False
+              labelspacing: 0.4
+              legend_fp:    24r
+              loc:          2
+        draw_subplot:
+          legend:       False
+          ylabel_kw:
+            labelpad: 25
+        draw_dataset:
+          plot_kw:
+            error_kw:
+              capsize: 5
+              elinewidth: 2
+              capthick: 2
+      presentation_wide_3:
         help: Three adjacent plots for 16:9 presentation (width = 19.20",
               height = 10.80")
         inherits: presentation_wide
         draw_figure:
-          ncols:        3
-          left:         1.5
-          sub_width:    4.0
-          wspace:       0.3
-          bottom:       4.3
-          sub_height:   4.0
+          ncols:      3
+          left:       1.5
+          sub_width:  4.0
+          wspace:     0.3
+          bottom:     4.3
+          sub_height: 4.0
           subplots:
             1:
               ylabel: ""
@@ -196,18 +227,26 @@ class StateProbFigureManager(FigureManager):
               ylabel: ""
               yticklabels: []
           shared_legend:
-            left:       14.1
-            sub_width:   4.0
-            sub_height:  4.0
-            bottom:      4.3
-            legend_lw:   10
+            left: 14.2
+            sub_width: 4.0
+            sub_height: 4.0
+            bottom: 4.4
+            legend_lw: 10
             legend_kw:
-              frameon:      False
+              frameon: False
               labelspacing: 0.5
-              legend_fp:    24r
-              loc:          2
+              legend_fp: 24r
+              loc: 2
         draw_subplot:
-          legend:       False
+          legend: False
+          ylabel_kw:
+            labelpad: 25
+        draw_dataset:
+          plot_kw:
+            error_kw:
+              capsize: 5
+              elinewidth: 2
+              capthick: 2
     """
 
     @manage_defaults_presets()
@@ -315,7 +354,7 @@ class StateProbFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, x=None, label="", handles=None,
-        debug=False, **kwargs):
+        disabled=False, verbose=1, debug=0, **kwargs):
         """
         Draws a dataset.
 
@@ -334,12 +373,11 @@ class StateProbFigureManager(FigureManager):
         from .H5Dataset import H5Dataset
 
         # Handle missing input gracefully
-        if  ("infile" not in kwargs
-        and ("P unbound" not in kwargs or "P unbound se" not in kwargs)):
+        if disabled:
             return
-        elif ("path" not in kwargs["infile"]
-        and  ("P unbound" not in kwargs or "P unbound se" not in kwargs)):
-            return
+        elif "infile" not in kwargs:
+            if "P unbound" not in kwargs or "P unbound se" not in kwargs:
+                return
 
         # Configure plot settings
         plot_kw = kwargs.get("plot_kw", {})
