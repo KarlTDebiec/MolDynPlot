@@ -59,7 +59,7 @@ class H5Dataset(object):
                 key     = infile.pop("key",     self.default_key)
             elif isinstance(infile, list):
                 if len(infile) >= 1:
-                    path    = expandvars(infile[0])
+                    path = expandvars(infile[0])
                 else:
                     raise OSError("Path to infile not provided")
                 if len(infile) >= 2:
@@ -75,6 +75,7 @@ class H5Dataset(object):
                 raise OSError("h5 file '{0}' does not exisit".format(path))
 
             with h5(path) as in_h5:
+                address="kde/pdist"
                 if address not in in_h5:
                     raise KeyError("Dataset {0}[{1}] not found".format(path,
                       address))

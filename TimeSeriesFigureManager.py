@@ -111,7 +111,7 @@ class TimeSeriesFigureManager(FigureManager):
           bandwidth: 0.1
           grid: !!python/object/apply:numpy.linspace [0,10,1000]
       notebook:
-        help: Single plot for notebook (width ≤ 6.5", height ≤ 8")
+        help: Single plot for notebook (width ≤ 6.5", height ≤ 9")
         inherits: notebook
         draw_figure:
           left:          0.50
