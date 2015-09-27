@@ -166,11 +166,6 @@ class PDistFigureManager(FigureManager):
 if __name__ == "__main__":
     PDistFigureManager().main()
 ########################## AWAITING REIMPLEMENTATION ##########################
-#def plot_three(content, **kwargs):
-#    figure, subplots = get_figure_subplots(
-#      nrows      = 2,    ncols  = 2,
-#      fig_width  = 10.0, left   = 1.0, sub_width  = 4.00, wspace = 0.5,
-#      fig_height =  7.5, bottom = 1.0, sub_height = 2.40, hspace = 0.5)
 #def poi_subplot(subplot, datasets, **kwargs):
 #        dPMFdx     = (y[1:] - y[:-1]) / (x[1] - x[0])
 #        dPMFdx     = np.mean(
@@ -190,8 +185,3 @@ if __name__ == "__main__":
 #        subplot.axvline(b, linewidth = 1.0, color = color)
 #        set_inset(subplot, "POI = {0:4.2f}".format(np.round(b,2)), fp = "14r",
 #          xpro = 0.95, ypro = 0.95, ha = "right", va = "top")
-#def plot_poi(datasets, **kwargs):
-#    figure, subplots = get_figure_subplots(
-#      nrows  = 2,    ncols      = len(datasets),
-#      left   = 1.00, sub_width  = 2.65, hspace = 0.0, right = 0.50,
-#      bottom = 0.75, sub_height = 2.00, wspace = 0.0, top   = 1.25)
