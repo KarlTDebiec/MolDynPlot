@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   myplotspec_sim.PDistFigureManager.py
+#   moldynplot.PDistFigureManager.py
 #
 #   Copyright (C) 2015 Karl T Debiec
 #   All rights reserved.
@@ -13,16 +13,14 @@ in a YAML file.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
-import matplotlib
-matplotlib.use("agg")
 if __name__ == "__main__":
-    __package__ = str("myplotspec_sim")
-    import myplotspec_sim
+    __package__ = str("moldynplot")
+    import moldynplot
 from .myplotspec.FigureManager import FigureManager
 ################################### CLASSES ###################################
 class PDistFigureManager(FigureManager):
     """
-    Manages the generation of pdist figures using matplotlib.
+    Manages the generation of pdist figures.
     """
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
@@ -30,81 +28,73 @@ class PDistFigureManager(FigureManager):
 
     defaults = """
         draw_figure:
-          fig_width:    10.00
-          left:          1.00
-          sub_width:     5.80
-          right:         3.20
-          fig_height:    7.50
-          top:           1.75
-          sub_height:    4.00
-          bottom:        1.75
           subplot_kw:
             autoscale_on: False
-          shared_legend:
-            left:       6.80
-            sub_width:  3.00
-            sub_height: 4.00
-            bottom:     1.75
-            legend_kw:
-              frameon:      False
-              labelspacing: 0.5
-              loc:          6
         draw_subplot:
-          xlabel:  Distance (Å)
-          ylabel:  Potential of Mean Force (kcal/mol)
-          xticks:  [0,1,2,3,4,5,6,7,8,9,10]
-          yticks:  [-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
+          xlabel: Distance (Å)
+          xticks: [2,3,4,5,6,7,8,9,10]
+          ylabel: Potential of Mean Force (kcal/mol)
+          yticks: [-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
         draw_dataset:
-          xkey:         center
-          ykey:         pmf
+          xkey: center
+          ykey: pmf
     """
-    presets  = """
-      presentation:
+    available_presets  = """
+      notebook:
+        class: target
+        inherits: notebook
         draw_figure:
-          fig_width:    10.00
-          left:          1.00
-          sub_width:     5.80
-          right:         3.20
-          fig_height:    7.50
-          top:           1.75
-          sub_height:    4.00
-          bottom:        1.75
-          title_fp:     24r
-          label_fp:     24r
+          left:       0.50
+          sub_width:  5.00
+          right:      0.25
+          bottom:     1.00
+          sub_height: 2.00
+          hspace:     0.10
+          top:        0.25
+          title_kw:
+            top: -0.1
+          shared_legend: True
+          shared_legend_kw:
+            left:       0.50
+            sub_width:  5.00
+            right:      0.25
+            bottom:     0.00
+            sub_height: 0.50
+            legend_kw:
+              loc: 9
+              ncol: 4
         draw_subplot:
-          title_fp:     24r
-          label_fp:     24r
-          tick_fp:      18r
-          legend_fp:    18r
-          lw:           2
-        draw_dataset:
-          plot_kw:
-            lw:         2
+          y2label_kw:
+            labelpad: 12
       count:
+        class: content
         draw_subplot:
-          ylabel:       Count
-          yticks:       [0,100,200,300,400,500,600,700,800,900,1000]
+          ylabel: Count
+          yticks: [0,100,200,300,400,500,600,700,800,900,1000]
         draw_dataset:
-          ykey:         count
+          ykey: count
       probability:
+        class: content
         draw_subplot:
-          ylabel:       Probability
-          yticks:       [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+          ylabel: Probability
+          yticks: [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
         draw_dataset:
-          ykey:         probability
+          ykey: probability
       free_energy:
+        class: content
         draw_subplot:
-          ylabel:       Free Energy $(k_B T)$
-          yticks:       [0,1,2,3,4,5,6,7,8,9,10]
+          ylabel: Free Energy $(k_B T)$
+          yticks: [0,1,2,3,4,5,6,7,8,9,10]
         draw_dataset:
-          ykey:         free energy
+          ykey: free energy
       pmf:
+        class: content
         draw_subplot:
-          ylabel:   Potential of Mean Force (kcal/mol)
-          yticks:   [-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
+          ylabel: Potential of Mean Force (kcal/mol)
+          yticks: [-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
         draw_dataset:
-          ykey:         pmf
-          zero_line:    True
+          ykey: pmf
+          zero_line: True
     """
 
     @manage_defaults_presets()
@@ -129,36 +119,43 @@ class PDistFigureManager(FigureManager):
             override draw_subplot
           kwargs (dict): Additional keyword arguments
         """
-        from .myplotspec import get_color
+        from .myplotspec import get_color, multi_get_copy
         from .H5Dataset import H5Dataset
 
-        plot_kw = kwargs.get("plot_kw", {})
+        plot_kw = multi_get_copy("plot_kw", kwargs, {})
         if "color" in plot_kw:
             plot_kw["color"] = get_color(plot_kw.pop("color"))
         elif "color" in kwargs:
             plot_kw["color"] = get_color(kwargs.pop("color"))
 
         # Load dataset, x, and y
-        dataset = H5Dataset(default_address = "pdist", default_key = "pdist",
+        dataset = H5Dataset(default_address="pdist", default_key="pdist",
                     **kwargs)
         xmin, xmax = subplot.get_xbound()
         x = dataset.datasets["pdist"][xkey] + xoffset
         y = dataset.datasets["pdist"][ykey] + yoffset
-        x = x[x >= xmin]
-        y = y[-1 * x.size:]
-        x = x[x <= xmax]
-        y = y[:x.size]
+        poi = kwargs.get("poi", False)
+        if poi:
+            import numpy as np
+            from scipy.optimize import curve_fit
+            xc = x[x >= 2.8]
+            yc = y[-1 * xc.size:]
+            xc = xc[xc <= 4.2]
+            yc = yc[:xc.size]
+            dPMFdx = (yc[1:] - yc[:-1]) / (xc[1] - xc[0])
+            poi_index  = np.where(dPMFdx == np.nanmax(dPMFdx))[0][0]
+            print(xc[poi_index])
+            subplot.axvline(xc[poi_index], color=plot_kw.get("color"))
 
         # y=0 line; should really be in draw_subplot; must figure out
         #   how to derive from method without rewriting completely
         #   or disturbing argument collection
         if (kwargs.get("zero_line", False)
-        and not hasattr(subplot, "zero_line")):
-            subplot.zero_line = subplot.plot([xmin, xmax], [0, 0],
-              color = "black")
+        and not hasattr(subplot, "_mps_zero_line")):
+            subplot._mps_zero_line = subplot.axhline(0, color="k")
 
         # Plot
-        handle = subplot.plot(x, y, label = label, **plot_kw)[0]
+        handle = subplot.plot(x, y, label=label, **plot_kw)[0]
         if handles is not None:
             handles[label] = handle
 
