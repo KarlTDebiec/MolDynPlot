@@ -39,33 +39,7 @@ class PDistFigureManager(FigureManager):
           xkey: center
           ykey: pmf
     """
-    available_presets  = """
-      notebook:
-        class: target
-        inherits: notebook
-        draw_figure:
-          left:       0.50
-          sub_width:  5.00
-          right:      0.25
-          bottom:     1.00
-          sub_height: 2.00
-          hspace:     0.10
-          top:        0.25
-          title_kw:
-            top: -0.1
-          shared_legend: True
-          shared_legend_kw:
-            left:       0.50
-            sub_width:  5.00
-            right:      0.25
-            bottom:     0.00
-            sub_height: 0.50
-            legend_kw:
-              loc: 9
-              ncol: 4
-        draw_subplot:
-          y2label_kw:
-            labelpad: 12
+    available_presets = """
       count:
         class: content
         draw_subplot:
@@ -95,12 +69,38 @@ class PDistFigureManager(FigureManager):
         draw_dataset:
           ykey: pmf
           zero_line: True
+      notebook:
+        class: target
+        inherits: notebook
+        draw_figure:
+          left:       0.50
+          sub_width:  5.00
+          right:      0.25
+          bottom:     1.00
+          sub_height: 2.00
+          hspace:     0.10
+          top:        0.25
+          title_kw:
+            top: -0.1
+          shared_legend: True
+          shared_legend_kw:
+            left:       0.50
+            sub_width:  5.00
+            right:      0.25
+            bottom:     0.00
+            sub_height: 0.50
+            legend_kw:
+              loc: 9
+              ncol: 4
+        draw_subplot:
+          y2label_kw:
+            labelpad: 12
     """
 
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, xkey="x", ykey="pmf", label="", xoffset=0,
-        yoffset=0, handles=None, debug=False, **kwargs):
+        yoffset=0, handles=None, verbose=1, debug=0, **kwargs):
         """
         Draws a dataset.
 
@@ -122,6 +122,9 @@ class PDistFigureManager(FigureManager):
         from .myplotspec import get_color, multi_get_copy
         from .H5Dataset import H5Dataset
 
+        if kwargs.get("infile") is None:
+            return
+
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
         if "color" in plot_kw:
             plot_kw["color"] = get_color(plot_kw.pop("color"))
@@ -138,9 +141,9 @@ class PDistFigureManager(FigureManager):
         if poi:
             import numpy as np
             from scipy.optimize import curve_fit
-            xc = x[x >= 2.8]
+            xc = x[x >= 3.0]
             yc = y[-1 * xc.size:]
-            xc = xc[xc <= 4.2]
+            xc = xc[xc <= 3.8]
             yc = yc[:xc.size]
             dPMFdx = (yc[1:] - yc[:-1]) / (xc[1] - xc[0])
             poi_index  = np.where(dPMFdx == np.nanmax(dPMFdx))[0][0]
