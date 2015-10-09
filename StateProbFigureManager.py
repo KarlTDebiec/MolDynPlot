@@ -111,21 +111,25 @@ class StateProbFigureManager(FigureManager):
         from .H5Dataset import H5Dataset
 
         # Handle missing input gracefully
-        print(kwargs.keys())
+        print(label, kwargs.keys())
         if experiment is not None:
             subplot.axhspan(experiment[0], experiment[1], lw=0,
               color=[0.7, 0.7, 0.7])
             handles["Experiment"] = subplot.plot([-10, -10], [-10, -10],
               color=[0.7, 0.7, 0.7], lw=5)[0]
             return
-        elif  ("infile" not in kwargs
-        and ("P unbound" not in kwargs or "P unbound se" not in kwargs)):
-            print ("NAY")
-            return
-        elif ("path" not in kwargs["infile"]
-        and  ("P unbound" not in kwargs or "P unbound se" not in kwargs)):
-            print ("NAY")
-            return
+        if "infile" not in kwargs:
+            if "P unbound" not in kwargs or "P unbound se" not in kwargs:
+                return
+            else:
+                y    = 1.0 - kwargs.pop("P unbound")
+                yerr = kwargs.pop("P unbound se") * 1.96
+        else:
+            dataset = H5Dataset(
+                        default_address="assign/stateprobs",
+                        default_key="pbound", **kwargs)
+            y    = 1.0 - dataset.datasets["pbound"]["P unbound"][0]
+            yerr = dataset.datasets["pbound"]["P unbound se"][0] * 1.96
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -146,16 +150,6 @@ class StateProbFigureManager(FigureManager):
                 x = 1 + len(handles)
             else:
                 x = 1
-        if not ("P unbound" in kwargs and "P unbound se" in kwargs):
-            dataset = H5Dataset(
-                        default_address="assign/stateprobs",
-                        default_key="pbound", **kwargs)
-            y    = 1.0 - dataset.datasets["pbound"]["P unbound"][0]
-            yerr = dataset.datasets["pbound"]["P unbound se"][0] * 1.96
-        else:
-            y    = 1.0 - kwargs.pop("P unbound")
-            yerr = kwargs.pop("P unbound se") * 1.96
-
         print(x, y, yerr)
 
         # Plot
