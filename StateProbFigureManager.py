@@ -30,14 +30,28 @@ class StateProbFigureManager(FigureManager):
         draw_figure:
           subplot_kw:
             autoscale_on: False
+          shared_legend_kw:
+            legend_kw:
+              numpoints: 1
+              handletextpad: 0.0
         draw_subplot:
           xticklabels:  []
           yticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
           tick_params:
             bottom: off
             top: off
+            right: off
+            left: on
+            direction: out
+            width: 1
           title_kw:
             verticalalignment: bottom
+          grid: True
+          grid_kw:
+            b: True
+            linestyle: '-'
+            alpha: 0.1
+            axis: y
         draw_dataset:
           plot_kw:
             lw: 2
@@ -45,10 +59,17 @@ class StateProbFigureManager(FigureManager):
             width: 0.6
             ecolor: black
             capsize: 4
+            zorder: 3
             error_kw:
               elinewidth: 1
               capthick:   1
               capsize:    3
+              zorder: 4
+          handle_kw:
+            marker: s
+            ls: none
+            ms: 6
+            mew: 1
     """
 
     available_presets = """
@@ -111,12 +132,12 @@ class StateProbFigureManager(FigureManager):
         from .H5Dataset import H5Dataset
 
         # Handle missing input gracefully
-        print(label, kwargs.keys())
+        handle_kw = multi_get_copy("handle_kw", kwargs, {})
         if experiment is not None:
             subplot.axhspan(experiment[0], experiment[1], lw=0,
               color=[0.7, 0.7, 0.7])
             handles["Experiment"] = subplot.plot([-10, -10], [-10, -10],
-              color=[0.7, 0.7, 0.7], lw=5)[0]
+              mfc=[0.7, 0.7, 0.7], **handle_kw)[0]
             return
         if "infile" not in kwargs:
             if "P unbound" not in kwargs or "P unbound se" not in kwargs:
@@ -155,7 +176,8 @@ class StateProbFigureManager(FigureManager):
         # Plot
         bar    = subplot.bar(x, y, yerr=yerr, **plot_kw)
         color  = bar.patches[0].get_facecolor()
-        handle = subplot.plot([-10, -10], [-10, -10], color=color)[0]
+        handle = subplot.plot([-10, -10], [-10, -10], mfc=color, mec="k",
+          **handle_kw)[0]
         if handles is not None:
             handles[label] = handle
 
