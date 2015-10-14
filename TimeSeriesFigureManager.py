@@ -56,6 +56,19 @@ class TimeSeriesFigureManager(FigureManager):
           bottom:     0.90
           sub_height: 1.80
           top:        0.40
+          shared_legend: True
+          shared_legend_kw:
+            left:       0.50
+            sub_width:  4.40
+            right:      0.20
+            bottom:     0.00
+            sub_height: 0.50
+            legend_kw:
+              frameon: False
+              labelspacing: 0.5
+              legend_fp: 8r
+              loc: 9
+              ncol: 2
         draw_dataset:
           plot_kw:
             lw: 1.0
