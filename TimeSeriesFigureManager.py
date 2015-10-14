@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   myplotspec_sim.TimeSeriesFigureManager.py
+#   moldynplot.TimeSeriesFigureManager.py
 #
 #   Copyright (C) 2015 Karl T Debiec
 #   All rights reserved.
@@ -14,13 +14,13 @@ file.
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
 if __name__ == "__main__":
-    __package__ = str("myplotspec_sim")
-    import myplotspec_sim
+    __package__ = str("moldynplot")
+    import moldynplot
 from .myplotspec.FigureManager import FigureManager
 ################################### CLASSES ###################################
 class TimeSeriesFigureManager(FigureManager):
     """
-    Class to manage the generation of time series figures
+    Manages the generation of time series figures
     """
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
@@ -28,294 +28,120 @@ class TimeSeriesFigureManager(FigureManager):
     from .myplotspec.manage_output import manage_output
 
     defaults = """
-        draw_figure:
-          subplot_kw:
-            autoscale_on: False
         draw_subplot:
-          xticks: [0,200,400,600,800,1000]
           xlabel: Time (ns)
-          yticks: [0,1,2,3,4,5,6,7,8,9,10]
-          ylabel_kw:
-            va: center
-            rotation: vertical
+          ylabel: RMSD (Å)
     """
 
-    presets  = """
+    available_presets = """
       rmsd:
+        class: content
         help: Root Mean Standard Deviation (RMSD) vs. time
         draw_subplot:
-          yticks: [0,1,2,3,4,5]
-          ylabel: RMSD ($\\AA$)
-          subplot2_kw:
-            xticks: [0.00,0.05,0.10,0.15,0.20]
-            xticklabels: ["0.00","0.05","0.10","0.15","0.20"]
-            yticks: [0,1,2,3,4,5]
-            y2ticks: [0,1,2,3,4,5]
+          ylabel: RMSD (Å)
         draw_dataset:
-          load_kw:
-            comment: "@"
-            delim_whitespace: True
-            names: ["time", "RMSD"]
-          xscale: 0.001
-          xkey: time
-          ykey: RMSD
-          grid: !!python/object/apply:numpy.linspace [0,5,100]
-      radgyr:
-        help: Radius of gyration vs. time
-        draw_subplot:
-          yticks: [10,11,12,13,14,15]
-          ylabel: Radius of Gyration ($\\AA$)
-          subplot2_kw:
-            xticks: [0.00,0.05,0.10,0.15,0.20]
-            xticklabels: ["0.00","0.05","0.10","0.15","0.20"]
-            yticks: [10,11,12,13,14,15]
-            y2ticks: [10,11,12,13,14,15]
-        draw_dataset:
-          load_kw:
-            sequential_ds: True
-            comment: "@"
-            names: ["radgyr", "maxdist"]
-          xscale: 0.1
-          xkey: time
-          ykey: radgyr
-          grid: !!python/object/apply:numpy.linspace [10,15,100]
-      notebook_pdist:
-        help: Second plot including probability density
-        extends: notebook
+          dataset_kw:
+            read_csv_kw:
+              delim_whitespace: True
+              index_col: False
+              names: [time, rmsd]
+              header: 0
+      notebook:
+        class: target
+        inherits: notebook
         draw_figure:
-          right:         1.60
-          subplot2:
-            left:        5.00
-            sub_width:   1.20
-            bottom:      0.90
-            sub_height:  1.80
-          shared_legend:
-            sub_width:   5.70
-        draw_subplot:
-          subplot2_kw:
-            xticks: [0.0,0.2,0.4,0.6,0.8,1.0]
-            xticklabels: ["0.0","0.2","0.4","0.6","0.8","1.0"]
-            xlabel: Probability
-            yticks: [0,1,2,3,4,5,6,7,8,9,10]
-            yticklabels: []
-            title_fp:  10b
-            label_fp:  10b
+          left:       0.50
+          sub_width:  4.40
+          right:      0.20
+          bottom:     0.90
+          sub_height: 1.80
+          top:        0.40
+        draw_dataset:
+          plot_kw:
+            lw: 1.0
+          partner_kw:
+            position: right
+            sub_width: 0.8
+            title_fp: 10b
+            label_fp: 10b
             tick_fp:   8r
-            legend_fp: 8r
             tick_params:
               length: 2
               pad: 6
+      pdist:
+        class: appearance
+        help: Draw colorbar to right of plot
         draw_dataset:
-          plot2_kw:
-            lw: 1.0
-          bandwidth: 0.1
-          grid: !!python/object/apply:numpy.linspace [0,10,1000]
-      notebook:
-        help: Single plot for notebook (width ≤ 6.5", height ≤ 9")
-        inherits: notebook
-        draw_figure:
-          left:          0.50
-          sub_width:     4.40
-          right:         0.20
-          bottom:        0.90
-          sub_height:    1.80
-          top:           0.40
-          shared_legend:
-            left:        0.50
-            sub_width:   4.30
-            sub_height:  0.50
-            bottom:      0.00
-            legend_lw: 3
-            legend_kw:
-              frameon: False
-              labelspacing: 0.5
-              legend_fp: 8r
-              loc: 9
-              ncol: 2
-        draw_subplot:
-          ylabel_kw:
-            labelpad: 10
-        draw_dataset:
-          plot_kw:
-            lw: 0.5
+          pdist: True
+          partner_kw:
+            position: right
+            sub_width: 0.8
+            xlabel:      Probability
+            xticks:      [0.00,0.05,0.10]
+            xticklabels: ["0.00","0.05","0.10"]
+            yticks:      [0,1,2,3,4,5,6]
+            yticklabels: []
     """
 
     @manage_defaults_presets()
     @manage_kwargs()
-    @manage_output()
-    def draw_figure(self, title=None, shared_xlabel=None,
-        shared_ylabel=None, shared_legend=None, subplot2=None,
-        **in_kwargs):
-        from collections import OrderedDict
-        from .myplotspec import get_figure_subplots
-        from .myplotspec.legend import set_shared_legend
-        from .myplotspec.text import set_title, set_shared_xlabel
-        from .myplotspec.text import set_shared_ylabel
-
-        # Prepare figure and subplots with specified dimensions
-        subplot_specs = in_kwargs.pop("subplots", {})
-        subplot_indexes = sorted([i for i in subplot_specs.keys()
-                            if str(i).isdigit()])
-        figure, subplots = get_figure_subplots(**in_kwargs)
-
-        # Format Figure
-        if title is not None:
-            set_title(figure, title = title, **in_kwargs)
-        if shared_xlabel is not None:
-            set_shared_xlabel(figure, xlabel=shared_xlabel, **in_kwargs)
-        if shared_ylabel is not None:
-            set_shared_ylabel(figure, ylabel=shared_ylabel, **in_kwargs)
-        if shared_legend is not None:
-            shared_handles = OrderedDict()
-
-        if subplot2 is not None:
-            figure, subplot2s = get_figure_subplots(figure=figure,
-              **subplot2)
-
-        # Configure and plot subplots
-        for i in subplot_indexes:
-            out_kwargs = subplot_specs[i].copy()
-            out_kwargs["verbose"] = in_kwargs.get("verbose", False)
-            out_kwargs["debug"] = in_kwargs.get("debug", False)
-            out_kwargs["preset"] = in_kwargs.get("preset", [])[:]
-            out_kwargs["yaml_dict"] = in_kwargs.get("yaml_dict", {})
-            out_kwargs["yaml_keys"] = [key
-              for key2 in [[key3 + ["subplots", "all"],
-                            key3 + ["subplots", i]]
-              for key3 in in_kwargs.get("yaml_keys")]
-              for key  in key2]
-            if shared_legend is not None:
-                out_kwargs["shared_handles"] = shared_handles
-            if i in subplots:
-                if subplot2 is not None and i in subplot2s:
-                    self.draw_subplot(subplot=subplots[i],
-                      subplot2=subplot2s[i], **out_kwargs)
-                else:
-                    self.draw_subplot(subplot=subplots[i], **out_kwargs)
-
-        # Draw legend
-        if shared_legend is not None:
-            set_shared_legend(figure, subplots, handles = shared_handles,
-              **shared_legend)
-
-        # Return results
-        return figure
-
-    @manage_defaults_presets()
-    @manage_kwargs()
-    def draw_subplot(self, subplot, subplot2=None, title=None,
-        legend=None, shared_handles=None, **in_kwargs):
-        from collections import OrderedDict
-        from .myplotspec.axes import set_xaxis, set_yaxis
-        from .myplotspec.legend import set_legend
-        from .myplotspec.text import set_title
-
-        # Format
-        set_xaxis(subplot, **in_kwargs)
-        set_yaxis(subplot, **in_kwargs)
-        if title is not None:
-            set_title(subplot, title = title, **in_kwargs)
-        if subplot2 is not None:
-            subplot2_kw = in_kwargs.get("subplot2_kw", {})
-            set_xaxis(subplot2, **subplot2_kw)
-            set_yaxis(subplot2, **subplot2_kw)
-            subplot2.set_autoscale_on(False)
-
-        # Configure and plot datasets
-        handles = OrderedDict()
-        dataset_specs = in_kwargs.pop("datasets", {})
-        dataset_indexes = sorted([i for i in dataset_specs.keys()
-                            if str(i).isdigit()])
-        for i in dataset_indexes:
-            out_kwargs = dataset_specs[i].copy()
-            out_kwargs["verbose"] = in_kwargs.get("verbose", False)
-            out_kwargs["debug"] = in_kwargs.get("debug", False)
-            out_kwargs["preset"] = in_kwargs.get("preset", [])[:]
-            out_kwargs["yaml_dict"] = in_kwargs.get("yaml_dict", {})
-            out_kwargs["yaml_keys"] = [key
-              for key2 in [[key3 + ["datasets", "all"],
-                            key3 + ["datasets", i]]
-              for key3 in in_kwargs.get("yaml_keys")]
-              for key  in key2]
-            if subplot2 is not None:
-                out_kwargs["subplot2"] = subplot2
-            self.draw_dataset(subplot=subplot, handles=handles,
-              **out_kwargs)
-
-        # Draw legend
-        if legend is not None and legend is not False:
-            set_legend(subplot, handles = handles, **in_kwargs)
-        if shared_handles is not None:
-            for label, handle in handles.items():
-                if label not in shared_handles:
-                    shared_handles[label] = handle
-
-    @manage_defaults_presets()
-    @manage_kwargs()
-    def draw_dataset(self, subplot, xkey, ykey, subplot2=None,
-        infile=None, label="", xscale=None, handles=None, verbose=False,
-        debug=False, **kwargs):
-        from .myplotspec import get_color
+    def draw_dataset(self, subplot, dt=None, downsample=None, label="",
+        handles=None, pdist=False, verbose=1, debug=0, **kwargs):
+        from .myplotspec import get_color, multi_get_copy
+        from .myplotspec.Dataset import Dataset
+        import pandas as pd
         import numpy as np
-        import pandas
         from os.path import expandvars
 
         # Load data
-        if  ("infile" is None):
-            return
-        if verbose >= 1:
-            print("Loading {0}".format(expandvars(infile)))
-        load_kw = kwargs.get("load_kw", {}).copy()
-        if load_kw.get("sequential_ds", False):
-            names = load_kw.pop("names")
-            lines_per_block = load_kw.get("lines_per_block", 10000)
-            col_i = 0
-            data = pandas.DataFrame(columns=names,
-              index=range(lines_per_block))
-            with open(expandvars(infile)) as f:
-                for line in f:
-                    if line.startswith("@"):
-                        continue
-                    else:
-                        line = np.array(line.split(), np.float)
-                        index = int(line[0])
-                        if index not in data.index:
-                            data = pandas.concat((data,
-                              pandas.DataFrame(columns=names, 
-                              index= range(index, index+lines_per_block))))
-                        if not np.isnan(data.loc[index][names[col_i]]):
-                            col_i += 1
-                        data.loc[index][names[col_i]] = line[1]
-            data.insert(0, "time", data.index)
-            data = data.dropna()
-        else:
-            data = pandas.read_csv(expandvars(infile), **load_kw)
-        if xscale is not None:
-            data[xkey] *= xscale
+        dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
+        if "infile" in kwargs:
+            dataset_kw["infile"] = kwargs["infile"]
+        dataframe= self.load_dataset(Dataset, verbose=verbose, debug=debug,
+          **dataset_kw).data
+
+        # Scale:
+        if dt is not None:
+            dataframe["time"] *= dt
+
+        # Downsample
+        if downsample is not None:
+            full_size = dataframe.shape[0]
+            reduced_size = int(full_size / downsample)
+            reduced = pd.DataFrame(0.0, index=range(0, reduced_size),
+              columns=dataframe.columns, dtype=np.int64)
+            for i in range(0, reduced_size):
+                reduced.loc[i] = dataframe[
+                  i*downsample:(i+1)*downsample+1].mean()
+            dataframe = reduced
 
         # Configure plot settings
-        plot_kw = kwargs.get("plot_kw", {}).copy()
+        plot_kw = multi_get_copy("plot_kw", kwargs, {})
         if "color" in plot_kw:
             plot_kw["color"] = get_color(plot_kw["color"])
         elif "color" in kwargs:
             plot_kw["color"] = get_color(kwargs.pop("color"))
 
         # Plot
-        handle = subplot.plot(data[xkey], data[ykey], **plot_kw)[0]
+        handle = subplot.plot(dataframe["time"], dataframe["rmsd"],
+          **plot_kw)[0]
         if handles is not None:
             handles[label] = handle
-        if subplot2 is not None:
+        if pdist:
             from sklearn.neighbors import KernelDensity
 
-            bandwidth = kwargs.get("bandwidth", 0.1)
-            grid = kwargs.get("grid", np.linspace(0,10,100))
-            kde = KernelDensity(bandwidth=bandwidth)
-            kde.fit(data[ykey][:, np.newaxis])
+            if not hasattr(subplot, "_mps_partner_subplot"):
+                from .myplotspec.axes import add_partner_subplot
+                add_partner_subplot(subplot, **kwargs)
+            kde_kw = multi_get_copy("kde_kw", kwargs, {"bandwidth": 0.1})
+            grid = kwargs.get("grid", np.linspace(0,6,100))
+            kde = KernelDensity(**kde_kw)
+            kde.fit(dataframe["rmsd"][:, np.newaxis])
             pdf = np.exp(kde.score_samples(grid[:, np.newaxis]))
             pdf /= pdf.sum()
-            plot2_kw = plot_kw.copy()
-            plot2_kw.update(kwargs.get("plot2_kw", {}))
-            subplot2.plot(pdf, grid, **plot2_kw)
+            pdist_kw = plot_kw.copy()
+            pdist_kw.update(kwargs.get("pdist_kw", {}))
+            subplot._mps_partner_subplot.plot(pdf, grid, **pdist_kw)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
