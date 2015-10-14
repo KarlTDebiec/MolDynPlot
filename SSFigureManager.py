@@ -100,29 +100,28 @@ class SSFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, label=None, handles=None, verbose=1,
-        debug=0, **kwargs):
+    def draw_dataset(self, subplot, downsample=None, label=None, handles=None,
+        verbose=1, debug=0, **kwargs):
         from os.path import expandvars
         import numpy as np
-        import pandas
+        import pandas as pd
         from .myplotspec import multi_get_copy
         from sys import exit
 
         # Load infile
         infile = expandvars(kwargs.get("infile"))
         dt = kwargs.get("dt", 1)
-        dataset = pandas.read_csv(infile, delim_whitespace=True,
+        dataset = pd.read_csv(infile, delim_whitespace=True,
           index_col=0)
         dataset.index *= dt / 1000
         dataset.index.names = ["time"]
 
         # Downsample
-        downsample = kwargs.get("downsample", 1000)
         if downsample is not None:
             full_size = dataset.shape[0]
             reduced_size = int(full_size / downsample)
-            reduced = pandas.DataFrame(0.0, index=range(0, reduced_size),
-              columns = dataset.columns, dtype=np.int64)
+            reduced = pd.DataFrame(0.0, index=range(0, reduced_size),
+              columns=dataset.columns, dtype=np.int64)
             for i in range(1, reduced_size):
                 reduced.loc[i] = dataset[
                   i*downsample:(i+1)*downsample].mode().loc[0]
