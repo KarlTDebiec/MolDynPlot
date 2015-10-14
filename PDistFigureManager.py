@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   myplotspec_sim.PDistFigureManager.py
+#   moldynplot.PDistFigureManager.py
 #
 #   Copyright (C) 2015 Karl T Debiec
 #   All rights reserved.
@@ -14,13 +14,13 @@ in a YAML file.
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
 if __name__ == "__main__":
-    __package__ = str("myplotspec_sim")
-    import myplotspec_sim
+    __package__ = str("moldynplot")
+    import moldynplot
 from .myplotspec.FigureManager import FigureManager
 ################################### CLASSES ###################################
 class PDistFigureManager(FigureManager):
     """
-    Manages the generation of pdist figures using matplotlib.
+    Manages the generation of pdist figures.
     """
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
@@ -31,62 +31,76 @@ class PDistFigureManager(FigureManager):
           subplot_kw:
             autoscale_on: False
         draw_subplot:
-          xticks: [0,1,2,3,4,5,6,7,8,9,10]
           xlabel: Distance (Å)
-          yticks: [-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
+          xticks: [2,3,4,5,6,7,8,9,10]
           ylabel: Potential of Mean Force (kcal/mol)
+          yticks: [-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
+        draw_dataset:
+          xkey: center
+          ykey: pmf
     """
-    presets  = """
+    available_presets = """
       count:
+        class: content
         draw_subplot:
           ylabel: Count
           yticks: [0,100,200,300,400,500,600,700,800,900,1000]
         draw_dataset:
           ykey: count
       probability:
+        class: content
         draw_subplot:
           ylabel: Probability
           yticks: [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
         draw_dataset:
           ykey: probability
       free_energy:
+        class: content
         draw_subplot:
           ylabel: Free Energy $(k_B T)$
           yticks: [0,1,2,3,4,5,6,7,8,9,10]
         draw_dataset:
           ykey: free energy
       pmf:
+        class: content
         draw_subplot:
           ylabel: Potential of Mean Force (kcal/mol)
           yticks: [-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
         draw_dataset:
           ykey: pmf
           zero_line: True
-      analogue:
-        draw_subplot:
-          xticks: [2,3,4,5,6,7,8]
-          yticks: [-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
       notebook:
-        help: Single plot for notebook (width ≤ 6.5", height ≤ 9")
+        class: target
         inherits: notebook
         draw_figure:
-          left:       0.60
-          sub_width:  4.70
-          wspace:     0.30
-          right:      0.20
-          bottom:     0.50
-          sub_height: 2.40
-          top:        0.30
+          left:       0.50
+          sub_width:  5.00
+          right:      0.25
+          bottom:     1.00
+          sub_height: 2.00
+          hspace:     0.10
+          top:        0.25
+          title_kw:
+            top: -0.1
+          shared_legend: True
+          shared_legend_kw:
+            left:       0.50
+            sub_width:  5.00
+            right:      0.25
+            bottom:     0.00
+            sub_height: 0.50
+            legend_kw:
+              loc: 9
+              ncol: 4
         draw_subplot:
-          legend: False
           y2label_kw:
-            labelpad: 6
+            labelpad: 12
     """
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, xkey="center", ykey="pmf", label="",
-        xoffset=0, yoffset=0, handles=None, debug=False, **kwargs):
+    def draw_dataset(self, subplot, xkey="x", ykey="pmf", label="", xoffset=0,
+        yoffset=0, handles=None, verbose=1, debug=0, **kwargs):
         """
         Draws a dataset.
 
@@ -105,50 +119,46 @@ class PDistFigureManager(FigureManager):
             override draw_subplot
           kwargs (dict): Additional keyword arguments
         """
-        from copy import copy
-        from .myplotspec import get_color
+        from .myplotspec import get_color, multi_get_copy
         from .H5Dataset import H5Dataset
 
-        plot_kw = copy(kwargs.get("plot_kw", {}))
+        if kwargs.get("infile") is None:
+            return
+
+        plot_kw = multi_get_copy("plot_kw", kwargs, {})
         if "color" in plot_kw:
             plot_kw["color"] = get_color(plot_kw.pop("color"))
         elif "color" in kwargs:
             plot_kw["color"] = get_color(kwargs.pop("color"))
 
         # Load dataset, x, and y
-        dataset = H5Dataset(default_address = "pdist", default_key = "pdist",
+        dataset = H5Dataset(default_address="pdist", default_key="pdist",
                     **kwargs)
         xmin, xmax = subplot.get_xbound()
-        x = copy(dataset.datasets["pdist"][xkey])
-        y = copy(dataset.datasets["pdist"][ykey])
-        x = x[x >= xmin]
-        y = y[-1 * x.size:]
-        x = x[x <= xmax]
-        y = y[:x.size]
-        import numpy as np
-        y -= np.min(y)
-        dydx = (y[1:] - y[:-1]) / (x[1] - x[0])
-        min_index  = (np.abs(x - 2.8)).argmin()
-        max_index  = (np.abs(x - 3.2)).argmin()
-        poi_index  = np.where(dydx == np.nanmax(
-          dydx[min_index:max_index]))[0][0]
-        min_index  = (np.abs(x - x[poi_index] + 0.10)).argmin()
-        max_index  = (np.abs(x - x[poi_index] - 0.10)).argmin()
-        def func(x, a, b, c):
-            return a * (x - b) ** 2 + c
-        from scipy.optimize import curve_fit
-        a, b, c = curve_fit(func, x[min_index:max_index],
-          dydx[min_index:max_index], p0 = [-100, 3, 4], maxfev = 10000)[0]
-        subplot.axvline(b, linewidth = 1.0, color = plot_kw["color"])
-        c = (np.abs(dataset.datasets["pdist"][xkey] - b)).argmin()
-        print("POI = {0:4.2f}".format(b))
+        x = dataset.datasets["pdist"][xkey] + xoffset
+        y = dataset.datasets["pdist"][ykey] + yoffset
+        poi = kwargs.get("poi", False)
+        if poi:
+            import numpy as np
+            from scipy.optimize import curve_fit
+            xc = x[x >= 3.0]
+            yc = y[-1 * xc.size:]
+            xc = xc[xc <= 3.8]
+            yc = yc[:xc.size]
+            dPMFdx = (yc[1:] - yc[:-1]) / (xc[1] - xc[0])
+            poi_index  = np.where(dPMFdx == np.nanmax(dPMFdx))[0][0]
+            print(xc[poi_index])
+            subplot.axvline(xc[poi_index], color=plot_kw.get("color"))
+
         # y=0 line; should really be in draw_subplot; must figure out
         #   how to derive from method without rewriting completely
         #   or disturbing argument collection
-#        subplot.plot([xmin, xmax], [0, 0], color = "black")
+        if (kwargs.get("zero_line", False)
+        and not hasattr(subplot, "_mps_zero_line")):
+            subplot._mps_zero_line = subplot.axhline(0, color="k")
 
         # Plot
-        handle = subplot.plot(x, y, label = label, **plot_kw)[0]
+        handle = subplot.plot(x, y, label=label, **plot_kw)[0]
         if handles is not None:
             handles[label] = handle
 
@@ -156,11 +166,6 @@ class PDistFigureManager(FigureManager):
 if __name__ == "__main__":
     PDistFigureManager().main()
 ########################## AWAITING REIMPLEMENTATION ##########################
-#def plot_three(content, **kwargs):
-#    figure, subplots = get_figure_subplots(
-#      nrows      = 2,    ncols  = 2,
-#      fig_width  = 10.0, left   = 1.0, sub_width  = 4.00, wspace = 0.5,
-#      fig_height =  7.5, bottom = 1.0, sub_height = 2.40, hspace = 0.5)
 #def poi_subplot(subplot, datasets, **kwargs):
 #        dPMFdx     = (y[1:] - y[:-1]) / (x[1] - x[0])
 #        dPMFdx     = np.mean(
@@ -180,8 +185,3 @@ if __name__ == "__main__":
 #        subplot.axvline(b, linewidth = 1.0, color = color)
 #        set_inset(subplot, "POI = {0:4.2f}".format(np.round(b,2)), fp = "14r",
 #          xpro = 0.95, ypro = 0.95, ha = "right", va = "top")
-#def plot_poi(datasets, **kwargs):
-#    figure, subplots = get_figure_subplots(
-#      nrows  = 2,    ncols      = len(datasets),
-#      left   = 1.00, sub_width  = 2.65, hspace = 0.0, right = 0.50,
-#      bottom = 0.75, sub_height = 2.00, wspace = 0.0, top   = 1.25)
