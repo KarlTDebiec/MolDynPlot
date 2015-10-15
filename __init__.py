@@ -22,14 +22,22 @@ def dssp_color_palette():
     """
     from matplotlib.colors import LinearSegmentedColormap
 
+#    palette = [(1.000, 1.000, 1.000),   # White
+#               (0.573, 0.367, 0.256),   # Brown
+#               (0.826, 0.504, 0.178),   # Orange
+#               (0.755, 0.241, 0.246),   # Red
+#               (0.304, 0.485, 0.632),   # Blue
+#               (0.555, 0.365, 0.575),   # Purple
+#               (0.369, 0.615, 0.361),   # Green
+#               (0.854, 0.850, 0.338)]   # Yellow
     palette = [(1.000, 1.000, 1.000),   # White
                (0.573, 0.367, 0.256),   # Brown
                (0.826, 0.504, 0.178),   # Orange
-               (0.755, 0.241, 0.246),   # Red
-               (0.304, 0.485, 0.632),   # Blue
-               (0.555, 0.365, 0.575),   # Purple
-               (0.369, 0.615, 0.361),   # Green
-               (0.854, 0.850, 0.338)]   # Yellow
+               (0.769, 0.306, 0.321),   # Red
+               (0.298, 0.447, 0.690),   # Blue
+               (0.506, 0.447, 0.698),   # Purple
+               (0.333, 0.659, 0.408),   # Green
+               (0.769, 0.678, 0.400)]   # Yellow
     cdict = {"red": [], "green": [], "blue": []}
     for i, (red, green, blue) in enumerate(palette):
         cdict["red"]   += [(i / (len(palette) - 1), red,   red)]
