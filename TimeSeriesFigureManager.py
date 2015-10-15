@@ -21,6 +21,10 @@ from .myplotspec.FigureManager import FigureManager
 class TimeSeriesFigureManager(FigureManager):
     """
     Manages the generation of time series figures
+
+    .. todo:
+      - Clean up defaults and presets; make less specific to my
+        systems
     """
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
@@ -28,9 +32,34 @@ class TimeSeriesFigureManager(FigureManager):
     from .myplotspec.manage_output import manage_output
 
     defaults = """
+        draw_figure:
+          subplot_kw:
+            autoscale_on: False
+          shared_legend: True
+          shared_legend_kw:
+            legend_kw:
+              frameon: False
+              loc: 9
         draw_subplot:
+          title_kw:
+            verticalalignment: bottom
           xlabel: Time (ns)
           ylabel: RMSD (Å)
+          tick_params:
+            bottom: on
+            top: off
+            right: off
+            left: on
+            direction: out
+            width: 1
+          grid: True
+          grid_kw:
+            b: True
+            linestyle: '-'
+            color: [0.8,0.8,0.8]
+        draw_dataset:
+          plot_kw:
+            zorder: 10
     """
 
     available_presets = """
@@ -50,24 +79,22 @@ class TimeSeriesFigureManager(FigureManager):
         class: target
         inherits: notebook
         draw_figure:
-          left:       0.50
+          left:       0.60
           sub_width:  4.40
           right:      0.20
-          bottom:     0.90
+          bottom:     1.00
           sub_height: 1.80
           top:        0.40
           shared_legend: True
           shared_legend_kw:
-            left:       0.50
+            left:       0.60
             sub_width:  4.40
             right:      0.20
             bottom:     0.00
             sub_height: 0.50
             legend_kw:
-              frameon: False
               labelspacing: 0.5
               legend_fp: 8r
-              loc: 9
               ncol: 2
         draw_dataset:
           plot_kw:
@@ -94,6 +121,19 @@ class TimeSeriesFigureManager(FigureManager):
             xticklabels: ["0.00","0.05","0.10"]
             yticks:      [0,1,2,3,4,5,6]
             yticklabels: []
+            tick_params:
+              bottom: on
+              top: off
+              right: off
+              left: off
+              direction: out
+              width: 1
+            grid: True
+            grid_kw:
+              b: True
+              linestyle: '-'
+              color: [0.8,0.8,0.8]
+              axis: y
     """
 
     @manage_defaults_presets()
