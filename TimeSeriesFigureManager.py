@@ -84,7 +84,7 @@ class TimeSeriesFigureManager(FigureManager):
           right:      0.20
           bottom:     1.00
           sub_height: 1.80
-          top:        0.40
+          top:        0.30
           shared_legend: True
           shared_legend_kw:
             left:       0.60
@@ -100,11 +100,13 @@ class TimeSeriesFigureManager(FigureManager):
           plot_kw:
             lw: 1.0
           partner_kw:
-            position: right
             sub_width: 0.8
             title_fp: 10b
+            xlabel_kw:
+              labelpad:  12.5
             label_fp: 10b
-            tick_fp:   8r
+            tick_fp: 8r
+            xticks:
             tick_params:
               length: 2
               pad: 6
@@ -117,8 +119,8 @@ class TimeSeriesFigureManager(FigureManager):
             position: right
             sub_width: 0.8
             xlabel:      Probability
-            xticks:      [0.00,0.05,0.10]
-            xticklabels: ["0.00","0.05","0.10"]
+            xticks:      [0,0.000001]
+            xticklabels: []
             yticks:      [0,1,2,3,4,5,6]
             yticklabels: []
             tick_params:
@@ -133,7 +135,6 @@ class TimeSeriesFigureManager(FigureManager):
               b: True
               linestyle: '-'
               color: [0.8,0.8,0.8]
-              axis: y
     """
 
     @manage_defaults_presets()
@@ -195,6 +196,13 @@ class TimeSeriesFigureManager(FigureManager):
             pdist_kw = plot_kw.copy()
             pdist_kw.update(kwargs.get("pdist_kw", {}))
             subplot._mps_partner_subplot.plot(pdf, grid, **pdist_kw)
+            pdf_max = pdf.max()
+            x_max = subplot._mps_partner_subplot.get_xbound()[1]
+            if pdf_max > x_max / 1.25:
+                subplot._mps_partner_subplot.set_xbound(0, pdf_max * 1.25)
+                xticks = [0, pdf_max*0.3125, pdf_max*0.625, pdf_max*0.9375,
+                          pdf_max*1.25]
+                subplot._mps_partner_subplot.set_xticks(xticks)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

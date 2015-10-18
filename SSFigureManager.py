@@ -27,8 +27,11 @@ class SSFigureManager(FigureManager):
     from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
+        draw_figure:
+          subplot_kw:
+            autoscale_on: False
         draw_subplot:
-          xlabel: Time (ns)
+          xlabel: Time (µs)
           ylabel_kw:
             va: center
           tick_params:
@@ -102,18 +105,22 @@ class SSFigureManager(FigureManager):
     @manage_kwargs()
     def draw_dataset(self, subplot, downsample=None, label=None, handles=None,
         verbose=1, debug=0, **kwargs):
+        """
+        """
         from os.path import expandvars
         import numpy as np
         import pandas as pd
         from .myplotspec import multi_get_copy
         from sys import exit
 
-        # Load infile
+        # Load data
         infile = expandvars(kwargs.get("infile"))
-        dt = kwargs.get("dt", 1)
         dataset = pd.read_csv(infile, delim_whitespace=True,
           index_col=0)
-        dataset.index *= dt / 1000
+
+        # Scale:
+        dt = kwargs.get("dt", 0.001)
+        dataset.index *= dt
         dataset.index.names = ["time"]
 
         # Downsample
