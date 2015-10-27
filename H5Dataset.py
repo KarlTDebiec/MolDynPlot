@@ -75,7 +75,6 @@ class H5Dataset(object):
                 raise OSError("h5 file '{0}' does not exisit".format(path))
 
             with h5(path) as in_h5:
-                address="kde/pdist"
                 if address not in in_h5:
                     raise KeyError("Dataset {0}[{1}] not found".format(path,
                       address))
