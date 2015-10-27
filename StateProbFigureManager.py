@@ -32,6 +32,7 @@ class StateProbFigureManager(FigureManager):
             autoscale_on: False
           shared_legend_kw:
             legend_kw:
+              frameon: False
               numpoints: 1
               handletextpad: 0.0
         draw_subplot:
@@ -43,7 +44,6 @@ class StateProbFigureManager(FigureManager):
             right: off
             left: on
             direction: out
-            width: 1
           title_kw:
             verticalalignment: bottom
           grid: True
@@ -53,23 +53,17 @@ class StateProbFigureManager(FigureManager):
             alpha: 0.1
             axis: y
         draw_dataset:
-          plot_kw:
-            lw: 2
+          bar_kw:
             align: center
             width: 0.6
             ecolor: black
-            capsize: 4
             zorder: 3
             error_kw:
-              elinewidth: 1
-              capthick:   1
-              capsize:    3
               zorder: 4
           handle_kw:
             marker: s
             ls: none
-            ms: 6
-            mew: 1
+            mec: black
     """
 
     available_presets = """
@@ -78,6 +72,43 @@ class StateProbFigureManager(FigureManager):
         draw_subplot:
           ylabel: $P_{bound}$
           yticklabels:  [0.0,"",0.2,"",0.4,"",0.6,"",0.8,"",1.0]
+      presentation:
+        class: target
+        inherits: presentation
+        draw_figure:
+          left:       6.70
+          sub_width:  3.20
+          sub_height: 3.20
+          bottom:     2.40
+          shared_legend: True
+          shared_legend_kw:
+            left:        6.80
+            sub_width:   3.00
+            sub_height:  2.38
+            bottom:      0.00
+            legend_kw:
+              columnspacing: 1
+              labelspacing: 0.8
+              legend_fp: 12r
+              loc: 9
+              ncol: 2
+        draw_subplot:
+          title_fp: 16b
+          label_fp: 16b
+          tick_fp:  12r
+          tick_params:
+            width: 2
+        draw_dataset:
+          bar_kw:
+            lw: 2
+            capsize: 4
+            error_kw:
+              capsize: 5
+              capthick: 2
+              elinewidth: 2
+          handle_kw:
+            ms: 10
+            mew: 2
       notebook:
         class: target
         inherits: notebook
@@ -89,13 +120,6 @@ class StateProbFigureManager(FigureManager):
           top:        0.50
           sub_height: 1.80
           bottom:     0.65
-          subplots:
-            1:
-              ylabel: ""
-              yticklabels: []
-            2:
-              ylabel: ""
-              yticklabels: []
           shared_legend: True
           shared_legend_kw:
             left:        0.60
@@ -103,17 +127,29 @@ class StateProbFigureManager(FigureManager):
             sub_height:  0.60
             bottom:      0.00
             legend_kw:
-              frameon: False
               labelspacing: 0.5
               legend_fp: 8r
               loc: 9
               ncol: 4
+        draw_subplot:
+          tick_params:
+            width: 1
+        draw_dataset:
+          bar_kw:
+            lw: 1
+            error_kw:
+              capsize: 2
+              capthick: 1
+              elinewidth: 1
+          handle_kw:
+            ms: 6
+            mew: 1
     """
 
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, experiment=None, x=None, label="",
-        handles=None, verbose=1, debug=0, **kwargs):
+        handles=None, bar=True, verbose=1, debug=0, **kwargs):
         """
         Draws a dataset.
 
@@ -122,7 +158,7 @@ class StateProbFigureManager(FigureManager):
           x (float): X coordinate of bar
           label (str, optional): Dataset label
           color (str, list, ndarray, float, optional): Dataset color
-          plot_kw (dict, optional): Additional keyword arguments passed
+          bar_kw (dict, optional): Additional keyword arguments passed
             to subplot.plot()
           handles (OrderedDict, optional): Nascent OrderedDict of
             [labels]: handles on subplot
@@ -153,31 +189,18 @@ class StateProbFigureManager(FigureManager):
             yerr = dataset.datasets["pbound"]["P unbound se"][0] * 1.96
 
         # Configure plot settings
-        plot_kw = multi_get_copy("plot_kw", kwargs, {})
-        if "color" in plot_kw:
-            plot_kw["color"] = get_color(plot_kw["color"])
-        elif "color" in kwargs:
-            plot_kw["color"] = get_color(kwargs.pop("color"))
-        if "ecolor" in plot_kw:
-            plot_kw["ecolor"] = get_color(plot_kw["ecolor"])
-        elif "color" in kwargs:
-            plot_kw["ecolor"] = get_color(kwargs.pop("ecolor"))
-        elif "color" in plot_kw:
-            plot_kw["ecolor"] = plot_kw["color"]
-
-        # Load dataset, x, and y
-        if x is None:
-            if handles is not None:
-                x = 1 + len(handles)
-            else:
-                x = 1
-        print(x, y, yerr)
 
         # Plot
-        bar    = subplot.bar(x, y, yerr=yerr, **plot_kw)
-        color  = bar.patches[0].get_facecolor()
-        handle = subplot.plot([-10, -10], [-10, -10], mfc=color, mec="k",
-          **handle_kw)[0]
+        if bar:
+            bar_kw = multi_get_copy("bar_kw", kwargs, {})
+            for color_key in ["color", "edgecolor", "facecolor", "ecolor"]:
+                if color_key in bar_kw:
+                    bar_kw[color_key] = get_color(bar_kw[color_key])
+            barplot = subplot.bar(x, y, yerr=yerr, **bar_kw)
+
+            handle_kw = multi_get_copy("handle_kw", kwargs, {})
+            handle_kw["mfc"] = barplot.patches[0].get_facecolor()
+            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
         if handles is not None:
             handles[label] = handle
 
