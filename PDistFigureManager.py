@@ -20,7 +20,7 @@ from .myplotspec.FigureManager import FigureManager
 ################################### CLASSES ###################################
 class PDistFigureManager(FigureManager):
     """
-    Manages the generation of pdist figures.
+    Manages the generation of probability distribution figures.
     """
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
