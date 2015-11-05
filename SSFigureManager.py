@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot.StateProbFigureManager.py
+#   moldynplot.SSFigureManager.py
 #
 #   Copyright (C) 2015 Karl T Debiec
 #   All rights reserved.
