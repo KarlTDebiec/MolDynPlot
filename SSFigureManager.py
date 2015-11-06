@@ -103,8 +103,8 @@ class SSFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, downsample=None, label=None, handles=None,
-        verbose=1, debug=0, **kwargs):
+    def draw_dataset(self, subplot, downsample=None, label=None, heatmap=True,
+        handles=None, verbose=1, debug=0, **kwargs):
         """
         """
         from os.path import expandvars
@@ -136,12 +136,11 @@ class SSFigureManager(FigureManager):
             reduced.index.names = ["time"]
             dataset = reduced
 
-        heatmap = True
         if heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
             pcolormesh = subplot.pcolor(
               dataset.index.values,
-              np.arange(len(dataset.columns)),
+              np.arange(0, len(dataset.columns) + 1, 1),
               dataset.T.values,
             **heatmap_kw)
 
