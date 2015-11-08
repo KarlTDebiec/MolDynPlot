@@ -130,8 +130,8 @@ class SSFigureManager(FigureManager):
             reduced = pd.DataFrame(0.0, index=range(0, reduced_size),
               columns=dataset.columns, dtype=np.int64)
             for i in range(1, reduced_size):
-                reduced.loc[i] = dataset[
-                  i*downsample:(i+1)*downsample].mode().loc[0]
+                reduced.iloc[i] = dataset.iloc[
+                  i*downsample:(i+1)*downsample].mode().iloc[0]
             reduced.index *= (dt * downsample) / 1000
             reduced.index.names = ["time"]
             dataset = reduced
