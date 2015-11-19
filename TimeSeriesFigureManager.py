@@ -139,7 +139,7 @@ class TimeSeriesFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, dt=None, downsample=None, label="",
+    def draw_dataset(self, subplot, dt=None, downsample=None, label=None,
         handles=None, pdist=False, verbose=1, debug=0, **kwargs):
         from .myplotspec import get_color, multi_get_copy
         from .myplotspec.Dataset import Dataset
@@ -179,7 +179,7 @@ class TimeSeriesFigureManager(FigureManager):
         # Plot
         handle = subplot.plot(dataframe["time"], dataframe["rmsd"],
           **plot_kw)[0]
-        if handles is not None:
+        if handles is not None and label is not None:
             handles[label] = handle
         if pdist:
             from sklearn.neighbors import KernelDensity
