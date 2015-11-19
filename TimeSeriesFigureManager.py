@@ -75,6 +75,7 @@ class TimeSeriesFigureManager(FigureManager):
               index_col: False
               names: [time, rmsd]
               header: 0
+          ykey: rmsd
       rg:
         class: content
         help: Radius of Gyration (Rg) vs. time
@@ -87,6 +88,7 @@ class TimeSeriesFigureManager(FigureManager):
               index_col: False
               names: [time, rg, rgmax]
               header: 0
+          ykey: rg
       presentation:
         class: target
         inherits: presentation
@@ -184,7 +186,7 @@ class TimeSeriesFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, dt=None, downsample=None, label=None,
-        handles=None, pdist=False, verbose=1, debug=0, **kwargs):
+        handles=None, ykey=None, pdist=False, verbose=1, debug=0, **kwargs):
         from .myplotspec import get_color, multi_get_copy
         from .myplotspec.Dataset import Dataset
         import pandas as pd
@@ -219,7 +221,7 @@ class TimeSeriesFigureManager(FigureManager):
             kde_kw = multi_get_copy("kde_kw", kwargs, {"bandwidth": 0.1})
             grid = kwargs.get("grid", np.linspace(0,6,100))
             kde = KernelDensity(**kde_kw)
-            kde.fit(dataframe["rg"][:, np.newaxis])
+            kde.fit(dataframe[ykey][:, np.newaxis])
             pdf = np.exp(kde.score_samples(grid[:, np.newaxis]))
             pdf /= pdf.sum()
             pdist_kw = plot_kw.copy()
@@ -245,7 +247,7 @@ class TimeSeriesFigureManager(FigureManager):
             dataframe = reduced
 
         # Plot
-        handle = subplot.plot(dataframe["time"], dataframe["rg"],
+        handle = subplot.plot(dataframe["time"], dataframe[ykey],
           **plot_kw)[0]
         if handles is not None and label is not None:
             handles[label] = handle
