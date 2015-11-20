@@ -51,15 +51,33 @@ class TimeSeriesFigureManager(FigureManager):
             right: off
             left: on
             direction: out
-            width: 1
           grid: True
           grid_kw:
             b: True
             linestyle: '-'
             color: [0.8,0.8,0.8]
+          y2tick_params:
+            bottom: on
+            top: off
+            right: off
+            left: off
+            direction: out
         draw_dataset:
           plot_kw:
             zorder: 10
+          partner_kw:
+            position: right
+            tick_params:
+              bottom: on
+              top: off
+              right: off
+              left: off
+              direction: out
+            grid: True
+            grid_kw:
+              b: True
+              linestyle: '-'
+              color: [0.8,0.8,0.8]
     """
 
     available_presets = """
@@ -106,10 +124,6 @@ class TimeSeriesFigureManager(FigureManager):
             legend_kw:
               labelspacing: 0.5
               ncol: 2
-        draw_subplot:
-          tick_params:
-            length: 3
-            width: 2
         draw_dataset:
           partner_kw:
             sub_width: 1.2
@@ -122,6 +136,7 @@ class TimeSeriesFigureManager(FigureManager):
             lw: 2
             tick_params:
               length: 3
+              pad: 6
               width: 2
       notebook:
         class: target
@@ -158,29 +173,18 @@ class TimeSeriesFigureManager(FigureManager):
             tick_params:
               length: 2
               pad: 6
+              width: 1
       pdist:
         class: appearance
-        help: Draw colorbar to right of plot
+        help: Draw probability distribution on right side of plot
         draw_dataset:
           pdist: True
           partner_kw:
-            position: right
             xlabel:      Probability
             xticks:      [0,0.000001]
             xticklabels: []
             yticks:      [0,1,2,3,4,5,6]
             yticklabels: []
-            tick_params:
-              bottom: on
-              top: off
-              right: off
-              left: off
-              direction: out
-            grid: True
-            grid_kw:
-              b: True
-              linestyle: '-'
-              color: [0.8,0.8,0.8]
     """
 
     @manage_defaults_presets()
