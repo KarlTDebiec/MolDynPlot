@@ -215,6 +215,17 @@ class TimeSeriesFigureManager(FigureManager):
         elif "color" in kwargs:
             plot_kw["color"] = get_color(kwargs.pop("color"))
 
+        # Downsample
+        if downsample is not None:
+            full_size = dataframe.shape[0]
+            reduced_size = int(full_size / downsample)
+            reduced = pd.DataFrame(0.0, index=range(0, reduced_size),
+              columns=dataframe.columns, dtype=np.int64)
+            for i in range(0, reduced_size):
+                reduced.loc[i] = dataframe[
+                  i*downsample:(i+1)*downsample+1].mean()
+            dataframe = reduced
+
         # Plot pdist
         if pdist:
             from sklearn.neighbors import KernelDensity
@@ -238,17 +249,6 @@ class TimeSeriesFigureManager(FigureManager):
                 xticks = [0, pdf_max*0.3125, pdf_max*0.625, pdf_max*0.9375,
                           pdf_max*1.25]
                 subplot._mps_partner_subplot.set_xticks(xticks)
-
-        # Downsample
-        if downsample is not None:
-            full_size = dataframe.shape[0]
-            reduced_size = int(full_size / downsample)
-            reduced = pd.DataFrame(0.0, index=range(0, reduced_size),
-              columns=dataframe.columns, dtype=np.int64)
-            for i in range(0, reduced_size):
-                reduced.loc[i] = dataframe[
-                  i*downsample:(i+1)*downsample+1].mean()
-            dataframe = reduced
 
         # Plot
         handle = subplot.plot(dataframe["time"], dataframe[ykey],
