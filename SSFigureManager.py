@@ -30,15 +30,22 @@ class SSFigureManager(FigureManager):
         draw_figure:
           subplot_kw:
             autoscale_on: False
+          shared_legend_kw:
+            legend_kw:
+              frameon: False
+              loc: 9
+              numpoints: 1
+              handletextpad: 0
         draw_subplot:
           xlabel: Time (µs)
           ylabel_kw:
             va: center
           tick_params:
-            left: off
+            left: on
             right: off
-            bottom: off
+            bottom: on
             top: off
+            direction: out
           y2ticks: []
           y2label_kw:
             rotation: 270
@@ -46,7 +53,8 @@ class SSFigureManager(FigureManager):
           grid_kw:
             b: True
             linestyle: '-'
-            axis: x
+            axis: both
+            color: [0.2,0.2,0.2]
         draw_dataset:
           heatmap_kw:
             cmap: !!python/object/apply:moldynplot.dssp_color_palette []
@@ -58,6 +66,8 @@ class SSFigureManager(FigureManager):
       dssp:
         class: content
         help: Dynamic secondary structure of proteins calculated by cpptraj
+        draw_subplot:
+          ylabel: Residue
         draw_dataset:
           labels:
             0: None
@@ -92,9 +102,6 @@ class SSFigureManager(FigureManager):
             bottom:     0.00
             sub_height: 0.50
             legend_kw:
-              loc: 9
-              numpoints: 1
-              handletextpad: 0
               ncol: 4
         draw_subplot:
           y2label_kw:
