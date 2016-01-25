@@ -51,15 +51,33 @@ class TimeSeriesFigureManager(FigureManager):
             right: off
             left: on
             direction: out
-            width: 1
           grid: True
           grid_kw:
             b: True
             linestyle: '-'
             color: [0.8,0.8,0.8]
+          y2tick_params:
+            bottom: on
+            top: off
+            right: off
+            left: off
+            direction: out
         draw_dataset:
           plot_kw:
             zorder: 10
+          partner_kw:
+            position: right
+            tick_params:
+              bottom: on
+              top: off
+              right: off
+              left: off
+              direction: out
+            grid: True
+            grid_kw:
+              b: True
+              linestyle: '-'
+              color: [0.8,0.8,0.8]
     """
 
     available_presets = """
@@ -75,6 +93,51 @@ class TimeSeriesFigureManager(FigureManager):
               index_col: False
               names: [time, rmsd]
               header: 0
+          ykey: rmsd
+      rg:
+        class: content
+        help: Radius of Gyration (Rg) vs. time
+        draw_subplot:
+          ylabel: $R_g$ (Å)
+        draw_dataset:
+          dataset_kw:
+            read_csv_kw:
+              delim_whitespace: True
+              index_col: False
+              names: [time, rg, rgmax]
+              header: 0
+          ykey: rg
+      presentation:
+        class: target
+        inherits: presentation
+        draw_figure:
+          left:       1.20
+          sub_width:  7.00
+          bottom:     2.90
+          sub_height: 3.00
+          shared_legend: True
+          shared_legend_kw:
+            left:       1.20
+            sub_width:  7.00
+            bottom:     1.70
+            sub_height: 0.50
+            legend_kw:
+              labelspacing: 0.5
+              ncol: 2
+        draw_dataset:
+          partner_kw:
+            sub_width: 1.2
+            title_fp: 18r
+            xlabel_kw:
+              labelpad: 20
+            label_fp: 18r
+            tick_fp: 14r
+            xticks:
+            lw: 2
+            tick_params:
+              length: 3
+              pad: 6
+              width: 2
       notebook:
         class: target
         inherits: notebook
@@ -110,37 +173,24 @@ class TimeSeriesFigureManager(FigureManager):
             tick_params:
               length: 2
               pad: 6
+              width: 1
       pdist:
         class: appearance
-        help: Draw colorbar to right of plot
+        help: Draw probability distribution on right side of plot
         draw_dataset:
           pdist: True
           partner_kw:
-            position: right
-            sub_width: 0.8
             xlabel:      Probability
             xticks:      [0,0.000001]
             xticklabels: []
             yticks:      [0,1,2,3,4,5,6]
             yticklabels: []
-            tick_params:
-              bottom: on
-              top: off
-              right: off
-              left: off
-              direction: out
-              width: 1
-            grid: True
-            grid_kw:
-              b: True
-              linestyle: '-'
-              color: [0.8,0.8,0.8]
     """
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, dt=None, downsample=None, label="",
-        handles=None, pdist=False, verbose=1, debug=0, **kwargs):
+    def draw_dataset(self, subplot, dt=None, downsample=None, label=None,
+        handles=None, ykey=None, pdist=False, verbose=1, debug=0, **kwargs):
         from .myplotspec import get_color, multi_get_copy
         from .myplotspec.Dataset import Dataset
         import pandas as pd
@@ -158,6 +208,13 @@ class TimeSeriesFigureManager(FigureManager):
         if dt is not None:
             dataframe["time"] *= dt
 
+        # Configure plot settings
+        plot_kw = multi_get_copy("plot_kw", kwargs, {})
+        if "color" in plot_kw:
+            plot_kw["color"] = get_color(plot_kw["color"])
+        elif "color" in kwargs:
+            plot_kw["color"] = get_color(kwargs.pop("color"))
+
         # Downsample
         if downsample is not None:
             full_size = dataframe.shape[0]
@@ -169,18 +226,7 @@ class TimeSeriesFigureManager(FigureManager):
                   i*downsample:(i+1)*downsample+1].mean()
             dataframe = reduced
 
-        # Configure plot settings
-        plot_kw = multi_get_copy("plot_kw", kwargs, {})
-        if "color" in plot_kw:
-            plot_kw["color"] = get_color(plot_kw["color"])
-        elif "color" in kwargs:
-            plot_kw["color"] = get_color(kwargs.pop("color"))
-
-        # Plot
-        handle = subplot.plot(dataframe["time"], dataframe["rmsd"],
-          **plot_kw)[0]
-        if handles is not None:
-            handles[label] = handle
+        # Plot pdist
         if pdist:
             from sklearn.neighbors import KernelDensity
 
@@ -190,7 +236,7 @@ class TimeSeriesFigureManager(FigureManager):
             kde_kw = multi_get_copy("kde_kw", kwargs, {"bandwidth": 0.1})
             grid = kwargs.get("grid", np.linspace(0,6,100))
             kde = KernelDensity(**kde_kw)
-            kde.fit(dataframe["rmsd"][:, np.newaxis])
+            kde.fit(dataframe[ykey][:, np.newaxis])
             pdf = np.exp(kde.score_samples(grid[:, np.newaxis]))
             pdf /= pdf.sum()
             pdist_kw = plot_kw.copy()
@@ -203,6 +249,22 @@ class TimeSeriesFigureManager(FigureManager):
                 xticks = [0, pdf_max*0.3125, pdf_max*0.625, pdf_max*0.9375,
                           pdf_max*1.25]
                 subplot._mps_partner_subplot.set_xticks(xticks)
+
+        # Plot
+        handle = subplot.plot(dataframe["time"], dataframe[ykey],
+          **plot_kw)[0]
+        if handles is not None and label is not None:
+            handles[label] = handle
+
+        # Plot experiment
+        if (kwargs.get("experiment", False)
+        and not hasattr(subplot, "_mps_experiment")):
+            subplot._mps_experiment = subplot.axhspan(20.04, 21.54, lw=0,
+            color=[0.7,0.7,0.7])
+            subplot._mps_partner_subplot.axhspan(20.04, 21.54, lw=0,
+            color=[0.7,0.7,0.7])
+            handles["Experiment"] = subplot.plot([-10, -10], [-10, -10],
+              color=[0.7, 0.7, 0.7], lw=2)[0]
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
