@@ -30,15 +30,23 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_figure:
           subplot_kw:
             autoscale_on: False
+          shared_legend_kw:
+            legend_kw:
+              frameon: False
+              loc: 9
+              numpoints: 1
+              handletextpad: 0
         draw_subplot:
           xlabel: Time (µs)
+          ylabel: Residue
           ylabel_kw:
             va: center
           tick_params:
-            left: off
+            left: on
             right: off
-            bottom: off
+            bottom: on
             top: off
+            direction: out
           y2ticks: []
           y2label_kw:
             rotation: 270
@@ -46,7 +54,8 @@ class TimeSeries2DFigureManager(FigureManager):
           grid_kw:
             b: True
             linestyle: '-'
-            axis: x
+            axis: both
+            color: [0.2,0.2,0.2]
         draw_dataset:
           heatmap: True
           heatmap_kw:
@@ -58,6 +67,8 @@ class TimeSeries2DFigureManager(FigureManager):
       dssp:
         class: content
         help: Dynamic secondary structure of proteins calculated by cpptraj
+        draw_subplot:
+          ylabel: Residue
         draw_dataset:
           labels:
             0: None
@@ -101,9 +112,6 @@ class TimeSeries2DFigureManager(FigureManager):
             bottom:     0.00
             sub_height: 0.50
             legend_kw:
-              loc: 9
-              numpoints: 1
-              handletextpad: 0
               ncol: 4
         draw_subplot:
           y2label_kw:
@@ -120,13 +128,12 @@ class TimeSeries2DFigureManager(FigureManager):
         import numpy as np
         import pandas as pd
         from .myplotspec import multi_get_copy
-        from sys import exit
 
         # Load data
+        print("loading")
         infile = expandvars(kwargs.get("infile"))
-        dataset = pd.read_csv(infile, delim_whitespace=True,
-          index_col=0)
-        print(dataset)
+        dataset = pd.read_csv(infile, delim_whitespace=True, index_col=0)
+        print("loaded")
 
         # Scale:
         dt = kwargs.get("dt", 0.001)
@@ -134,17 +141,17 @@ class TimeSeries2DFigureManager(FigureManager):
         dataset.index.names = ["time"]
 
         # Downsample
-        if downsample is not None:
-            full_size = dataset.shape[0]
-            reduced_size = int(full_size / downsample)
-            reduced = pd.DataFrame(0.0, index=range(0, reduced_size),
-              columns=dataset.columns, dtype=np.int64)
-            for i in range(1, reduced_size):
-                reduced.loc[i] = dataset[
-                  i*downsample:(i+1)*downsample].mean()
-            reduced.index *= (dt * downsample) / 1000
-            reduced.index.names = ["time"]
-            dataset = reduced
+#        if downsample is not None:
+#            full_size = dataset.shape[0]
+#            reduced_size = int(full_size / downsample)
+#            reduced = pd.DataFrame(0.0, index=range(0, reduced_size),
+#              columns=dataset.columns, dtype=np.int64)
+#            for i in range(1, reduced_size):
+#                reduced.iloc[i] = dataset.iloc[
+#                  i*downsample:(i+1)*downsample].mode().iloc[0]
+#            reduced.index *= (dt * downsample) / 1000
+#            reduced.index.names = ["time"]
+#            dataset = reduced
 
         if heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
@@ -154,16 +161,16 @@ class TimeSeries2DFigureManager(FigureManager):
               dataset.T.values,
             **heatmap_kw)
 
-#        if handles is not None:
-#            cmap = pcolormesh.cmap
-#            labels = kwargs.get("labels")
-#            h_kw=dict(ls="none", marker="s", ms=5, mec="k")
-#
-#            for i in sorted(labels.keys()):
-#                label = labels[i]
-#                handles[label] = subplot.plot((0),(0),
-#                  mfc=cmap(i / (len(labels) - 1)),
-#                  **h_kw)[0]
+        if handles is not None:
+            cmap = pcolormesh.cmap
+            labels = kwargs.get("labels")
+            h_kw=dict(ls="none", marker="s", ms=5, mec="k")
+
+            for i in sorted(labels.keys()):
+                label = labels[i]
+                handles[label] = subplot.plot((0),(0),
+                  mfc=cmap(i / (len(labels) - 1)),
+                  **h_kw)[0]
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
