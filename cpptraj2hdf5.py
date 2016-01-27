@@ -29,7 +29,8 @@ if __name__ == "__main__":
     parser.add_argument(
       "kind",
       type     = str,
-      choices  = [str("dihedral"), str("hbond"), str("secstruct")],
+      choices  = [str("dihedral"),   str("hbond"), 
+                  str("perresrmsd"), str("secstruct")],
       help     = "kind of dataset")
     parser.add_argument(
       "infile",
@@ -45,13 +46,15 @@ if __name__ == "__main__":
     kwargs      = vars(parser.parse_args())
     infile      = kwargs["infile"]
     outfile     = kwargs["outfile"]
-    
     if kwargs["kind"] == "dihedral":
         field_dtype = "f4"
         address     = "dihedral"
     elif kwargs["kind"] == "hbond":
         field_dtype = "i1"
         address     = "hbond"
+    elif kwargs["kind"] == "perresrmsd":
+        field_dtype = "f4"
+        address     = "perresrmsd"
     elif kwargs["kind"] == "secstruct":
         field_dtype = "i1"
         address     = "secstruct"
