@@ -125,41 +125,33 @@ class TimeSeries2DFigureManager(FigureManager):
         """
         """
         from os.path import expandvars
+        import h5py
         import numpy as np
-        import pandas as pd
         from .myplotspec import multi_get_copy
 
         # Load data
-        print("loading")
-        infile = expandvars(kwargs.get("infile"))
-        dataset = pd.read_csv(infile, delim_whitespace=True, index_col=0)
-        print("loaded")
+        with h5py.File(expandvars(kwargs.get("infile"))) as h5_file:
+            key = kwargs.get("key", h5_file.keys()[0])
+            dataset = np.array(h5_file[key])
 
         # Scale:
         dt = kwargs.get("dt", 0.001)
-        dataset.index *= dt
-        dataset.index.names = ["time"]
+        time = np.arange(dataset.shape[0]) * dt
 
         # Downsample
-#        if downsample is not None:
-#            full_size = dataset.shape[0]
-#            reduced_size = int(full_size / downsample)
-#            reduced = pd.DataFrame(0.0, index=range(0, reduced_size),
-#              columns=dataset.columns, dtype=np.int64)
-#            for i in range(1, reduced_size):
-#                reduced.iloc[i] = dataset.iloc[
-#                  i*downsample:(i+1)*downsample].mode().iloc[0]
-#            reduced.index *= (dt * downsample) / 1000
-#            reduced.index.names = ["time"]
-#            dataset = reduced
+        if downsample is not None:
+            from scipy.stats.mstats import mode
+
+            full_size = dataset.shape[0] - (dataset.shape[0] % downsample)
+            dataset = np.reshape(dataset[:full_size],
+              (int(full_size / downsample), downsample, dataset.shape[1]))
+            dataset = np.squeeze(mode(dataset, axis=1)[0])
+            time = np.arange(dataset.shape[0]) * (dt * downsample)
 
         if heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
-            pcolormesh = subplot.pcolor(
-              dataset.index.values,
-              np.arange(0, len(dataset.columns) + 1, 1),
-              dataset.T.values,
-            **heatmap_kw)
+            y = np.arange(dataset.shape[1])
+            pcolormesh = subplot.pcolor(time, y, dataset.T, **heatmap_kw)
 
         if handles is not None:
             cmap = pcolormesh.cmap
@@ -169,8 +161,7 @@ class TimeSeries2DFigureManager(FigureManager):
             for i in sorted(labels.keys()):
                 label = labels[i]
                 handles[label] = subplot.plot((0),(0),
-                  mfc=cmap(i / (len(labels) - 1)),
-                  **h_kw)[0]
+                  mfc=cmap(i / (len(labels) - 1)), **h_kw)[0]
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
