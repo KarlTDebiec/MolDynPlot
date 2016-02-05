@@ -179,7 +179,7 @@ class TimeSeries2DFigureManager(FigureManager):
 
         if heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
-            y = np.arange(1, dataset.shape[1]+2)
+            y = kwargs.get("y", np.arange(1, dataset.shape[1]+2))
             pcolormesh = subplot.pcolor(time, y, dataset.T, **heatmap_kw)
 
             if colorbar:
