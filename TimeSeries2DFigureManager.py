@@ -159,6 +159,8 @@ class TimeSeries2DFigureManager(FigureManager):
         with h5py.File(expandvars(kwargs.get("infile"))) as h5_file:
             key = kwargs.get("key", h5_file.keys()[0])
             dataset = np.array(h5_file[key])
+        if "usecols" in kwargs:
+            dataset = dataset[:,kwargs.get("usecols")]
 
         # Scale:
         dt = kwargs.get("dt", 0.001)
