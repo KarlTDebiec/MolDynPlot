@@ -37,6 +37,8 @@ class TimeSeries2DFigureManager(FigureManager):
               numpoints: 1
               handletextpad: 0
         draw_subplot:
+          title_kw:
+            verticalalignment: bottom
           xlabel: Time (µs)
           ylabel: Residue
           ylabel_kw:
@@ -67,9 +69,17 @@ class TimeSeries2DFigureManager(FigureManager):
       dssp:
         class: content
         help: Dynamic secondary structure of proteins calculated by cpptraj
+        draw_figure:
+          shared_legend: True
         draw_subplot:
           ylabel: Residue
         draw_dataset:
+          downsample_mode: mode
+          heatmap_kw:
+            cmap: !!python/object/apply:moldynplot.dssp_color_palette []
+            vmin: 0
+            vmax: 7
+          legend: True
           labels:
             0: None
             1: Parallel β Sheet
@@ -79,49 +89,65 @@ class TimeSeries2DFigureManager(FigureManager):
             5: π Helix
             6: Turn
             7: Bend
-          heatmap_kw:
-            cmap: !!python/object/apply:moldynplot.dssp_color_palette []
-            vmin: 0
-            vmax: 7
       perres_rmsd:
         class: content
         help: Per-residue RMSD calculated by cpptraj
         draw_dataset:
+          downsample_mode: mean
           heatmap_kw:
-            cmap: afmhot
+            cmap: afmhot_r
             vmin: 0
             vmax: 10
+          colorbar: True
+          colorbar_kw:
+            zticks: [0,1,2,3,4,5,6,7,8,9,10]
+            zlabel: Per-Residue Backbone RMSD (Å)
       notebook:
         class: target
         inherits: notebook
         draw_figure:
-          left:       0.50
+          left:       0.60
           sub_width:  5.00
           right:      0.25
-          bottom:     1.00
+          bottom:     1.10
           sub_height: 2.00
           hspace:     0.10
-          top:        0.25
+          top:        0.35
           title_kw:
             top: -0.1
-          shared_legend: True
           shared_legend_kw:
             left:       0.50
             sub_width:  5.00
             right:      0.25
-            bottom:     0.00
+            bottom:     0.10
             sub_height: 0.50
+            top:        0.60
             legend_kw:
               ncol: 4
         draw_subplot:
-          y2label_kw:
+          ylabel_kw:
             labelpad: 12
+        draw_dataset:
+          partner_kw:
+            position: bottom
+            left:       2.10
+            sub_width:  2.00
+            right:      1.75
+            bottom:     0.40
+            sub_height: 0.10
+            top:        0.50
+          colorbar_kw:
+            ztick_fp: 8r
+            zlabel_fp: 10b
+            zlabel_kw:
+              labelpad: 3
     """
 
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, downsample=None, label=None, heatmap=True,
-        handles=None, verbose=1, debug=0, **kwargs):
+        colorbar=False, legend=False, handles=None, labels=None, verbose=1,
+        debug=0, **kwargs):
         """
         """
         from os.path import expandvars
@@ -133,6 +159,8 @@ class TimeSeries2DFigureManager(FigureManager):
         with h5py.File(expandvars(kwargs.get("infile"))) as h5_file:
             key = kwargs.get("key", h5_file.keys()[0])
             dataset = np.array(h5_file[key])
+        if "usecols" in kwargs:
+            dataset = dataset[:,kwargs.get("usecols")]
 
         # Scale:
         dt = kwargs.get("dt", 0.001)
@@ -141,27 +169,38 @@ class TimeSeries2DFigureManager(FigureManager):
         # Downsample
         if downsample is not None:
             from scipy.stats.mstats import mode
-
             full_size = dataset.shape[0] - (dataset.shape[0] % downsample)
             dataset = np.reshape(dataset[:full_size],
               (int(full_size / downsample), downsample, dataset.shape[1]))
-            dataset = np.squeeze(mode(dataset, axis=1)[0])
+            downsample_mode = kwargs.get("downsample_mode", "mean")
+            if downsample_mode == "mean":
+                dataset = np.mean(dataset, axis=1)
+            elif downsample_mode == "mode":
+                dataset = np.squeeze(mode(dataset, axis=1)[0])
             time = np.arange(dataset.shape[0]) * (dt * downsample)
 
         if heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
-            y = np.arange(dataset.shape[1])
+            y = kwargs.get("y", np.arange(1, dataset.shape[1]+2))
             pcolormesh = subplot.pcolor(time, y, dataset.T, **heatmap_kw)
 
-        if handles is not None:
-            cmap = pcolormesh.cmap
-            labels = kwargs.get("labels")
-            h_kw=dict(ls="none", marker="s", ms=5, mec="k")
+            if colorbar:
+                from .myplotspec.axes import set_colorbar
+                if not hasattr(subplot, "_mps_partner_subplot"):
+                    from .myplotspec.axes import add_partner_subplot
+                    add_partner_subplot(subplot, verbose=verbose,
+                      debug=debug, **kwargs)
+                set_colorbar(subplot, pcolormesh, **kwargs)
 
-            for i in sorted(labels.keys()):
-                label = labels[i]
-                handles[label] = subplot.plot((0),(0),
-                  mfc=cmap(i / (len(labels) - 1)), **h_kw)[0]
+            if legend:
+                if handles is not None and labels is not None:
+                    cmap = pcolormesh.cmap
+                    h_kw=dict(ls="none", marker="s", ms=5, mec="k")
+
+                    for i in sorted(labels.keys()):
+                        label = labels[i]
+                        handles[label] = subplot.plot((-1),(-1),
+                          mfc=cmap(i / (len(labels) - 1)), **h_kw)[0]
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
