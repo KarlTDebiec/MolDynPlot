@@ -92,3 +92,4 @@ if __name__ == "__main__":
         print(data, data.shape)
         hdf5_file.create_dataset(address, data=data, dtype=dtype,
           chunks=True, compression="gzip", scaleoffset=scaleoffset)
+        hdf5_file[address].attrs["fields"] = list(fields)
