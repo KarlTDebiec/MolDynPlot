@@ -43,12 +43,6 @@ class TimeSeries2DFigureManager(FigureManager):
           ylabel: Residue
           ylabel_kw:
             va: center
-          tick_params:
-            left: on
-            right: off
-            bottom: on
-            top: off
-            direction: out
           y2ticks: []
           y2label_kw:
             rotation: 270
@@ -102,6 +96,72 @@ class TimeSeries2DFigureManager(FigureManager):
           colorbar_kw:
             zticks: [0,1,2,3,4,5,6,7,8,9,10]
             zlabel: Per-Residue Backbone RMSD (Å)
+      manuscript:
+        class: target
+        inherits: manuscript
+        draw_figure:
+          left:       0.45
+          sub_width:  6.43
+          wspace:     0.05
+          right:      0.12
+          bottom:     0.35
+          sub_height: 1.00
+          hspace:     0.05
+          top:        0.25
+          multiplot: True
+          multi_tick_params:
+            left: on
+            right: off
+            bottom: on
+            top: off
+          title_kw:
+            top: -0.1
+          shared_legend_kw:
+            left:       0.45
+            sub_width:  6.43
+            right:      0.12
+            bottom:     0.00
+            sub_height: 0.25
+            legend_kw:
+              ncol: 8
+        draw_subplot:
+          legend: False
+          xlabel_kw:
+            labelpad: 3
+          ylabel_kw:
+            rotation: horizontal
+            labelpad: 3
+          grid_kw:
+            alpha: 0.3
+        draw_dataset:
+          partner_kw:
+            hspace:    0.05
+            wspace:    0.05
+            sub_width: 0.05
+          colorbar_kw:
+            ztick_fp: 6r
+            zlabel_fp: 8b
+          contour_kw:
+            linewidths: 0.7
+          plot_kw:
+            ms: 2
+          label_kw:
+            fp: 6b
+      manuscript_stacked_dssp:
+        class: target
+        extends: manuscript
+        help: Set of vertically stacked DSSP plots
+        draw_figure:
+          bottom: 0.60
+          hspace: 0.00
+          shared_ylabel_kw:
+            left: -0.33
+        draw_subplot:
+          ylabel:
+          ylabel_kw:
+            labelpad: 5
+          yticklabels: []
+          ylabel_fp: 6r
       notebook:
         class: target
         inherits: notebook
