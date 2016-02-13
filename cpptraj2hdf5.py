@@ -59,37 +59,52 @@ if __name__ == "__main__":
         scaleoffset = 4
         address = "perresrmsd"
     elif kwargs["kind"] == "secstruct":
-        dtype = np.float32
+        dtype = np.uint8
         scaleoffset = 3
         address = "secstruct"
 
-    # Determine dimensions of dataset
-    with open(devnull, "w") as fnull:
+    if infile.endswith("gnu"):
+        print(infile)
+        raw = np.genfromtxt(infile, skip_header=13,
+                  skip_footer=2,invalid_raise=False,
+                  dtype=np.float64)
+        dim_1 = int(np.max(raw[:,0]))
+        dim_2 = int(np.max(raw[:,1]))
+        data = np.zeros((int(np.max(raw[:,0])), int(np.max(raw[:,1]))), dtype)
+        for frame in raw:
+            data[int(frame[0]) - 1, int(frame[1]) - 1] = dtype(frame[2])
 
-        # Determine field names and prepare dtype
-        command = "head -n 1 {0}".format(infile)
-        process = Popen(command, stdout=PIPE, stderr=fnull, shell=True)
-        fields = process.stdout.read().split()
-        if fields.pop(0) != "#Frame":
-            raise TypeError("cpptraj2hdf5 currently only supports input in " +
-                            "the form of '#Frame field_1 field_2 ...'")
-        n_fields = len(fields)
+        # Open hdf5 file
+        with h5py.File(outfile) as hdf5_file:
+            hdf5_file.create_dataset(address, data=data, dtype=dtype,
+              chunks=True, compression="gzip", scaleoffset=scaleoffset)
 
-    # Open hdf5 file
-    with h5py.File(outfile) as hdf5_file:
-        # Instantiate resizable dataset
+    else:
+        # Determine dimensions of dataset
+        with open(devnull, "w") as fnull:
 
-        def iter_func():
-            with open(infile, 'r') as open_file:
-                next(open_file)
-                for line in open_file:
-                    line = line.split()[1:]
-                    for item in line:
-                        yield dtype(item)
+            # Determine field names and prepare dtype
+            command = "head -n 1 {0}".format(infile)
+            process = Popen(command, stdout=PIPE, stderr=fnull, shell=True)
+            fields = process.stdout.read().split()
+            if fields.pop(0) != "#Frame":
+                raise TypeError("cpptraj2hdf5 currently only supports input " +
+                                "in the form of '#Frame field_1 field_2 ...'")
+            n_fields = len(fields)
 
-        data = np.fromiter(iter_func(), dtype=dtype)
-        data = data.reshape((-1, n_fields))
-        print(data, data.shape)
-        hdf5_file.create_dataset(address, data=data, dtype=dtype,
-          chunks=True, compression="gzip", scaleoffset=scaleoffset)
-        hdf5_file[address].attrs["fields"] = list(fields)
+        # Open hdf5 file
+        with h5py.File(outfile) as hdf5_file:
+            def iter_func():
+                with open(infile, 'r') as open_file:
+                    next(open_file)
+                    for line in open_file:
+                        line = line.split()[1:]
+                        for item in line:
+                            yield dtype(item)
+
+            data = np.fromiter(iter_func(), dtype=dtype)
+            data = data.reshape((-1, n_fields))
+            print(data, data.shape)
+            hdf5_file.create_dataset(address, data=data, dtype=dtype,
+              chunks=True, compression="gzip", scaleoffset=scaleoffset)
+            hdf5_file[address].attrs["fields"] = list(fields)
