@@ -100,8 +100,8 @@ class TimeSeries2DFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.45
-          sub_width:  6.43
+          left:       0.51
+          sub_width:  6.31
           wspace:     0.05
           right:      0.12
           bottom:     0.35
@@ -117,12 +117,13 @@ class TimeSeries2DFigureManager(FigureManager):
           title_kw:
             top: -0.1
           shared_legend_kw:
-            left:       0.45
-            sub_width:  6.43
+            left:       0.51
+            sub_width:  6.31
             right:      0.12
             bottom:     0.00
             sub_height: 0.25
             legend_kw:
+              legend_fp: 7r
               ncol: 8
         draw_subplot:
           legend: False
@@ -155,13 +156,13 @@ class TimeSeries2DFigureManager(FigureManager):
           bottom: 0.60
           hspace: 0.00
           shared_ylabel_kw:
-            left: -0.33
+            left: -0.37
         draw_subplot:
           ylabel:
           ylabel_kw:
-            labelpad: 5
+            labelpad: 6
           yticklabels: []
-          ylabel_fp: 6r
+          ylabel_fp: 7r
       notebook:
         class: target
         inherits: notebook
