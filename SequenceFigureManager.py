@@ -27,14 +27,22 @@ class SequenceFigureManager(FigureManager):
     from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
-#        draw_figure:
-#          subplot_kw:
-#            autoscale_on: False
          draw_subplot:
           xlabel: Residue
+          grid: True
+          grid_kw:
+            b: True
+            linestyle: '-'
+            axis: both
+            color: [0.8,0.8,0.8]
          draw_dataset:
-           bar_kw:
-             align: center
+          dataset_kw:
+            read_csv_kw:
+              delim_whitespace: True
+              index_col: 0
+          errorbar_kw:
+            ls: None
+            zorder: 10
     """
     available_presets = """
       secstruct:
@@ -48,6 +56,7 @@ class SequenceFigureManager(FigureManager):
           kind: ss
           ykey: Alpha
       R1:
+        class: content
         help: Format subplot for R1 relaxation
         draw_subplot:
           xticklabels: []
@@ -58,6 +67,7 @@ class SequenceFigureManager(FigureManager):
           y_key:    "R1"
           yerr_key: "R1 se"
       R2:
+        class: content
         help: Format subplot for R2 relaxation
         draw_subplot:
           xticklabels: []
@@ -68,6 +78,7 @@ class SequenceFigureManager(FigureManager):
           y_key:    "R2"
           yerr_key: "R2 se"
       HetNOE:
+        class: content
         help: Format subplot for Heteronuclear NOE relaxation
         draw_subplot:
           xlabel:      Residue
@@ -78,6 +89,7 @@ class SequenceFigureManager(FigureManager):
           y_key:    "NOE"
           yerr_key: "NOE se"
       order:
+        class: content
         help: Format subplot for S2 order parameter
         draw_subplot:
           xlabel:      Residue
@@ -88,9 +100,10 @@ class SequenceFigureManager(FigureManager):
           y_key:    "S2"
           yerr_key: "S2 se"
       relaxation_3:
+        class: content
         help: Three stacked plots including R1, R2, and HetNOE
         draw_figure:
-          nrows:        3
+          nrows: 3
           subplots:
             0:
               preset: R1
@@ -102,6 +115,7 @@ class SequenceFigureManager(FigureManager):
               preset: HetNOE
               yticklabels:  [0.0,0.2,0.4,0.6,0.8]
       relaxation_4:
+        class: content
         help: Four stacked plots including R1, R2, HetNOE, and S2
         draw_figure:
           nrows: 4
@@ -118,6 +132,39 @@ class SequenceFigureManager(FigureManager):
             3:
               preset: order
               yticklabels: [0.0,0.2,0.4,0.6,0.8]
+      manuscript:
+        class: target
+        inherits: manuscript
+        draw_figure:
+          left:       0.51
+          sub_width:  6.31
+          wspace:     0.05
+          right:      0.12
+          bottom:     0.35
+          sub_height: 1.00
+          hspace:     0.00
+          top:        0.25
+          multiplot: True
+          multi_tick_params:
+            left: on
+            right: off
+            bottom: on
+            top: off
+          title_kw:
+            top: -0.1
+        draw_subplot:
+          legend: False
+          xlabel_kw:
+            labelpad: 3
+          ylabel_kw:
+            rotation: horizontal
+            labelpad: 3
+          grid_kw:
+            alpha: 0.3
+        draw_dataset:
+          errorbar_kw:
+            lw: 1
+            capthick: 1
       notebook:
         help: Notebook (width ≤ 6.5, height ≤ 9)
         inherits: notebook
@@ -153,34 +200,28 @@ class SequenceFigureManager(FigureManager):
     def draw_dataset(self, subplot, kind, ykey=None, ysekey=None,
         label=None, handles=None, verbose=1, debug=0, **kwargs):
         from .myplotspec import get_color, multi_get_copy
-        from .SSDataset import SSDataset
-        dataset_classes = {"ss": SSDataset}
+        from .myplotspec.Dataset import Dataset
 
         # Load data
-        kind = kind.lower()
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        try:
-            dataset = self.load_dataset(dataset_classes[kind],
-                        dataset_classes=dataset_classes,
-                        verbose=verbose, debug=debug, **dataset_kw).data
-        except TypeError:
-            from warnings import warn
-            warn("{0} has raised an ".format(dataset_classes[kind].__name__) +
-              "error; skipping this dataset.")
-            return
+        dataframe= self.load_dataset(Dataset, verbose=verbose, debug=debug,
+          **dataset_kw).data
+        print(dataframe)
 
         # Configure plot settings
-        bar_kw = multi_get_copy("bar_kw", kwargs, {})
-        for color_key in ["color", "edgecolor", "facecolor", "ecolor"]:
-            if color_key in bar_kw:
-                bar_kw[color_key] = get_color(bar_kw[color_key])
-        if label is not None:
-            bar_kw["label"] = label
+        errorbar_kw = multi_get_copy("errorbar_kw", kwargs, {})
+        if "color" in errorbar_kw:
+            errorbar_kw["color"] = get_color(errorbar_kw["color"])
+        elif "color" in kwargs:
+            errorbar_kw["color"] = get_color(kwargs.pop("color"))
 
-        # Plot data
-        subplot.bar(dataset.index - 1, dataset[ykey], **bar_kw)
+#        # Plot data
+        x = [int(c.split(":")[1]) for c in list(dataframe.columns.values)]
+        print(ykey)
+        subplot.errorbar(x, y=dataframe.loc[ykey], yerr=dataframe.loc[ysekey],
+          **errorbar_kw)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

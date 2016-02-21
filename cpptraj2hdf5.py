@@ -64,7 +64,6 @@ if __name__ == "__main__":
         address = "secstruct"
 
     if infile.endswith("gnu"):
-        print(infile)
         raw = np.genfromtxt(infile, skip_header=13,
                   skip_footer=2,invalid_raise=False,
                   dtype=np.float64)
