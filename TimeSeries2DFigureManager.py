@@ -240,6 +240,7 @@ class TimeSeries2DFigureManager(FigureManager):
                 dataset = np.squeeze(mode(dataset, axis=1)[0])
             time = np.arange(dataset.shape[0]) * (dt * downsample)
 
+        # Draw heatmap, colorbar, and legend
         if heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
             y = kwargs.get("y", np.arange(1, dataset.shape[1]+2))
