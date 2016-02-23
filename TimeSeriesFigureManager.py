@@ -190,7 +190,8 @@ class TimeSeriesFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, dt=None, downsample=None, label=None,
-        handles=None, ykey=None, pdist=False, verbose=1, debug=0, **kwargs):
+        xoffset=0, handles=None, ykey=None, pdist=False, verbose=1, debug=0,
+        **kwargs):
         from .myplotspec import get_color, multi_get_copy
         from .myplotspec.Dataset import Dataset
         import pandas as pd
@@ -225,6 +226,9 @@ class TimeSeriesFigureManager(FigureManager):
                 reduced.loc[i] = dataframe[
                   i*downsample:(i+1)*downsample+1].mean()
             dataframe = reduced
+
+        # Offset
+        dataframe["time"] += xoffset
 
         # Plot pdist
         if pdist:
