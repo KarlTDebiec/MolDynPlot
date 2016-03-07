@@ -35,6 +35,11 @@ class TimeSeriesFigureManager(FigureManager):
         draw_figure:
           subplot_kw:
             autoscale_on: False
+          multi_tick_params:
+            left: on
+            right: off
+            bottom: on
+            top: off
           shared_legend: True
           shared_legend_kw:
             legend_kw:
@@ -43,8 +48,7 @@ class TimeSeriesFigureManager(FigureManager):
         draw_subplot:
           title_kw:
             verticalalignment: bottom
-          xlabel: Time (ns)
-          ylabel: RMSD (Å)
+          xlabel: Time
           tick_params:
             bottom: on
             top: off
@@ -56,12 +60,6 @@ class TimeSeriesFigureManager(FigureManager):
             b: True
             linestyle: '-'
             color: [0.8,0.8,0.8]
-          y2tick_params:
-            bottom: on
-            top: off
-            right: off
-            left: off
-            direction: out
         draw_dataset:
           plot_kw:
             zorder: 10

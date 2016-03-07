@@ -30,6 +30,11 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_figure:
           subplot_kw:
             autoscale_on: False
+          multi_tick_params:
+            left: on
+            right: off
+            bottom: on
+            top: off
           shared_legend_kw:
             legend_kw:
               frameon: False
@@ -39,18 +44,23 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_subplot:
           title_kw:
             verticalalignment: bottom
-          xlabel: Time (µs)
+          xlabel: Time
           ylabel: Residue
           ylabel_kw:
             va: center
           y2ticks: []
           y2label_kw:
             rotation: 270
+          tick_params:
+            bottom: on
+            top: off
+            right: off
+            left: on
+            direction: out
           grid: True
           grid_kw:
             b: True
             linestyle: '-'
-            axis: both
             color: [0.2,0.2,0.2]
         draw_dataset:
           heatmap: True
@@ -109,11 +119,6 @@ class TimeSeries2DFigureManager(FigureManager):
           hspace:     0.05
           top:        0.25
           multiplot: True
-          multi_tick_params:
-            left: on
-            right: off
-            bottom: on
-            top: off
           title_kw:
             top: -0.1
           shared_legend_kw:

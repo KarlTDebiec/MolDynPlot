@@ -27,13 +27,30 @@ class SequenceFigureManager(FigureManager):
     from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
+        draw_figure
+          subplot_kw:
+            autoscale_on: False
+          multi_tick_params:
+            left: on
+            right: off
+            bottom: on
+            top: off
          draw_subplot:
+          title_kw:
+            verticalalignment: bottom
           xlabel: Residue
+          ylabel_kw:
+            va: center
+          tick_params:
+            bottom: on
+            top: off
+            right: off
+            left: on
+            direction: out
           grid: True
           grid_kw:
             b: True
             linestyle: '-'
-            axis: both
             color: [0.8,0.8,0.8]
          draw_dataset:
           dataset_kw:
@@ -145,11 +162,6 @@ class SequenceFigureManager(FigureManager):
           hspace:     0.00
           top:        0.25
           multiplot: True
-          multi_tick_params:
-            left: on
-            right: off
-            bottom: on
-            top: off
           title_kw:
             top: -0.1
         draw_subplot:
