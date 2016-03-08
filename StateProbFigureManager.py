@@ -114,21 +114,20 @@ class StateProbFigureManager(FigureManager):
         inherits: manuscript
         draw_figure:
           left:       0.60
-          sub_width:  1.80
+          sub_width:  1.50
           wspace:     0.10
           right:      0.20
           top:        0.50
-          sub_height: 1.80
+          sub_height: 1.50
           bottom:     0.65
           shared_legend: True
           shared_legend_kw:
             left:        0.60
-            sub_width:   1.80
+            sub_width:   1.50
             sub_height:  0.60
             bottom:      0.00
             legend_kw:
               labelspacing: 0.5
-              legend_fp: 8r
               loc: 9
               ncol: 4
         draw_dataset:
