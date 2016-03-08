@@ -109,6 +109,38 @@ class StateProbFigureManager(FigureManager):
           handle_kw:
             ms: 10
             mew: 2
+      manuscript:
+        class: target
+        inherits: manuscript
+        draw_figure:
+          left:       0.60
+          sub_width:  1.80
+          wspace:     0.10
+          right:      0.20
+          top:        0.50
+          sub_height: 1.80
+          bottom:     0.65
+          shared_legend: True
+          shared_legend_kw:
+            left:        0.60
+            sub_width:   1.80
+            sub_height:  0.60
+            bottom:      0.00
+            legend_kw:
+              labelspacing: 0.5
+              legend_fp: 8r
+              loc: 9
+              ncol: 4
+        draw_dataset:
+          bar_kw:
+            lw: 1
+            error_kw:
+              capsize: 2
+              capthick: 1
+              elinewidth: 1
+          handle_kw:
+            ms: 6
+            mew: 1
       notebook:
         class: target
         inherits: notebook

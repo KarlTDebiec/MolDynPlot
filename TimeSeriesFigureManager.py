@@ -29,7 +29,6 @@ class TimeSeriesFigureManager(FigureManager):
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
     from .myplotspec.manage_kwargs import manage_kwargs
-    from .myplotspec.manage_output import manage_output
 
     defaults = """
         draw_figure:
