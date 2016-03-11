@@ -21,10 +21,6 @@ from .myplotspec.FigureManager import FigureManager
 class TimeSeriesFigureManager(FigureManager):
     """
     Manages the generation of time series figures
-
-    .. todo:
-      - Clean up defaults and presets; make less specific to my
-        systems
     """
 
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
@@ -44,24 +40,24 @@ class TimeSeriesFigureManager(FigureManager):
             legend_kw:
               frameon: False
               loc: 9
+              numpoints: 1
+              handletextpad: 0.0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
           xlabel: Time
           tick_params:
+            left: on
+            right: off
             bottom: on
             top: off
-            right: off
-            left: on
             direction: out
           grid: True
           grid_kw:
             b: True
-            linestyle: '-'
             color: [0.8,0.8,0.8]
+            linestyle: '-'
         draw_dataset:
-          plot_kw:
-            zorder: 10
           partner_kw:
             position: right
             tick_params:
@@ -73,8 +69,14 @@ class TimeSeriesFigureManager(FigureManager):
             grid: True
             grid_kw:
               b: True
-              linestyle: '-'
               color: [0.8,0.8,0.8]
+              linestyle: '-'
+          plot_kw:
+            zorder: 10
+          handle_kw:
+            marker: s
+            ls: none
+            mec: black
     """
 
     available_presets = """
@@ -135,6 +137,45 @@ class TimeSeriesFigureManager(FigureManager):
               length: 3
               pad: 6
               width: 2
+      manuscript:
+        class: target
+        inherits: manuscript
+        draw_figure:
+          left:       0.50
+          sub_width:  4.40
+          right:      0.20
+          bottom:     0.70
+          sub_height: 1.80
+          top:        0.20
+          shared_legend: True
+          shared_legend_kw:
+            left:       0.50
+            sub_width:  4.40
+            sub_height: 0.30
+            bottom:     0.00
+            legend_kw:
+              labelspacing: 0.5
+              legend_fp: 7r
+              ncol: 5
+        draw_dataset:
+          partner_kw:
+            sub_width: 0.8
+            title_fp: 8b
+            xlabel_kw:
+              labelpad:  12.5
+            label_fp: 8b
+            tick_fp: 6r
+            xticks:
+            tick_params:
+              direction: out
+              length: 2
+              pad: 3
+              width: 1
+          plot_kw:
+            lw: 1.0
+          handle_kw:
+            ms: 6
+            mew: 1
       notebook:
         class: target
         inherits: notebook
@@ -187,8 +228,8 @@ class TimeSeriesFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, dt=None, downsample=None, label=None,
-        xoffset=0, handles=None, ykey=None, pdist=False, verbose=1, debug=0,
-        **kwargs):
+        xoffset=0, handles=None, ykey=None, pdist=False, fill_between=False,
+        verbose=1, debug=0, **kwargs):
         from .myplotspec import get_color, multi_get_copy
         from .myplotspec.Dataset import Dataset
         import pandas as pd
@@ -212,6 +253,11 @@ class TimeSeriesFigureManager(FigureManager):
             plot_kw["color"] = get_color(plot_kw["color"])
         elif "color" in kwargs:
             plot_kw["color"] = get_color(kwargs.pop("color"))
+        fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
+        if "color" in fill_between_kw:
+            fill_between_kw["color"] = get_color(fill_between_kw["color"])
+        elif "color" in plot_kw:
+            fill_between_kw["color"] = get_color(plot_kw["color"])
 
         # Downsample
         if downsample is not None:
@@ -252,20 +298,28 @@ class TimeSeriesFigureManager(FigureManager):
                 subplot._mps_partner_subplot.set_xticks(xticks)
 
         # Plot
-        handle = subplot.plot(dataframe["time"], dataframe[ykey],
-          **plot_kw)[0]
+        if fill_between:
+            fill_between_lb_key = kwargs.get("fill_between_lb_key")
+            fill_between_ub_key = kwargs.get("fill_between_ub_key")
+            subplot.fill_between(dataframe["time"], 
+              dataframe[fill_between_lb_key],
+              dataframe[fill_between_ub_key], **fill_between_kw)
+        plot = subplot.plot(dataframe["time"], dataframe[ykey], **plot_kw)[0]
+        handle_kw = multi_get_copy("handle_kw", kwargs, {})
+        handle_kw["mfc"] = plot.get_color()
+        handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
         if handles is not None and label is not None:
             handles[label] = handle
 
         # Plot experiment
-        if (kwargs.get("experiment", False)
-        and not hasattr(subplot, "_mps_experiment")):
-            subplot._mps_experiment = subplot.axhspan(20.04, 21.54, lw=0,
-            color=[0.7,0.7,0.7])
-            subplot._mps_partner_subplot.axhspan(20.04, 21.54, lw=0,
-            color=[0.7,0.7,0.7])
-            handles["Experiment"] = subplot.plot([-10, -10], [-10, -10],
-              color=[0.7, 0.7, 0.7], lw=2)[0]
+#        if (kwargs.get("experiment", False)
+#        and not hasattr(subplot, "_mps_experiment")):
+#            subplot._mps_experiment = subplot.axhspan(20.04, 21.54, lw=0,
+#            color=[0.7,0.7,0.7])
+#            subplot._mps_partner_subplot.axhspan(20.04, 21.54, lw=0,
+#            color=[0.7,0.7,0.7])
+#            handles["Experiment"] = subplot.plot([-10, -10], [-10, -10],
+#              color=[0.7, 0.7, 0.7], lw=2)[0]
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

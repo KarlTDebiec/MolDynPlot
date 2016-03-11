@@ -30,28 +30,34 @@ class StateProbFigureManager(FigureManager):
         draw_figure:
           subplot_kw:
             autoscale_on: False
+          multi_tick_params:
+            left: on
+            right: off
+            bottom: off
+            top: off
           shared_legend_kw:
             legend_kw:
               frameon: False
+              loc: 9
               numpoints: 1
               handletextpad: 0.0
         draw_subplot:
+          title_kw:
+            verticalalignment: bottom
           xticklabels:  []
           yticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
           tick_params:
+            left: on
+            right: off
             bottom: off
             top: off
-            right: off
-            left: on
             direction: out
-          title_kw:
-            verticalalignment: bottom
           grid: True
           grid_kw:
-            b: True
-            linestyle: '-'
-            alpha: 0.1
             axis: y
+            b: True
+            color: [0.8,0.8,0.8]
+            linestyle: '-'
         draw_dataset:
           bar_kw:
             align: center
@@ -113,22 +119,22 @@ class StateProbFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.60
+          left:       0.50
           sub_width:  1.50
           wspace:     0.10
           right:      0.20
-          top:        0.50
+          top:        0.40
           sub_height: 1.50
           bottom:     0.65
           shared_legend: True
           shared_legend_kw:
-            left:        0.60
+            left:        0.50
             sub_width:   1.50
             sub_height:  0.60
             bottom:      0.00
             legend_kw:
               labelspacing: 0.5
-              loc: 9
+              legend_fp: 7r
               ncol: 4
         draw_dataset:
           bar_kw:

@@ -118,9 +118,6 @@ class TimeSeries2DFigureManager(FigureManager):
           sub_height: 1.00
           hspace:     0.05
           top:        0.25
-          multiplot: True
-          title_kw:
-            top: -0.1
           shared_legend_kw:
             left:       0.51
             sub_width:  6.31
