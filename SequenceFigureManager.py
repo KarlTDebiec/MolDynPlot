@@ -27,7 +27,7 @@ class SequenceFigureManager(FigureManager):
     from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
-        draw_figure
+        draw_figure:
           subplot_kw:
             autoscale_on: False
           multi_tick_params:
@@ -35,7 +35,7 @@ class SequenceFigureManager(FigureManager):
             right: off
             bottom: on
             top: off
-         draw_subplot:
+        draw_subplot:
           title_kw:
             verticalalignment: bottom
           xlabel: Residue
@@ -52,7 +52,7 @@ class SequenceFigureManager(FigureManager):
             b: True
             linestyle: '-'
             color: [0.8,0.8,0.8]
-         draw_dataset:
+        draw_dataset:
           dataset_kw:
             read_csv_kw:
               delim_whitespace: True
