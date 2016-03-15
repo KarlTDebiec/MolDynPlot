@@ -171,20 +171,18 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_figure:
           left:       0.60
           sub_width:  5.00
+          wspace:     0.10
           right:      0.25
           bottom:     1.10
           sub_height: 2.00
           hspace:     0.10
           top:        0.35
-          title_kw:
-            top: -0.1
           shared_legend_kw:
             left:       0.50
             sub_width:  5.00
             right:      0.25
             bottom:     0.10
             sub_height: 0.50
-            top:        0.60
             legend_kw:
               ncol: 4
         draw_subplot:

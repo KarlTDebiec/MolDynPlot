@@ -162,7 +162,7 @@ class TimeSeriesFigureManager(FigureManager):
             sub_width: 0.8
             title_fp: 8b
             xlabel_kw:
-              labelpad:  12.5
+              labelpad: 12.5
             label_fp: 8b
             tick_fp: 6r
             xticks:
@@ -218,7 +218,7 @@ class TimeSeriesFigureManager(FigureManager):
         draw_dataset:
           pdist: True
           partner_kw:
-            xlabel:      Probability
+            xlabel:      Distribution
             xticks:      [0,0.000001]
             xticklabels: []
             yticks:      [0,1,2,3,4,5,6]
