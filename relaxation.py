@@ -92,7 +92,9 @@ if __name__ == "__main__":
             header += "\n"
 
         # Read input file(s) containing autocorrelation function from cpptraj
-        acf = np.loadtxt(infile, dtype=np.float32)[:,1:]
+        raw_data = np.loadtxt(infile, dtype=np.float32)
+        acf = raw_data[:,1:]
+        dt = np.mean(raw_data[1:,0] - raw_data[:-1,0])
         
         # Initialize data, now that output is known
         if data is None:
@@ -103,7 +105,7 @@ if __name__ == "__main__":
         sdf = np.real(np.fft.rfft(acf, axis=0))
 
         # Calculate appropriate frequencies for desired spectral density
-        sdf_freq = np.fft.fftfreq(sdf.shape[0])
+        sdf_freq = np.fft.fftfreq(sdf.shape[0], d=1/dt)
 
         # Interpolate calculated spectral density 
         for k in range(sdf.shape[1]):
