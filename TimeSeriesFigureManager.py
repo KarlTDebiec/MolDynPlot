@@ -229,7 +229,7 @@ class TimeSeriesFigureManager(FigureManager):
     @manage_kwargs()
     def draw_dataset(self, subplot, dt=None, downsample=None, label=None,
         xoffset=0, handles=None, ykey=None, pdist=False, fill_between=False,
-        verbose=1, debug=0, **kwargs):
+        plot=True, verbose=1, debug=0, **kwargs):
         from .myplotspec import get_color, multi_get_copy
         from .myplotspec.Dataset import Dataset
         import pandas as pd
@@ -297,19 +297,22 @@ class TimeSeriesFigureManager(FigureManager):
                           pdf_max*1.25]
                 subplot._mps_partner_subplot.set_xticks(xticks)
 
-        # Plot
+        # Plot fill_between
         if fill_between:
             fill_between_lb_key = kwargs.get("fill_between_lb_key")
             fill_between_ub_key = kwargs.get("fill_between_ub_key")
             subplot.fill_between(dataframe["time"], 
               dataframe[fill_between_lb_key],
               dataframe[fill_between_ub_key], **fill_between_kw)
-        plot = subplot.plot(dataframe["time"], dataframe[ykey], **plot_kw)[0]
-        handle_kw = multi_get_copy("handle_kw", kwargs, {})
-        handle_kw["mfc"] = plot.get_color()
-        handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
-        if handles is not None and label is not None:
-            handles[label] = handle
+
+        # Plot series
+        if plot:
+            plot = subplot.plot(dataframe["time"], dataframe[ykey], **plot_kw)[0]
+            handle_kw = multi_get_copy("handle_kw", kwargs, {})
+            handle_kw["mfc"] = plot.get_color()
+            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
+            if handles is not None and label is not None:
+                handles[label] = handle
 
         # Plot experiment
 #        if (kwargs.get("experiment", False)
