@@ -241,7 +241,6 @@ class CorrFigureManager(FigureManager):
             from .myplotspec.text import set_text
 
             label_kw = multi_get_copy("label_kw", kwargs, {})
-            print(label_kw)
             set_text(subplot, **label_kw)
 
 #################################### MAIN #####################################
