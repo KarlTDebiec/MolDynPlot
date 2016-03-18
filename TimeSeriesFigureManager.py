@@ -228,13 +228,14 @@ class TimeSeriesFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, dt=None, downsample=None, label=None,
-        xoffset=0, handles=None, ykey=None, pdist=False, fill_between=False,
-        plot=True, verbose=1, debug=0, **kwargs):
+        xoffset=0, ykey=None, handles=None,
+        pdist=False, fill_between=False, plot=True,
+        verbose=1, debug=0, **kwargs):
+        from os.path import expandvars
+        import numpy as np
+        import pandas as pd
         from .myplotspec import get_color, multi_get_copy
         from .myplotspec.Dataset import Dataset
-        import pandas as pd
-        import numpy as np
-        from os.path import expandvars
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
@@ -253,11 +254,6 @@ class TimeSeriesFigureManager(FigureManager):
             plot_kw["color"] = get_color(plot_kw["color"])
         elif "color" in kwargs:
             plot_kw["color"] = get_color(kwargs.pop("color"))
-        fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
-        if "color" in fill_between_kw:
-            fill_between_kw["color"] = get_color(fill_between_kw["color"])
-        elif "color" in plot_kw:
-            fill_between_kw["color"] = get_color(plot_kw["color"])
 
         # Downsample
         if downsample is not None:
@@ -298,6 +294,11 @@ class TimeSeriesFigureManager(FigureManager):
                 subplot._mps_partner_subplot.set_xticks(xticks)
 
         # Plot fill_between
+        fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
+        if "color" in fill_between_kw:
+            fill_between_kw["color"] = get_color(fill_between_kw["color"])
+        elif "color" in plot_kw:
+            fill_between_kw["color"] = get_color(plot_kw["color"])
         if fill_between:
             fill_between_lb_key = kwargs.get("fill_between_lb_key")
             fill_between_ub_key = kwargs.get("fill_between_ub_key")
