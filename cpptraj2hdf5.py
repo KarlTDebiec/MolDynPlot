@@ -29,7 +29,7 @@ if __name__ == "__main__":
     parser.add_argument(
       "kind",
       type     = str,
-      choices  = [str("dihedral"),   str("hbond"), 
+      choices  = [str("dihedral"),   str("hbond"),     str("jcoupling"),
                   str("perresrmsd"), str("secstruct")],
       help     = "kind of dataset")
     parser.add_argument(
@@ -54,6 +54,10 @@ if __name__ == "__main__":
         dtype = np.uint8
         scaleoffset = 1
         address = "hbond"
+    elif kwargs["kind"] == "jcoupling":
+        dtype = np.float32
+        scaleoffset = 3
+        address = "jcoupling"
     elif kwargs["kind"] == "perresrmsd":
         dtype = np.float32
         scaleoffset = 4
@@ -94,7 +98,7 @@ if __name__ == "__main__":
         # Open hdf5 file
         with h5py.File(outfile) as hdf5_file:
             def iter_func():
-                with open(infile, 'r') as open_file:
+                with open(infile, "r") as open_file:
                     next(open_file)
                     for line in open_file:
                         line = line.split()[1:]
