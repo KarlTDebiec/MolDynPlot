@@ -205,7 +205,7 @@ class CorrFigureManager(FigureManager):
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
         get_colors(plot_kw, kwargs)
 
-        # Plot x=y correlation line
+        # Plot expected correlation line
         if draw_corr_line and not hasattr(subplot, "_mps_corr_line"):
             corr_line_kw = multi_get_copy("corr_line_kw", kwargs, {})
             get_colors(corr_line_kw)
@@ -218,11 +218,11 @@ class CorrFigureManager(FigureManager):
             errorbar_kw = multi_get_copy("errorbar_kw", kwargs, {})
             get_colors(errorbar_kw, plot_kw)
             subplot.errorbar(
-              errorbar_kw.pop("x", [0,10]), errorbar_kw.pop("y", [0,10]),
+              errorbar_kw.pop("x"), errorbar_kw.pop("y"),
               yerr=errorbar_kw.pop("yerr")*1.96,
               **errorbar_kw)
 
-        # Plot manual legend handles
+        # Plot legend handles
         if draw_handle:
             if label is None:
                 warn("'draw_handle' is enabled but a value for argument"
