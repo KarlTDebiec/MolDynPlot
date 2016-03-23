@@ -29,8 +29,8 @@ if __name__ == "__main__":
     parser.add_argument(
       "kind",
       type     = str,
-      choices  = [str("dihedral"),   str("hbond"),     str("jcoupling"),
-                  str("perresrmsd"), str("secstruct")],
+      choices  = [str("dihedral"), str("hbond"),     str("jcoupling"),
+                  str("natcon"),   str("perresrmsd"), str("secstruct")],
       help     = "kind of dataset")
     parser.add_argument(
       "infile",
@@ -58,6 +58,10 @@ if __name__ == "__main__":
         dtype = np.float32
         scaleoffset = 3
         address = "jcoupling"
+    elif kwargs["kind"] == "natcon":
+        dtype = np.float32
+        scaleoffset = 4
+        address = "natcon"
     elif kwargs["kind"] == "perresrmsd":
         dtype = np.float32
         scaleoffset = 4
