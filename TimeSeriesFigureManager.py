@@ -80,19 +80,40 @@ class TimeSeriesFigureManager(FigureManager):
     """
 
     available_presets = """
+      natcon:
+        class: content
+        help: "% Native contacts vs. time"
+        draw_subplot:
+          ylabel: "% Native Contacts"
+          yticks:      [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+          yticklabels: [0,10,20,30,40,50,60,70,80,90,100]
+        draw_dataset:
+          ykey: percent_native_contacts
+          dataset_kw:
+            cls: moldynplot.CpptrajDataset.NatConDataset
+            downsample_mode: mean
+          partner_kw:
+            yticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+          plot_kw:
+            drawstyle: steps
       rmsd:
         class: content
         help: Root Mean Standard Deviation (RMSD) vs. time
         draw_subplot:
           ylabel: RMSD (Å)
+          yticks: [0,2,4,6,8,10]
         draw_dataset:
+          ykey: rmsd
+          partner_kw:
+            yticks: [0,2,4,6,8,10]
           dataset_kw:
+            cls: moldynplot.CpptrajDataset.CpptrajDataset
+            pdist: True
             read_csv_kw:
               delim_whitespace: True
-              index_col: False
-              names: [time, rmsd]
+              names: [frame, rmsd]
               header: 0
-          ykey: rmsd
+              index_col: 0
       rg:
         class: content
         help: Radius of Gyration (Rg) vs. time
@@ -216,114 +237,87 @@ class TimeSeriesFigureManager(FigureManager):
         class: appearance
         help: Draw probability distribution on right side of plot
         draw_dataset:
-          pdist: True
+          draw_pdist: True
           partner_kw:
             xlabel:      Distribution
             xticks:      [0,0.000001]
             xticklabels: []
-            yticks:      [0,1,2,3,4,5,6]
             yticklabels: []
     """
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, dt=None, downsample=None, label=None,
-        xoffset=0, ykey=None, handles=None,
-        pdist=False, fill_between=False, plot=True,
+    def draw_dataset(self, subplot, label=None,
+        ykey=None, handles=None,
+        draw_pdist=False, draw_fill_between=False, draw_plot=True,
         verbose=1, debug=0, **kwargs):
         from os.path import expandvars
+        from warnings import warn
         import numpy as np
         import pandas as pd
-        from .myplotspec import get_color, multi_get_copy
-        from .myplotspec.Dataset import Dataset
+        from .myplotspec import get_colors, multi_get_copy
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataframe= self.load_dataset(Dataset, verbose=verbose, debug=debug,
-          **dataset_kw).data
-
-        # Scale:
-        if dt is not None:
-            dataframe["time"] *= dt
+        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
+        dataframe = dataset.dataframe
+        print(dataframe)
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
-        if "color" in plot_kw:
-            plot_kw["color"] = get_color(plot_kw["color"])
-        elif "color" in kwargs:
-            plot_kw["color"] = get_color(kwargs.pop("color"))
-
-        # Downsample
-        if downsample is not None:
-            full_size = dataframe.shape[0]
-            reduced_size = int(full_size / downsample)
-            reduced = pd.DataFrame(0.0, index=range(0, reduced_size),
-              columns=dataframe.columns, dtype=np.int64)
-            for i in range(0, reduced_size):
-                reduced.loc[i] = dataframe[
-                  i*downsample:(i+1)*downsample+1].mean()
-            dataframe = reduced
-
-        # Offset
-        dataframe["time"] += xoffset
+        get_colors(plot_kw, kwargs)
 
         # Plot pdist
-        if pdist:
-            from sklearn.neighbors import KernelDensity
+        if draw_pdist:
 
+            # Add subplot if not already present
             if not hasattr(subplot, "_mps_partner_subplot"):
                 from .myplotspec.axes import add_partner_subplot
-                add_partner_subplot(subplot, **kwargs)
-            kde_kw = multi_get_copy("kde_kw", kwargs, {"bandwidth": 0.1})
-            grid = kwargs.get("grid", np.linspace(0,6,100))
-            kde = KernelDensity(**kde_kw)
-            kde.fit(dataframe[ykey][:, np.newaxis])
-            pdf = np.exp(kde.score_samples(grid[:, np.newaxis]))
-            pdf /= pdf.sum()
-            pdist_kw = plot_kw.copy()
-            pdist_kw.update(kwargs.get("pdist_kw", {}))
-            subplot._mps_partner_subplot.plot(pdf, grid, **pdist_kw)
-            pdf_max = pdf.max()
-            x_max = subplot._mps_partner_subplot.get_xbound()[1]
-            if pdf_max > x_max / 1.25:
-                subplot._mps_partner_subplot.set_xbound(0, pdf_max * 1.25)
-                xticks = [0, pdf_max*0.3125, pdf_max*0.625, pdf_max*0.9375,
-                          pdf_max*1.25]
-                subplot._mps_partner_subplot.set_xticks(xticks)
 
-        # Plot fill_between
-        fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
-        if "color" in fill_between_kw:
-            fill_between_kw["color"] = get_color(fill_between_kw["color"])
-        elif "color" in plot_kw:
-            fill_between_kw["color"] = get_color(plot_kw["color"])
-        if fill_between:
-            fill_between_lb_key = kwargs.get("fill_between_lb_key")
-            fill_between_ub_key = kwargs.get("fill_between_ub_key")
-            subplot.fill_between(dataframe["time"], 
-              dataframe[fill_between_lb_key],
-              dataframe[fill_between_ub_key], **fill_between_kw)
+                add_partner_subplot(subplot, **kwargs)
+
+            if not (hasattr(dataset, "pdist_x")
+            and     hasattr(dataset, "pdist_y")):
+                warn("'draw_pdist' is enabled but dataset does not have the "
+                     "necessary attributes 'pdist_x' and 'pdist_y', skipping.")
+            else:
+                pdist_kw = plot_kw.copy()
+                pdist_kw.update(kwargs.get("pdist_kw", {}))
+
+                subplot._mps_partner_subplot.plot( dataset.pdist_y,
+                  dataset.pdist_x, **pdist_kw)
+                pdist_max = dataset.pdist_y.max()
+                x_max = subplot._mps_partner_subplot.get_xbound()[1]
+                if pdist_max > x_max / 1.25:
+                    subplot._mps_partner_subplot.set_xbound(0, pdist_max*1.25)
+                    xticks = [0, pdist_max*0.25, pdist_max*0.50,
+                      pdist_max*0.75, pdist_max, pdist_max*1.25]
+                    subplot._mps_partner_subplot.set_xticks(xticks)
+
+#        # Plot fill_between
+#        fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
+#        if "color" in fill_between_kw:
+#            fill_between_kw["color"] = get_color(fill_between_kw["color"])
+#        elif "color" in plot_kw:
+#            fill_between_kw["color"] = get_color(plot_kw["color"])
+#        if fill_between:
+#            fill_between_lb_key = kwargs.get("fill_between_lb_key")
+#            fill_between_ub_key = kwargs.get("fill_between_ub_key")
+#            subplot.fill_between(dataframe["time"], 
+#              dataframe[fill_between_lb_key],
+#              dataframe[fill_between_ub_key], **fill_between_kw)
 
         # Plot series
-        if plot:
-            plot = subplot.plot(dataframe["time"], dataframe[ykey], **plot_kw)[0]
+        if draw_plot:
+            plot = subplot.plot(dataframe.index.values, dataframe[ykey],
+              **plot_kw)[0]
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
             handle_kw["mfc"] = plot.get_color()
             handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
             if handles is not None and label is not None:
                 handles[label] = handle
-
-        # Plot experiment
-#        if (kwargs.get("experiment", False)
-#        and not hasattr(subplot, "_mps_experiment")):
-#            subplot._mps_experiment = subplot.axhspan(20.04, 21.54, lw=0,
-#            color=[0.7,0.7,0.7])
-#            subplot._mps_partner_subplot.axhspan(20.04, 21.54, lw=0,
-#            color=[0.7,0.7,0.7])
-#            handles["Experiment"] = subplot.plot([-10, -10], [-10, -10],
-#              color=[0.7, 0.7, 0.7], lw=2)[0]
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
