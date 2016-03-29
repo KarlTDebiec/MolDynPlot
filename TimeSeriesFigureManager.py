@@ -295,18 +295,15 @@ class TimeSeriesFigureManager(FigureManager):
                       pdist_max*0.75, pdist_max, pdist_max*1.25]
                     subplot._mps_partner_subplot.set_xticks(xticks)
 
-#        # Plot fill_between
-#        fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
-#        if "color" in fill_between_kw:
-#            fill_between_kw["color"] = get_color(fill_between_kw["color"])
-#        elif "color" in plot_kw:
-#            fill_between_kw["color"] = get_color(plot_kw["color"])
-#        if fill_between:
-#            fill_between_lb_key = kwargs.get("fill_between_lb_key")
-#            fill_between_ub_key = kwargs.get("fill_between_ub_key")
-#            subplot.fill_between(dataframe["time"], 
-#              dataframe[fill_between_lb_key],
-#              dataframe[fill_between_ub_key], **fill_between_kw)
+        # Plot fill_between
+        if draw_fill_between:
+            fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
+            get_colors(fill_between_kw, plot_kw)
+            fill_between_lb_key = kwargs.get("fill_between_lb_key")
+            fill_between_ub_key = kwargs.get("fill_between_ub_key")
+            subplot.fill_between(dataframe.index.values, 
+              dataframe[fill_between_lb_key],
+              dataframe[fill_between_ub_key], **fill_between_kw)
 
         # Plot series
         if draw_plot:
