@@ -9,18 +9,46 @@
 #   BSD license. See the LICENSE file for details.
 """
 """
-################################### MODULES ####################################
+################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
-##################################### MAIN #####################################
+import numpy as np
+################################## FUNCTIONS ##################################
+def saxs(address="saxs", dtype=np.float32, scaleoffset=3, **kwargs):
+
+    infiles = kwargs["infile"]
+    outfile = kwargs["outfile"]
+    q = None
+    data = None
+    for i, infile in enumerate(infiles):
+        datum = np.loadtxt(infile, skiprows=3)
+        if q is None:
+            q = datum[:,0]
+        else:
+            if not (datum[:,0] == q).all():
+                raise()
+        if data is None:
+            data = np.zeros((len(infiles), q.size))
+        data[i,:] = datum[:,1]
+
+    # Open hdf5 file
+    with h5py.File(outfile) as hdf5_file:
+
+        print(data, data.shape)
+        hdf5_file.create_dataset(address + "/q", data=q, dtype=dtype,
+          chunks=True, compression="gzip", scaleoffset=scaleoffset)
+        hdf5_file.create_dataset(address + "/intensity", data=data,
+          dtype=dtype, chunks=True, compression="gzip",
+          scaleoffset=scaleoffset)
+
+#################################### MAIN #####################################
 if __name__ == "__main__":
     import argparse
     from os import devnull
     from subprocess import Popen, PIPE
     import h5py
-    import numpy as np
 
     # Prepare argument parser
     parser            = argparse.ArgumentParser(
@@ -29,11 +57,13 @@ if __name__ == "__main__":
     parser.add_argument(
       "kind",
       type     = str,
-      choices  = [str("dihedral"), str("hbond"),     str("jcoupling"),
-                  str("natcon"),   str("perresrmsd"), str("secstruct")],
+      choices  = [str("dihedral"), str("hbond"),      str("jcoupling"),
+                  str("natcon"),   str("perresrmsd"), str("saxs"),
+                  str("secstruct")],
       help     = "kind of dataset")
     parser.add_argument(
       "infile",
+      nargs    = "+",
       type     = str,
       help     = "cpptraj output file from which to load dataset; " +
                  "may be plain text or gzip")
@@ -44,8 +74,6 @@ if __name__ == "__main__":
 
     # Parse arguments
     kwargs  = vars(parser.parse_args())
-    infile  = kwargs["infile"]
-    outfile = kwargs["outfile"]
     if kwargs["kind"] == "dihedral":
         dtype = np.float32
         scaleoffset = 4
@@ -66,10 +94,16 @@ if __name__ == "__main__":
         dtype = np.float32
         scaleoffset = 4
         address = "perresrmsd"
+    elif kwargs["kind"] == "saxs":
+        from sys import exit
+        saxs(**kwargs)
+        exit()
     elif kwargs["kind"] == "secstruct":
         dtype = np.uint8
         scaleoffset = 3
         address = "secstruct"
+    infile  = kwargs["infile"][0]
+    outfile = kwargs["outfile"]
 
     if infile.endswith("gnu"):
         raw = np.genfromtxt(infile, skip_header=13,
