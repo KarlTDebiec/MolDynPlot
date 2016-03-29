@@ -263,7 +263,6 @@ class TimeSeriesFigureManager(FigureManager):
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
         dataframe = dataset.dataframe
-        print(dataframe)
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})

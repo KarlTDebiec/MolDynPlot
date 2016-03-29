@@ -214,7 +214,7 @@ class SequenceFigureManager(FigureManager):
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataframe= self.load_dataset(Dataset, verbose=verbose, debug=debug,
-          **dataset_kw).data
+          **dataset_kw).dataframe
         x = np.array([filter(lambda x: x in '0123456789.', s)
               for s in dataframe.index.values], np.int)
 
@@ -244,13 +244,13 @@ class SequenceFigureManager(FigureManager):
                     fb_ub.extend([
                       dataframe[ykey][index] + yse * 1.96,
                       dataframe[ykey][index] + yse * 1.96])
-#                else:
-#                    fb_x.append(None)
-#                    fb_lb.append(None)
-#                    fb_ub.append(None)
-                fb_x.append(None)
-                fb_lb.append(None)
-                fb_ub.append(None)
+                else:
+                    fb_x.append(None)
+                    fb_lb.append(None)
+                    fb_ub.append(None)
+#                fb_x.append(None)
+#                fb_lb.append(None)
+#                fb_ub.append(None)
             fb_x = np.array(fb_x, np.float)
             fb_lb = np.array(fb_lb, np.float)
             fb_ub = np.array(fb_ub, np.float)
