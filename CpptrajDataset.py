@@ -24,15 +24,20 @@ class CpptrajDataset(Dataset):
         dataframe = self.dataframe
         dataframe.index.name = "time"
 
+        if "usecols" in kwargs:
+            dataframe = dataframe[dataframe.columns[kwargs.pop("usecols")]]
+
         # Convert from frame index to time
         if "dt" in kwargs:
-            dt = kwargs.pop("dt")
-            dataframe.index *= dt
+            dataframe.index *= kwargs.pop("dt")
 
-        # Offset
+        # Offset time
         if "toffset" in kwargs:
-            toffset = kwargs.pop("toffset")
-            dataframe.index += toffset
+            dataframe.index += kwargs.pop("toffset")
+
+        # Store y, if applicable
+        if "y" in kwargs:
+            self.y = kwargs.pop("y")
 
         # Downsample
         if kwargs.get("downsample") is not None:
@@ -47,7 +52,12 @@ class CpptrajDataset(Dataset):
               :dataframe.shape[0]-(dataframe.shape[0] % downsample)],
               new_shape[:-1]).mean(axis=1)
             reduced = np.reshape(reduced, new_shape)
-            reduced = np.squeeze(reduced.mean(axis=1))
+            if downsample_mode == "mean":
+                reduced = np.squeeze(reduced.mean(axis=1))
+            elif downsample_mode == "mode":
+                from scipy.stats.mstats import mode
+                reduced = np.squeeze(mode(reduced, axis=1)[0])
+
             reduced = pd.DataFrame(data=reduced, index=index,
               columns=dataframe.columns.values)
             reduced.index.name = "time"
@@ -117,3 +127,42 @@ class NatConDataset(CpptrajDataset):
             pdist_y[1:-1:2] = pdist_y[2:-1:2] = pdist
             self.pdist_x = pdist_x
             self.pdist_y = pdist_y
+
+class SAXSDataset(CpptrajDataset):
+
+    def __init__(self, infile, address="saxs", downsample=None,
+        verbose=1, debug=0, **kwargs):
+        from os.path import expandvars
+        import h5py
+        import numpy as np
+        import pandas as pd
+
+        # Load
+        with h5py.File(expandvars(infile)) as h5_file:
+            q = ["{0:5.3f}".format(a) for a in np.array(h5_file[address+"/q"])]
+
+        super(SAXSDataset, self).__init__(infile=infile,
+          address=address+"/intensity",
+          verbose=verbose, debug=debug, dataframe_kw=dict(columns=q), **kwargs)
+        dataframe = self.dataframe
+
+        # Store y
+        self.y = np.array(dataframe.columns, np.float)
+
+        # Downsample
+        if downsample is not None:
+
+            reduced = dataframe.values[
+              :dataframe.shape[0]-(dataframe.shape[0] % downsample),:]
+            new_shape=(int(reduced.shape[0]/ downsample),
+                downsample, reduced.shape[1])
+            index = np.reshape(dataframe.index.values[
+              :dataframe.shape[0]-(dataframe.shape[0] % downsample)],
+              new_shape[:-1]).mean(axis=1)
+            reduced = np.reshape(reduced, new_shape)
+            reduced = np.squeeze(reduced.mean(axis=1))
+
+            reduced = pd.DataFrame(data=reduced, index=index,
+              columns=dataframe.columns.values)
+            reduced.index.name = "time"
+            dataframe = self.dataframe = reduced

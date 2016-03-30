@@ -35,6 +35,7 @@ class TimeSeries2DFigureManager(FigureManager):
             right: off
             bottom: on
             top: off
+          shared_legend: True
           shared_legend_kw:
             legend_kw:
               frameon: False
@@ -46,27 +47,27 @@ class TimeSeries2DFigureManager(FigureManager):
             verticalalignment: bottom
           xlabel: Time
           ylabel: Residue
-          ylabel_kw:
-            va: center
-          y2ticks: []
-          y2label_kw:
-            rotation: 270
           tick_params:
+            direction: out
             bottom: on
             top: off
             right: off
             left: on
-            direction: out
           grid: True
           grid_kw:
             b: True
-            linestyle: '-'
             color: [0.2,0.2,0.2]
+            linestyle: '-'
+          legend: False
         draw_dataset:
-          heatmap: True
+          draw_heatmap: True
           heatmap_kw:
             edgecolors: none
             rasterized: True
+          handle_kw:
+            ls: none
+            marker: s
+            mec: black
     """
 
     available_presets = """
@@ -78,12 +79,14 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_subplot:
           ylabel: Residue
         draw_dataset:
-          downsample_mode: mode
+          dataset_kw:
+            cls: moldynplot.CpptrajDataset.CpptrajDataset
+            downsample_mode: mode
           heatmap_kw:
             cmap: !!python/object/apply:moldynplot.dssp_color_palette []
             vmin: 0
             vmax: 7
-          legend: True
+          draw_legend: True
           labels:
             0: None
             1: Parallel β Sheet
@@ -96,73 +99,99 @@ class TimeSeries2DFigureManager(FigureManager):
       perres_rmsd:
         class: content
         help: Per-residue RMSD calculated by cpptraj
+        draw_figure:
+          shared_legend: False
         draw_dataset:
-          downsample_mode: mean
+          dataset_kw:
+            cls: moldynplot.CpptrajDataset.CpptrajDataset
+            downsample_mode: mean
           heatmap_kw:
             cmap: afmhot_r
             vmin: 0
             vmax: 10
-          colorbar: True
+          draw_colorbar: True
           colorbar_kw:
             zticks: [0,1,2,3,4,5,6,7,8,9,10]
             zlabel: Per-Residue Backbone RMSD (Å)
+      saxs:
+        class: content
+        help: Small-angle X-ray scattering calculated by saxs_md
+        draw_figure:
+          shared_legend: False
+        draw_subplot:
+          ylabel: "q ($Å^{-1}$)"
+          yticks:      [0.00,0.05,0.10,0.15,0.20,0.25,0.30,0.35]
+          yticklabels: ["0.00","0.05","0.10","0.15","0.20","0.25","0.30","0.35"]
+          grid_kw:
+            color: [0.5,0.5,0.5]
+        draw_dataset:
+          dataset_kw:
+            cls: moldynplot.CpptrajDataset.SAXSDataset
+            downsample_mode: mean
+          heatmap_kw:
+            cmap: bone
+            vmin: 0
+            vmax: 10000000
+          draw_colorbar: True
+          colorbar_kw:
+            zticks: [0,5000000,10000000]
+            zlabel: Intensity
       manuscript:
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.51
-          sub_width:  6.31
+          left:       0.50
+          sub_width:  4.40
           wspace:     0.05
-          right:      0.12
-          bottom:     0.35
+          right:      0.20
+          bottom:     0.80
           sub_height: 1.00
           hspace:     0.05
           top:        0.25
           shared_legend_kw:
-            left:       0.51
-            sub_width:  6.31
-            right:      0.12
+            left:       0.50
+            sub_width:  4.40
             bottom:     0.00
-            sub_height: 0.25
+            sub_height: 0.40
             legend_kw:
               legend_fp: 7r
-              ncol: 8
+              ncol: 4
         draw_subplot:
-          legend: False
           xlabel_kw:
             labelpad: 3
           ylabel_kw:
-            rotation: horizontal
-            labelpad: 3
-          grid_kw:
-            alpha: 0.3
+            labelpad: 6
         draw_dataset:
           partner_kw:
-            hspace:    0.05
-            wspace:    0.05
-            sub_width: 0.05
+            position: bottom
+            hspace:     0.42
+            sub_height: 0.05
+            left:       1.82
+            sub_width:  1.76
           colorbar_kw:
-            ztick_fp: 6r
+            ztick_fp:  6r
             zlabel_fp: 8b
-          contour_kw:
-            linewidths: 0.7
-          plot_kw:
-            ms: 2
-          label_kw:
-            fp: 6b
+            zlabel_kw:
+              labelpad: 2
+          handle_kw:
+            ms: 5
       manuscript_stacked_dssp:
         class: target
         extends: manuscript
         help: Set of vertically stacked DSSP plots
         draw_figure:
-          bottom: 0.60
-          hspace: 0.00
+          sub_width: 6.31
+          bottom:    0.60
+          hspace:    0.00
           shared_ylabel_kw:
             left: -0.37
+          shared_legend_kw:
+            sub_width:  6.31
         draw_subplot:
           ylabel:
           ylabel_kw:
             labelpad: 6
+            rotation: horizontal
           yticklabels: []
           ylabel_fp: 7r
       notebook:
@@ -206,63 +235,57 @@ class TimeSeries2DFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, downsample=None, label=None, heatmap=True,
-        colorbar=False, legend=False, handles=None, labels=None, verbose=1,
-        debug=0, **kwargs):
+    def draw_dataset(self, subplot, label=None,
+        handles=None,
+        draw_heatmap=False, draw_colorbar=False, draw_legend=False,
+        verbose=1, debug=0, **kwargs):
         """
         """
-        from os.path import expandvars
-        import h5py
-        import numpy as np
         from .myplotspec import multi_get_copy
 
         # Load data
-        with h5py.File(expandvars(kwargs.get("infile"))) as h5_file:
-            key = kwargs.get("key", h5_file.keys()[0])
-            dataset = np.array(h5_file[key])
-        if "usecols" in kwargs:
-            dataset = dataset[:,kwargs.get("usecols")]
+        dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
+        if "infile" in kwargs:
+            dataset_kw["infile"] = kwargs["infile"]
+        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
+        dataframe = dataset.dataframe
 
-        # Scale:
-        dt = kwargs.get("dt", 0.001)
-        time = np.arange(dataset.shape[0]) * dt
-
-        # Downsample
-        if downsample is not None:
-            from scipy.stats.mstats import mode
-            full_size = dataset.shape[0] - (dataset.shape[0] % downsample)
-            dataset = np.reshape(dataset[:full_size],
-              (int(full_size / downsample), downsample, dataset.shape[1]))
-            downsample_mode = kwargs.get("downsample_mode", "mean")
-            if downsample_mode == "mean":
-                dataset = np.mean(dataset, axis=1)
-            elif downsample_mode == "mode":
-                dataset = np.squeeze(mode(dataset, axis=1)[0])
-            time = np.arange(dataset.shape[0]) * (dt * downsample)
+        print(dataframe, dataframe.shape, dataframe.values.min(),
+        dataframe.values.max())
 
         # Draw heatmap, colorbar, and legend
-        if heatmap:
+        if draw_heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
-            y = kwargs.get("y", np.arange(1, dataset.shape[1]+2))
-            pcolormesh = subplot.pcolor(time, y, dataset.T, **heatmap_kw)
 
-            if colorbar:
+            if hasattr(dataset, "y"):
+                y = dataset.y
+            else:
+                import numpy as np
+                y = np.array(range(1, dataframe.shape[1] + 2))
+            pcolormesh = subplot.pcolor(dataframe.index.values, y,
+              dataframe.values.T, **heatmap_kw)
+
+            if draw_colorbar:
                 from .myplotspec.axes import set_colorbar
+
                 if not hasattr(subplot, "_mps_partner_subplot"):
                     from .myplotspec.axes import add_partner_subplot
+
                     add_partner_subplot(subplot, verbose=verbose,
                       debug=debug, **kwargs)
+
                 set_colorbar(subplot, pcolormesh, **kwargs)
 
-            if legend:
+            if draw_legend:
+                labels = kwargs.get("labels")
                 if handles is not None and labels is not None:
                     cmap = pcolormesh.cmap
-                    h_kw=dict(ls="none", marker="s", ms=5, mec="k")
+                    handle_kw = multi_get_copy("handle_kw", kwargs, {})
 
                     for i in sorted(labels.keys()):
                         label = labels[i]
                         handles[label] = subplot.plot((-1),(-1),
-                          mfc=cmap(i / (len(labels) - 1)), **h_kw)[0]
+                          mfc=cmap(i / (len(labels) - 1)), **handle_kw)[0]
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

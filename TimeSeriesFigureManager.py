@@ -41,12 +41,13 @@ class TimeSeriesFigureManager(FigureManager):
               frameon: False
               loc: 9
               numpoints: 1
-              handletextpad: 0.0
+              handletextpad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
           xlabel: Time
           tick_params:
+            direction: out
             left: on
             right: off
             bottom: on
@@ -61,21 +62,28 @@ class TimeSeriesFigureManager(FigureManager):
           partner_kw:
             position: right
             tick_params:
+              direction: out
               bottom: on
               top: off
               right: off
               left: off
-              direction: out
             grid: True
             grid_kw:
               b: True
               color: [0.8,0.8,0.8]
               linestyle: '-'
+            xticks:
+            tick_params:
+              direction: out
+              bottom: on
+              top: off
+              right: off
+              left: off
           plot_kw:
             zorder: 10
           handle_kw:
-            marker: s
             ls: none
+            marker: s
             mec: black
     """
 
@@ -167,33 +175,36 @@ class TimeSeriesFigureManager(FigureManager):
           right:      0.20
           bottom:     0.70
           sub_height: 1.80
-          top:        0.20
-          shared_legend: True
+          top:        0.25
           shared_legend_kw:
             left:       0.50
             sub_width:  4.40
-            sub_height: 0.30
             bottom:     0.00
+            sub_height: 0.30
             legend_kw:
               labelspacing: 0.5
               legend_fp: 7r
               ncol: 5
+        draw_subplot:
+          xlabel_kw:
+            labelpad: 3
+          ylabel_kw:
+            labelpad: 6
         draw_dataset:
           partner_kw:
+            hspace:    0.05
             sub_width: 0.8
             title_fp: 8b
             xlabel_kw:
               labelpad: 12.5
             label_fp: 8b
             tick_fp: 6r
-            xticks:
             tick_params:
-              direction: out
               length: 2
               pad: 3
               width: 1
           plot_kw:
-            lw: 1.0
+            lw: 1
           handle_kw:
             ms: 6
             mew: 1
@@ -251,10 +262,7 @@ class TimeSeriesFigureManager(FigureManager):
         ykey=None, handles=None,
         draw_pdist=False, draw_fill_between=False, draw_plot=True,
         verbose=1, debug=0, **kwargs):
-        from os.path import expandvars
         from warnings import warn
-        import numpy as np
-        import pandas as pd
         from .myplotspec import get_colors, multi_get_copy
 
         # Load data
@@ -275,7 +283,8 @@ class TimeSeriesFigureManager(FigureManager):
             if not hasattr(subplot, "_mps_partner_subplot"):
                 from .myplotspec.axes import add_partner_subplot
 
-                add_partner_subplot(subplot, **kwargs)
+                add_partner_subplot(subplot, verbose=verbose,
+                  debug=debug, **kwargs)
 
             if not (hasattr(dataset, "pdist_x")
             and     hasattr(dataset, "pdist_y")):
