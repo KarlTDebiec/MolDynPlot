@@ -130,8 +130,8 @@ class NatConDataset(CpptrajDataset):
 
 class SAXSDataset(CpptrajDataset):
 
-    def __init__(self, infile, address="saxs", downsample=None,
-        verbose=1, debug=0, **kwargs):
+    def __init__(self, infile, address="saxs", downsample=None, log=False,
+        mean=False, yoffset=False, verbose=1, debug=0, **kwargs):
         from os.path import expandvars
         import h5py
         import numpy as np
@@ -142,8 +142,8 @@ class SAXSDataset(CpptrajDataset):
             q = ["{0:5.3f}".format(a) for a in np.array(h5_file[address+"/q"])]
 
         super(SAXSDataset, self).__init__(infile=infile,
-          address=address+"/intensity",
-          verbose=verbose, debug=debug, dataframe_kw=dict(columns=q), **kwargs)
+          address=address+"/intensity", verbose=verbose, debug=debug,
+          dataframe_kw=dict(columns=q), **kwargs)
         dataframe = self.dataframe
 
         # Store y
@@ -166,3 +166,16 @@ class SAXSDataset(CpptrajDataset):
               columns=dataframe.columns.values)
             reduced.index.name = "time"
             dataframe = self.dataframe = reduced
+
+        # Log scale
+        if log:
+            dataframe[:] = np.log10(dataframe[:])
+
+        if mean:
+            self.dataframe = dataframe = pd.DataFrame(
+              data=dataframe.mean(axis=0), columns=["intensity"])
+            dataframe.index.name = "q"
+
+            if yoffset is not None:
+                self.dataframe["intensity"] += yoffset
+

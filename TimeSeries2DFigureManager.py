@@ -119,7 +119,7 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_figure:
           shared_legend: False
         draw_subplot:
-          ylabel: "q ($Å^{-1}$)"
+          ylabel:      "q ($Å^{-1}$)"
           yticks:      [0.00,0.05,0.10,0.15,0.20,0.25,0.30,0.35]
           yticklabels: ["0.00","0.05","0.10","0.15","0.20","0.25","0.30","0.35"]
           grid_kw:
@@ -128,6 +128,7 @@ class TimeSeries2DFigureManager(FigureManager):
           dataset_kw:
             cls: moldynplot.CpptrajDataset.SAXSDataset
             downsample_mode: mean
+            log: False
           heatmap_kw:
             cmap: bone
             vmin: 0
@@ -136,6 +137,19 @@ class TimeSeries2DFigureManager(FigureManager):
           colorbar_kw:
             zticks: [0,5000000,10000000]
             zlabel: Intensity
+      saxs_log:
+        class: content
+        help: Intensity on log scale
+        extends: saxs
+        draw_dataset:
+          dataset_kw:
+            log: True
+          heatmap_kw:
+            vmin: 5
+            vmax: 10
+          colorbar_kw:
+            zticks: [5,6,7,8,9,10]
+            zlabel: $log_{10}$(Intensity)
       manuscript:
         class: target
         inherits: manuscript
@@ -249,9 +263,6 @@ class TimeSeries2DFigureManager(FigureManager):
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
         dataframe = dataset.dataframe
-
-        print(dataframe, dataframe.shape, dataframe.values.min(),
-        dataframe.values.max())
 
         # Draw heatmap, colorbar, and legend
         if draw_heatmap:
