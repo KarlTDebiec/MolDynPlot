@@ -131,7 +131,7 @@ class NatConDataset(CpptrajDataset):
 class SAXSDataset(CpptrajDataset):
 
     def __init__(self, infile, address="saxs",
-        downsample=None, mean=False, yoffset=False,
+        downsample=None, mean=False, scale=False,
         verbose=1, debug=0, **kwargs):
         from os.path import expandvars
         import h5py
@@ -174,7 +174,6 @@ class SAXSDataset(CpptrajDataset):
             dataframe.index.name = "q"
             dataframe.index = np.array(dataframe.index, np.float)
 
-            scale = True
             if scale:
                 from scipy.interpolate import interp1d
                 from scipy.optimize import curve_fit
@@ -198,8 +197,6 @@ class SAXSDataset(CpptrajDataset):
                 self_x      = np.array(self_x, np.float64)
                 self_y      = np.array(self_y, np.float64)
                 target_y    = np.array(target_y, np.float64)
-                target_y_se = np.array(target.dataframe["intensity_se"],
-                  np.float64)
 
                 # Update target
                 interp_target_y    = interp1d(target_x, target_y, kind="cubic")

@@ -106,8 +106,8 @@ class SAXSFigureManager(FigureManager):
         help: Plot y axis using base 10 logarithmic scale
         draw_subplot:
           ylabel:      "$log_{10}$(Intensity)"
-          yticks:      [-5,-4,-3,-2,-1,0]
-          yticklabels: [-5,-4,-3,-2,-1,0]
+          yticks:      [-4,-3,-2,-1,0]
+          yticklabels: [-4,-3,-2,-1,0]
         draw_dataset:
           logy: True
       presentation:
