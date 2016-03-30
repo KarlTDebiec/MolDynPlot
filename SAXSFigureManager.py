@@ -46,10 +46,11 @@ class SAXSFigureManager(FigureManager):
           title_kw:
             verticalalignment: bottom
           xlabel:      "q ($Å^{-1}$)"
-          xticks:      [0.00,0.05,0.10,0.15,0.20,0.25,0.30,0.35]
+          xticks:      [ 0.00,  0.05,  0.10,  0.15,  0.20,  0.25,  0.30,  0.35]
           xticklabels: ["0.00","0.05","0.10","0.15","0.20","0.25","0.30","0.35"]
-          ylabel: $log_{10}$(Intensity)
-          yticks: [5,6,7,8,9,10]
+          ylabel:      "Intensity"
+          yticks:      [ 0.00,  0.02,  0.04,  0.06,  0.08,  0.10,  0.12]
+          yticklabels: ["0.00","0.02","0.04","0.06","0.08","0.10","0.12"]
           tick_params:
             direction: out
             left: on
@@ -63,26 +64,6 @@ class SAXSFigureManager(FigureManager):
             color: [0.8,0.8,0.8]
             linestyle: '-'
         draw_dataset:
-          partner_kw:
-            position: right
-            tick_params:
-              direction: out
-              bottom: on
-              top: off
-              right: off
-              left: off
-            grid: True
-            grid_kw:
-              b: True
-              color: [0.8,0.8,0.8]
-              linestyle: '-'
-            xticks:
-            tick_params:
-              direction: out
-              bottom: on
-              top: off
-              right: off
-              left: off
           plot_kw:
             zorder: 10
           handle_kw:
@@ -93,23 +74,42 @@ class SAXSFigureManager(FigureManager):
 
     available_presets = """
       amber:
+        class: content
+        help: Data from sax_md
         draw_dataset:
           dataset_kw:
             cls: moldynplot.CpptrajDataset.SAXSDataset
-            log: True
             mean: True
       experiment:
+        class: content
+        help: Data from experiment
         draw_dataset:
           dataset_kw:
             cls: moldynplot.ExperimentDataset.SAXSDataset
             read_csv_kw:
+              engine: python
               skiprows: 2
               skipfooter: 5
               names: [q, intensity, intensity_se]
               sep: " "
               skipinitialspace: True
               index_col: 0
-            log: True
+      logx:
+        class: appearance
+        help: Plot x axis using base 10 logarithmic scale
+        draw_subplot:
+          xlabel: "$log_{10}$(q)"
+        draw_dataset:
+          logx: True
+      logy:
+        class: appearance
+        help: Plot y axis using base 10 logarithmic scale
+        draw_subplot:
+          ylabel:      "$log_{10}$(Intensity)"
+          yticks:      [-5,-4,-3,-2,-1,0]
+          yticklabels: [-5,-4,-3,-2,-1,0]
+        draw_dataset:
+          logy: True
       presentation:
         class: target
         inherits: presentation
@@ -224,7 +224,7 @@ class SAXSFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None,
-        handles=None,
+        handles=None, logx=False, logy=False,
         draw_fill_between=False, draw_plot=True,
         verbose=1, debug=0, **kwargs):
         import numpy as np
@@ -246,15 +246,28 @@ class SAXSFigureManager(FigureManager):
         if draw_fill_between:
             fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
             get_colors(fill_between_kw, plot_kw)
-            subplot.fill_between(dataframe.index.values, 
-              dataframe["intensity"] - 1.96 * dataframe["intensity_se"],
-              dataframe["intensity"] + 1.96 * dataframe["intensity_se"],
-              **fill_between_kw)
+            x = dataframe.index.values
+            if logx:
+                x = np.log10(x)
+            y = dataframe["intensity"]
+            y_se = dataframe["intensity_se"]
+            if logy:
+                y_se = (y_se / (y * np.log(10)))
+                y = np.log10(y)
+            y_lb = y - 1.96 * y_se
+            y_ub = y + 1.96 * y_se
+            subplot.fill_between(x, y_lb, y_ub, **fill_between_kw)
 
         # Plot series
         if draw_plot:
-            plot = subplot.plot(dataframe.index.values,
-              dataframe["intensity"], **plot_kw)[0]
+            x = dataframe.index.values
+            if logx:
+                x = np.log10(x)
+            y = dataframe["intensity"]
+            if logy:
+                y = np.log10(y)
+            print(y.values.min(), y.values.max())
+            plot = subplot.plot(x, y, **plot_kw)[0]
 #            handle_kw = multi_get_copy("handle_kw", kwargs, {})
 #            handle_kw["mfc"] = plot.get_color()
 #            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]

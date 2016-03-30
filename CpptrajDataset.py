@@ -130,8 +130,9 @@ class NatConDataset(CpptrajDataset):
 
 class SAXSDataset(CpptrajDataset):
 
-    def __init__(self, infile, address="saxs", downsample=None, log=False,
-        mean=False, yoffset=False, verbose=1, debug=0, **kwargs):
+    def __init__(self, infile, address="saxs",
+        downsample=None, mean=False, yoffset=False,
+        verbose=1, debug=0, **kwargs):
         from os.path import expandvars
         import h5py
         import numpy as np
@@ -167,15 +168,45 @@ class SAXSDataset(CpptrajDataset):
             reduced.index.name = "time"
             dataframe = self.dataframe = reduced
 
-        # Log scale
-        if log:
-            dataframe[:] = np.log10(dataframe[:])
-
         if mean:
             self.dataframe = dataframe = pd.DataFrame(
               data=dataframe.mean(axis=0), columns=["intensity"])
             dataframe.index.name = "q"
+            dataframe.index = np.array(dataframe.index, np.float)
 
-            if yoffset is not None:
-                self.dataframe["intensity"] += yoffset
+            scale = True
+            if scale:
+                from scipy.interpolate import interp1d
+                from scipy.optimize import curve_fit
 
+                # Prepare target
+                scale_target = expandvars(kwargs.pop("scale_target"))
+                target = self.load_dataset(infile=scale_target, loose=True,
+                  **kwargs)
+                target_x = target.dataframe.index.values
+                target_y = target.dataframe["intensity"]
+
+                # Prepare own values
+                self_x = dataframe.index.values
+                self_y = dataframe["intensity"].values
+                self_x = self_x[np.logical_and(self_x > target_x.min(),
+                                               self_x < target_x.max())]
+                self_y = self_y[np.logical_and(self_x > target_x.min(),
+                                               self_x < target_x.max())]
+
+                # Must increase precision to support 
+                self_x      = np.array(self_x, np.float64)
+                self_y      = np.array(self_y, np.float64)
+                target_y    = np.array(target_y, np.float64)
+                target_y_se = np.array(target.dataframe["intensity_se"],
+                  np.float64)
+
+                # Update target
+                interp_target_y    = interp1d(target_x, target_y, kind="cubic")
+                target_y           = interp_target_y(self_x)
+
+                def scale_y(_, a):
+                    return a * self_y
+                scaling_factor = curve_fit(scale_y, self_x, target_y,
+                  p0=(2e-9))[0][0]
+                self.dataframe["intensity"] *= scaling_factor

@@ -15,7 +15,8 @@ from .myplotspec.Dataset import Dataset
 ################################### CLASSES ###################################
 class SAXSDataset(Dataset):
 
-    def __init__(self, infile, log=False, yoffset=None,
+    def __init__(self, infile,
+        yoffset=None,
         verbose=1, debug=0, **kwargs):
         from os.path import expandvars
         import h5py
@@ -27,17 +28,6 @@ class SAXSDataset(Dataset):
           verbose=verbose, debug=debug, **kwargs)
         dataframe = self.dataframe
 
-#        # Store y
-#        self.y = np.array(dataframe.columns, np.float)
-
-        # Log scale
-        if log:
-            self.dataframe["intensity_se"] = (
-             dataframe["intensity_se"] / (self.dataframe["intensity"] *
-             np.log(10)))
-            self.dataframe["intensity"] = np.log10(dataframe["intensity"])
-
-        # Offset
-        if yoffset is not None:
-            self.dataframe["intensity"] += yoffset
-        print(self.dataframe)
+#        # Offset
+#        if yoffset is not None:
+#            self.dataframe["intensity"] += yoffset
