@@ -114,33 +114,24 @@ class SAXSFigureManager(FigureManager):
         class: target
         inherits: presentation
         draw_figure:
-          left:       1.20
+          left:       1.25
           sub_width:  7.00
           bottom:     2.90
           sub_height: 3.00
           shared_legend: True
           shared_legend_kw:
-            left:       1.20
-            sub_width:  7.00
-            bottom:     1.70
-            sub_height: 0.50
+            left:       8.35
+            sub_width:  2.00
+            bottom:     2.90
+            sub_height: 3.00
             legend_kw:
               labelspacing: 0.5
-              ncol: 2
+              loc: 2
+              ncol: 1
         draw_dataset:
-          partner_kw:
-            sub_width: 1.2
-            title_fp: 18r
-            xlabel_kw:
-              labelpad: 20
-            label_fp: 18r
-            tick_fp: 14r
-            xticks:
-            lw: 2
-            tick_params:
-              length: 3
-              pad: 6
-              width: 2
+          handle_kw:
+            ms: 12
+            mew: 2
       manuscript:
         class: target
         inherits: manuscript
@@ -204,21 +195,6 @@ class SAXSFigureManager(FigureManager):
               labelspacing: 0.5
               legend_fp: 8r
               ncol: 2
-        draw_dataset:
-          plot_kw:
-            lw: 1.0
-          partner_kw:
-            sub_width: 0.8
-            title_fp: 10b
-            xlabel_kw:
-              labelpad:  12.5
-            label_fp: 10b
-            tick_fp: 8r
-            xticks:
-            tick_params:
-              length: 2
-              pad: 6
-              width: 1
     """
 
     @manage_defaults_presets()
@@ -268,11 +244,14 @@ class SAXSFigureManager(FigureManager):
                 y = np.log10(y)
             print(y.values.min(), y.values.max())
             plot = subplot.plot(x, y, **plot_kw)[0]
-#            handle_kw = multi_get_copy("handle_kw", kwargs, {})
-#            handle_kw["mfc"] = plot.get_color()
-#            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
-#            if handles is not None and label is not None:
-#                handles[label] = handle
+
+        draw_handle=True
+        if draw_handle:
+            handle_kw = multi_get_copy("handle_kw", kwargs, {})
+            handle_kw["mfc"] = plot_kw["color"]
+            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
+            if handles is not None and label is not None:
+                handles[label] = handle
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
