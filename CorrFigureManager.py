@@ -185,6 +185,38 @@ class CorrFigureManager(FigureManager):
               ha: center
               va: center
             border_lw: 1
+      presentation:
+        class: target
+        inherits: presentation
+        draw_figure:
+          fig_width:  5.12
+          left:       2.00
+          sub_width:  1.944444
+          bottom:     2.20
+          sub_height: 3.50
+          shared_legend: True
+          shared_legend_kw:
+            left:       2.00
+            sub_width:  1.944444
+            sub_height: 1.5
+            bottom:     0.00
+            legend_kw:
+              labelspacing: 0.5
+              ncol: 5
+        draw_dataset:
+          errorbar_kw:
+            capsize: 6
+            capthick: 2
+            elinewidth: 2
+          handle_kw:
+            ms: 12
+            mew: 2
+          label_kw:
+            fp: 14r
+            text_kw:
+              ha: center
+              va: center
+            border_lw: 2
     """
 
     @manage_defaults_presets()
