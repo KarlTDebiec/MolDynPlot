@@ -141,17 +141,17 @@ class TimeSeriesFigureManager(FigureManager):
         draw_figure:
           left:       1.20
           sub_width:  7.00
-          bottom:     2.90
+          bottom:     3.10
           sub_height: 3.00
           shared_legend: True
           shared_legend_kw:
             left:       1.20
             sub_width:  7.00
-            bottom:     1.70
+            bottom:     1.90
             sub_height: 0.50
             legend_kw:
-              labelspacing: 0.5
-              ncol: 2
+              labelspacing: 0.0
+              ncol: 5
         draw_dataset:
           partner_kw:
             sub_width: 1.2
@@ -166,6 +166,9 @@ class TimeSeriesFigureManager(FigureManager):
               length: 3
               pad: 6
               width: 2
+          handle_kw:
+            ms: 12
+            mew: 2
       manuscript:
         class: target
         inherits: manuscript
