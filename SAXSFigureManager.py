@@ -201,7 +201,7 @@ class SAXSFigureManager(FigureManager):
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None,
         handles=None, logx=False, logy=False,
-        draw_fill_between=False, draw_plot=True,
+        draw_fill_between=False, draw_plot=True, draw_handle=True,
         verbose=1, debug=0, **kwargs):
         import numpy as np
         import pandas as pd
@@ -245,7 +245,6 @@ class SAXSFigureManager(FigureManager):
             print(y.values.min(), y.values.max())
             plot = subplot.plot(x, y, **plot_kw)[0]
 
-        draw_handle=True
         if draw_handle:
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
             handle_kw["mfc"] = plot_kw["color"]

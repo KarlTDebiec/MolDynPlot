@@ -35,6 +35,13 @@ class SequenceFigureManager(FigureManager):
             right: off
             bottom: on
             top: off
+          shared_legend: True
+          shared_legend_kw:
+            legend_kw:
+              frameon: False
+              loc: 9
+              numpoints: 1
+              handletextpad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -60,6 +67,10 @@ class SequenceFigureManager(FigureManager):
           errorbar_kw:
             ls: None
             zorder: 10
+          handle_kw:
+            ls: none
+            marker: s
+            mec: black
     """
     available_presets = """
       secstruct:
@@ -152,11 +163,7 @@ class SequenceFigureManager(FigureManager):
           sub_height: 1.00
           hspace:     0.00
           top:        0.25
-          multiplot: True
-          title_kw:
-            top: -0.1
         draw_subplot:
-          legend: False
           xlabel_kw:
             labelpad: 3
           ylabel_kw:
@@ -169,7 +176,7 @@ class SequenceFigureManager(FigureManager):
             lw: 1
             capthick: 1
       notebook:
-        help: Notebook (width ≤ 6.5, height ≤ 9)
+        class: target
         inherits: notebook
         draw_figure:
           left:       0.70
@@ -186,16 +193,38 @@ class SequenceFigureManager(FigureManager):
           bar_kw:
             lw: 0.5
       presentation:
-        help: Three stacked plots for presentation (width = 10.24,
-              height = 7.68)
+        class: target
         inherits: presentation
         draw_figure:
           left:       1.50
-          sub_width:  7.50
-          bottom:     3.60
-          sub_height: 2.60
+          sub_width:  6.00
+          bottom:     2.30
+          sub_height: 1.20
+          hspace:     0.10
+          shared_legend: True
+          shared_legend_kw:
+            left: 7.6
+            sub_width: 2.00
+            bottom: 2.30
+            sub_height:  2.5
+            legend_kw:
+                loc: 2
         draw_subplot:
-          legend: False
+          xlabel_kw:
+            labelpad: 3
+          ylabel_kw:
+            rotation: horizontal
+            labelpad: 3
+        draw_dataset:
+          fill_between_kw:
+            zorder: 9
+          errorbar_kw:
+            capsize: 0
+            capthick: 2
+            elinewidth: 2
+          handle_kw:
+            ms: 12
+            mew: 2
     """
 
     @manage_defaults_presets()
@@ -203,7 +232,7 @@ class SequenceFigureManager(FigureManager):
     def draw_dataset(self, subplot,
         ykey=None, ysekey=None, label=None,
         handles=None,
-        draw_fill_between=False, draw_errorbar=True,
+        draw_fill_between=False, draw_errorbar=True, draw_handle=True,
         verbose=1, debug=0, **kwargs):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
@@ -263,6 +292,19 @@ class SequenceFigureManager(FigureManager):
             get_colors(errorbar_kw, plot_kw)
             subplot.errorbar(x, y=dataframe[ykey], yerr=dataframe[ysekey]*1.96,
               **errorbar_kw)
+
+        if draw_handle:
+            handle_kw = multi_get_copy("handle_kw", kwargs, {})
+            handle_kw["mfc"] = plot_kw["color"]
+            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
+            if handles is not None and label is not None:
+                handles[label] = handle
+
+#        if not hasattr(subplot, "_mps_fill_between"):
+#            subplot._mps_fill_between = subplot.fill_between([11.5, 12.5], [0,
+#            0], [10,10], color=[0.7,0.7,0.7], lw=0)
+#            subplot._mps_fill_between = subplot.fill_between([40.5, 41.5], [0,
+#            0], [10,10], color=[0.7,0.7,0.7], lw=0)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
