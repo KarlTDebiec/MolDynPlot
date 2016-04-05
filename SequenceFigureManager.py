@@ -158,7 +158,7 @@ class SequenceFigureManager(FigureManager):
           right:      0.12
           bottom:     0.35
           sub_height: 1.00
-          hspace:     0.00
+          hspace:     0.10
           top:        0.25
         draw_subplot:
           xlabel_kw:
@@ -269,6 +269,8 @@ class SequenceFigureManager(FigureManager):
                             yse = yse_min
                     elif yse_min is not None:
                         yse = yse_min
+                    else:
+                        yse = 0
                     fb_lb.extend([
                       dataframe[ykey][index] - yse * 1.96,
                       dataframe[ykey][index] - yse * 1.96])
