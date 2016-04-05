@@ -64,6 +64,8 @@ class SequenceFigureManager(FigureManager):
             read_csv_kw:
               delim_whitespace: True
               index_col: 0
+          fill_between_kw:
+            zorder: 9
           errorbar_kw:
             ls: None
             zorder: 10
@@ -87,7 +89,6 @@ class SequenceFigureManager(FigureManager):
         class: content
         help: Format subplot for R1 relaxation
         draw_subplot:
-          xticklabels: []
           ylabel:      "$R_1$"
           yticks:      [0,1,2,3,4,5]
         draw_dataset:
@@ -97,7 +98,6 @@ class SequenceFigureManager(FigureManager):
         class: content
         help: Format subplot for R2 relaxation
         draw_subplot:
-          xticklabels: []
           ylabel:      "$R_2$"
           yticks:      [0,2,4,6,8,10,12,14,16,18,20]
         draw_dataset:
@@ -107,7 +107,6 @@ class SequenceFigureManager(FigureManager):
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
         draw_subplot:
-          xlabel:      Residue
           ylabel:      "Het\n\nNOE"
           yticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
@@ -117,13 +116,11 @@ class SequenceFigureManager(FigureManager):
         class: content
         help: Format subplot for S2 order parameter
         draw_subplot:
-          xlabel:      Residue
           ylabel:      "$S^2$"
           yticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
-          yticklabels: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          y_key:    "S2"
-          yerr_key: "S2 se"
+          ykey:   s2
+          ysekey: s2_se
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -172,9 +169,14 @@ class SequenceFigureManager(FigureManager):
           grid_kw:
             alpha: 0.3
         draw_dataset:
-          errorbar_kw:
+          fill_between_kw:
             lw: 1
-            capthick: 1
+          errorbar_kw:
+            capsize: 0
+            lw: 1.5
+            marker: 'o'
+            mew: 0
+            ms: 4
       notebook:
         class: target
         inherits: notebook
