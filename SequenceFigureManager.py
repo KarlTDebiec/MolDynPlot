@@ -98,8 +98,8 @@ class SequenceFigureManager(FigureManager):
         class: content
         help: Format subplot for R2 relaxation
         draw_subplot:
-          ylabel:      "$R_2$"
-          yticks:      [0,2,4,6,8,10,12,14,16,18,20]
+          ylabel: "$R_2$"
+          yticks: [0,2,4,6,8,10,12,14,16,18,20]
         draw_dataset:
           ykey:   r2
           ysekey: r2_se
@@ -107,8 +107,8 @@ class SequenceFigureManager(FigureManager):
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
         draw_subplot:
-          ylabel:      "Het\n\nNOE"
-          yticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
+          ylabel: "Het\n\nNOE"
+          yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
           ykey:   noe
           ysekey: noe_se
@@ -116,11 +116,19 @@ class SequenceFigureManager(FigureManager):
         class: content
         help: Format subplot for S2 order parameter
         draw_subplot:
-          ylabel:      "$S^2$"
-          yticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
+          ylabel: "$S^2$"
+          yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
           ykey:   s2
           ysekey: s2_se
+      error:
+        class: content
+        help: Format subplot for normalized error
+        draw_subplot:
+          ylabel: "Normalized\\nerror"
+          yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
+          ylabel_kw:
+            rotation: vertical
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -156,10 +164,17 @@ class SequenceFigureManager(FigureManager):
           sub_width:  6.00
           wspace:     0.05
           right:      0.12
-          bottom:     0.35
+          bottom:     0.70
           sub_height: 1.00
           hspace:     0.10
           top:        0.25
+          shared_legend_kw:
+            left:       0.60
+            sub_width:  6.00
+            bottom:     0.00
+            sub_height: 0.30
+            legend_kw:
+              ncol: 5
         draw_subplot:
           xlabel_kw:
             labelpad: 3
@@ -173,7 +188,7 @@ class SequenceFigureManager(FigureManager):
             lw: 1
           errorbar_kw:
             capsize: 0
-            lw: 1.5
+            elinewidth: 1.5
             marker: 'o'
             mew: 0
             ms: 4
@@ -203,7 +218,6 @@ class SequenceFigureManager(FigureManager):
           bottom:     2.30
           sub_height: 1.20
           hspace:     0.10
-          shared_legend: True
           shared_legend_kw:
             left: 7.6
             sub_width: 2.00
@@ -222,8 +236,10 @@ class SequenceFigureManager(FigureManager):
             zorder: 9
           errorbar_kw:
             capsize: 0
-            capthick: 2
             elinewidth: 2
+            marker: 'o'
+            mew: 0
+            ms: 2
           handle_kw:
             ms: 12
             mew: 2
@@ -234,7 +250,8 @@ class SequenceFigureManager(FigureManager):
     def draw_dataset(self, subplot,
         ykey=None, ysekey=None, label=None,
         handles=None,
-        draw_fill_between=False, draw_errorbar=True, draw_handle=True,
+        draw_fill_between=False, draw_errorbar=True, draw_plot=False,
+        draw_handle=True,
         verbose=1, debug=0, **kwargs):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
@@ -297,18 +314,28 @@ class SequenceFigureManager(FigureManager):
             subplot.errorbar(x, y=dataframe[ykey], yerr=dataframe[ysekey]*1.96,
               **errorbar_kw)
 
+        # Plot series
+        if draw_plot:
+            p_x, p_y = [], []
+            for residue in range(x.min(), x.max()+1):
+                if residue in x:
+                    p_x.extend([residue-0.5, residue+0.5])
+                    index = np.argmax(x==residue)
+                    p_y.extend([dataframe[ykey][index],
+                                dataframe[ykey][index]])
+                else:
+                    p_x.append(None)
+                    p_y.append(None)
+            p_x = np.array(p_x, np.float)
+            p_y = np.array(p_y, np.float)
+            plot = subplot.plot(p_x, p_y, **plot_kw)[0]
+
         if draw_handle:
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
             handle_kw["mfc"] = plot_kw["color"]
             handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
             if handles is not None and label is not None:
                 handles[label] = handle
-
-#        if not hasattr(subplot, "_mps_fill_between"):
-#            subplot._mps_fill_between = subplot.fill_between([11.5, 12.5], [0,
-#            0], [10,10], color=[0.7,0.7,0.7], lw=0)
-#            subplot._mps_fill_between = subplot.fill_between([40.5, 41.5], [0,
-#            0], [10,10], color=[0.7,0.7,0.7], lw=0)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
