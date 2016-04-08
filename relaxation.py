@@ -8,11 +8,11 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Processes NMR relaxation-related data output by cpptraj
+Processes NMR relaxation and related data
 """
-################################### MODULES ####################################
+################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
-##################################### MAIN #####################################
+#################################### MAIN #####################################
 #def process_acf():
 #    from os import devnull
 #    from subprocess import Popen, PIPE
@@ -36,7 +36,8 @@ from __future__ import absolute_import,division,print_function,unicode_literals
 #        if header is None:
 #            with open(devnull, "w") as fnull:
 #                command = "head -n 1 {0}".format(headerfile)
-#                process = Popen(command, stdout=PIPE, stderr=fnull, shell=True)
+#                process = Popen(command, stdout=PIPE, stderr=fnull,
+#                shell=True)
 #            fields = process.stdout.read().split()
 #            if fields[0] in ["#", "#Frame"]:
 #                fields.pop(0)
@@ -168,8 +169,104 @@ def process_ired(infiles, outfile, indexfile=None, **kwargs):
         header += "{0:>12s}".format(column)
 
     np.savetxt(outfile, np.column_stack((data.index.values, data.values)),
-      fmt=fmt, header=header)
+      fmt=fmt, header=header, comments='#')
 
+def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
+    from os import devnull
+    import pandas as pd
+    pd.set_option("display.width", None)
+    import numpy as np
+
+    if len(sim_infiles) != len(exp_infiles):
+        raise ValueError("Number of simulation input files must match number "+
+                         "of experimental input files, as they are treated "+
+                         "pairwise. {0} simulation ".format(len(sim_infiles))+
+                         "input file(s) and {0} ".format(len(exp_infiles))+
+                         "experiment input file(s) provided.")
+
+    # Work through each pair of infiles
+    errs = []
+    final_index = None
+    for sim_infile, exp_infile in zip(sim_infiles, exp_infiles):
+        print("Comparing simulation infile '{0}' ".format(sim_infile) +
+              "with experimental infile '{0}':".format(exp_infile))
+
+        # Load infiles and select shared indexes and columns
+        sim = pd.read_csv(sim_infile, delim_whitespace=True, index_col=0)
+        exp = pd.read_csv(exp_infile, delim_whitespace=True, index_col=0)
+        overlap = sim.index.intersection(exp.index)
+        if final_index is None:
+            final_index = exp.index
+        final_index = final_index.union(overlap)
+        sim = sim.loc[overlap]
+        exp = exp.loc[overlap]
+        err_cols = [c for c in sim.columns.values
+                      if not c.endswith("_se")
+                      and c in exp.columns.values]
+        err_se_cols = [c + "_se" for c in err_cols
+                       if  c + "_se" in sim.columns.values
+                       and c + "_se" in exp.columns.values]
+        print("   Files share fields {0} and {1} for {2} residues".format(
+            str(map(str, err_cols)).replace("'", ""),
+            str(map(str, err_se_cols)).replace("'", ""),
+            len(overlap)))
+
+        # Calculate error of available fields
+        err = pd.DataFrame(0, index=overlap, columns = 
+          [x for t in zip(err_cols, err_se_cols) for x in t])
+        err[err_cols] = (np.abs(exp[err_cols] - sim[err_cols]) 
+                         / np.abs(exp[err_cols]))
+
+        # Calculate uncertainty of error of available fields
+        if len(err_se_cols) != 0:
+            err[err_se_cols] = 0
+            err[err_se_cols] = np.sqrt((err[err_cols].values) ** 2 * 
+                       ((np.sqrt(exp[err_se_cols].values ** 2
+                       + sim[err_se_cols].values ** 2)
+                         / (exp[err_cols].values - sim[err_cols].values)) ** 2 
+                        + (exp[err_se_cols].values / exp[err_cols].values) ** 2))
+        errs.append(err)
+
+    # Determine final columns and indexes
+    final_cols = []
+    final_index = sorted(final_index, key=lambda x: int(x.split(":")[1]))
+    for err in errs:
+        for col in err.columns.values:
+            if not col in final_cols:
+                final_cols.append(col)
+
+    # Sum the columns
+    final = pd.DataFrame(0.0, index=final_index, columns=final_cols)
+    counts = pd.DataFrame(0, index=final_index, columns=final_cols)
+    for err in errs:
+        for col in err.columns.values:
+            if not col.endswith("_se"):
+                final[col].loc[err.index] += err[col].loc[err.index]
+            else:
+                final[col].loc[err.index] += err[col].loc[err.index] ** 2
+            counts[col].loc[err.index] += 1
+
+    # Average the columns
+    print("Averaging fields:")
+    for col in final_cols:
+        if not col.endswith("_se"):
+            print("    Averaging field '{0}'".format(col))
+            final[col] /= counts[col]
+        else:
+            print("    Progagating uncertainty for field '{0}'".format(col))
+            final[col] = np.sqrt(final[col]) / counts[col]
+
+    # Write outfile
+    print("Writing outfile '{0}' with fields ".format(outfile) +
+          "{0} for ".format(str(map(str, final_cols)).replace("'", "")) +
+          "{0} residues".format(len(final_index)))
+    header = "residue    "
+    for col in final_cols:
+        header += "{0:>12s}".format(col)
+    fmt = ["%12s"] + ["%11.5f"] * len(final_cols)
+    np.savetxt(outfile, np.column_stack((final.index.values,
+      final.values)), fmt=fmt, header=header, comments='#')
+    
 if __name__ == "__main__":
     import argparse
 
@@ -251,7 +348,58 @@ if __name__ == "__main__":
       type     = str,
       help     = "Text file to which processed data will be output")
 
+    # Prepare error subparser
+    ired_subparser  = subparsers.add_parser(
+      name        = "error",
+      help        = "Calculates error of simulated relaxation relative to " +
+                    "experiment",
+      description = "Calculates error of simulated relaxation relative to " +
+                    "experiment. The intended use case is to break down " +
+                    "errors relative to experimental data collected at " +
+                    "multiple magnetic fields or by multiple groups, " +
+                    "error(residue, measurement, magnet/group), into a form " +
+                    "that is easier to visualize and communicate, " +
+                    "error(residue, measurement). " +
+                    "Reads in a series of input files containing simulated " +
+                    "data and a series of files containing corresponding " +
+                    "experimental data. These files are treated in pairs " +
+                    "and the error between all data points present in both " +
+                    "(e.g. row 'GLN:2', column 'r1') calculated. " +
+                    "Columns ending in '_se' are treated as uncertainties, " +
+                    "and are propogated into uncertainties in the resulting " +
+                    "errors rather than being averaged. Take caution when " +
+                    "processing datasets that omit uncertainties alongside " +
+                    "those that do (experimental uncertainties are not " + 
+                    "always reported), as the resulting uncertainties in " +
+                    "the residuals will be incorrect.")
+
+    input_group  = ired_subparser.add_argument_group("input")
+    action_group = ired_subparser.add_argument_group("action")
+    output_group = ired_subparser.add_argument_group("output")
+    input_group.add_argument(
+      "-sim_infile",
+      required = True,
+      dest     = "sim_infiles",
+      nargs    = "+",
+      type     = str,
+      help     = "input file(s) from which to load simulation datasets")
+    input_group.add_argument(
+      "-exp_infile",
+      required = True,
+      dest     = "exp_infiles",
+      nargs    = "+",
+      type     = str,
+      help     = "input file(s) from which to load experimental datasets")
+    output_group.add_argument(
+      "-outfile",
+      required = True,
+      type     = str,
+      help     = "Text file to which processed data will be output")
+
     # Parse arguments and run selected function
     kwargs  = vars(parser.parse_args())
-    if kwargs.pop("mode") == "ired":
+    mode = kwargs.pop("mode")
+    if   mode == "ired":
         process_ired(**kwargs)
+    elif mode == "error":
+        process_error(**kwargs)
