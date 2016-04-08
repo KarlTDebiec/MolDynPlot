@@ -42,10 +42,10 @@ class SAXSDataset(Dataset):
             # Prepare own values
             self_x = dataframe.index.values
             self_y = dataframe["intensity"].values
-            self_x = self_x[np.logical_and(self_x > target_x.min(),
-                                           self_x < target_x.max())]
-            self_y = self_y[np.logical_and(self_x > target_x.min(),
-                                           self_x < target_x.max())]
+            indexes = np.logical_and(self_x > target_x.min(),
+                                     self_x < target_x.max())
+            self_x = self_x[indexes]
+            self_y = self_y[indexes]
 
             # Must increase precision to support 
             self_x      = np.array(self_x, np.float64)
@@ -60,5 +60,7 @@ class SAXSDataset(Dataset):
                 return a * self_y
             scaling_factor = curve_fit(scale_y, self_x, target_y,
               p0=(1))[0][0]
+            print(scaling_factor)
             self.dataframe["intensity"]    *= scaling_factor
-            self.dataframe["intensity_se"] *= scaling_factor
+            if "intensity_se" in self.dataframe.columns.values:
+                self.dataframe["intensity_se"] *= scaling_factor

@@ -94,6 +94,19 @@ class SAXSFigureManager(FigureManager):
               sep: " "
               skipinitialspace: True
               index_col: 0
+      envelope:
+        class: content
+        help: Data back-calculated from molecular envelope
+        draw_dataset:
+          dataset_kw:
+            cls: moldynplot.ExperimentDataset.SAXSDataset
+            read_csv_kw:
+              engine: python
+              skiprows: 1
+              names: [q, intensity, something]
+              sep: " "
+              skipinitialspace: True
+              index_col: 0
       logx:
         class: appearance
         help: Plot x axis using base 10 logarithmic scale
@@ -242,7 +255,6 @@ class SAXSFigureManager(FigureManager):
             y = dataframe["intensity"]
             if logy:
                 y = np.log10(y)
-            print(y.values.min(), y.values.max())
             plot = subplot.plot(x, y, **plot_kw)[0]
 
         if draw_handle:
