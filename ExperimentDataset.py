@@ -7,7 +7,7 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Manages cpptraj datasets.
+Manages cpptraj datasets
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals

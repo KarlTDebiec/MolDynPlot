@@ -52,7 +52,6 @@ class TimeSeriesFigureManager(FigureManager):
             right: off
             bottom: on
             top: off
-            direction: out
           grid: True
           grid_kw:
             b: True
