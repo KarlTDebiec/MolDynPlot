@@ -31,11 +31,10 @@ class TimeSeries2DFigureManager(FigureManager):
           subplot_kw:
             autoscale_on: False
           multi_tick_params:
-            left: on
-            right: off
+            left:   on
+            right:  off
             bottom: on
-            top: off
-          shared_legend: True
+            top:    off
           shared_legend_kw:
             spines: False
             handle_kw:
@@ -51,7 +50,6 @@ class TimeSeries2DFigureManager(FigureManager):
           title_kw:
             verticalalignment: bottom
           xlabel: Time
-          ylabel: Residue
           tick_params:
             direction: out
             bottom: on
@@ -63,7 +61,6 @@ class TimeSeries2DFigureManager(FigureManager):
             b: True
             color: [0.2,0.2,0.2]
             linestyle: '-'
-          legend: False
         draw_dataset:
           draw_heatmap: True
           heatmap_kw:
@@ -105,7 +102,6 @@ class TimeSeries2DFigureManager(FigureManager):
             cmap: !!python/object/apply:moldynplot.dssp_cmap []
             vmin: 0
             vmax: 7
-          draw_legend: True
       perres_rmsd:
         class: content
         help: Per-residue RMSD calculated by cpptraj
@@ -137,29 +133,26 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_dataset:
           dataset_kw:
             cls: moldynplot.CpptrajDataset.SAXSDataset
-            downsample_mode: mean
-            log: False
           heatmap_kw:
             cmap: bone
             vmin: 0
             vmax: 10000000
           draw_colorbar: True
           colorbar_kw:
-            zticks: [0,5000000,10000000]
             zlabel: Intensity
+            zticks: [0,5000000,10000000]
       saxs_log:
         class: content
         help: Intensity on log scale
         extends: saxs
         draw_dataset:
-          dataset_kw:
-            log: True
+          logz: True
           heatmap_kw:
             vmin: 5
             vmax: 10
           colorbar_kw:
-            zticks: [5,6,7,8,9,10]
             zlabel: $log_{10}$(Intensity)
+            zticks: [5,6,7,8,9,10]
       manuscript:
         class: target
         inherits: manuscript
@@ -260,9 +253,10 @@ class TimeSeries2DFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None,
-        handles=None,
+        handles=None, logz=False,
         draw_heatmap=False, draw_colorbar=False, draw_legend=False,
         verbose=1, debug=0, **kwargs):
+        import numpy as np
         from .myplotspec import multi_get_copy
 
         # Load data
@@ -275,14 +269,15 @@ class TimeSeries2DFigureManager(FigureManager):
         # Draw heatmap
         if draw_heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
-
+            x = dataframe.index.values
             if hasattr(dataset, "y"):
                 y = dataset.y
             else:
-                import numpy as np
                 y = np.array(range(1, dataframe.shape[1] + 2))
-            pcolormesh = subplot.pcolor(dataframe.index.values, y,
-              dataframe.values.T, **heatmap_kw)
+            z = dataframe.values.T
+            if logz:
+                z = np.log10(z)
+            pcolormesh = subplot.pcolor(x, y, z, **heatmap_kw)
 
             # Draw colorbar
             if draw_colorbar:
