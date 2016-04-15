@@ -120,7 +120,6 @@ class SAXSFigureManager(FigureManager):
         draw_subplot:
           ylabel:      "$log_{10}$(Intensity)"
           yticks:      [-4,-3,-2,-1,0]
-          yticklabels: [-4,-3,-2,-1,0]
         draw_dataset:
           logy: True
       presentation:
