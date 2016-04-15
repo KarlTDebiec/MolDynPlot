@@ -13,7 +13,7 @@ General functions.
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
 ################################### CLASSES ###################################
-def dssp_color_palette():
+def dssp_cmap(z=None, vmin=None, vmax=None):
     """
     Generates colormap for dssp
 
@@ -22,14 +22,6 @@ def dssp_color_palette():
     """
     from matplotlib.colors import LinearSegmentedColormap
 
-#    palette = [(1.000, 1.000, 1.000),   # White
-#               (0.573, 0.367, 0.256),   # Brown
-#               (0.826, 0.504, 0.178),   # Orange
-#               (0.755, 0.241, 0.246),   # Red
-#               (0.304, 0.485, 0.632),   # Blue
-#               (0.555, 0.365, 0.575),   # Purple
-#               (0.369, 0.615, 0.361),   # Green
-#               (0.854, 0.850, 0.338)]   # Yellow
     palette = [(1.000, 1.000, 1.000),   # White
                (0.573, 0.367, 0.256),   # Brown
                (0.826, 0.504, 0.178),   # Orange
@@ -47,4 +39,7 @@ def dssp_color_palette():
     cdict["green"] = tuple(cdict["green"])
     cdict["blue"]  = tuple(cdict["blue"])
 
-    return LinearSegmentedColormap("test", cdict)
+    if z is None or vmin is None or vmax is None:
+        return LinearSegmentedColormap("test", cdict)
+    else:
+        return LinearSegmentedColormap("test", cdict)(z / (vmax - vmin))
