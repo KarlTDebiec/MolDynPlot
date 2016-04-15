@@ -2,3 +2,7 @@
     path   = myplotspec
     url    = https://github.com/KarlTDebiec/myplotspec.git
     ignore = dirty
+[submodule "fpblockaverager"]
+    path   = fpblockaverager
+    url    = https://github.com/KarlTDebiec/FPBlockAverager.git
+    ignore = dirty
