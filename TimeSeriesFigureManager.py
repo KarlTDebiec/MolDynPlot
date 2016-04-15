@@ -116,24 +116,31 @@ class TimeSeriesFigureManager(FigureManager):
           dataset_kw:
             cls: moldynplot.CpptrajDataset.CpptrajDataset
             pdist: True
+            pdist_key: rmsd
             read_csv_kw:
               delim_whitespace: True
-              names: [frame, rmsd]
               header: 0
               index_col: 0
+              names: [frame, rmsd]
       rg:
         class: content
         help: Radius of Gyration (Rg) vs. time
         draw_subplot:
           ylabel: $R_g$ (Å)
+          yticks: [0,5,10,15,20,25,30]
         draw_dataset:
+          ykey: rg
+          partner_kw:
+            yticks: [0,5,10,15,20,25,30]
           dataset_kw:
+            cls: moldynplot.CpptrajDataset.CpptrajDataset
+            pdist: True
+            pdist_key: rg
             read_csv_kw:
               delim_whitespace: True
-              index_col: False
-              names: [time, rg, rgmax]
               header: 0
-          ykey: rg
+              index_col: 0
+              names: [frame, rg, rgmax]
       presentation:
         class: target
         inherits: presentation

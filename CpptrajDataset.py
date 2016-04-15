@@ -66,11 +66,13 @@ class CpptrajDataset(Dataset):
         if kwargs.get("pdist", False):
             from sklearn.neighbors import KernelDensity
 
+            pdist_key = kwargs.get("pdist_key", dataframe.columns.values[0])
+
             kde_kw = kwargs.get("kde_kw",  {"bandwidth": 0.1})
             grid = kwargs.get("grid", np.linspace(
                 dataframe.values.min(), dataframe.values.max(), 100))
             kde = KernelDensity(**kde_kw)
-            kde.fit(dataframe["rmsd"][:, np.newaxis])
+            kde.fit(dataframe[pdist_key][:, np.newaxis])
             pdf = np.exp(kde.score_samples(grid[:, np.newaxis]))
             pdf /= pdf.sum()
             self.pdist_x = grid
