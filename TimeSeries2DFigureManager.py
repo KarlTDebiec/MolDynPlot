@@ -37,11 +37,16 @@ class TimeSeries2DFigureManager(FigureManager):
             top: off
           shared_legend: True
           shared_legend_kw:
+            spines: False
+            handle_kw:
+              ls: none
+              marker: s
+              mec: black
             legend_kw:
               frameon: False
+              handletextpad: 0
               loc: 9
               numpoints: 1
-              handletextpad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -64,10 +69,6 @@ class TimeSeries2DFigureManager(FigureManager):
           heatmap_kw:
             edgecolors: none
             rasterized: True
-          handle_kw:
-            ls: none
-            marker: s
-            mec: black
     """
 
     available_presets = """
@@ -76,6 +77,24 @@ class TimeSeries2DFigureManager(FigureManager):
         help: Dynamic secondary structure of proteins calculated by cpptraj
         draw_figure:
           shared_legend: True
+          shared_legend_kw:
+            handles:
+              "None":
+                color: !!python/object/apply:moldynplot.dssp_cmap [0,0,7]
+              "Parallel β Sheet":
+                color: !!python/object/apply:moldynplot.dssp_cmap [1,0,7]
+              "Antiparallel β Sheet":
+                color: !!python/object/apply:moldynplot.dssp_cmap [2,0,7]
+              "$3_{10}$ Helix":
+                color: !!python/object/apply:moldynplot.dssp_cmap [3,0,7]
+              "α Helix":
+                color: !!python/object/apply:moldynplot.dssp_cmap [4,0,7]
+              "π Helix":
+                color: !!python/object/apply:moldynplot.dssp_cmap [5,0,7]
+              "Turn":
+                color: !!python/object/apply:moldynplot.dssp_cmap [6,0,7]
+              "Bend":
+                color: !!python/object/apply:moldynplot.dssp_cmap [7,0,7]
         draw_subplot:
           ylabel: Residue
         draw_dataset:
@@ -83,19 +102,10 @@ class TimeSeries2DFigureManager(FigureManager):
             cls: moldynplot.CpptrajDataset.CpptrajDataset
             downsample_mode: mode
           heatmap_kw:
-            cmap: !!python/object/apply:moldynplot.dssp_color_palette []
+            cmap: !!python/object/apply:moldynplot.dssp_cmap []
             vmin: 0
             vmax: 7
           draw_legend: True
-          labels:
-            0: None
-            1: Parallel β Sheet
-            2: Antiparallel β Sheet
-            3: $3_{10}$ Helix
-            4: α Helix
-            5: π Helix
-            6: Turn
-            7: Bend
       perres_rmsd:
         class: content
         help: Per-residue RMSD calculated by cpptraj
@@ -167,6 +177,8 @@ class TimeSeries2DFigureManager(FigureManager):
             sub_width:  4.40
             bottom:     0.00
             sub_height: 0.40
+            handle_kw:
+              ms: 5
             legend_kw:
               legend_fp: 7r
               ncol: 4
@@ -187,8 +199,6 @@ class TimeSeries2DFigureManager(FigureManager):
             zlabel_fp: 8b
             zlabel_kw:
               labelpad: 2
-          handle_kw:
-            ms: 5
       manuscript_stacked_dssp:
         class: target
         extends: manuscript
@@ -253,8 +263,6 @@ class TimeSeries2DFigureManager(FigureManager):
         handles=None,
         draw_heatmap=False, draw_colorbar=False, draw_legend=False,
         verbose=1, debug=0, **kwargs):
-        """
-        """
         from .myplotspec import multi_get_copy
 
         # Load data
@@ -264,7 +272,7 @@ class TimeSeries2DFigureManager(FigureManager):
         dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
         dataframe = dataset.dataframe
 
-        # Draw heatmap, colorbar, and legend
+        # Draw heatmap
         if draw_heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
 
@@ -276,6 +284,7 @@ class TimeSeries2DFigureManager(FigureManager):
             pcolormesh = subplot.pcolor(dataframe.index.values, y,
               dataframe.values.T, **heatmap_kw)
 
+            # Draw colorbar
             if draw_colorbar:
                 from .myplotspec.axes import set_colorbar
 
@@ -286,17 +295,6 @@ class TimeSeries2DFigureManager(FigureManager):
                       debug=debug, **kwargs)
 
                 set_colorbar(subplot, pcolormesh, **kwargs)
-
-            if draw_legend:
-                labels = kwargs.get("labels")
-                if handles is not None and labels is not None:
-                    cmap = pcolormesh.cmap
-                    handle_kw = multi_get_copy("handle_kw", kwargs, {})
-
-                    for i in sorted(labels.keys()):
-                        label = labels[i]
-                        handles[label] = subplot.plot((-1),(-1),
-                          mfc=cmap(i / (len(labels) - 1)), **handle_kw)[0]
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
