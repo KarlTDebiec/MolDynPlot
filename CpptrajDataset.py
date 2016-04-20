@@ -63,6 +63,7 @@ class CpptrajDataset(Dataset):
             reduced.index.name = "time"
             dataframe = self.dataframe = reduced
 
+        # Calculate probability distribution
         if kwargs.get("pdist", False):
             from sklearn.neighbors import KernelDensity
 
@@ -77,6 +78,16 @@ class CpptrajDataset(Dataset):
             pdf /= pdf.sum()
             self.pdist_x = grid
             self.pdist_y = pdf
+
+        # Calculate mean and standard error
+        if kwargs.get("blockavg", False):
+            from .fpblockaverager.FPBlockAverager import FPBlockAverager
+
+            print(dataframe.mean())
+            print(dataframe.std())
+            block_averager = FPBlockAverager(dataframe)
+            parameters = block_averager.parameters
+            print(parameters)
 
 class NatConDataset(CpptrajDataset):
 

@@ -107,6 +107,8 @@ class TimeSeries2DFigureManager(FigureManager):
         help: Per-residue RMSD calculated by cpptraj
         draw_figure:
           shared_legend: False
+        draw_subplot:
+          ylabel: Residue
         draw_dataset:
           dataset_kw:
             cls: moldynplot.CpptrajDataset.CpptrajDataset
