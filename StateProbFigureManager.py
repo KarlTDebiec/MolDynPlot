@@ -207,7 +207,7 @@ class StateProbFigureManager(FigureManager):
         # Handle missing input gracefully
         handle_kw = multi_get_copy("handle_kw", kwargs, {})
         if experiment is not None:
-            subplot.axhspan(experiment[0], experiment[1], lw=0,
+            subplot.axhspan(experiment[0], experiment[1], lw=2,
               color=[0.7, 0.7, 0.7])
             handles["Experiment"] = subplot.plot([-10, -10], [-10, -10],
               mfc=[0.7, 0.7, 0.7], **handle_kw)[0]

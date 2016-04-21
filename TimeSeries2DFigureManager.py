@@ -53,9 +53,9 @@ class TimeSeries2DFigureManager(FigureManager):
           tick_params:
             direction: out
             bottom: on
-            top: off
-            right: off
-            left: on
+            top:    off
+            right:  off
+            left:   on
           grid: True
           grid_kw:
             b: True
