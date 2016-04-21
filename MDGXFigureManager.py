@@ -32,10 +32,29 @@ class MDGXFigureManager(FigureManager):
           subplot_kw:
             autoscale_on: False
           multi_tick_params:
-            left: on
-            right: off
+            direction: out
+            left:   on
+            right:  off
             bottom: off
-            top: off
+            top:    off
+          shared_legend_kw:
+            spines: False
+            handle_kw:
+              ls: none
+              marker: s
+              mec: black
+            legend_kw:
+              frameon: False
+              handletextpad: 0
+              loc: 9
+              numpoints: 1
+              title: Backbone torsion class
+            handles:
+              - ["Neutral",            {color: green}]
+              - ["Negatively-charged", {color: red}]
+              - ["Positively-charged", {color: blue}]
+              - ["Glycine",            {color: yellow}]
+              - ["Proline",            {color: purple}]
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -43,10 +62,10 @@ class MDGXFigureManager(FigureManager):
           ylabel: '$\\left|{U_{QM}-U_{MM}}\\right|$\n\n(kcal/mol)'
           tick_params:
             direction: out
-            left: on
-            right: off
+            left:   on
+            right:  off
             bottom: off
-            top: off
+            top:    off
           grid: True
           grid_kw:
             axis: y
@@ -70,9 +89,20 @@ class MDGXFigureManager(FigureManager):
           left:       0.59
           sub_width:  6.29
           right:      0.12
-          bottom:     0.30
+          bottom:     0.60
           sub_height: 1.00
           top:        0.20
+          shared_legend: True
+          shared_legend_kw:
+            left:       0.59
+            sub_width:  6.29
+            bottom:     0.00
+            sub_height: 0.40
+            handle_kw:
+              ms: 5
+            legend_kw:
+              legend_fp: 7r
+              ncol: 5
         draw_subplot:
           xlabel_kw:
             labelpad: 3
@@ -139,7 +169,7 @@ class MDGXFigureManager(FigureManager):
         violin_kw = multi_get_copy("violin_kw", kwargs, {})
         get_colors(violin_kw, plot_kw)
         y = [d["error"] for d in dataset.selections]
-        x = kwargs.get("x", np.arange(0.5,len(dataset.selections)+0.5,1))
+        x = kwargs.get("x", range(1,len(dataset.selections)+1,1))
         if draw_percentile:
             percentile_kw = plot_kw.copy()
             percentile_kw.update(kwargs.get("percentile_kw", {}))
@@ -175,7 +205,7 @@ class MDGXFigureManager(FigureManager):
                 if draw_percentile:
                     prc_y = np.percentile(y[i], 25)
                     prc_xmin = vertices[np.abs(
-                      vertices[:vertices.shape[0],1]-prc_y).argmin(),0]
+                      vertices[:vertices.shape[0],1]-prc_y).argmin(),0] 
                     subplot.plot([prc_xmin, x[i]+(x[i]-prc_xmin)],
                       [prc_y, prc_y], **percentile_kw)
                     prc_y = np.percentile(y[i], 50)
