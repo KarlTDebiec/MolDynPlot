@@ -56,9 +56,19 @@ class CorrFigureManager(FigureManager):
             color: [0.8,0.8,0.8]
             linestyle: '-'
         draw_dataset:
+          dataset_kw:
+            cls: moldynplot.CorrDataset.CorrDataset
+            x_kw:
+              read_csv_kw:
+                delim_whitespace: True
+                index_col: 0
+            y_kw:
+              read_csv_kw:
+                delim_whitespace: True
+                index_col: 0
           corr_line_kw:
-            x: [0, 10]
-            y: [0, 10]
+            x: [0, 100]
+            y: [0, 100]
             color: [0.5,0.5,0.5]
             zorder: 9
           errorbar_kw:
@@ -72,58 +82,58 @@ class CorrFigureManager(FigureManager):
     """
 
     available_presets = """
-      R1:
+      r1:
         class: content
         help: Format subplot for R1 relaxation
         draw_subplot:
-          xlabel:      $R_1$ Experiment
-          xticks:      [0.0,0.5,1.0,1.5,2.0,2.5,3.0]
-          xticklabels: [0.0,0.5,1.0,1.5,2.0,2.5,3.0]
-          ylabel:      $R_1$ Simulation
-          yticks:      [0.0,0.5,1.0,1.5,2.0,2.5,3.0]
-          yticklabels: [0.0,0.5,1.0,1.5,2.0,2.5,3.0]
+          xlabel: "$R_1$ Experiment"
+          xticks: [0,1,2,3,4,5]
+          yticks: [0,1,2,3,4,5]
+          ylabel: "$R_1$ Simulation"
         draw_dataset:
-          y_key:    R1
-          yerr_key: R1 se
-      R2:
+          xkey:   r1
+          xsekey: r1_se
+          ykey:   r1
+          ysekey: r1_se
+      r2:
         class: content
         help: Format subplot for R2 relaxation
         draw_subplot:
-          xlabel:      $R_2$ Experiment
-          xticks:      [0.0,3.0,6.0,9.0,12.0,15.0]
-          xticklabels: [0.0,3.0,6.0,9.0,12.0,15.0]
-          ylabel:      $R_2$ Simulation
-          yticks:      [0.0,3.0,6.0,9.0,12.0,15.0]
-          yticklabels: [0.0,3.0,6.0,9.0,12.0,15.0]
+          xlabel: "$R_2$ Experiment"
+          xticks: [0,2,4,6,8,10,12,14,16,18,20]
+          ylabel: "$R_2$ Simulation"
+          yticks: [0,2,4,6,8,10,12,14,16,18,20]
         draw_dataset:
-          y_key:    R2
-          yerr_key: R2 se
-      HetNOE:
+          xkey:   r2
+          xsekey: r2_se
+          ykey:   r2
+          ysekey: r2_se
+      hetnoe:
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
         draw_subplot:
-          xlabel:      "HetNOE Experiment"
-          xticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
-          xticklabels: [0.0,0.2,0.4,0.6,0.8,1.0]
-          ylabel:      "HetNOE Simulation"
-          yticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
-          yticklabels: [0.0,0.2,0.4,0.6,0.8,1.0]
+          xlabel: "HetNOE Experiment"
+          xticks: [0.0,0.2,0.4,0.6,0.8,1.0]
+          ylabel: "HetNOE Simulation"
+          yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          y_key:    "NOE"
-          yerr_key: "NOE se"
-      order:
+          xkey:   noe
+          xsekey: noe_se
+          ykey:   noe
+          ysekey: noe_se
+      s2:
         class: content
         help: Format subplot for S2 order parameter
         draw_subplot:
-          xlabel:      $S^2$ Experiment
-          xticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
-          xticklabels: [0.0,0.2,0.4,0.6,0.8,1.0]
-          ylabel:      $S^2$ Simulation
-          yticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
-          yticklabels: [0.0,0.2,0.4,0.6,0.8,1.0]
+          xlabel: "$S^2$ Experiment"
+          xticks: [0.0,0.2,0.4,0.6,0.8,1.0]
+          ylabel: "$S^2$ Simulation"
+          yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          y_key:    "S2"
-          yerr_key: "S2 se"
+          xkey:   s2
+          xsekey: s2_se
+          ykey:   s2
+          ysekey: s2_se
       rotdif:
         class: content
         help: Format subplot for rotational diffusion
@@ -142,13 +152,13 @@ class CorrFigureManager(FigureManager):
           ncols: 2
           subplots:
             0:
-              preset: R1
+              preset: r1
             1:
-              preset: R2
+              preset: r2
             2:
-              preset: HetNOE
+              preset: hetnoe
             3:
-              preset: order
+              preset: s2
       manuscript:
         class: target
         inherits: manuscript
@@ -222,7 +232,7 @@ class CorrFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot,
-        label=None,
+        xkey=None, ykey=None, xsekey=None, ysekey=None, label=None,
         handles=None,
         draw_corr_line=True, draw_errorbar=True, draw_plot=True,
         draw_handle=False, draw_label=False,
@@ -232,6 +242,11 @@ class CorrFigureManager(FigureManager):
         import numpy as np
         import pandas as pd
         from .myplotspec import get_colors, multi_get_copy
+
+        # Load data
+        dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
+        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
+        dataframe = dataset.dataframe
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -249,31 +264,34 @@ class CorrFigureManager(FigureManager):
         if draw_errorbar:
             errorbar_kw = multi_get_copy("errorbar_kw", kwargs, {})
             get_colors(errorbar_kw, plot_kw)
-            subplot.errorbar(
-              errorbar_kw.pop("x"), errorbar_kw.pop("y"),
-              yerr=errorbar_kw.pop("yerr")*1.96,
+
+            eb_x   = errorbar_kw.get("x",   dataframe[xkey,   "x"])
+            eb_y   = errorbar_kw.get("x",   dataframe[ykey,   "y"])
+            eb_xse = errorbar_kw.get("xse", dataframe[xsekey, "x"])
+            eb_yse = errorbar_kw.get("yse", dataframe[ysekey, "y"])
+            subplot.errorbar(eb_x, eb_y, xerr=eb_xse*1.96, yerr=eb_yse*1.96,
               **errorbar_kw)
 
-        # Plot legend handles
-        if draw_handle:
-            if label is None:
-                warn("'draw_handle' is enabled but a value for argument"
-                     "'label' was not provided; skipping")
-            else:
-                handle_kw = multi_get_copy("handle_kw", kwargs, {})
-                get_colors(handle_kw, plot_kw)
-                handle = subplot.plot(
-                  handle_kw.pop("x", [-10,-10]), handle_kw.pop("y", [-10,-10]),
-                  **handle_kw)[0]
-                if handles is not None:
-                    handles[label] = handle
-
-        # Draw label
-        if draw_label:
-            from .myplotspec.text import set_text
-
-            label_kw = multi_get_copy("label_kw", kwargs, {})
-            set_text(subplot, **label_kw)
+#        # Plot legend handles
+#        if draw_handle:
+#            if label is None:
+#                warn("'draw_handle' is enabled but a value for argument"
+#                     "'label' was not provided; skipping")
+#            else:
+#                handle_kw = multi_get_copy("handle_kw", kwargs, {})
+#                get_colors(handle_kw, plot_kw)
+#                handle = subplot.plot(
+#                  handle_kw.pop("x", [-10,-10]), handle_kw.pop("y", [-10,-10]),
+#                  **handle_kw)[0]
+#                if handles is not None:
+#                    handles[label] = handle
+#
+#        # Draw label
+#        if draw_label:
+#            from .myplotspec.text import set_text
+#
+#            label_kw = multi_get_copy("label_kw", kwargs, {})
+#            set_text(subplot, **label_kw)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
