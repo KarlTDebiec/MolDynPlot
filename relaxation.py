@@ -85,6 +85,8 @@ from __future__ import absolute_import,division,print_function,unicode_literals
 #            output.write("\n")
 
 def process_ired(infiles, outfile, indexfile=None, **kwargs):
+    """
+    """
     from os import devnull
     import re
     from subprocess import Popen, PIPE
@@ -172,6 +174,8 @@ def process_ired(infiles, outfile, indexfile=None, **kwargs):
       fmt=fmt, header=header, comments='#')
 
 def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
+    """
+    """
     from os import devnull
     import pandas as pd
     pd.set_option("display.width", None)
@@ -212,7 +216,7 @@ def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
             len(overlap)))
 
         # Calculate error of available fields
-        err = pd.DataFrame(0, index=overlap, columns = 
+        err = pd.DataFrame(0, index=overlap, columns=
           [x for t in zip(err_cols, err_se_cols) for x in t])
         err[err_cols] = (np.abs(exp[err_cols] - sim[err_cols]) 
                          / np.abs(exp[err_cols]))
