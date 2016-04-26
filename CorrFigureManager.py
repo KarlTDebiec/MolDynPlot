@@ -267,10 +267,13 @@ class CorrFigureManager(FigureManager):
 
             eb_x   = errorbar_kw.get("x",   dataframe[xkey,   "x"])
             eb_y   = errorbar_kw.get("x",   dataframe[ykey,   "y"])
-            eb_xse = errorbar_kw.get("xse", dataframe[xsekey, "x"])
-            eb_yse = errorbar_kw.get("yse", dataframe[ysekey, "y"])
-            subplot.errorbar(eb_x, eb_y, xerr=eb_xse*1.96, yerr=eb_yse*1.96,
-              **errorbar_kw)
+            if xsekey is not None:
+                errorbar_kw["xerr"] = errorbar_kw.get("xse",
+                  dataframe[xsekey, "x"]) * 1.96
+            if ysekey is not None:
+                errorbar_kw["yerr"] = errorbar_kw.get("yse",
+                  dataframe[ysekey, "y"]) * 1.96
+            subplot.errorbar(eb_x, eb_y, **errorbar_kw)
 
 #        # Plot legend handles
 #        if draw_handle:

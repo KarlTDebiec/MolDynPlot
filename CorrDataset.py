@@ -42,8 +42,26 @@ class CorrDataset(Dataset):
 
         return (cls, x_cls.get_cache_key(**x_kw), y_cls.get_cache_key(**y_kw))
 
+    @staticmethod
+    def get_cache_message(cache_key):
+        """
+        Generates message to be used when reloading previously-loaded
+        dataset.
+
+        Arguments:
+            cache_key (tuple): key with which dataset object is stored
+              in dataset cache
+
+        Returns:
+            cache_message (str): message to be used when reloading
+              previously-loaded dataset
+        """
+        return "Dataset previously loaded from '{0}' and '{1}'".format(
+          cache_key[1][1], cache_key[2][1])
+
     def __init__(self,
         verbose=1, debug=0, **kwargs):
+        from itertools import izip_longest
         import numpy as np
         import pandas as pd
         from .myplotspec import multi_get_copy
@@ -58,21 +76,24 @@ class CorrDataset(Dataset):
         y_dataset = self.load_dataset(verbose=verbose, debug=debug, **y_kw)
         y_df = y_dataset.dataframe
 
-        overlap_index = x_df.index.intersection(y_df.index)
+        overlap_idx = x_df.index.intersection(y_df.index)
         corr_cols = [c for c in y_df.columns.values
                       if not c.endswith("_se")
                       and c in x_df.columns.values]
-        corr_se_cols = [c + "_se" for c in corr_cols
-                       if  c + "_se" in y_df.columns.values
-                       and c + "_se" in x_df.columns.values]
-        overlap_columns = [x for t in zip(corr_cols, corr_se_cols) for x in t]
 
-        corr = pd.DataFrame(0, index=overlap_index,
-          columns=pd.MultiIndex.from_product([overlap_columns, ["x", "y"]]))
+        overlap_cols = []
+        for c in corr_cols:
+            overlap_cols += [(c, "x"), (c, "y")]
+            if c + "_se" in x_df.columns.values:
+                overlap_cols += [(c + "_se", "x")]
+            if c + "_se" in y_df.columns.values:
+                overlap_cols += [(c + "_se", "y")]
+
+        corr = pd.DataFrame(0, index=overlap_idx,
+          columns=pd.MultiIndex.from_tuples(overlap_cols))
         corr.iloc[:, corr.columns.get_level_values(1)=="x"] = x_df[
-          overlap_columns].loc[overlap_index].values
+          [a[0] for a in overlap_cols if a[1] == "x"]].loc[overlap_idx].values
         corr.iloc[:, corr.columns.get_level_values(1)=="y"] = y_df[
-          overlap_columns].loc[overlap_index].values
+          [a[0] for a in overlap_cols if a[1] == "y"]].loc[overlap_idx].values
 
         self.dataframe = corr
-        print(corr)
