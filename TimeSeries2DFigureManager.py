@@ -204,11 +204,15 @@ class TimeSeries2DFigureManager(FigureManager):
             left: -0.37
           shared_legend_kw:
             sub_width:  6.31
+            sub_height: 0.25
+            legend_kw:
+              ncol: 8
         draw_subplot:
           ylabel:
           ylabel_kw:
-            labelpad: 6
+            labelpad: 4
             rotation: horizontal
+            verticalalignment: center
           yticklabels: []
           ylabel_fp: 7r
       notebook:
