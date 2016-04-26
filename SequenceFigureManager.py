@@ -85,7 +85,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           kind: ss
           ykey: Alpha
-      R1:
+      r1:
         class: content
         help: Format subplot for R1 relaxation
         draw_subplot:
@@ -94,7 +94,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           ykey:   r1
           ysekey: r1_se
-      R2:
+      r2:
         class: content
         help: Format subplot for R2 relaxation
         draw_subplot:
@@ -103,7 +103,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           ykey:   r2
           ysekey: r2_se
-      HetNOE:
+      hetnoe:
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
         draw_subplot:
@@ -112,7 +112,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           ykey:   noe
           ysekey: noe_se
-      order:
+      s2:
         class: content
         help: Format subplot for S2 order parameter
         draw_subplot:
@@ -137,25 +137,26 @@ class SequenceFigureManager(FigureManager):
           nrows: 3
           subplots:
             0:
-              preset: R1
+              preset: r1
             1:
-              preset: R2
+              preset: r2
             2:
-              preset: HetNOE
+              preset: hetnoe
       relaxation_4:
         class: content
         help: Four stacked plots including R1, R2, HetNOE, and S2
         draw_figure:
+          multiplot: True
           nrows: 4
           subplots:
             0:
-              preset: R1
+              preset: r1
             1:
-              preset: R2
+              preset: r2
             2:
-              preset: HetNOE
+              preset: hetnoe
             3:
-              preset: order
+              preset: s2
       manuscript:
         class: target
         inherits: manuscript
@@ -255,13 +256,12 @@ class SequenceFigureManager(FigureManager):
         verbose=1, debug=0, **kwargs):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
-        from .myplotspec.Dataset import Dataset
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataframe= self.load_dataset(Dataset, verbose=verbose, debug=debug,
+        dataframe= self.load_dataset(verbose=verbose, debug=debug,
           **dataset_kw).dataframe
         x = np.array([filter(lambda x: x in '0123456789.', s)
               for s in dataframe.index.values], np.int)
@@ -298,9 +298,6 @@ class SequenceFigureManager(FigureManager):
                     fb_x.append(None)
                     fb_lb.append(None)
                     fb_ub.append(None)
-#                fb_x.append(None)
-#                fb_lb.append(None)
-#                fb_ub.append(None)
             fb_x = np.array(fb_x, np.float)
             fb_lb = np.array(fb_lb, np.float)
             fb_ub = np.array(fb_ub, np.float)
