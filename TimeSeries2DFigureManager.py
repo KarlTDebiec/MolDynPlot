@@ -76,22 +76,22 @@ class TimeSeries2DFigureManager(FigureManager):
           shared_legend: True
           shared_legend_kw:
             handles:
-              "None":
-                color: !!python/object/apply:moldynplot.dssp_cmap [0,0,7]
-              "Parallel β Sheet":
-                color: !!python/object/apply:moldynplot.dssp_cmap [1,0,7]
-              "Antiparallel β Sheet":
-                color: !!python/object/apply:moldynplot.dssp_cmap [2,0,7]
-              "$3_{10}$ Helix":
-                color: !!python/object/apply:moldynplot.dssp_cmap [3,0,7]
-              "α Helix":
-                color: !!python/object/apply:moldynplot.dssp_cmap [4,0,7]
-              "π Helix":
-                color: !!python/object/apply:moldynplot.dssp_cmap [5,0,7]
-              "Turn":
-                color: !!python/object/apply:moldynplot.dssp_cmap [6,0,7]
-              "Bend":
-                color: !!python/object/apply:moldynplot.dssp_cmap [7,0,7]
+              - ["None",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [0,0,7]}]
+              - ["Parallel β Sheet",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [1,0,7]}]
+              - ["Antiparallel β Sheet",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [2,0,7]}]
+              - ["$3_{10}$ Helix",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [3,0,7]}]
+              - ["α Helix",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [4,0,7]}]
+              - ["π Helix",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [5,0,7]}]
+              - ["Turn",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [6,0,7]}]
+              - ["Bend",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [7,0,7]}]
         draw_subplot:
           ylabel: Residue
         draw_dataset:
