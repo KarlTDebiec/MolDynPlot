@@ -36,6 +36,10 @@ class CorrFigureManager(FigureManager):
             top: off
           shared_legend: True
           shared_legend_kw:
+            handle_kw:
+              marker: s
+              ls: none
+              mec: black
             legend_kw:
               frameon: False
               loc: 9
@@ -245,8 +249,12 @@ class CorrFigureManager(FigureManager):
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
-        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
-        dataframe = dataset.dataframe
+        if "cls" in dataset_kw and dataset_kw["cls"] is not None:
+            dataset = self.load_dataset(verbose=verbose, debug=debug,
+              **dataset_kw)
+            dataframe = dataset.dataframe
+        else:
+            dataset = dataframe = None
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -256,6 +264,7 @@ class CorrFigureManager(FigureManager):
         if draw_corr_line and not hasattr(subplot, "_mps_corr_line"):
             corr_line_kw = multi_get_copy("corr_line_kw", kwargs, {})
             get_colors(corr_line_kw)
+            # Must pass 'x' and 'y' as positional arguments
             subplot._mps_corr_line = subplot.plot(
               corr_line_kw.pop("x", [0,10]), corr_line_kw.pop("y", [0,10]),
               **corr_line_kw)
@@ -265,36 +274,52 @@ class CorrFigureManager(FigureManager):
             errorbar_kw = multi_get_copy("errorbar_kw", kwargs, {})
             get_colors(errorbar_kw, plot_kw)
 
-            eb_x   = errorbar_kw.get("x",   dataframe[xkey,   "x"])
-            eb_y   = errorbar_kw.get("x",   dataframe[ykey,   "y"])
-            if xsekey is not None:
-                errorbar_kw["xerr"] = errorbar_kw.get("xse",
-                  dataframe[xsekey, "x"]) * 1.96
-            if ysekey is not None:
-                errorbar_kw["yerr"] = errorbar_kw.get("yse",
-                  dataframe[ysekey, "y"]) * 1.96
+            if "x" in errorbar_kw:
+                eb_x = errorbar_kw.pop("x")
+            elif dataframe is not None:
+                eb_x = dataframe[xkey, "x"]
+            if "y" in errorbar_kw:
+                eb_y = errorbar_kw.pop("y")
+            elif dataframe is not None:
+                eb_y = dataframe[ykey, "y"]
+            if "xerr" not in errorbar_kw:
+                if "xse" in errorbar_kw:
+                    errorbar_kw["xerr"] = errorbar_kw.pop("xse") * 1.96
+                elif "xse" in kwargs:
+                    errorbar_kw["xerr"] = kwargs.pop("xse") * 1.96
+                elif xsekey is not None and (xsekey, "x") in dataframe:
+                    errorbar_kw["xerr"] = errorbar_kw.get("xse",
+                      dataframe[xsekey, "x"]) * 1.96
+            if "yerr" not in errorbar_kw:
+                if "yse" in errorbar_kw:
+                    errorbar_kw["yerr"] = errorbar_kw.pop("yse") * 1.96
+                elif "yse" in kwargs:
+                    errorbar_kw["yerr"] = kwargs.pop("yse") * 1.96
+                elif ysekey is not None and (ysekey, "y") in dataframe:
+                    errorbar_kw["yerr"] = errorbar_kw.get("yse",
+                      dataframe[ysekey, "y"]) * 1.96
             subplot.errorbar(eb_x, eb_y, **errorbar_kw)
 
-#        # Plot legend handles
-#        if draw_handle:
-#            if label is None:
-#                warn("'draw_handle' is enabled but a value for argument"
-#                     "'label' was not provided; skipping")
-#            else:
-#                handle_kw = multi_get_copy("handle_kw", kwargs, {})
-#                get_colors(handle_kw, plot_kw)
-#                handle = subplot.plot(
-#                  handle_kw.pop("x", [-10,-10]), handle_kw.pop("y", [-10,-10]),
-#                  **handle_kw)[0]
-#                if handles is not None:
-#                    handles[label] = handle
-#
-#        # Draw label
-#        if draw_label:
-#            from .myplotspec.text import set_text
-#
-#            label_kw = multi_get_copy("label_kw", kwargs, {})
-#            set_text(subplot, **label_kw)
+        # Plot legend handles
+        if draw_handle:
+            if label is None:
+                warn("'draw_handle' is enabled but a value for argument"
+                     "'label' was not provided; skipping")
+            else:
+                handle_kw = multi_get_copy("handle_kw", kwargs, {})
+                get_colors(handle_kw, plot_kw)
+                handle = subplot.plot(
+                  handle_kw.pop("x", [-10,-10]), handle_kw.pop("y", [-10,-10]),
+                  **handle_kw)[0]
+                if handles is not None:
+                    handles[label] = handle
+
+        # Draw label
+        if draw_label:
+            from .myplotspec.text import set_text
+
+            label_kw = multi_get_copy("label_kw", kwargs, {})
+            set_text(subplot, **label_kw)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
