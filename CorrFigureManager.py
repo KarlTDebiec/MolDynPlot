@@ -145,10 +145,10 @@ class CorrFigureManager(FigureManager):
           multi_xticklabels:  [0,1,2,3,4,5,6,7,8]
           multi_yticklabels:  [0,1,2,3,4,5,6,7,8]
         draw_subplot:
-          xlabel:      $\\tau_c$ Experiment
-          xticks:      [0,1,2,3,4,5,6,7,8]
-          ylabel:      $\\tau_c$ Simulation
-          yticks:      [0,1,2,3,4,5,6,7,8]
+          xlabel: $\\tau_c$ Experiment
+          xticks: [0,1,2,3,4,5,6,7,8]
+          ylabel: $\\tau_c$ Simulation
+          yticks: [0,1,2,3,4,5,6,7,8]
       relaxation_4:
         help: Four plots (2x2) including R1, R2, HetNOE, and S2
         draw_figure:
