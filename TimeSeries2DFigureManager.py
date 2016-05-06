@@ -107,6 +107,8 @@ class TimeSeries2DFigureManager(FigureManager):
         help: Per-residue RMSD calculated by cpptraj
         draw_figure:
           shared_legend: False
+        draw_subplot:
+          ylabel: Residue
         draw_dataset:
           dataset_kw:
             cls: moldynplot.CpptrajDataset.CpptrajDataset
@@ -173,7 +175,6 @@ class TimeSeries2DFigureManager(FigureManager):
             handle_kw:
               ms: 5
             legend_kw:
-              legend_fp: 7r
               ncol: 4
         draw_subplot:
           xlabel_kw:
@@ -192,10 +193,26 @@ class TimeSeries2DFigureManager(FigureManager):
             zlabel_fp: 8b
             zlabel_kw:
               labelpad: 2
+      manuscript_colorbar_right:
+        class: target
+        extends: manuscript
+        help: Colorbar on right side of plot
+        draw_dataset:
+          partner_kw:
+            position: right
+            left:       null
+            sub_width:  0.0630
+            wspace:     0.2380
+            hspace:     null
+            sub_height: null
+          colorbar_kw:
+            zlabel_kw:
+              labelpad: 12
+              rotation: 270
       manuscript_stacked_dssp:
         class: target
         extends: manuscript
-        help: Set of vertically stacked DSSP plots
+        help: Series of vertically stacked DSSP plots
         draw_figure:
           sub_width: 6.31
           bottom:    0.60
@@ -259,8 +276,10 @@ class TimeSeries2DFigureManager(FigureManager):
     def draw_dataset(self, subplot, label=None,
         handles=None, logz=False,
         draw_heatmap=False, draw_colorbar=False, draw_legend=False,
+        draw_label=True, 
         verbose=1, debug=0, **kwargs):
         import numpy as np
+        import six
         from .myplotspec import multi_get_copy
 
         # Load data
@@ -294,6 +313,21 @@ class TimeSeries2DFigureManager(FigureManager):
                       debug=debug, **kwargs)
 
                 set_colorbar(subplot, pcolormesh, **kwargs)
+
+        # Draw label
+        if draw_label and label is not None:
+            from .myplotspec.text import set_text
+
+            label_kw = kwargs.get("label_kw", {})
+            if (isinstance(label, six.string_types)
+            and isinstance(label_kw, dict)):
+                set_text(subplot, s=label, **label_kw)
+            elif (isinstance(label, list) and isinstance(label_kw, list)
+            and len(label) == len(label_kw)):
+                for l, kw in zip(label, label_kw):
+                    set_text(subplot, s=l, **kw)
+            else:
+                raise Exception("bad label arguments")
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
