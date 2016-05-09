@@ -205,7 +205,7 @@ class TimeSeriesFigureManager(FigureManager):
             sub_width: 0.8
             title_fp: 8b
             xlabel_kw:
-              labelpad: 12.5
+              labelpad: 8.5
             label_fp: 8b
             tick_fp: 6r
             tick_params:
