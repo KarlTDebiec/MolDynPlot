@@ -318,7 +318,7 @@ class TimeSeries2DFigureManager(FigureManager):
         if draw_label and label is not None:
             from .myplotspec.text import set_text
 
-            label_kw = kwargs.get("label_kw", {})
+            label_kw = multi_get_copy("label_kw", kwargs, {})
             if (isinstance(label, six.string_types)
             and isinstance(label_kw, dict)):
                 set_text(subplot, s=label, **label_kw)

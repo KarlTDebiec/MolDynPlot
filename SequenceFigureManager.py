@@ -59,6 +59,10 @@ class SequenceFigureManager(FigureManager):
             b: True
             linestyle: '-'
             color: [0.8,0.8,0.8]
+          label_kw:
+            zorder: 10
+            horizontalalignment: left
+            verticalalignment: top
         draw_dataset:
           dataset_kw:
             read_csv_kw:
@@ -129,6 +133,10 @@ class SequenceFigureManager(FigureManager):
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
           ylabel_kw:
             rotation: vertical
+        draw_dataset:
+          draw_fill_between: False
+          draw_errorbar:     False
+          draw_plot:         True
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -184,6 +192,11 @@ class SequenceFigureManager(FigureManager):
             labelpad: 3
           grid_kw:
             alpha: 0.3
+          draw_label: True
+          label_kw:
+            border_lw: 1
+            xabs:  0.02
+            yabs: -0.03
         draw_dataset:
           fill_between_kw:
             lw: 1
@@ -219,7 +232,7 @@ class SequenceFigureManager(FigureManager):
             elinewidth: 0.75
             marker: 'o'
             mew: 0
-            ms: 2.5
+            ms: 2
       notebook:
         class: target
         inherits: notebook
@@ -279,7 +292,7 @@ class SequenceFigureManager(FigureManager):
         ykey=None, ysekey=None, label=None,
         handles=None,
         draw_fill_between=False, draw_errorbar=True, draw_plot=False,
-        draw_handle=True,
+        draw_handle=True, draw_label=False,
         verbose=1, debug=0, **kwargs):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
