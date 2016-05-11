@@ -201,11 +201,16 @@ class SequenceFigureManager(FigureManager):
           left:       0.55
           sub_width:  2.85
           right:      0.10
-          top:        0.20
+          top:        0.25
+          title_kw:
+            top:     -0.125
           shared_legend_kw:
-            spines: True
             left:       0.55
             sub_width:  2.85
+            bottom:     0.05
+            sub_height: 0.30
+            legend_kw:
+              loc: 10
         draw_dataset:
           fill_between_kw:
             lw: 0.5
