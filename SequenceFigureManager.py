@@ -193,6 +193,28 @@ class SequenceFigureManager(FigureManager):
             marker: 'o'
             mew: 0
             ms: 4
+      manuscript_tight:
+        class: target
+        extends: manuscript
+        help: Tighter formatting for two columns
+        draw_figure:
+          left:       0.55
+          sub_width:  2.85
+          right:      0.10
+          top:        0.20
+          shared_legend_kw:
+            spines: True
+            left:       0.55
+            sub_width:  2.85
+        draw_dataset:
+          fill_between_kw:
+            lw: 0.5
+          errorbar_kw:
+            capsize: 0
+            elinewidth: 0.75
+            marker: 'o'
+            mew: 0
+            ms: 2.5
       notebook:
         class: target
         inherits: notebook
