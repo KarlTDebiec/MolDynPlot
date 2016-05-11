@@ -61,6 +61,10 @@ class TimeSeries2DFigureManager(FigureManager):
             b: True
             color: [0.2,0.2,0.2]
             linestyle: '-'
+          label_kw:
+            zorder: 10
+            horizontalalignment: left
+            verticalalignment: top
         draw_dataset:
           draw_heatmap: True
           heatmap_kw:
@@ -102,7 +106,7 @@ class TimeSeries2DFigureManager(FigureManager):
             cmap: !!python/object/apply:moldynplot.dssp_cmap []
             vmin: 0
             vmax: 7
-      perres_rmsd:
+      perresrmsd:
         class: content
         help: Per-residue RMSD calculated by cpptraj
         draw_figure:
@@ -176,11 +180,18 @@ class TimeSeries2DFigureManager(FigureManager):
               ms: 5
             legend_kw:
               ncol: 4
+          title_kw:
+            top: -0.1
         draw_subplot:
           xlabel_kw:
             labelpad: 3
           ylabel_kw:
             labelpad: 6
+          draw_label: True
+          label_kw:
+            border_lw: 1
+            xabs:  0.02
+            yabs: -0.03
         draw_dataset:
           partner_kw:
             position: bottom
@@ -193,22 +204,6 @@ class TimeSeries2DFigureManager(FigureManager):
             zlabel_fp: 8b
             zlabel_kw:
               labelpad: 2
-      manuscript_colorbar_right:
-        class: target
-        extends: manuscript
-        help: Colorbar on right side of plot
-        draw_dataset:
-          partner_kw:
-            position: right
-            left:       null
-            sub_width:  0.0630
-            wspace:     0.2380
-            hspace:     null
-            sub_height: null
-          colorbar_kw:
-            zlabel_kw:
-              labelpad: 12
-              rotation: 270
       manuscript_stacked_dssp:
         class: target
         extends: manuscript
@@ -232,6 +227,71 @@ class TimeSeries2DFigureManager(FigureManager):
             verticalalignment: center
           yticklabels: []
           ylabel_fp: 7r
+      manuscript_dssp_perresrmsd:
+        class: target
+        extends: manuscript
+        help: Stacked DSSP and per-residue RMSD plots
+        draw_figure:
+          nrows: 2
+          right:      1.25
+          sub_width:  5.25
+          bottom:     0.40
+          multiplot: True
+          shared_legend: True
+          shared_legend_kw:
+            mode: "partner"
+            partner_kw:
+              position: right
+              sub_width:  1.24
+              wspace:     0.01
+              sub_height: 1.15
+            handles:
+              - ["None",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [0,0,7]}]
+              - ["Parallel β Sheet",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [1,0,7]}]
+              - ["Antiparallel β Sheet",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [2,0,7]}]
+              - ["$3_{10}$ Helix",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [3,0,7]}]
+              - ["α Helix",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [4,0,7]}]
+              - ["π Helix",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [5,0,7]}]
+              - ["Turn",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [6,0,7]}]
+              - ["Bend",
+                 {color: !!python/object/apply:moldynplot.dssp_cmap [7,0,7]}]
+            legend_kw:
+              title: Secondary Structure
+              loc: 2
+              ncol: 1
+          subplots:
+            0:
+              preset: dssp
+            1:
+              preset: perresrmsd
+        draw_subplot:
+          datasets:
+            0:
+              colorbar_kw:
+                zlabel: "Backbone RMSD (Å)"
+        draw_dataset:
+          partner_kw:
+            position: right
+            left:       5.880
+            sub_width:  1.000
+            wspace:     0.238
+            bottom:     0.400
+            sub_height: 0.063
+            hspace:     null
+          colorbar_kw:
+            position: top
+            zlabel: "Backbone RMSD (Å)"
+            zlabel_kw:
+              rotation: 0
+              labelpad: 5
+            zticklabels: [0,"",2,"",4,"",6,"",8,"",10]
       notebook:
         class: target
         inherits: notebook
