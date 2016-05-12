@@ -190,8 +190,8 @@ class TimeSeries2DFigureManager(FigureManager):
           draw_label: True
           label_kw:
             border_lw: 1
-            xabs:  0.02
-            yabs: -0.03
+            xabs:  0.020
+            yabs: -0.025
         draw_dataset:
           partner_kw:
             position: bottom
@@ -233,8 +233,9 @@ class TimeSeries2DFigureManager(FigureManager):
         help: Stacked DSSP and per-residue RMSD plots
         draw_figure:
           nrows: 2
-          right:      1.25
-          sub_width:  5.25
+          right:      1.35
+          sub_width:  5.15
+          left:       0.50
           bottom:     0.40
           multiplot: True
           shared_legend: True
@@ -279,12 +280,12 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_dataset:
           partner_kw:
             position: right
-            left:       5.880
+            left:       null
             sub_width:  1.000
-            wspace:     0.238
+            wspace:     0.150
             bottom:     0.400
             sub_height: 0.063
-            hspace:     null
+#            hspace:     null
           colorbar_kw:
             position: top
             zlabel: "Backbone RMSD (Å)"
