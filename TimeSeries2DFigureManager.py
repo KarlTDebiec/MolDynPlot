@@ -61,6 +61,11 @@ class TimeSeries2DFigureManager(FigureManager):
             b: True
             color: [0.2,0.2,0.2]
             linestyle: '-'
+            lw: 0.5
+          hline_kw:
+            color: [0.2,0.2,0.2]
+            linestyle: '-'
+            lw: 0.5
           label_kw:
             zorder: 10
             horizontalalignment: left
