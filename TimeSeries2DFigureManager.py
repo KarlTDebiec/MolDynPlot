@@ -214,13 +214,13 @@ class TimeSeries2DFigureManager(FigureManager):
         extends: manuscript
         help: Series of vertically stacked DSSP plots
         draw_figure:
-          sub_width: 6.31
+          sub_width: 6.30
           bottom:    0.60
           hspace:    0.00
           shared_ylabel_kw:
             left: -0.37
           shared_legend_kw:
-            sub_width:  6.31
+            sub_width:  6.30
             sub_height: 0.25
             legend_kw:
               ncol: 8
