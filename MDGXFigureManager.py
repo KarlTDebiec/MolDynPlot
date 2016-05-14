@@ -126,7 +126,14 @@ class MDGXFigureManager(FigureManager):
             color: black
             lw: 0.5
             zorder: 11
-          mean_kw:
+          mae_kw:
+            linestyle: none
+            marker: o
+            ms: 2
+            mfc: white
+            mew: 0
+            zorder: 12
+          rmse_kw:
             linestyle: none
             marker: o
             ms: 2
@@ -144,7 +151,7 @@ class MDGXFigureManager(FigureManager):
     def draw_dataset(self, subplot,
         label=None,
         handles=None,
-        draw_body=True, draw_percentile=True, draw_mean=True,
+        draw_body=True, draw_percentile=True, draw_mae=False, draw_rmse=True,
         draw_edge=True,
         verbose=1, debug=0, **kwargs):
         """
@@ -173,11 +180,18 @@ class MDGXFigureManager(FigureManager):
         if draw_percentile:
             percentile_kw = plot_kw.copy()
             percentile_kw.update(kwargs.get("percentile_kw", {}))
+            get_colors(percentile_kw)
             median_kw = percentile_kw.copy()
             median_kw.update(kwargs.get("median_kw", {}))
-        if draw_mean:
-            mean_kw = plot_kw.copy()
-            mean_kw.update(kwargs.get("mean_kw", {}))
+            get_colors(median_kw)
+        if draw_mae:
+            mae_kw = plot_kw.copy()
+            mae_kw.update(kwargs.get("mae_kw", {}))
+            get_colors(mae_kw)
+        if draw_rmse:
+            rmse_kw = plot_kw.copy()
+            rmse_kw.update(kwargs.get("rmse_kw", {}))
+            get_colors(rmse_kw)
 
         # Plot bodies
         if draw_body:
@@ -219,8 +233,13 @@ class MDGXFigureManager(FigureManager):
                     subplot.plot([prc_xmin, x[i]+(x[i]-prc_xmin)],
                       [prc_y, prc_y], **percentile_kw)
 
-                if draw_mean:
-                    subplot.plot([x[i]], [y[i].mean()], **mean_kw)
+                if draw_mae:
+                    subplot.plot([x[i]], [y[i].mean()], **mae_kw)
+
+                if draw_rmse:
+                    print([np.sqrt((y[i]**2).mean())])
+                    subplot.plot([x[i]], [np.sqrt((y[i]**2).mean())],
+                      **rmse_kw)
 
         # Plot edges
         if draw_edge:
