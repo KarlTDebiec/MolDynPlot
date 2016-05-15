@@ -57,6 +57,10 @@ class TimeSeriesFigureManager(FigureManager):
             b: True
             color: [0.8,0.8,0.8]
             linestyle: '-'
+          label_kw:
+            zorder: 10
+            horizontalalignment: left
+            verticalalignment: top
         draw_dataset:
           partner_kw:
             position: right
@@ -203,6 +207,11 @@ class TimeSeriesFigureManager(FigureManager):
             labelpad: 3
           ylabel_kw:
             labelpad: 6
+          draw_label: True
+          label_kw:
+            border_lw: 1
+            xabs:  0.020
+            yabs: -0.025
         draw_dataset:
           partner_kw:
             hspace:    0.05
@@ -329,6 +338,9 @@ class TimeSeriesFigureManager(FigureManager):
 
         # Plot series
         if draw_plot:
+            if verbose >= 2:
+                print("mean  {0}: {1:6.3f}".format(ykey, dataframe[ykey].mean()))
+                print("stdev {0}: {1:6.3f}".format(ykey, dataframe[ykey].std()))
             plot = subplot.plot(dataframe.index.values, dataframe[ykey],
               **plot_kw)[0]
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
