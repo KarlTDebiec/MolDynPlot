@@ -176,6 +176,8 @@ class TimeSeries2DFigureManager(FigureManager):
           sub_height: 1.00
           hspace:     0.05
           top:        0.25
+          title_kw:
+            top: -0.1
           shared_legend_kw:
             left:       0.50
             sub_width:  4.40
@@ -185,8 +187,6 @@ class TimeSeries2DFigureManager(FigureManager):
               ms: 5
             legend_kw:
               ncol: 4
-          title_kw:
-            top: -0.1
         draw_subplot:
           xlabel_kw:
             labelpad: 3
