@@ -181,11 +181,11 @@ class TimeSeriesFigureManager(FigureManager):
         draw_figure:
           left:       0.50
           sub_width:  4.40
-          wspace:     0.05
+          wspace:     0.10
           right:      0.20
           bottom:     0.70
           sub_height: 1.80
-          hspace:     0.05
+          hspace:     0.10
           top:        0.25
           title_kw:
             top: -0.1
