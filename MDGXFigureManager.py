@@ -237,7 +237,9 @@ class MDGXFigureManager(FigureManager):
                     subplot.plot([x[i]], [y[i].mean()], **mae_kw)
 
                 if draw_rmse:
-                    print([np.sqrt((y[i]**2).mean())])
+                    if verbose >= 2:
+                        print("{0:2d}: {1:5.2f}".format(x[i],
+                          np.sqrt((y[i]**2).mean())))
                     subplot.plot([x[i]], [np.sqrt((y[i]**2).mean())],
                       **rmse_kw)
 
