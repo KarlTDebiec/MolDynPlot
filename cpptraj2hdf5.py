@@ -24,7 +24,6 @@ def cpptraj(infile, outfile, address, dtype, scaleoffset, verbose=1, **kwargs):
     """
     from os import devnull
     from subprocess import Popen, PIPE
-    print(kwargs)
 
     if infile.endswith("gnu"):
         raw = np.genfromtxt(infile, skip_header=13,
