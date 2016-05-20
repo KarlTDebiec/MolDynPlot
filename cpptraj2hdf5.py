@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #   moldynplot.cpptraj2hdf5.py
 #
-#   Copyright (C) 2012-2015 Karl T Debiec
+#   Copyright (C) 2012-2016 Karl T Debiec
 #   All rights reserved.
 #
 #   This software may be modified and distributed under the terms of the
@@ -15,95 +15,16 @@ if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
 import numpy as np
+import h5py
 ################################## FUNCTIONS ##################################
-def saxs(address="saxs", dtype=np.float32, scaleoffset=3, **kwargs):
-
-    infiles = kwargs["infile"]
-    outfile = kwargs["outfile"]
-    q = None
-    data = None
-    for i, infile in enumerate(infiles):
-        datum = np.loadtxt(infile, skiprows=3)
-        if q is None:
-            q = datum[:,0]
-        else:
-            if not (datum[:,0] == q).all():
-                raise()
-        if data is None:
-            data = np.zeros((len(infiles), q.size))
-        data[i,:] = datum[:,1]
-
-    # Open hdf5 file
-    with h5py.File(outfile) as hdf5_file:
-
-        print(data, data.shape)
-        hdf5_file.create_dataset(address + "/q", data=q, dtype=dtype,
-          chunks=True, compression="gzip", scaleoffset=scaleoffset)
-        hdf5_file.create_dataset(address + "/intensity", data=data,
-          dtype=dtype, chunks=True, compression="gzip",
-          scaleoffset=scaleoffset)
-
-#################################### MAIN #####################################
-if __name__ == "__main__":
-    import argparse
+def cpptraj(infile, outfile, address, dtype, scaleoffset, verbose=1, **kwargs):
+    """
+    .. todo:
+        - Support multiple infiles
+    """
     from os import devnull
     from subprocess import Popen, PIPE
-    import h5py
-
-    # Prepare argument parser
-    parser            = argparse.ArgumentParser(
-      description     = __doc__,
-      formatter_class = argparse.RawTextHelpFormatter)
-    parser.add_argument(
-      "kind",
-      type     = str,
-      choices  = [str("dihedral"), str("hbond"),      str("jcoupling"),
-                  str("natcon"),   str("perresrmsd"), str("saxs"),
-                  str("secstruct")],
-      help     = "kind of dataset")
-    parser.add_argument(
-      "infile",
-      nargs    = "+",
-      type     = str,
-      help     = "cpptraj output file from which to load dataset; " +
-                 "may be plain text or gzip")
-    parser.add_argument(
-      "outfile",
-      type     = str,
-      help     = "HDF5 file to which to dataset will be output")
-
-    # Parse arguments
-    kwargs  = vars(parser.parse_args())
-    if kwargs["kind"] == "dihedral":
-        dtype = np.float32
-        scaleoffset = 4
-        address = "dihedral"
-    elif kwargs["kind"] == "hbond":
-        dtype = np.uint8
-        scaleoffset = 1
-        address = "hbond"
-    elif kwargs["kind"] == "jcoupling":
-        dtype = np.float32
-        scaleoffset = 3
-        address = "jcoupling"
-    elif kwargs["kind"] == "natcon":
-        dtype = np.float32
-        scaleoffset = 4
-        address = "natcon"
-    elif kwargs["kind"] == "perresrmsd":
-        dtype = np.float32
-        scaleoffset = 4
-        address = "perresrmsd"
-    elif kwargs["kind"] == "saxs":
-        from sys import exit
-        saxs(**kwargs)
-        exit()
-    elif kwargs["kind"] == "secstruct":
-        dtype = np.uint8
-        scaleoffset = 3
-        address = "secstruct"
-    infile  = kwargs["infile"][0]
-    outfile = kwargs["outfile"]
+    print(kwargs)
 
     if infile.endswith("gnu"):
         raw = np.genfromtxt(infile, skip_header=13,
@@ -149,3 +70,216 @@ if __name__ == "__main__":
             hdf5_file.create_dataset(address, data=data, dtype=dtype,
               chunks=True, compression="gzip", scaleoffset=scaleoffset)
             hdf5_file[address].attrs["fields"] = list(fields)
+
+def saxs(package, infiles, outfile, address, dtype, scaleoffset, verbose=1,
+    **kwargs):
+    """
+    """
+    from os.path import expandvars
+    from glob import glob
+
+    # Process arguments
+    processed_infiles = []
+    for infile in infiles:
+        processed_infiles.extend(glob(expandvars(infile)))
+    infiles = processed_infiles
+    if verbose >= 1:
+        print("Loading SAXS data from {0} infiles, ".format(len(infiles)) +
+              "starting with '{0}'".format(infiles[0]))
+    outfile = expandvars(outfile)
+
+    if package == "saxs_md":
+        q = None
+        data = None
+        for i, infile in enumerate(infiles):
+            if verbose >= 2:
+                print("Loading SAXS data from {0}".format(infile))
+            datum = np.loadtxt(infile, skiprows=3)
+            if q is None:
+                q = datum[:,0]
+                if verbose >= 1:
+                    print("q contains {0} points ".format(q.size) +
+                          "ranging from {0} to {1} Å^-1".format(q[0], q[-1]))
+                if verbose >= 2:
+                    print("q:\n{0}".format(q))
+            else:
+                if not (datum[:,0] == q).all():
+                    raise()
+            if data is None:
+                data = np.zeros((len(infiles), q.size))
+            data[i,:] = datum[:,1]
+
+    elif package == "foxs":
+        q = None
+        data = None
+        frames_per_file = None
+        for i, infile in enumerate(infiles):
+            if verbose >= 2:
+                print("Loading SAXS data from {0}".format(infile))
+            datum = np.loadtxt(infile)
+            if q is None:
+                q = datum[:,0]
+                if verbose >= 1:
+                    print("q contains {0} points ".format(q.size) +
+                          "ranging from {0} to {1} Å^-1".format(q[0], q[-1]))
+                if verbose >= 2:
+                    print("q:\n{0}".format(q))
+            else:
+                if not (datum[:,0] == q).all():
+                    raise()
+            if frames_per_file is None:
+                frames_per_file = datum.shape[1] / 3
+            if data is None:
+                data = np.zeros((len(infiles)*frames_per_file, q.size))
+            data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::3].T
+
+    if verbose >= 1:
+        print("Loaded {0} intensity datasets".format(data.shape[0]))
+    if verbose >= 2:
+        print("Intensity:\n{0}".format(data))
+        print(data.shape)
+    # Open hdf5 file
+    with h5py.File(outfile) as hdf5_file:
+        if verbose >= 1:
+            print("Writing q to '{0}[{1}/q]'".format(outfile, address))
+        hdf5_file.create_dataset(address + "/q", data=q, dtype=dtype,
+          chunks=True, compression="gzip", scaleoffset=scaleoffset)
+        if verbose >= 1:
+            print("Writing intensity to '{0}[{1}/intensity]'".format(outfile,
+              address))
+        hdf5_file.create_dataset(address + "/intensity", data=data,
+          dtype=dtype, chunks=True, compression="gzip",
+          scaleoffset=scaleoffset)
+
+#################################### MAIN #####################################
+if __name__ == "__main__":
+    import argparse
+
+    # Prepare argument parser
+    parser            = argparse.ArgumentParser(
+      description     = __doc__,
+      formatter_class = argparse.RawTextHelpFormatter)
+
+    kind_subparser = parser.add_subparsers(
+      title           = "kind")
+
+    # SAXS
+    saxs_parser = kind_subparser.add_parser(
+      name  = "saxs",
+      help  = "small-angle X-ray scattering from 'saxs_md' or 'FOXS'")
+    saxs_package = saxs_parser.add_mutually_exclusive_group()
+    saxs_package.add_argument(
+      "-s", "--saxs_md",
+      action   = "store_const",
+      const    = "saxs_md",
+      default  = "saxs_md",
+      dest     = "package",
+      help     = "parse output from AmberTools' 'saxs_md' program (default)")
+    saxs_package.add_argument(
+      "-f", "--foxs",
+      action   = "store_const",
+      const    = "foxs",
+      default  = "saxs_md",
+      dest     = "package",
+      help     = "parse output from 'FOXS' program")
+    saxs_parser.add_argument(
+      "infiles",
+      nargs    = "+",
+      type     = str,
+      metavar  = "infile",
+      help     = "file(s) from which to load calculated SAXS curves")
+    saxs_parser.add_argument(
+      "outfile",
+      type     = str,
+      help     = "HDF5 file to which to dataset will be output")
+    saxs_parser.set_defaults(
+      function    = saxs,
+      address     = "saxs",
+      dtype       = np.float32,
+      scaleoffset = 3)
+
+    # Cpptraj
+    cpptraj_parser = argparse.ArgumentParser(add_help=False)
+    cpptraj_parser.add_argument(
+      "infile",
+      type     = str,
+      metavar  = "infile",
+      help     = "file from which to load cpptraj output; "
+                 "may be plain text or gzip")
+    cpptraj_parser.add_argument(
+      "outfile",
+      type     = str,
+      help     = "HDF5 file to which to dataset will be output")
+    cpptraj_parser.set_defaults(
+      function = cpptraj)
+
+    kind_subparser.add_parser(
+      name        = "dihedral",
+      parents     = [cpptraj_parser],
+      help        = "cpptraj's 'dihedral' or 'multidihedral'").set_defaults(
+      address     = "dihedral",
+      dtype       = np.float32,
+      scaleoffset = 4)
+    kind_subparser.add_parser(
+      name        = "hbond",
+      parents     = [cpptraj_parser],
+      help        = "cpptraj's 'hbond'").set_defaults(
+      address     = "hbond",
+      dtype       = np.uint8,
+      scaleoffset = 1)
+    kind_subparser.add_parser(
+      name        = "jcoupling",
+      parents     = [cpptraj_parser],
+      help        = "cpptraj's 'jcoupling'").set_defaults(
+      address     = "jcoupling",
+      dtype       = np.float32,
+      scaleoffset = 3)
+    kind_subparser.add_parser(
+      name        = "natcon",
+      parents     = [cpptraj_parser],
+      help        = "native contacts, NOTE: actually inter-residue minimum "
+                    "distances, not cpptraj's 'nativecontacts' command, which "
+                    "does not appear to work").set_defaults(
+      address     = "natcon",
+      dtype       = np.float32,
+      scaleoffset = 4)
+    kind_subparser.add_parser(
+      name        = "perresrmsd",
+      parents     = [cpptraj_parser],
+      help        = "cpptraj's 'rms' with 'perres' option").set_defaults(
+      address     = "perresrmsd",
+      dtype       = np.float32,
+      scaleoffset = 4)
+    kind_subparser.add_parser(
+      name        = "secstruct",
+      parents     = [cpptraj_parser],
+      help        = "cpptraj's 'secstruct'").set_defaults(
+      address     = "secstruct",
+      dtype       = np.uint8,
+      scaleoffset = 3)
+
+    # Verbosity
+    for p in kind_subparser.choices.values():
+        p.add_argument(
+          "-address",
+          type     = str,
+          help     = "Address within HDF5 file at which to output dataset: "
+                     "(default: /%(default)s)")
+        verbosity = p.add_mutually_exclusive_group()
+        verbosity.add_argument(
+          "-v", "--verbose",
+          action   = "count",
+          default  = 1,
+          help     = "Enable verbose output, may be specified more than once")
+        verbosity.add_argument(
+          "-q", "--quiet",
+          action   = "store_const",
+          const    = 0,
+          default  = 1,
+          dest     = "verbose",
+          help     = "Disable verbose output")
+
+
+    # Parse arguments
+    kwargs = vars(parser.parse_args())
+    kwargs.pop("function")(**kwargs)
