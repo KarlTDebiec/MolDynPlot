@@ -238,7 +238,7 @@ class StateProbFigureManager(FigureManager):
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
             handle_kw["mfc"] = barplot.patches[0].get_facecolor()
             handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
-        if handles is not None:
+        if handles is not None and label is not None:
             handles[label] = handle
 
 #################################### MAIN #####################################
