@@ -201,7 +201,7 @@ class TimeSeriesFigureManager(FigureManager):
             legend_kw:
               labelspacing: 0.5
               legend_fp: 7r
-              ncol: 5
+              ncol: 6
         draw_subplot:
           xlabel_kw:
             labelpad: 3
@@ -214,8 +214,8 @@ class TimeSeriesFigureManager(FigureManager):
             yabs: -0.025
         draw_dataset:
           partner_kw:
-            hspace:    0.05
-            sub_width: 0.8
+            wspace:    0.10
+            sub_width: 0.80
             title_fp: 8b
             xlabel_kw:
               labelpad: 8.5
