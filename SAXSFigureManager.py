@@ -35,6 +35,10 @@ class SAXSFigureManager(FigureManager):
             right: off
             bottom: on
             top: off
+          multi_xticklabels: ["0.00","0.05","0.10","0.15",
+                              "0.20","0.25","0.30","0.35"]
+          multi_yticklabels: ["0.00","0.02","0.04","0.06",
+                              "0.08","0.10","0.12"]
           shared_legend: True
           shared_legend_kw:
             legend_kw:
@@ -117,9 +121,11 @@ class SAXSFigureManager(FigureManager):
       logy:
         class: appearance
         help: Plot y axis using base 10 logarithmic scale
+        draw_figure:
+          multi_yticklabels: [-4,-3,-2,-1,0]
         draw_subplot:
-          ylabel:      "$log_{10}$(Intensity)"
-          yticks:      [-4,-3,-2,-1,0]
+          ylabel: "$log_{10}$(Intensity)"
+          yticks: [-4,-3,-2,-1,0]
         draw_dataset:
           logy: True
       presentation:

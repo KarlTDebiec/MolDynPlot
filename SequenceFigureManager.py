@@ -366,6 +366,10 @@ class SequenceFigureManager(FigureManager):
             p_x = np.array(p_x, np.float)
             p_y = np.array(p_y, np.float)
             plot = subplot.plot(p_x, p_y, **plot_kw)[0]
+            if verbose >= 2:
+                print(ykey, np.nanmean(p_y))
+                print(p_x)
+                print(p_y)
 
         if draw_handle:
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
