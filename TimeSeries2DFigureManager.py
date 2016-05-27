@@ -290,7 +290,6 @@ class TimeSeries2DFigureManager(FigureManager):
             wspace:     0.150
             bottom:     0.400
             sub_height: 0.063
-#            hspace:     null
           colorbar_kw:
             position: top
             zlabel: "Backbone RMSD (Å)"
