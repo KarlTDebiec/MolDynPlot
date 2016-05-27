@@ -65,7 +65,8 @@ def cpptraj(infile, outfile, address, dtype, scaleoffset, verbose=1, **kwargs):
 
             data = np.fromiter(iter_func(), dtype=dtype)
             data = data.reshape((-1, n_fields))
-            print(data, data.shape)
+            print(data.shape)
+            print(np.mean(data, axis=0))
             hdf5_file.create_dataset(address, data=data, dtype=dtype,
               chunks=True, compression="gzip", scaleoffset=scaleoffset)
             hdf5_file[address].attrs["fields"] = list(fields)
@@ -132,6 +133,30 @@ def saxs(package, infiles, outfile, address, dtype, scaleoffset, verbose=1,
                 data = np.zeros((len(infiles)*frames_per_file, q.size))
             data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::3].T
 
+    elif package == "crysol":
+        q = None
+        data = None
+        frames_per_file = None
+        for i, infile in enumerate(infiles):
+            if verbose >= 2:
+                print("Loading SAXS data from {0}".format(infile))
+            datum = np.loadtxt(infile, skiprows=1)
+            if q is None:
+                q = datum[:,0]
+                if verbose >= 1:
+                    print("q contains {0} points ".format(q.size) +
+                          "ranging from {0} to {1} Å^-1".format(q[0], q[-1]))
+                if verbose >= 2:
+                    print("q:\n{0}".format(q))
+            else:
+                if not (datum[:,0] == q).all():
+                    raise()
+            if frames_per_file is None:
+                frames_per_file = datum.shape[1] / 5
+            if data is None:
+                data = np.zeros((len(infiles)*frames_per_file, q.size))
+            data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::5].T
+
     if verbose >= 1:
         print("Loaded {0} intensity datasets".format(data.shape[0]))
     if verbose >= 2:
@@ -174,6 +199,13 @@ if __name__ == "__main__":
       default  = "saxs_md",
       dest     = "package",
       help     = "parse output from AmberTools' 'saxs_md' program (default)")
+    saxs_package.add_argument(
+      "-c", "--crysol",
+      action   = "store_const",
+      const    = "crysol",
+      default  = "saxs_md",
+      dest     = "package",
+      help     = "parse output from 'crysol' program")
     saxs_package.add_argument(
       "-f", "--foxs",
       action   = "store_const",
