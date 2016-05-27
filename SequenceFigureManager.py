@@ -371,6 +371,7 @@ class SequenceFigureManager(FigureManager):
                 print(p_x)
                 print(p_y)
 
+        # Plot handle
         if draw_handle:
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
             handle_kw["mfc"] = plot_kw["color"]
