@@ -37,6 +37,11 @@ class TimeSeriesFigureManager(FigureManager):
             top: off
           shared_legend: True
           shared_legend_kw:
+            spines: False
+            handle_kw:
+              ls: none
+              marker: s
+              mec: black
             legend_kw:
               frameon: False
               loc: 9
@@ -84,6 +89,9 @@ class TimeSeriesFigureManager(FigureManager):
               left: off
           plot_kw:
             zorder: 10
+          fill_between_kw:
+            color: [0.7, 0.7, 0.7]
+            lw: 0
           handle_kw:
             ls: none
             marker: s
@@ -198,6 +206,8 @@ class TimeSeriesFigureManager(FigureManager):
             sub_width:  4.40
             bottom:     0.00
             sub_height: 0.30
+            handle_kw:
+              ms: 5
             legend_kw:
               labelspacing: 0.5
               legend_fp: 7r
@@ -289,14 +299,51 @@ class TimeSeriesFigureManager(FigureManager):
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
-        if "infile" in kwargs:
-            dataset_kw["infile"] = kwargs["infile"]
-        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
-        dataframe = dataset.dataframe
+        if "cls" in dataset_kw and dataset_kw["cls"] is not None:
+            if "infile" in kwargs:
+                dataset_kw["infile"] = kwargs["infile"]
+            dataset = self.load_dataset(verbose=verbose, debug=debug,
+              **dataset_kw)
+            dataframe = dataset.dataframe
+        else:
+            dataset = dataframe = None
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
         get_colors(plot_kw, kwargs)
+
+        # Plot fill_between
+        if draw_fill_between:
+            fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
+            get_colors(fill_between_kw, plot_kw)
+
+            if "x" in fill_between_kw:
+                fb_x = fill_between_kw.pop("x")
+            else:
+                fb_x = dataframe.index.values
+            if "ylb" in fill_between_kw:
+                fb_ylb = fill_between_kw.pop("ylb")
+            elif "fill_between_lb_key" in fill_between_kw:
+                fill_between_lb_key = fill_between_kw.pop(
+                  "fill_between_lb_key")
+                fb_ylb = dataframe[fill_between_lb_key]
+            elif "fill_between_lb_key" in kwargs:
+                fill_between_lb_key = kwargs.get( "fill_between_lb_key")
+                fb_ylb = dataframe[fill_between_lb_key]
+            else:
+                warn("inappropriate fill_between settings")
+            if "yub" in fill_between_kw:
+                fb_yub = fill_between_kw.pop("yub")
+            elif "fill_between_ub_key" in fill_between_kw:
+                fill_between_ub_key = fill_between_kw.pop(
+                  "fill_between_ub_key")
+                fb_yub = dataframe[fill_between_ub_key]
+            elif "fill_between_ub_key" in kwargs:
+                fill_between_ub_key = kwargs.get( "fill_between_ub_key")
+                fb_yub = dataframe[fill_between_ub_key]
+            else:
+                warn("inappropriate fill_between settings")
+            subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
 
         # Plot pdist
         if draw_pdist:
@@ -316,7 +363,7 @@ class TimeSeriesFigureManager(FigureManager):
                 pdist_kw = plot_kw.copy()
                 pdist_kw.update(kwargs.get("pdist_kw", {}))
 
-                subplot._mps_partner_subplot.plot( dataset.pdist_y,
+                subplot._mps_partner_subplot.plot(dataset.pdist_y,
                   dataset.pdist_x, **pdist_kw)
                 pdist_max = dataset.pdist_y.max()
                 x_max = subplot._mps_partner_subplot.get_xbound()[1]
@@ -326,15 +373,9 @@ class TimeSeriesFigureManager(FigureManager):
                       pdist_max*0.75, pdist_max, pdist_max*1.25]
                     subplot._mps_partner_subplot.set_xticks(xticks)
 
-        # Plot fill_between
-        if draw_fill_between:
-            fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
-            get_colors(fill_between_kw, plot_kw)
-            fill_between_lb_key = kwargs.get("fill_between_lb_key")
-            fill_between_ub_key = kwargs.get("fill_between_ub_key")
-            subplot.fill_between(dataframe.index.values, 
-              dataframe[fill_between_lb_key],
-              dataframe[fill_between_ub_key], **fill_between_kw)
+            if draw_fill_between:
+                subplot._mps_partner_subplot.fill_between(fb_x, fb_ylb,
+                  fb_yub, **fill_between_kw)
 
         # Plot series
         if draw_plot:

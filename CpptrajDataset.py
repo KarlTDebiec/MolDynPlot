@@ -177,35 +177,43 @@ class SAXSDataset(CpptrajDataset):
             dataframe.index = np.array(dataframe.index, np.float)
 
             if scale:
-                from scipy.interpolate import interp1d
-                from scipy.optimize import curve_fit
+                scaling_factor = kwargs.get("scaling_factor")
+                if scaling_factor is None:
+                    from scipy.interpolate import interp1d
+                    from scipy.optimize import curve_fit
 
-                # Prepare target
-                scale_target = expandvars(kwargs.pop("scale_target"))
-                target = self.load_dataset(infile=scale_target, loose=True,
-                  **kwargs)
-                target_x = target.dataframe.index.values
-                target_y = target.dataframe["intensity"]
+                    # Prepare target
+                    scale_target = expandvars(kwargs.pop("scale_target"))
+                    target = self.load_dataset(infile=scale_target, loose=True,
+                      **kwargs)
+                    target_x   = target.dataframe.index.values
+                    target_y   = target.dataframe["intensity"]
+                    target_yse = target.dataframe["intensity_se"]
 
-                # Prepare own values
-                self_x = dataframe.index.values
-                self_y = dataframe["intensity"].values
-                self_x = self_x[np.logical_and(self_x > target_x.min(),
-                                               self_x < target_x.max())]
-                self_y = self_y[np.logical_and(self_x > target_x.min(),
-                                               self_x < target_x.max())]
+                    # Prepare own values over x range of target
+                    self_x = dataframe.index.values
+                    self_y = dataframe["intensity"].values
+                    self_y = self_y[np.logical_and(self_x > target_x.min(),
+                                                   self_x < target_x.max())]
+                    self_x = self_x[np.logical_and(self_x > target_x.min(),
+                                                   self_x < target_x.max())]
 
-                # Must increase precision to support 
-                self_x      = np.array(self_x, np.float64)
-                self_y      = np.array(self_y, np.float64)
-                target_y    = np.array(target_y, np.float64)
+                    # Must increase precision to fit
+                    self_x     = np.array(self_x, np.float64)
+                    self_y     = np.array(self_y, np.float64)
+                    target_y   = np.array(target_y, np.float64)
+                    target_yse = np.array(target_yse, np.float64)
 
-                # Update target
-                interp_target_y    = interp1d(target_x, target_y, kind="cubic")
-                target_y           = interp_target_y(self_x)
+                    # Interpolate target values at own x
+                    interp_target_y   = interp1d(target_x, target_y, kind="cubic")
+                    target_y          = interp_target_y(self_x)
+                    interp_target_yse = interp1d(target_x, target_yse,
+                                          kind="cubic")
+                    target_yse        = interp_target_y(self_x)
 
-                def scale_y(_, a):
-                    return a * self_y
-                scaling_factor = curve_fit(scale_y, self_x, target_y,
-                  p0=(2e-9))[0][0]
+                    def scale_y(_, a):
+                        return a * self_y
+                    scaling_factor = curve_fit(scale_y, self_x, target_y,
+                      p0=(2e-9), bounds=(0,0.35), sigma=target_yse)[0][0]
+                print(scaling_factor)
                 self.dataframe["intensity"] *= scaling_factor
