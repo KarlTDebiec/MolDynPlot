@@ -127,11 +127,14 @@ def saxs(package, infiles, outfile, address, dtype, scaleoffset, verbose=1,
             else:
                 if not (datum[:,0] == q).all():
                     raise()
-            if frames_per_file is None:
-                frames_per_file = datum.shape[1] / 3
+            frames_per_file = datum.shape[1] / 3
             if data is None:
                 data = np.zeros((len(infiles)*frames_per_file, q.size))
-            data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::3].T
+            try:
+                data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::3].T
+            except:
+                data.resize((i+1)*frames_per_file, data.shape[1])
+                data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::3].T
 
     elif package == "crysol":
         q = None
@@ -151,11 +154,14 @@ def saxs(package, infiles, outfile, address, dtype, scaleoffset, verbose=1,
             else:
                 if not (datum[:,0] == q).all():
                     raise()
-            if frames_per_file is None:
-                frames_per_file = datum.shape[1] / 5
+            frames_per_file = datum.shape[1] / 5
             if data is None:
                 data = np.zeros((len(infiles)*frames_per_file, q.size))
-            data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::5].T
+            try:
+                data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::5].T
+            except:
+                data.resize((i+1)*frames_per_file, data.shape[1])
+                data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::5].T
 
     if verbose >= 1:
         print("Loaded {0} intensity datasets".format(data.shape[0]))
