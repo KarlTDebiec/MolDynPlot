@@ -160,6 +160,8 @@ class SAXSFigureManager(FigureManager):
           bottom:     0.70
           sub_height: 1.80
           top:        0.25
+          title_kw:
+            top: -0.125
           shared_legend_kw:
             left:       0.50
             sub_width:  4.40
