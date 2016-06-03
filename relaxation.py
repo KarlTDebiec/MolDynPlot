@@ -331,8 +331,8 @@ def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
     np.savetxt(outfile, np.column_stack((final.index.values,
       final.values)), fmt=fmt, header=header, comments='#')
 
-def process_relax(infiles, delays, peaklist, outfile,
-    verbose=1, debug=0, **kwargs):
+def process_relax(relax_type, peaklist, infiles, delays, error_method,
+    n_synth_datasets, outfile, verbose=1, debug=0, **kwargs):
     """
     """
     from glob import glob
@@ -354,6 +354,7 @@ def process_relax(infiles, delays, peaklist, outfile,
     peaklist = expandvars(peaklist)
     outfile = expandvars(outfile)
 
+    # Load peaklist
     if verbose >= 1:
         print("Loading peaklist from '{0}'".format(peaklist))
     def convert_name(name):
@@ -361,9 +362,10 @@ def process_relax(infiles, delays, peaklist, outfile,
     relax = pd.read_csv(peaklist, sep="\t", usecols=[2,3,4], index_col=2,
       converters={4:convert_name}, names=["1H", "15N", "residue"], skiprows=1)
 
+    # Load peak intensities from spectra
     for infile, delay in zip(infiles, delays):
         if verbose >= 1:
-            print("Loading spectra from '{0}'".format(infile))
+            print("Loading intensities from '{0}'".format(infile))
         parameters, intensity = nmrglue.pipe.read(infile)
         hydrogen = nmrglue.pipe.make_uc(parameters, intensity,
                      dim=1).ppm_scale()
@@ -383,20 +385,23 @@ def process_relax(infiles, delays, peaklist, outfile,
         if verbose >= 1:
             print("Calculating relaxation for {0}".format(peak.name))
 
-        def model_function(time, intensity, relaxation):
-            return intensity * np.exp(-1 * time * relaxation)
+        def model_function(delay, intensity, relaxation):
+            return intensity * np.exp(-1 * delay * relaxation)
 
         I = np.array(peak.filter(regex=(".*ms")).values, np.float64)
         I0, R = curve_fit(model_function, delays, I, p0=(I[0], 1.0))[0]
 
         # Calculate error
-        rmse = np.sqrt(np.mean((I - model_function(delays, I0, R)) ** 2))
-        mae  = np.mean(np.sqrt((I - model_function(delays, I0, R)) ** 2))
+        if error_method == "rmse":
+            error = np.sqrt(np.mean((I - model_function(delays, I0, R)) ** 2))
+        elif error_method == "mae":
+            error = np.mean(np.sqrt((I - model_function(delays, I0, R)) ** 2))
 
         # Construct synthetic relaxation profiles
-        synth_datasets = np.zeros((100, I.size))
+        synth_datasets = np.zeros((n_synth_datasets, I.size))
         for i, I_mean in enumerate(model_function(delays, I0, R)):
-            synth_datasets[:, i] = np.random.normal(I_mean, rmse, 100)
+            synth_datasets[:, i] = np.random.normal(I_mean, error,
+                                     n_synth_datasets)
 
         def synth_fit_decay(synth_intensity):
             try:
@@ -416,7 +421,7 @@ def process_relax(infiles, delays, peaklist, outfile,
         return pd.Series([I0, R, R_se])
 
     fit = relax.apply(calc_relax, axis=1)
-    fit.columns = ["I0", "r1", "r1_se"]
+    fit.columns = ["I0", relax_type, relax_type + "_se"]
     relax = relax.join(fit)
 
     print(relax)
@@ -574,30 +579,69 @@ if __name__ == "__main__":
     input_group  = relax_subparser.add_argument_group("input")
     action_group = relax_subparser.add_argument_group("action")
     output_group = relax_subparser.add_argument_group("output")
-    input_group.add_argument(
-      "-infile",
-      required = True,
-      dest     = "infiles",
-      nargs    = "+",
-      type     = str,
-      help     = "NMR spectra")
-    input_group.add_argument(
-      "-delay",
-      required = True,
-      dest     = "delays",
-      nargs    = "+",
-      type     = str,
-      help     = "Delays")
+    relax_type = input_group.add_mutually_exclusive_group()
+    relax_type.add_argument(
+      "--r1",
+      action   = "store_const",
+      const    = "r1",
+      default  = "r1",
+      dest     = "relax_type",
+      help     = "process R1 relaxation data")
+    relax_type.add_argument(
+      "--r2",
+      action   = "store_const",
+      const    = "r2",
+      default  = "r1",
+      dest     = "relax_type",
+      help     = "process R2 relaxation data")
     input_group.add_argument(
       "-peaklist",
       required = True,
       type     = str,
-      help     = "Peak list")
+      help     = "peak list (exported from ccpnmr)")
+    input_group.add_argument(
+      "-infile",
+      required = True,
+      dest     = "infiles",
+      metavar  = "INFILE",
+      nargs    = "+",
+      type     = str,
+      help     = "NMR spectra (NMRPipe format)")
+    input_group.add_argument(
+      "-delay",
+      required = True,
+      dest     = "delays",
+      metavar  = "DELAY",
+      nargs    = "+",
+      type     = str,
+      help     = "delays (ms); number of delays must match number of infiles")
+    action_group.add_argument(
+      "-synthetics",
+      required = False,
+      dest     = "n_synth_datasets",
+      default  = 100,
+      type     = int,
+      help     = "number of synthetic datasets to use to calculate error")
+    error_method = action_group.add_mutually_exclusive_group()
+    error_method.add_argument(
+      "--rmse",
+      action   = "store_const",
+      const    = "rmse",
+      default  = "rmse",
+      dest     = "error_method",
+      help     = "use root mean square error to generate synthetic datasets")
+    error_method.add_argument(
+      "--mae",
+      action   = "store_const",
+      const    = "mae",
+      default  = "rmse",
+      dest     = "error_method",
+      help     = "use mean absolute error to generate synthetic datasets")
     output_group.add_argument(
       "-outfile",
       required = True,
       type     = str,
-      help     = "Text file to which processed data will be output")
+      help     = "text file to which processed data will be output")
 
     # Verbosity
     for p in subparsers.choices.values():
@@ -606,14 +650,14 @@ if __name__ == "__main__":
           "-v", "--verbose",
           action   = "count",
           default  = 1,
-          help     = "Enable verbose output, may be specified more than once")
+          help     = "enable verbose output, may be specified more than once")
         verbosity.add_argument(
           "-q", "--quiet",
           action   = "store_const",
           const    = 0,
           default  = 1,
           dest     = "verbose",
-          help     = "Disable verbose output")
+          help     = "disable verbose output")
 
     # Parse arguments and run selected function
     kwargs  = vars(parser.parse_args())
