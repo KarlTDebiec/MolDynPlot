@@ -316,7 +316,6 @@ if __name__ == "__main__":
           dest     = "verbose",
           help     = "Disable verbose output")
 
-
     # Parse arguments
     kwargs = vars(parser.parse_args())
     kwargs.pop("function")(**kwargs)
