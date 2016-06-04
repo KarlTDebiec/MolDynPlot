@@ -12,7 +12,7 @@ Processes NMR relaxation and related data
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
-#################################### MAIN #####################################
+################################## FUNCTIONS ##################################
 def spawn(function):
     """
     **Arguments:**
@@ -29,7 +29,7 @@ def spawn(function):
             queue_out.put((i, function(argument)))
     return run_function
 
-def multiprocess_map(function, arguments, n_processes = 1):
+def multiprocess_map(function, arguments, n_processes=1):
     """
     Runs a *function* with *arguments* using *n_processes*
     Meant as a replacement for multiproccessing.Pool.imap_unordered,
@@ -438,6 +438,78 @@ def process_relax(relax_type, peaklist, infiles, delays, error_method,
     np.savetxt(outfile, np.column_stack((relax.index.values,
       relax.values)), fmt=fmt, header=header, comments='#')
 
+def process_hetnoe(peaklist, infiles, outfile, verbose=1, debug=0, **kwargs):
+    """
+    """
+    from glob import glob
+    from os.path import expandvars
+    import nmrglue
+    import numpy as np
+    import pandas as pd
+    pd.set_option("display.width", None)
+
+    # Process arguments
+    processed_infiles = []
+    for infile in infiles:
+        processed_infiles += glob(expandvars(infile))
+    infiles = processed_infiles
+    if len(infiles) != 2:
+        raise()
+    peaklist = expandvars(peaklist)
+    outfile = expandvars(outfile)
+
+    # Load peaklist
+    if verbose >= 1:
+        print("Loading peaklist from '{0}'".format(peaklist))
+    def convert_name(name):
+        return "{0}:{1}".format(name[-4:-1].upper(), name[2:-4])
+    relax = pd.read_csv(peaklist, sep="\t", usecols=[2,3,4], index_col=2,
+      converters={4:convert_name}, names=["1H", "15N", "residue"], skiprows=1)
+
+    # Load peak intensities from spectra
+    def calc_intensity(peak, **kwargs):
+        H_index = np.argmin((hydrogen - peak["1H"])  ** 2)
+        N_index = np.argmin((nitrogen - peak["15N"]) ** 2)
+        return intensity[N_index, H_index]
+
+    if verbose >= 1:
+        print("Loading intensities from '{0}'".format(infiles[0]))
+    parameters, intensity = nmrglue.pipe.read(infiles[0])
+    hydrogen = nmrglue.pipe.make_uc(parameters, intensity,
+                 dim=1).ppm_scale()
+    nitrogen = nmrglue.pipe.make_uc(parameters, intensity,
+                 dim=0).ppm_scale()
+    hydrogen += 0.0612858
+    nitrogen += 0.08399
+
+    relax["sat"] = relax.apply(calc_intensity, axis=1)
+    sat_se = intensity[np.logical_and(intensity > -intensity.std(),
+      intensity < intensity.std())].std()
+
+    if verbose >= 1:
+        print("Loading intensities from '{0}'".format(infiles[1]))
+    parameters, intensity = nmrglue.pipe.read(infiles[1])
+    relax["nosat"] = relax.apply(calc_intensity, axis=1)
+    nosat_se = intensity[np.logical_and(intensity > -intensity.std(),
+      intensity < intensity.std())].std()
+
+    relax["noe"] = relax["sat"] / relax["nosat"]
+    relax["noe_se"] = np.sqrt((sat_se / relax["sat"]) ** 2 +
+      (nosat_se / relax["nosat"]) ** 2) * relax["noe"]
+
+    # Write outfile
+    if verbose >= 1:
+        print("Writing outfile '{0}'".format(outfile))
+    columns = [relax.index.name] + list(relax.columns.values)
+    header = "{0:<11s}".format(columns.pop(0))
+    for column in columns:
+        header += "{0:>12s}".format(column)
+    fmt = ["%12s", "%11.4f", "%11.4f"] + ["%11d"] * 2 + \
+         ["%11.4f", "%11.4f"]
+    np.savetxt(outfile, np.column_stack((relax.index.values,
+      relax.values)), fmt=fmt, header=header, comments='#')
+
+#################################### MAIN #####################################
 if __name__ == "__main__":
     import argparse
 
@@ -637,6 +709,34 @@ if __name__ == "__main__":
       default  = "rmse",
       dest     = "error_method",
       help     = "use mean absolute error to generate synthetic datasets")
+    output_group.add_argument(
+      "-outfile",
+      required = True,
+      type     = str,
+      help     = "text file to which processed data will be output")
+
+    # Prepare hetnoe subparser
+    hetnoe_subparser  = subparsers.add_parser(
+      name     = "hetnoe",
+      help     = "Process experimental heteronuclear NOE relaxation data")
+    hetnoe_subparser.set_defaults(
+      function   = process_hetnoe)
+    input_group  = hetnoe_subparser.add_argument_group("input")
+    action_group = hetnoe_subparser.add_argument_group("action")
+    output_group = hetnoe_subparser.add_argument_group("output")
+    input_group.add_argument(
+      "-peaklist",
+      required = True,
+      type     = str,
+      help     = "peak list (exported from ccpnmr)")
+    input_group.add_argument(
+      "-infile",
+      required = True,
+      dest     = "infiles",
+      metavar  = "INFILE",
+      nargs    = 2,
+      type     = str,
+      help     = "NMR spectra (NMRPipe format)")
     output_group.add_argument(
       "-outfile",
       required = True,
