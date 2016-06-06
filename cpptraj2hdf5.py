@@ -17,7 +17,8 @@ if __name__ == "__main__":
 import numpy as np
 import h5py
 ################################## FUNCTIONS ##################################
-def cpptraj(infile, outfile, address, dtype, scaleoffset, verbose=1, **kwargs):
+def process_cpptraj(infile, outfile, address, dtype, scaleoffset,
+    verbose=1, debug=0, **kwargs):
     """
     .. todo:
         - Support multiple infiles
@@ -71,8 +72,8 @@ def cpptraj(infile, outfile, address, dtype, scaleoffset, verbose=1, **kwargs):
               chunks=True, compression="gzip", scaleoffset=scaleoffset)
             hdf5_file[address].attrs["fields"] = list(fields)
 
-def saxs(package, infiles, outfile, address, dtype, scaleoffset, verbose=1,
-    **kwargs):
+def process_saxs(package, infiles, outfile, address, dtype, scaleoffset,
+    verbose=1, debug=0, **kwargs):
     """
     """
     from os.path import expandvars
@@ -109,65 +110,37 @@ def saxs(package, infiles, outfile, address, dtype, scaleoffset, verbose=1,
                 data = np.zeros((len(infiles), q.size))
             data[i,:] = datum[:,1]
 
-    elif package == "foxs":
+    elif package == "foxs" or package == "crysol":
         q = None
         data = None
-        frames_per_file = None
-        for i, infile in enumerate(infiles):
+        j = 0
+        for infile in infiles:
             if verbose >= 2:
                 print("Loading SAXS data from {0}".format(infile))
             datum = np.loadtxt(infile)
             if q is None:
-                q = datum[:,0]
+                q = np.unique(datum[:,0])
                 if verbose >= 1:
                     print("q contains {0} points ".format(q.size) +
                           "ranging from {0} to {1} Å^-1".format(q[0], q[-1]))
                 if verbose >= 2:
                     print("q:\n{0}".format(q))
             else:
-                if not (datum[:,0] == q).all():
+                if not (np.unique(datum[:,0]) == q).all():
                     raise()
-            frames_per_file = datum.shape[1] / 3
+            n_frames = datum.shape[0] / q.size
             if data is None:
-                data = np.zeros((len(infiles)*frames_per_file, q.size))
-            try:
-                data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::3].T
-            except:
-                data.resize((i+1)*frames_per_file, data.shape[1])
-                data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::3].T
-
-    elif package == "crysol":
-        q = None
-        data = None
-        frames_per_file = None
-        for i, infile in enumerate(infiles):
-            if verbose >= 2:
-                print("Loading SAXS data from {0}".format(infile))
-            datum = np.loadtxt(infile, skiprows=1)
-            if q is None:
-                q = datum[:,0]
-                if verbose >= 1:
-                    print("q contains {0} points ".format(q.size) +
-                          "ranging from {0} to {1} Å^-1".format(q[0], q[-1]))
-                if verbose >= 2:
-                    print("q:\n{0}".format(q))
-            else:
-                if not (datum[:,0] == q).all():
-                    raise()
-            frames_per_file = datum.shape[1] / 5
-            if data is None:
-                data = np.zeros((len(infiles)*frames_per_file, q.size))
-            try:
-                data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::5].T
-            except:
-                data.resize((i+1)*frames_per_file, data.shape[1])
-                data[i*frames_per_file:(i+1)*frames_per_file,:] = datum[:,1::5].T
+                data = np.zeros((n_frames*len(infiles), q.size))
+            intensity = np.reshape(datum[:,1], (n_frames, q.size))
+            data[j:j+n_frames,:] = intensity
+            j += n_frames
 
     if verbose >= 1:
         print("Loaded {0} intensity datasets".format(data.shape[0]))
     if verbose >= 2:
         print("Intensity:\n{0}".format(data))
         print(data.shape)
+
     # Open hdf5 file
     with h5py.File(outfile) as hdf5_file:
         if verbose >= 1:
@@ -230,7 +203,7 @@ if __name__ == "__main__":
       type     = str,
       help     = "HDF5 file to which to dataset will be output")
     saxs_parser.set_defaults(
-      function    = saxs,
+      function    = process_saxs,
       address     = "saxs",
       dtype       = np.float32,
       scaleoffset = 3)
@@ -248,7 +221,7 @@ if __name__ == "__main__":
       type     = str,
       help     = "HDF5 file to which to dataset will be output")
     cpptraj_parser.set_defaults(
-      function = cpptraj)
+      function = process_cpptraj)
 
     kind_subparser.add_parser(
       name        = "dihedral",
