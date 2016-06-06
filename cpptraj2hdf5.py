@@ -117,7 +117,7 @@ def process_saxs(package, infiles, outfile, address, dtype, scaleoffset,
         for infile in infiles:
             if verbose >= 2:
                 print("Loading SAXS data from {0}".format(infile))
-            datum = np.loadtxt(infile)
+            datum = np.loadtxt(infile, comments=["#","D"])
             if q is None:
                 q = np.unique(datum[:,0])
                 if verbose >= 1:
