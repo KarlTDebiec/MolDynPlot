@@ -82,7 +82,10 @@ def process_saxs(package, infiles, outfile, address, dtype, scaleoffset,
     # Process arguments
     processed_infiles = []
     for infile in infiles:
-        processed_infiles.extend(glob(expandvars(infile)))
+        processed_infiles.extend(sorted(glob(expandvars(infile))))
+    if len(processed_infiles) == 0:
+        print("No infiles found matching '{0}', exiting".format(infiles))
+        return
     infiles = processed_infiles
     if verbose >= 1:
         print("Loading SAXS data from {0} infiles, ".format(len(infiles)) +
