@@ -176,9 +176,8 @@ class SAXSDataset(CpptrajDataset):
             dataframe.index.name = "q"
             dataframe.index = np.array(dataframe.index, np.float)
 
-            if scale:
-                scaling_factor = kwargs.get("scaling_factor")
-                if scaling_factor is None:
+            if scale is not None:
+                if not isinstance(scale, float):
                     from scipy.interpolate import interp1d
                     from scipy.optimize import curve_fit
 
@@ -213,7 +212,13 @@ class SAXSDataset(CpptrajDataset):
 
                     def scale_y(_, a):
                         return a * self_y
-                    scaling_factor = curve_fit(scale_y, self_x, target_y,
+                    scale = curve_fit(scale_y, self_x, target_y,
                       p0=(2e-9), bounds=(0,0.35), sigma=target_yse)[0][0]
-                print(scaling_factor)
-                self.dataframe["intensity"] *= scaling_factor
+                if verbose >= 1:
+                    print("scaling dataset by {0}".format(scale))
+                self.dataframe["intensity"] *= scale
+        else:
+            if scale is not None and isinstance(scale, float):
+                if verbose >= 1:
+                    print("scaling dataset by {0}".format(scale))
+                self.dataframe *= scale
