@@ -75,6 +75,12 @@ class TimeSeries2DFigureManager(FigureManager):
           heatmap_kw:
             edgecolors: none
             rasterized: True
+            zorder: 0.1
+          contour_kw:
+            colors: '0.25'
+            levels: [1, 2, 3, 4, 5]
+            linestyles: solid
+            zorder: 0.2
     """
 
     available_presets = """
@@ -159,11 +165,13 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_dataset:
           logz: True
           heatmap_kw:
-            vmin: 5
-            vmax: 10
+            vmin: -4
+            vmax: 0
           colorbar_kw:
             zlabel: $log_{10}$(Intensity)
-            zticks: [5,6,7,8,9,10]
+            zticks: [-4,-3,-2,-1,0]
+          contour_kw:
+            levels: [-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5]
       manuscript:
         class: target
         inherits: manuscript
@@ -204,6 +212,7 @@ class TimeSeries2DFigureManager(FigureManager):
             sub_height: 0.05
             left:       1.82
             sub_width:  1.76
+            bottom:     0.30
           colorbar_kw:
             ztick_fp:  6r
             zlabel_fp: 8b
@@ -340,8 +349,8 @@ class TimeSeries2DFigureManager(FigureManager):
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None,
         handles=None, logz=False,
-        draw_heatmap=False, draw_colorbar=False, draw_legend=False,
-        draw_label=True, 
+        draw_heatmap=False, draw_colorbar=False, draw_contour=False,
+        draw_legend=False, draw_label=True, 
         verbose=1, debug=0, **kwargs):
         import numpy as np
         import six
@@ -357,15 +366,15 @@ class TimeSeries2DFigureManager(FigureManager):
         # Draw heatmap
         if draw_heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
-            x = dataframe.index.values
+            hm_x = dataframe.index.values
             if hasattr(dataset, "y"):
-                y = dataset.y
+                hm_y = dataset.y
             else:
-                y = np.array(range(1, dataframe.shape[1] + 2))
-            z = dataframe.values.T
+                hm_y = np.array(range(1, dataframe.shape[1] + 2))
+            hm_z = dataframe.values.T
             if logz:
-                z = np.log10(z)
-            pcolormesh = subplot.pcolor(x, y, z, **heatmap_kw)
+                hm_z = np.log10(hm_z)
+            pcolormesh = subplot.pcolor(hm_x, hm_y, hm_z, **heatmap_kw)
 
             # Draw colorbar
             if draw_colorbar:
@@ -378,6 +387,24 @@ class TimeSeries2DFigureManager(FigureManager):
                       debug=debug, **kwargs)
 
                 set_colorbar(subplot, pcolormesh, **kwargs)
+
+        # Draw contour
+        if draw_contour:
+            contour_kw = multi_get_copy("contour_kw", kwargs, {})
+            ct_x = dataframe.index.values
+            if hasattr(dataset, "y"):
+                ct_y = dataset.y
+            else:
+                ct_y = np.array(range(1, dataframe.shape[1] + 2))
+            ct_z = dataframe.values.T
+            if logz:
+                ct_z = np.log10(ct_z)
+            if "levels" in kwargs:
+                contour_kw["levels"] = kwargs.pop("color")
+            elif "levels" not in contour_kw:
+                contour_kw["levels"] = range(0,
+                  int(np.ceil(np.nanmax(dataframe.values))))
+            contour = subplot.contour(ct_x, ct_y, ct_z, **contour_kw)
 
         # Draw label
         if draw_label and label is not None:
