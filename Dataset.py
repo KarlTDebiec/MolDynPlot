@@ -147,6 +147,11 @@ class TimeSeriesDataset(Dataset):
 
     def calc_error(self, error_mode="std", **kwargs):
         """
+        Calculates standard error using time series data.
+
+        .. todo:
+            - Support breaking into sections (essentially downsampling,
+              then calculating standard error
         """
 
         # Arguments
@@ -157,7 +162,9 @@ class TimeSeriesDataset(Dataset):
         if error_mode == "std":
             se = timeseries.std()
         elif error_mode == "block":
-            se = timeseries.std()
+            from .fpblockaverager.FPBlockAverager import FPBlockAverager
+            ba = FPBlockAverager(timeseries, **kwargs)
+            se = ba.parameters.loc["exp", "a (se)"]
         else:
             if verbose >= 1:
                 print("error_mode '{0}' not understood, ".format(scale) +
@@ -385,7 +392,7 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
 
             # Scale
             if scale:
-                curve_fit_kw = dict(p0=(2e-9), bounds=(0.0,0.35))
+#                curve_fit_kw = dict(p0=(2e-9), bounds=(0.0,0.35))
                 curve_fit_kw = dict(p0=(2e-9))  # Not clear why bounds broke
                 curve_fit_kw.update(kwargs.get("curve_fit_kw", {}))
                 scale = self.scale(scale, curve_fit_kw=curve_fit_kw, **kwargs)
@@ -393,9 +400,10 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         elif scale:
             self.timeseries *= scale
         if calc_error:
-            se = self.calc_error(error_mode="std", **kwargs)
+            se = self.calc_error(error_mode="block", **kwargs)
             se.name = "intensity_se"
             dataframe = self.dataframe = pd.concat([dataframe, se], axis=1)
+            print(dataframe)
 
 class SAXSExperimentDataset(SAXSDataset):
     """
