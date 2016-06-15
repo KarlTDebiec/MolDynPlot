@@ -211,6 +211,8 @@ class SAXSDataset(Dataset):
         if "intensity_se" in self.dataframe.columns.values:
             self.dataframe["intensity_se"] *= scale
 
+        return scale
+
 class NatConDataset(TimeSeriesDataset):
     """
     Manages native contact datasets.
@@ -326,10 +328,10 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
             q = ["{0:5.3f}".format(a) for a in np.array(h5_file[address+"/q"])]
         super(SAXSTimeSeriesDataset, self).__init__(infile=infile,
           address=address+"/intensity", dataframe_kw=dict(columns=q), **kwargs)
-        dataframe = self.dataframe
-
-        # Store y
-        self.y = np.array(dataframe.columns, np.float)
+        timeseries = self.dataframe
+#
+#        # Store y
+#        self.y = np.array(dataframe.columns, np.float)
 
         # Downsample
         if downsample is not None:
@@ -337,34 +339,37 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
                 print("downsampling by factor of {0} using mean".format(
                   downsample))
 
-            reduced = dataframe.values[
-              :dataframe.shape[0]-(dataframe.shape[0] % downsample),:]
+            reduced = timeseries.values[
+              :timeseries.shape[0]-(timeseries.shape[0] % downsample),:]
             new_shape=(int(reduced.shape[0]/ downsample),
                 downsample, reduced.shape[1])
-            index = np.reshape(dataframe.index.values[
-              :dataframe.shape[0]-(dataframe.shape[0] % downsample)],
+            index = np.reshape(timeseries.index.values[
+              :timeseries.shape[0]-(timeseries.shape[0] % downsample)],
               new_shape[:-1]).mean(axis=1)
             reduced = np.reshape(reduced, new_shape)
             reduced = np.squeeze(reduced.mean(axis=1))
 
             reduced = pd.DataFrame(data=reduced, index=index,
-              columns=dataframe.columns.values)
+              columns=timeseries.columns.values)
             reduced.index.name = "time"
-            dataframe = self.dataframe = reduced
+            timeseries = self.timeseries = reduced
 
         # Average over time series
         if calc_mean:
             self.dataframe = dataframe = pd.DataFrame(
-              data=dataframe.mean(axis=0), columns=["intensity"])
+              data=timeseries.mean(axis=0), columns=["intensity"])
             dataframe.index.name = "q"
-            dataframe.index = np.array(dataframe.index, np.float)
+            dataframe.index = np.array(timeseries.index, np.float)
 
             # Scale
             if scale:
-#                curve_fit_kw = dict(p0=(2e-9), bounds=(0.0,0.35))
+                curve_fit_kw = dict(p0=(2e-9), bounds=(0.0,0.35))
                 curve_fit_kw = dict(p0=(2e-9))  # Not clear why bounds broke
                 curve_fit_kw.update(kwargs.get("curve_fit_kw", {}))
-                self.scale(scale, curve_fit_kw=curve_fit_kw, **kwargs)
+                scale = self.scale(scale, curve_fit_kw=curve_fit_kw, **kwargs)
+                self.timeseries *= scale
+        elif scale:
+            self.timeseries *= scale
 
 class SAXSExperimentDataset(SAXSDataset):
     """

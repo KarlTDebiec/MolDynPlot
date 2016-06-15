@@ -354,26 +354,29 @@ class TimeSeries2DFigureManager(FigureManager):
         verbose=1, debug=0, **kwargs):
         import numpy as np
         import six
-        from .myplotspec import multi_get_copy
+        from .myplotspec import get_colors, multi_get_copy
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
-        dataframe = dataset.dataframe
+        timeseries = dataset.timeseries
 
         # Draw heatmap
         if draw_heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
-            hm_x = dataframe.index.values
-            if hasattr(dataset, "y"):
-                hm_y = dataset.y
-            else:
-                hm_y = np.array(range(1, dataframe.shape[1] + 2))
-            hm_z = dataframe.values.T
+            hm_x = timeseries.index.values
+            try:
+                hm_y = np.array(timeseries.columns, np.float)
+            except:
+                hm_y = np.array(range(1, timeseries.shape[1] + 2))
+            hm_z = timeseries.values.T
             if logz:
                 hm_z = np.log10(hm_z)
+            print(hm_x, hm_x.shape)
+            print(hm_y, hm_y.shape)
+            print(hm_z, hm_z.shape)
             pcolormesh = subplot.pcolor(hm_x, hm_y, hm_z, **heatmap_kw)
 
             # Draw colorbar
@@ -391,19 +394,18 @@ class TimeSeries2DFigureManager(FigureManager):
         # Draw contour
         if draw_contour:
             contour_kw = multi_get_copy("contour_kw", kwargs, {})
-            ct_x = dataframe.index.values
-            if hasattr(dataset, "y"):
-                ct_y = dataset.y
-            else:
-                ct_y = np.array(range(1, dataframe.shape[1] + 2))
-            ct_z = dataframe.values.T
+            get_colors(contour_kw)
+            if "levels" not in contour_kw:
+                contour_kw["levels"] = range(0,
+                  int(np.ceil(np.nanmax(timeseries.values))))
+            ct_x = timeseries.index.values
+            try:
+                ct_y = np.array(timeseries.columns, np.float)
+            except:
+                ct_y = np.array(range(1, timeseries.shape[1] + 2))
+            ct_z = timeseries.values.T
             if logz:
                 ct_z = np.log10(ct_z)
-            if "levels" in kwargs:
-                contour_kw["levels"] = kwargs.pop("color")
-            elif "levels" not in contour_kw:
-                contour_kw["levels"] = range(0,
-                  int(np.ceil(np.nanmax(dataframe.values))))
             contour = subplot.contour(ct_x, ct_y, ct_z, **contour_kw)
 
         # Draw label
