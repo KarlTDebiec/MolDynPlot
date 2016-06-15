@@ -59,6 +59,10 @@ class SequenceFigureManager(FigureManager):
             b: True
             linestyle: '-'
             color: [0.8,0.8,0.8]
+          label_kw:
+            zorder: 10
+            horizontalalignment: left
+            verticalalignment: top
         draw_dataset:
           dataset_kw:
             read_csv_kw:
@@ -85,7 +89,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           kind: ss
           ykey: Alpha
-      R1:
+      r1:
         class: content
         help: Format subplot for R1 relaxation
         draw_subplot:
@@ -94,7 +98,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           ykey:   r1
           ysekey: r1_se
-      R2:
+      r2:
         class: content
         help: Format subplot for R2 relaxation
         draw_subplot:
@@ -103,7 +107,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           ykey:   r2
           ysekey: r2_se
-      HetNOE:
+      hetnoe:
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
         draw_subplot:
@@ -112,7 +116,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           ykey:   noe
           ysekey: noe_se
-      order:
+      s2:
         class: content
         help: Format subplot for S2 order parameter
         draw_subplot:
@@ -129,6 +133,10 @@ class SequenceFigureManager(FigureManager):
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
           ylabel_kw:
             rotation: vertical
+        draw_dataset:
+          draw_fill_between: False
+          draw_errorbar:     False
+          draw_plot:         True
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -137,25 +145,26 @@ class SequenceFigureManager(FigureManager):
           nrows: 3
           subplots:
             0:
-              preset: R1
+              preset: r1
             1:
-              preset: R2
+              preset: r2
             2:
-              preset: HetNOE
+              preset: hetnoe
       relaxation_4:
         class: content
         help: Four stacked plots including R1, R2, HetNOE, and S2
         draw_figure:
+          multiplot: True
           nrows: 4
           subplots:
             0:
-              preset: R1
+              preset: r1
             1:
-              preset: R2
+              preset: r2
             2:
-              preset: HetNOE
+              preset: hetnoe
             3:
-              preset: order
+              preset: s2
       manuscript:
         class: target
         inherits: manuscript
@@ -183,6 +192,11 @@ class SequenceFigureManager(FigureManager):
             labelpad: 3
           grid_kw:
             alpha: 0.3
+          draw_label: True
+          label_kw:
+            border_lw: 1
+            xabs:  0.02
+            yabs: -0.03
         draw_dataset:
           fill_between_kw:
             lw: 1
@@ -192,6 +206,33 @@ class SequenceFigureManager(FigureManager):
             marker: 'o'
             mew: 0
             ms: 4
+      manuscript_tight:
+        class: target
+        extends: manuscript
+        help: Tighter formatting for two columns
+        draw_figure:
+          left:       0.55
+          sub_width:  2.85
+          right:      0.10
+          top:        0.25
+          title_kw:
+            top:     -0.125
+          shared_legend_kw:
+            left:       0.55
+            sub_width:  2.85
+            bottom:     0.05
+            sub_height: 0.30
+            legend_kw:
+              loc: 10
+        draw_dataset:
+          fill_between_kw:
+            lw: 0.5
+          errorbar_kw:
+            capsize: 0
+            elinewidth: 0.75
+            marker: 'o'
+            mew: 0
+            ms: 2
       notebook:
         class: target
         inherits: notebook
@@ -251,17 +292,16 @@ class SequenceFigureManager(FigureManager):
         ykey=None, ysekey=None, label=None,
         handles=None,
         draw_fill_between=False, draw_errorbar=True, draw_plot=False,
-        draw_handle=True,
+        draw_handle=True, draw_label=False,
         verbose=1, debug=0, **kwargs):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
-        from .myplotspec.Dataset import Dataset
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataframe= self.load_dataset(Dataset, verbose=verbose, debug=debug,
+        dataframe= self.load_dataset(verbose=verbose, debug=debug,
           **dataset_kw).dataframe
         x = np.array([filter(lambda x: x in '0123456789.', s)
               for s in dataframe.index.values], np.int)
@@ -298,9 +338,6 @@ class SequenceFigureManager(FigureManager):
                     fb_x.append(None)
                     fb_lb.append(None)
                     fb_ub.append(None)
-#                fb_x.append(None)
-#                fb_lb.append(None)
-#                fb_ub.append(None)
             fb_x = np.array(fb_x, np.float)
             fb_lb = np.array(fb_lb, np.float)
             fb_ub = np.array(fb_ub, np.float)
@@ -329,7 +366,12 @@ class SequenceFigureManager(FigureManager):
             p_x = np.array(p_x, np.float)
             p_y = np.array(p_y, np.float)
             plot = subplot.plot(p_x, p_y, **plot_kw)[0]
+            if verbose >= 2:
+                print(ykey, np.nanmean(p_y))
+                print(p_x)
+                print(p_y)
 
+        # Plot handle
         if draw_handle:
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
             handle_kw["mfc"] = plot_kw["color"]
