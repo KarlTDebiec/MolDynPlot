@@ -82,14 +82,14 @@ class SAXSFigureManager(FigureManager):
         help: Data from sax_md
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.CpptrajDataset.SAXSDataset
-            mean: True
+            cls: moldynplot.Dataset.SAXSTimeSeriesDataset
+            calc_mean: True
       experiment:
         class: content
         help: Data from experiment
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.ExperimentDataset.SAXSDataset
+            cls: moldynplot.Dataset.SAXSExperimentDataset
             read_csv_kw:
               engine: python
               skiprows: 2
@@ -103,7 +103,7 @@ class SAXSFigureManager(FigureManager):
         help: Data back-calculated from molecular envelope
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.ExperimentDataset.SAXSDataset
+            cls: moldynplot.Dataset.SAXSExperimentDataset
             read_csv_kw:
               engine: python
               skiprows: 1
