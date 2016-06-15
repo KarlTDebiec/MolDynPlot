@@ -153,6 +153,7 @@ class TimeSeriesDataset(Dataset):
             - Support breaking into sections (essentially downsampling,
               then calculating standard error
         """
+        from .fpblockaverager.FPBlockAverager import FPBlockAverager
 
         # Arguments
         verbose = kwargs.get("verbose", 1)
@@ -160,9 +161,12 @@ class TimeSeriesDataset(Dataset):
 
         # Calculate standard error
         if error_mode == "std":
+            if verbose >= 1:
+                print("calculating standard error using standard deviation")
             se = timeseries.std()
         elif error_mode == "block":
-            from .fpblockaverager.FPBlockAverager import FPBlockAverager
+            if verbose >= 1:
+                print("calculating standard error using block averaging")
             ba = FPBlockAverager(timeseries, **kwargs)
             se = ba.parameters.loc["exp", "a (se)"]
         else:
@@ -403,7 +407,6 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
             se = self.calc_error(error_mode="block", **kwargs)
             se.name = "intensity_se"
             dataframe = self.dataframe = pd.concat([dataframe, se], axis=1)
-            print(dataframe)
 
 class SAXSExperimentDataset(SAXSDataset):
     """
