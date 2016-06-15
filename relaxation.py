@@ -151,7 +151,6 @@ def process_ired(infiles, outfile, indexfile=None, **kwargs):
     import re
     from subprocess import Popen, PIPE
     import pandas as pd
-    pd.set_option("display.width", None)
     import numpy as np
 
     r1r2noe_datasets = []
@@ -238,7 +237,6 @@ def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
     """
     from os import devnull
     import pandas as pd
-    pd.set_option("display.width", None)
     import numpy as np
 
     if len(sim_infiles) != len(exp_infiles):
@@ -342,7 +340,6 @@ def process_relax(relax_type, peaklist, infiles, delays, error_method,
     import pandas as pd
     from scipy.interpolate import RectBivariateSpline
     from scipy.optimize import curve_fit
-    pd.set_option("display.width", None)
 
     # Process arguments
     processed_infiles = []
@@ -420,11 +417,10 @@ def process_relax(relax_type, peaklist, infiles, delays, error_method,
 
         return pd.Series([I0, R, R_se])
 
+    # Calculate relaxation rates and standard errors
     fit = relax.apply(calc_relax, axis=1)
     fit.columns = ["I0", relax_type, relax_type + "_se"]
     relax = relax.join(fit)
-
-    print(relax)
 
     # Write outfile
     if verbose >= 1:
@@ -446,7 +442,6 @@ def process_hetnoe(peaklist, infiles, outfile, verbose=1, debug=0, **kwargs):
     import nmrglue
     import numpy as np
     import pandas as pd
-    pd.set_option("display.width", None)
 
     # Process arguments
     processed_infiles = []

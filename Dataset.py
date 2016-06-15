@@ -142,7 +142,29 @@ class TimeSeriesDataset(Dataset):
           columns=timeseries.columns.values)
         reduced.index.name = "time"
         timeseries = self.timeseries = reduced
+
         return timeseries
+
+    def calc_error(self, error_mode="std", **kwargs):
+        """
+        """
+
+        # Arguments
+        verbose = kwargs.get("verbose", 1)
+        timeseries=self.timeseries
+
+        # Calculate standard error
+        if error_mode == "std":
+            se = timeseries.std()
+        elif error_mode == "block":
+            se = timeseries.std()
+        else:
+            if verbose >= 1:
+                print("error_mode '{0}' not understood, ".format(scale) +
+                      "must be one of 'std', 'block'; not calculating error.")
+            return
+
+        return se
 
 class SAXSDataset(Dataset):
     """
@@ -317,7 +339,8 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
     """
 
     def __init__(self, infile, address="saxs", downsample=None,
-        calc_mean=False, scale=False, **kwargs):
+        calc_mean=False, calc_error=True, error_mode="std", scale=False,
+        **kwargs):
         """
         Initializes dataset.
 
@@ -339,6 +362,7 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         """
         from os.path import expandvars
 
+        # Arguments
         verbose = kwargs.get("verbose", 1)
 
         # Load
@@ -368,6 +392,10 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
                 self.timeseries *= scale
         elif scale:
             self.timeseries *= scale
+        if calc_error:
+            se = self.calc_error(error_mode="std", **kwargs)
+            se.name = "intensity_se"
+            dataframe = self.dataframe = pd.concat([dataframe, se], axis=1)
 
 class SAXSExperimentDataset(SAXSDataset):
     """
