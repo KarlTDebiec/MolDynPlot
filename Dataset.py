@@ -44,68 +44,44 @@ class TimeSeriesDataset(Dataset):
           grid (ndarray): Grid on which to calculate probability
             distribution
           verbose (int): Level of verbose output
-          debug (int): Level of debug output
           kwargs (dict): Additional keyword arguments
 
           .. todo:
             - 'y' argument does not belong here; make sure it is
               removable
+            - move downsampling to function
             - Calculate pdist for multiple columns
             - Make pdist a dataframe rather than explicit x and y
             - Calculate pdist using histogram
             - Verbose pdist
         """
 
+        # Arguments
         verbose = kwargs.get("verbose", 1)
+
+        # Load
         super(TimeSeriesDataset, self).__init__( **kwargs)
-        dataframe = self.dataframe
-        dataframe.index.name = "time"
+        timeseries = self.timeseries = self.dataframe
+        timeseries.index.name = "time"
 
         if "usecols" in kwargs:
-            dataframe = dataframe[dataframe.columns[kwargs.pop("usecols")]]
+            timeseries = timeseries[timeseries.columns[kwargs.pop("usecols")]]
 
         # Convert from frame index to time
         if "dt" in kwargs:
-            dataframe.index *= kwargs.pop("dt")
+            timeseries.index *= kwargs.pop("dt")
 
         # Offset time
         if "toffset" in kwargs:
-            dataframe.index += kwargs.pop("toffset")
+            timeseries.index += kwargs.pop("toffset")
 #
 #        # Store y, if applicable
 #        if "y" in kwargs:
 #            self.y = kwargs.pop("y")
 
         # Downsample
-        if downsample is not None:
-            downsample = kwargs.pop("downsample")
-            downsample_mode = kwargs.get("downsample_mode", "mean")
-
-            reduced = dataframe.values[
-              :dataframe.shape[0]-(dataframe.shape[0] % downsample),:]
-            new_shape=(int(reduced.shape[0]/ downsample),
-                downsample, reduced.shape[1])
-            index = np.reshape(dataframe.index.values[
-              :dataframe.shape[0]-(dataframe.shape[0] % downsample)],
-              new_shape[:-1]).mean(axis=1)
-            reduced = np.reshape(reduced, new_shape)
-            if downsample_mode == "mean":
-                if verbose >= 1:
-                    print("downsampling by factor of {0} using mean".format(
-                      downsample))
-                reduced = np.squeeze(reduced.mean(axis=1))
-            elif downsample_mode == "mode":
-                from scipy.stats.mstats import mode
-
-                if verbose >= 1:
-                    print("downsampling by factor of {0} using mode".format(
-                      downsample))
-                reduced = np.squeeze(mode(reduced, axis=1)[0])
-
-            reduced = pd.DataFrame(data=reduced, index=index,
-              columns=dataframe.columns.values)
-            reduced.index.name = "time"
-            dataframe = self.dataframe = reduced
+        if downsample:
+            self.downsample(downsample, **kwargs)
 
         if calc_pdist:
             from sklearn.neighbors import KernelDensity
@@ -121,6 +97,52 @@ class TimeSeriesDataset(Dataset):
             pdf /= pdf.sum()
             self.pdist_x = grid
             self.pdist_y = pdf
+
+    def downsample(self, downsample, downsample_mode="mean", **kwargs):
+        """
+        Downsamples time series.
+
+        Arguments:
+          downsample (int): Interval by which to downsample points
+          downsample_mode (str): Method of downsampling; may be 'mean'
+            or 'mode'
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from scipy.stats.mstats import mode
+
+        # Arguments
+        verbose = kwargs.get("verbose", 1)
+        timeseries=self.timeseries
+
+        # Truncate dataset
+        reduced = timeseries.values[
+          :timeseries.shape[0] - (timeseries.shape[0] % downsample),:]
+        new_shape = (int(reduced.shape[0]/downsample), downsample,
+          reduced.shape[1])
+        index = np.reshape(timeseries.index.values[
+          :timeseries.shape[0]-(timeseries.shape[0] % downsample)],
+          new_shape[:-1]).mean(axis=1)
+        reduced = np.reshape(reduced, new_shape)
+
+        # Downsample
+        if downsample_mode == "mean":
+            if verbose >= 1:
+                print("downsampling by factor of {0} using mean".format(
+                  downsample))
+            reduced = np.squeeze(reduced.mean(axis=1))
+        elif downsample_mode == "mode":
+            if verbose >= 1:
+                print("downsampling by factor of {0} using mode".format(
+                  downsample))
+            reduced = np.squeeze(mode(reduced, axis=1)[0])
+
+        # Store downsampled time series
+        reduced = pd.DataFrame(data=reduced, index=index,
+          columns=timeseries.columns.values)
+        reduced.index.name = "time"
+        timeseries = self.timeseries = reduced
+        return timeseries
 
 class SAXSDataset(Dataset):
     """
@@ -140,7 +162,6 @@ class SAXSDataset(Dataset):
             scipy.optimize.curve_fit (scale to match target dataset
             only)
           verbose (int): Level of verbose output
-          debug (int): Level of debug output
           kwargs (dict): Additional keyword arguments
         """
         from os.path import expandvars, isfile
@@ -236,7 +257,6 @@ class NatConDataset(TimeSeriesDataset):
             mode
           pdist (bool): Calculate probability distribution
           verbose (int): Level of verbose output
-          debug (int): Level of debug output
           kwargs (dict): Additional keyword arguments
         """
         verbose = kwargs.get("verbose", 1)
@@ -311,11 +331,9 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
             time of first point)
           downsample (int): Interval by which to downsample points
           verbose (int): Level of verbose output
-          debug (int): Level of debug output
           kwargs (dict): Additional keyword arguments
 
         .. todo:
-          - Should y be stored here?
           - Calculate error
           - Shift downsampling to superclass
         """
@@ -331,25 +349,8 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         timeseries = self.timeseries = self.dataframe
 
         # Downsample
-        if downsample is not None:
-            if verbose >= 1:
-                print("downsampling by factor of {0} using mean".format(
-                  downsample))
-
-            reduced = timeseries.values[
-              :timeseries.shape[0]-(timeseries.shape[0] % downsample),:]
-            new_shape=(int(reduced.shape[0]/ downsample),
-                downsample, reduced.shape[1])
-            index = np.reshape(timeseries.index.values[
-              :timeseries.shape[0]-(timeseries.shape[0] % downsample)],
-              new_shape[:-1]).mean(axis=1)
-            reduced = np.reshape(reduced, new_shape)
-            reduced = np.squeeze(reduced.mean(axis=1))
-
-            reduced = pd.DataFrame(data=reduced, index=index,
-              columns=timeseries.columns.values)
-            reduced.index.name = "time"
-            timeseries = self.timeseries = reduced
+        if downsample:
+            self.downsample(downsample, downsample_mode="mean", **kwargs)
 
         # Average over time series
         if calc_mean:
@@ -381,7 +382,6 @@ class SAXSExperimentDataset(SAXSDataset):
           infile (str): Path to input file, may contain environment
             variables
           verbose (int): Level of verbose output
-          debug (int): Level of debug output
           kwargs (dict): Additional keyword arguments
         """
         from os.path import expandvars
@@ -456,7 +456,7 @@ class H5Dataset(object):
                     key     = self.default_key
 
             if not isfile(path):
-                raise OSError("h5 file '{0}' does not exisit".format(path))
+                raise OSError("h5 file '{0}' does not exist".format(path))
 
             with h5(path) as in_h5:
                 if address not in in_h5:

@@ -374,9 +374,6 @@ class TimeSeries2DFigureManager(FigureManager):
             hm_z = timeseries.values.T
             if logz:
                 hm_z = np.log10(hm_z)
-            print(hm_x, hm_x.shape)
-            print(hm_y, hm_y.shape)
-            print(hm_z, hm_z.shape)
             pcolormesh = subplot.pcolor(hm_x, hm_y, hm_z, **heatmap_kw)
 
             # Draw colorbar
