@@ -328,10 +328,7 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
             q = ["{0:5.3f}".format(a) for a in np.array(h5_file[address+"/q"])]
         super(SAXSTimeSeriesDataset, self).__init__(infile=infile,
           address=address+"/intensity", dataframe_kw=dict(columns=q), **kwargs)
-        timeseries = self.dataframe
-#
-#        # Store y
-#        self.y = np.array(dataframe.columns, np.float)
+        timeseries = self.timeseries = self.dataframe
 
         # Downsample
         if downsample is not None:
@@ -359,7 +356,7 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
             self.dataframe = dataframe = pd.DataFrame(
               data=timeseries.mean(axis=0), columns=["intensity"])
             dataframe.index.name = "q"
-            dataframe.index = np.array(timeseries.index, np.float)
+            dataframe.index = np.array(timeseries.columns.values, np.float)
 
             # Scale
             if scale:
