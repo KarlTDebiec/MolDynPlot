@@ -506,3 +506,37 @@ class H5Dataset(object):
                 self.attrs[key]    = dict(dataset.attrs)
             print("Loaded Dataset {0}[{1}]; Stored at {2}".format(
               path, address, key))
+
+#class SAXSDiffDataset(SAXSDataset):
+#    """
+#    Manages Small Angle X-ray Scattering difference datasets.
+#    """
+#
+#    @classmethod
+#    def get_cache_key(cls, dataset_classes=None, *args, **kwargs):
+#        """
+#        Generates tuple of arguments to be used as key for dataset
+#        cache.
+#
+#        Arguments documented under :func:`__init__`.
+#        """
+#        from .myplotspec import multi_get_copy
+#
+#        minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})
+#        minuend_class = dataset_classes[minuend_kw["kind"].lower()]
+#        key = [cls, mask_cutoff, minuend_class.get_cache_key(**minuend_kw)]
+#
+#        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"],
+#          kwargs, {})
+#        if isinstance(subtrahend_kw, dict):
+#            subtrahend_kw = [subtrahend_kw]
+#        for sh_kw in subtrahend_kw:
+#            sh_class = dataset_classes[sh_kw.pop("kind").lower()]
+#            key.append(sh_class.get_cache_key(**sh_kw))
+#
+#        return tuple(key)
+#
+#    def __init__(self, **kwargs):
+#        # Load minuend
+#        print("ADF")
+#        minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})

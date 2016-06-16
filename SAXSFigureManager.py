@@ -77,13 +77,14 @@ class SAXSFigureManager(FigureManager):
     """
 
     available_presets = """
-      amber:
+      simulation:
         class: content
-        help: Data from sax_md
+        help: Data from simulation (saxs_md, crysol, foxs)
         draw_dataset:
           dataset_kw:
             cls: moldynplot.Dataset.SAXSTimeSeriesDataset
             calc_mean: True
+            calc_error: True
       experiment:
         class: content
         help: Data from experiment
@@ -127,6 +128,19 @@ class SAXSFigureManager(FigureManager):
           ylabel: "$log_{10}$(Intensity)"
           yticks: [-4,-3,-2,-1,0]
         draw_dataset:
+          logy: True
+      difflogy:
+        class: appearance
+        extends: logy
+        help: Plot difference on y axis using base 10 logarithmic scale
+        draw_figure:
+          multi_yticklabels: [-3,-2,-1,0,1,2,3]
+        draw_subplot:
+          ylabel: "$log_{10}$(Intensity)"
+          yticks: [-3,-2,-1,0,1,2,3]
+        draw_dataset:
+          dataset_kw:
+            cls: moldynplot.Dataset.SAXSDiffDataset
           logy: True
       presentation:
         class: target
