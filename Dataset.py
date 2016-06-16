@@ -507,11 +507,11 @@ class H5Dataset(object):
             print("Loaded Dataset {0}[{1}]; Stored at {2}".format(
               path, address, key))
 
-#class SAXSDiffDataset(SAXSDataset):
-#    """
-#    Manages Small Angle X-ray Scattering difference datasets.
-#    """
-#
+class SAXSDiffDataset(SAXSDataset):
+    """
+    Manages Small Angle X-ray Scattering difference datasets.
+    """
+
 #    @classmethod
 #    def get_cache_key(cls, dataset_classes=None, *args, **kwargs):
 #        """
@@ -535,8 +535,25 @@ class H5Dataset(object):
 #            key.append(sh_class.get_cache_key(**sh_kw))
 #
 #        return tuple(key)
-#
-#    def __init__(self, **kwargs):
-#        # Load minuend
-#        print("ADF")
-#        minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})
+
+    def __init__(self, dataset_cache=None, **kwargs):
+        from sys import exit
+        from .myplotspec import multi_get_copy
+
+        self.dataset_cache = dataset_cache
+
+        minuend_kw    = multi_get_copy(["minuend", "minuend_kw"],
+                          kwargs, {})
+        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"],
+                          kwargs, {})
+        minuend    = self.load_dataset(loose=True, **minuend_kw)
+        subtrahend = self.load_dataset(loose=True, **subtrahend_kw)
+        m_I    = minuend.dataframe["intensity"]
+        m_I_se = minuend.dataframe["intensity_se"]
+        s_I    = subtrahend.dataframe["intensity"]
+        s_I_se = subtrahend.dataframe["intensity_se"]
+        diff_I    = (m_I - s_I)
+        diff_I_se = np.sqrt(m_I_se**2 +s_I_se**2)
+        diff_I.name = "intensity"
+        diff_I_se.name = "intensity_se"
+        self.dataframe = pd.concat([diff_I, diff_I_se], axis=1)

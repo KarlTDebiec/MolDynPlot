@@ -67,6 +67,10 @@ class SAXSFigureManager(FigureManager):
             b: True
             color: [0.8,0.8,0.8]
             linestyle: '-'
+          label_kw:
+            zorder: 10
+            horizontalalignment: right
+            verticalalignment: top
         draw_dataset:
           plot_kw:
             zorder: 10
@@ -129,19 +133,21 @@ class SAXSFigureManager(FigureManager):
           yticks: [-4,-3,-2,-1,0]
         draw_dataset:
           logy: True
-      difflogy:
+      diffy:
         class: appearance
-        extends: logy
-        help: Plot difference on y axis using base 10 logarithmic scale
+        help: Plot difference on y axis
         draw_figure:
-          multi_yticklabels: [-3,-2,-1,0,1,2,3]
+          multi_yticklabels: ["-0.020","-0.015","-0.010","-0.005","0.000",
+                               "0.005", "0.010", "0.015", "0.020"]
         draw_subplot:
-          ylabel: "$log_{10}$(Intensity)"
-          yticks: [-3,-2,-1,0,1,2,3]
+          ylabel: "Δ Intensity"
+          yticks:      [ -0.020,  -0.015,  -0.010,  -0.005,  0.000,
+                          0.005,   0.010,   0.015,   0.020]
+          yticklabels: ["-0.020","-0.015","-0.010","-0.005","0.000",
+                         "0.005", "0.010", "0.015", "0.020"]
         draw_dataset:
           dataset_kw:
             cls: moldynplot.Dataset.SAXSDiffDataset
-          logy: True
       presentation:
         class: target
         inherits: presentation
@@ -190,6 +196,11 @@ class SAXSFigureManager(FigureManager):
             labelpad: 3
           ylabel_kw:
             labelpad: 6
+          draw_label: True
+          label_kw:
+            border_lw: 1
+            xabs: -0.05
+            yabs: -0.05
         draw_dataset:
           partner_kw:
             hspace:    0.05
@@ -233,10 +244,9 @@ class SAXSFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, label=None,
-        handles=None, logx=False, logy=False,
-        draw_fill_between=False, draw_plot=True, draw_handle=True,
-        verbose=1, debug=0, **kwargs):
+    def draw_dataset(self, subplot, label=None, handles=None, logx=False,
+        logy=False, draw_fill_between=False, draw_plot=True, draw_handle=True,
+        draw_label=True, verbose=1, debug=0, **kwargs):
         import numpy as np
         import pandas as pd
         from .myplotspec import get_colors, multi_get_copy
@@ -280,7 +290,7 @@ class SAXSFigureManager(FigureManager):
 
         if draw_handle:
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
-            handle_kw["mfc"] = plot_kw["color"]
+            handle_kw["mfc"] = plot_kw.get("color", "blue")
             handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
             if handles is not None and label is not None:
                 handles[label] = handle
