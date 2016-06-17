@@ -30,158 +30,212 @@ class PDistFigureManager(FigureManager):
         draw_figure:
           subplot_kw:
             autoscale_on: False
+          multi_tick_params:
+            left: on
+            right: off
+            bottom: on
+            top: off
+          shared_legend: True
+          shared_legend_kw:
+            spines: False
+            handle_kw:
+              ls: none
+              marker: s
+              mec: black
+            legend_kw:
+              frameon: False
+              loc: 9
+              numpoints: 1
+              handletextpad: 0
         draw_subplot:
-          xlabel: Distance (Å)
-          xticks: [2,3,4,5,6,7,8,9,10]
-          ylabel: Potential of Mean Force (kcal/mol)
-          yticks: [-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
+          title_kw:
+            verticalalignment: bottom
+          ylabel:      "Distribution"
+          yticklabels: []
+          tick_params:
+            direction: out
+            left: on
+            right: off
+            bottom: on
+            top: off
+          grid: True
+          grid_kw:
+            b: True
+            color: [0.8,0.8,0.8]
+            linestyle: '-'
+          label_kw:
+            zorder: 10
+            horizontalalignment: left
+            verticalalignment: top
         draw_dataset:
-          xkey: center
-          ykey: pmf
+          plot_kw:
+            zorder: 10
+          fill_between_kw:
+            color: [0.7, 0.7, 0.7]
+            lw: 0
+          handle_kw:
+            ls: none
+            marker: s
+            mec: black
     """
     available_presets = """
-      count:
+      rmsd:
         class: content
+        help: Root Mean Standard Deviation (RMSD)
         draw_subplot:
-          ylabel: Count
-          yticks: [0,100,200,300,400,500,600,700,800,900,1000]
+          xlabel: RMSD (Å)
+          xticks: [0,2,4,6,8,10]
         draw_dataset:
-          ykey: count
-      probability:
+          ykey: rmsd
+          dataset_kw:
+            cls: moldynplot.Dataset.TimeSeriesDataset
+            calc_pdist: True
+            read_csv_kw:
+              delim_whitespace: True
+              header: 0
+              index_col: 0
+              names: [frame, rmsd]
+      rg:
         class: content
+        help: Radius of Gyration (Rg)
         draw_subplot:
-          ylabel: Probability
-          yticks: [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+          xlabel: $R_g$ (Å)
+          xticks: [0,5,10,15,20,25,30]
         draw_dataset:
-          ykey: probability
-      free_energy:
-        class: content
-        draw_subplot:
-          ylabel: Free Energy $(k_B T)$
-          yticks: [0,1,2,3,4,5,6,7,8,9,10]
-        draw_dataset:
-          ykey: free energy
-      pmf:
-        class: content
-        draw_subplot:
-          ylabel: Potential of Mean Force (kcal/mol)
-          yticks: [-4.5,-4.0,-3.5,-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
-        draw_dataset:
-          ykey: pmf
-          zero_line: True
-      notebook:
+          ykey: rg
+          dataset_kw:
+            cls: moldynplot.Dataset.TimeSeriesDataset
+            calc_pdist: True
+            read_csv_kw:
+              delim_whitespace: True
+              header: 0
+              index_col: 0
+              names: [frame, rg, rgmax]
+      manuscript:
         class: target
-        inherits: notebook
+        inherits: manuscript
         draw_figure:
           left:       0.50
-          sub_width:  5.00
-          right:      0.25
-          bottom:     1.00
-          sub_height: 2.00
+          sub_width:  2.50
+          wspace:     0.10
+          right:      0.20
+          bottom:     0.70
+          sub_height: 1.00
           hspace:     0.10
           top:        0.25
           title_kw:
             top: -0.1
-          shared_legend: True
           shared_legend_kw:
             left:       0.50
-            sub_width:  5.00
-            right:      0.25
+            sub_width:  2.50
             bottom:     0.00
-            sub_height: 0.50
+            sub_height: 0.30
+            handle_kw:
+              ms: 5
             legend_kw:
-              loc: 9
-              ncol: 4
+              labelspacing: 0.5
+              legend_fp: 7r
+              ncol: 6
         draw_subplot:
+          xlabel_kw:
+            labelpad: 3
+          ylabel_kw:
+            labelpad: 6
+          y2ticks: []
           y2label_kw:
-            labelpad: 12
+            rotation: 270
+            verticalalignment: bottom
+          draw_label: True
+          label_kw:
+            border_lw: 1
+            xabs:  0.020
+            yabs: -0.025
+        draw_dataset:
+          partner_kw:
+            wspace:    0.10
+            sub_width: 0.80
+            title_fp: 8b
+            xlabel_kw:
+              labelpad: 8.5
+            label_fp: 8b
+            tick_fp: 6r
+            tick_params:
+              length: 2
+              pad: 3
+              width: 1
+          plot_kw:
+            lw: 1
+          handle_kw:
+            ms: 6
+            mew: 1
     """
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, xkey="x", ykey="pmf", label="", xoffset=0,
-        yoffset=0, handles=None, verbose=1, debug=0, **kwargs):
+    def draw_dataset(self, subplot, label=None, ykey=None, handles=None,
+        draw_pdist=True, draw_fill_between=False, verbose=1, debug=0,
+        **kwargs):
         """
-        Draws a dataset.
-
-        Arguments:
-          subplot (Axes): Axes on which to draw
-          xkey (str): Name of field in dataset from which to load x
-          ykey (str): Name of field in dataset from which to load y
-          label (str, optional): Dataset label
-          color (str, list, ndarray, float, optional): Dataset color
-          plot_kw (dict, optional): Additional keyword arguments passed
-            to subplot.plot()
-          handles (OrderedDict, optional): Nascent OrderedDict of
-            [labels]: handles on subplot
-          zero_line (bool): Draw a horizontal line at y=0; really a
-            subplot setting, but placed here to avoid needing to
-            override draw_subplot
-          kwargs (dict): Additional keyword arguments
         """
-        from .myplotspec import get_color, multi_get_copy
-        from .H5Dataset import H5Dataset
+        from warnings import warn
+        from .myplotspec import get_colors, multi_get_copy
 
-        if kwargs.get("infile") is None:
-            return
+        # Load data
+        dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
+        if "infile" in kwargs:
+            dataset_kw["infile"] = kwargs["infile"]
+        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
+        if dataset is not None and hasattr(dataset, "pdist"):
+            pdist = dataset.pdist
+        else:
+            pdist = None
 
+        # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
-        if "color" in plot_kw:
-            plot_kw["color"] = get_color(plot_kw.pop("color"))
-        elif "color" in kwargs:
-            plot_kw["color"] = get_color(kwargs.pop("color"))
+        get_colors(plot_kw, kwargs)
 
-        # Load dataset, x, and y
-        dataset = H5Dataset(default_address="pdist", default_key="pdist",
-                    **kwargs)
-        xmin, xmax = subplot.get_xbound()
-        x = dataset.datasets["pdist"][xkey] + xoffset
-        y = dataset.datasets["pdist"][ykey] + yoffset
-        poi = kwargs.get("poi", False)
-        if poi:
-            import numpy as np
-            from scipy.optimize import curve_fit
-            xc = x[x >= 3.0]
-            yc = y[-1 * xc.size:]
-            xc = xc[xc <= 3.8]
-            yc = yc[:xc.size]
-            dPMFdx = (yc[1:] - yc[:-1]) / (xc[1] - xc[0])
-            poi_index  = np.where(dPMFdx == np.nanmax(dPMFdx))[0][0]
-            print(xc[poi_index])
-            subplot.axvline(xc[poi_index], color=plot_kw.get("color"))
+        # Plot fill_between
+        if draw_fill_between:
+            fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
+            get_colors(fill_between_kw, plot_kw)
 
-        # y=0 line; should really be in draw_subplot; must figure out
-        #   how to derive from method without rewriting completely
-        #   or disturbing argument collection
-        if (kwargs.get("zero_line", False)
-        and not hasattr(subplot, "_mps_zero_line")):
-            subplot._mps_zero_line = subplot.axhline(0, color="k")
+            if "x" in fill_between_kw:
+                fb_x = fill_between_kw.pop("x")
+            if "ylb" in fill_between_kw:
+                fb_ylb = fill_between_kw.pop("ylb")
+            if "yub" in fill_between_kw:
+                fb_yub = fill_between_kw.pop("yub")
+            subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
 
-        # Plot
-        handle = subplot.plot(x, y, label=label, **plot_kw)[0]
-        if handles is not None:
-            handles[label] = handle
+        # Plot pdist
+        if draw_pdist:
+            if not hasattr(dataset, "pdist"):
+                warn("'draw_pdist' is enabled but dataset does not have the "
+                     "necessary attribute 'pdist', skipping.")
+            else:
+                pdist = pdist[ykey]
+                pdist_kw = plot_kw.copy()
+                pdist_kw.update(kwargs.get("pdist_kw", {}))
+
+                pd_x = pdist.index.values
+                pd_y = pdist.values
+
+                subplot.plot(pd_x, pd_y, **pdist_kw)
+                pdist_rescale = True
+                if pdist_rescale:
+                    pdist_max = pd_y.max()
+                    y_max = subplot.get_ybound()[1]
+                    if (pdist_max > y_max / 1.25
+                    or not hasattr(subplot, "_mps_rescaled")):
+                        subplot.set_ybound(0, pdist_max*1.25)
+                        yticks = [0, pdist_max*0.25, pdist_max*0.50,
+                          pdist_max*0.75, pdist_max, pdist_max*1.25]
+                        subplot.set_yticks(yticks)
+                        subplot._mps_rescaled = True
+
+            if draw_fill_between:
+                subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
     PDistFigureManager().main()
-########################## AWAITING REIMPLEMENTATION ##########################
-#def poi_subplot(subplot, datasets, **kwargs):
-#        dPMFdx     = (y[1:] - y[:-1]) / (x[1] - x[0])
-#        dPMFdx     = np.mean(
-#          np.reshape(dPMFdx[:(dPMFdx.size - dPMFdx.size % downsample)],
-#          (dPMFdx.size   / downsample, downsample)), axis = 1)
-#        xp         = (x[:-1]  + x[1:])  / 2
-#        min_index  = (np.abs(xp - 2.8)).argmin()
-#        max_index  = (np.abs(xp - 3.2)).argmin()
-#        poi_index  = np.where(dPMFdx == np.nanmax(
-#          dPMFdx[min_index:max_index]))[0][0]
-#        min_index  = (np.abs(xp - xp[poi_index] + 0.10)).argmin()
-#        max_index  = (np.abs(xp - xp[poi_index] - 0.10)).argmin()
-#        def func(x, a, b, c): return a * (x - b) ** 2 + c
-#        a, b, c = curve_fit(func, xp[min_index:max_index],
-#          dPMFdx[min_index:max_index], p0 = [-100, 3, 4], maxfev = 10000)[0]
-#        subplot.plot(xp, dPMFdx, linewidth = 2.0, color = color)
-#        subplot.axvline(b, linewidth = 1.0, color = color)
-#        set_inset(subplot, "POI = {0:4.2f}".format(np.round(b,2)), fp = "14r",
-#          xpro = 0.95, ypro = 0.95, ha = "right", va = "top")

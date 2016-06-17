@@ -288,10 +288,11 @@ class TimeSeriesFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, label=None,
-        ykey=None, handles=None,
+    def draw_dataset(self, subplot, label=None, ykey=None, handles=None,
         draw_pdist=False, draw_fill_between=False, draw_plot=True,
         verbose=1, debug=0, **kwargs):
+        """
+        """
         from warnings import warn
         from .myplotspec import get_colors, multi_get_copy
 
@@ -300,7 +301,7 @@ class TimeSeriesFigureManager(FigureManager):
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
-        if dataset is not None:
+        if dataset is not None and hasattr(dataset, "timeseries"):
             timeseries = dataset.timeseries
         else:
             timeseries = None
