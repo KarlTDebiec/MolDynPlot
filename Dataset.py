@@ -84,19 +84,86 @@ class TimeSeriesDataset(Dataset):
             self.downsample(downsample, **kwargs)
 
         if calc_pdist:
-            from sklearn.neighbors import KernelDensity
+            self.calc_pdist(**kwargs)
 
-            pdist_key = kwargs.get("pdist_cols", dataframe.columns.values[0])
+    def calc_pdist(self, **kwargs):
+        """
+        Calcualtes probability distribution of time series.
 
-            kde_kw = kwargs.get("pdist_kde_kw",  {"bandwidth": 0.1})
-            grid = kwargs.get("pdist_grid", np.linspace(
-                dataframe.values.min(), dataframe.values.max(), 100))
-            kde = KernelDensity(**kde_kw)
-            kde.fit(dataframe[pdist_key][:, np.newaxis])
-            pdf = np.exp(kde.score_samples(grid[:, np.newaxis]))
-            pdf /= pdf.sum()
-            self.pdist_x = grid
-            self.pdist_y = pdf
+        Arguments:
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from collections import OrderedDict
+        from sklearn.neighbors import KernelDensity
+
+        # Arguments
+        verbose = kwargs.get("verbose", 1)
+        timeseries = self.timeseries
+
+        pdist_kw = kwargs.get("pdist_kw", {"bandwidth": 0.1})
+        mode = "kde"
+        if mode == "kde":
+
+            # Prepare bandwidths
+            bandwidth = pdist_kw.pop("bandwidth", None)
+            if bandwidth is None:
+                all_bandwidth = None
+                bandwidth = {}
+            elif isinstance(bandwidth, float):
+                all_bandwidth = bandwidth
+                bandwidth = {}
+            elif isinstance(bandwidth, dict):
+                all_bandwidth = None
+                pass
+            for column, series in timeseries.iteritems():
+                if column in bandwidth:
+                    bandwidth[column] = float(bandwidth[column])
+                elif all_bandwidth is not None:
+                    bandwidth[column] = all_bandwidth
+                else:
+                    bandwidth[column] = series.std() / 10.0
+
+            # Prepare grids
+            grid = pdist_kw.pop("grid", None)
+            if grid is None:
+                all_grid = None
+                grid = {}
+            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
+                all_grid = np.array(grid)
+                grid = {}
+            elif isinstance(grid, dict):
+                all_grid = None
+                pass
+            for column, series in timeseries.iteritems():
+                if column in grid:
+                    grid[column] = np.array(grid[column])
+                elif all_grid is not None:
+                    grid[column] = all_grid
+                else:
+                    grid[column] = np.linspace(series.min() - series.std(),
+                                      series.max() + series.std(), 100)
+
+            # Calculate probability distributions
+            kde_kw = pdist_kw.get("kde_kw", {})
+            pdist = OrderedDict()
+            for column, series in timeseries.iteritems():
+                if verbose >= 1:
+                    print("calculating probability distribution of "
+                    "{0} using a kernel density estimate".format(column))
+                kde = KernelDensity(bandwidth=bandwidth[column], **kde_kw)
+                kde.fit(series[:, np.newaxis])
+                pdf = np.exp(kde.score_samples(grid[column][:, np.newaxis]))
+                pdf /= pdf.sum()
+                series_pdist = pd.DataFrame(pdf, index=grid[column],
+                  columns=["probability"])
+                series_pdist.index.name = column
+                pdist[column] = series_pdist
+
+            self.pdist = pdist
+            return pdist
 
     def downsample(self, downsample, downsample_mode="mean", **kwargs):
         """
@@ -113,7 +180,7 @@ class TimeSeriesDataset(Dataset):
 
         # Arguments
         verbose = kwargs.get("verbose", 1)
-        timeseries=self.timeseries
+        timeseries = self.timeseries
 
         # Truncate dataset
         reduced = timeseries.values[

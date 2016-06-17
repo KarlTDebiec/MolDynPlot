@@ -109,7 +109,7 @@ class TimeSeriesFigureManager(FigureManager):
         draw_dataset:
           ykey: percent_native_contacts
           dataset_kw:
-            cls: moldynplot.CpptrajDataset.NatConDataset
+            cls: moldynplot.Dataset.NatConDataset
             downsample_mode: mean
           partner_kw:
             yticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
@@ -126,9 +126,8 @@ class TimeSeriesFigureManager(FigureManager):
           partner_kw:
             yticks: [0,2,4,6,8,10]
           dataset_kw:
-            cls: moldynplot.CpptrajDataset.CpptrajDataset
-            pdist: True
-            pdist_key: rmsd
+            cls: moldynplot.Dataset.TimeSeriesDataset
+            calc_pdist: True
             read_csv_kw:
               delim_whitespace: True
               header: 0
@@ -145,9 +144,8 @@ class TimeSeriesFigureManager(FigureManager):
           partner_kw:
             yticks: [0,5,10,15,20,25,30]
           dataset_kw:
-            cls: moldynplot.CpptrajDataset.CpptrajDataset
-            pdist: True
-            pdist_key: rg
+            cls: moldynplot.Dataset.TimeSeriesDataset
+            calc_pdist: True
             read_csv_kw:
               delim_whitespace: True
               header: 0
@@ -299,14 +297,13 @@ class TimeSeriesFigureManager(FigureManager):
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
-        if "cls" in dataset_kw and dataset_kw["cls"] is not None:
-            if "infile" in kwargs:
-                dataset_kw["infile"] = kwargs["infile"]
-            dataset = self.load_dataset(verbose=verbose, debug=debug,
-              **dataset_kw)
-            dataframe = dataset.dataframe
+        if "infile" in kwargs:
+            dataset_kw["infile"] = kwargs["infile"]
+        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
+        if dataset is not None:
+            timeseries = dataset.timeseries
         else:
-            dataset = dataframe = None
+            timeseries = None
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -320,16 +317,16 @@ class TimeSeriesFigureManager(FigureManager):
             if "x" in fill_between_kw:
                 fb_x = fill_between_kw.pop("x")
             else:
-                fb_x = dataframe.index.values
+                fb_x = timeseries.index.values
             if "ylb" in fill_between_kw:
                 fb_ylb = fill_between_kw.pop("ylb")
             elif "fill_between_lb_key" in fill_between_kw:
                 fill_between_lb_key = fill_between_kw.pop(
                   "fill_between_lb_key")
-                fb_ylb = dataframe[fill_between_lb_key]
+                fb_ylb = timeseries[fill_between_lb_key]
             elif "fill_between_lb_key" in kwargs:
                 fill_between_lb_key = kwargs.get( "fill_between_lb_key")
-                fb_ylb = dataframe[fill_between_lb_key]
+                fb_ylb = timeseries[fill_between_lb_key]
             else:
                 warn("inappropriate fill_between settings")
             if "yub" in fill_between_kw:
@@ -337,10 +334,10 @@ class TimeSeriesFigureManager(FigureManager):
             elif "fill_between_ub_key" in fill_between_kw:
                 fill_between_ub_key = fill_between_kw.pop(
                   "fill_between_ub_key")
-                fb_yub = dataframe[fill_between_ub_key]
+                fb_yub = timeseries[fill_between_ub_key]
             elif "fill_between_ub_key" in kwargs:
                 fill_between_ub_key = kwargs.get( "fill_between_ub_key")
-                fb_yub = dataframe[fill_between_ub_key]
+                fb_yub = timeseries[fill_between_ub_key]
             else:
                 warn("inappropriate fill_between settings")
             subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
@@ -355,17 +352,19 @@ class TimeSeriesFigureManager(FigureManager):
                 add_partner_subplot(subplot, verbose=verbose,
                   debug=debug, **kwargs)
 
-            if not (hasattr(dataset, "pdist_x")
-            and     hasattr(dataset, "pdist_y")):
+            if not hasattr(dataset, "pdist"):
                 warn("'draw_pdist' is enabled but dataset does not have the "
-                     "necessary attributes 'pdist_x' and 'pdist_y', skipping.")
+                     "necessary attribute 'pdist', skipping.")
             else:
+                pdist = dataset.pdist[ykey]
                 pdist_kw = plot_kw.copy()
                 pdist_kw.update(kwargs.get("pdist_kw", {}))
 
-                subplot._mps_partner_subplot.plot(dataset.pdist_y,
-                  dataset.pdist_x, **pdist_kw)
-                pdist_max = dataset.pdist_y.max()
+                pd_x = pdist.index.values
+                pd_y = pdist.values
+
+                subplot._mps_partner_subplot.plot(pd_y, pd_x, **pdist_kw)
+                pdist_max = pd_y.max()
                 x_max = subplot._mps_partner_subplot.get_xbound()[1]
                 if pdist_max > x_max / 1.25:
                     subplot._mps_partner_subplot.set_xbound(0, pdist_max*1.25)
@@ -380,10 +379,12 @@ class TimeSeriesFigureManager(FigureManager):
         # Plot series
         if draw_plot:
             if verbose >= 2:
-                print("mean  {0}: {1:6.3f}".format(ykey, dataframe[ykey].mean()))
-                print("stdev {0}: {1:6.3f}".format(ykey, dataframe[ykey].std()))
-            plot = subplot.plot(dataframe.index.values, dataframe[ykey],
-              **plot_kw)[0]
+                print("mean  {0}: {1:6.3f}".format(ykey,
+                  timeseries[ykey].mean()))
+                print("stdev {0}: {1:6.3f}".format(ykey,
+                  timeseries[ykey].std()))
+            plot = subplot.plot(timeseries.index.values, timeseries[ykey],
+                     **plot_kw)[0]
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
             handle_kw["mfc"] = plot.get_color()
             handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
