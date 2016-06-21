@@ -62,15 +62,33 @@ def run(input_pdb, input_data, output_pdb, field, verbose=1, **kwargs):
 
     if verbose >= 1:
         print("Loading input data file '{0}'".format(input_data))
-    data = np.loadtxt(input_data)
+    data = pd.read_csv(input_data, index_col=0, delimiter=r"\s\s+")
     if verbose >= 2:
         print(data)
 
     if verbose >= 1:
         print("Storing data in '{0}'".format(field))
-    for residue in data:
-        pdb[field][pdb["residue_number"].astype(int) == int(residue[0])] = \
-          (residue[1] / 10)
+    pdb[field] = pd.to_numeric(pdb[field])
+    pdb[field] = 0
+    for residue, row in data.iterrows():
+        residue = int(residue.split(":")[1])
+        pdb[field][pdb["residue_number"].astype(int) == residue] = \
+          (row["pre"])
+    pdb[field][pdb["residue_number"].astype(int) ==  56] = 1
+    pdb[field][pdb["residue_number"].astype(int) ==  57] = 1
+    pdb[field][pdb["residue_number"].astype(int) ==  58] = 1
+    pdb[field][pdb["residue_number"].astype(int) ==  59] = 1
+    pdb[field][pdb["residue_number"].astype(int) ==  60] = 1
+    pdb[field][pdb["residue_number"].astype(int) ==  61] = 1
+    pdb[field][pdb["residue_number"].astype(int) ==  91] = 1
+    pdb[field][pdb["residue_number"].astype(int) == 101] = 1
+    pdb[field][pdb["residue_number"].astype(int) == 108] = 1
+    pdb[field][pdb["residue_number"].astype(int) == 110] = 1
+    pdb[field][pdb["residue_number"].astype(int) == 112] = 1
+    pdb[field][pdb["residue_number"].astype(int) == 115] = 1
+    pdb[field][np.isnan(pdb[field])] = 0
+    pdb[field][pdb[field] >= 1] = 1
+    print(pdb[field])
 
     if verbose >= 1:
         print("Writing output pdb file '{0}'".format(output_pdb))
@@ -141,6 +159,5 @@ if __name__ == "__main__":
 
     # Parse arguments
     kwargs = vars(parser.parse_args())
-    print(kwargs)
 
     run(**kwargs)
