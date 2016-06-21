@@ -504,6 +504,67 @@ def process_hetnoe(peaklist, infiles, outfile, verbose=1, debug=0, **kwargs):
     np.savetxt(outfile, np.column_stack((relax.index.values,
       relax.values)), fmt=fmt, header=header, comments='#')
 
+def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
+    **kwargs):
+    """
+    """
+    from glob import glob
+    from os.path import expandvars
+    import nmrglue
+    import numpy as np
+    import pandas as pd
+
+    # Process arguments
+    dia_infile  = glob(expandvars(dia_infile))[0]
+    para_infile = glob(expandvars(para_infile))[0]
+
+    # Load peaklist
+#    if verbose >= 1:
+#        print("Loading peaklist from '{0}'".format(peaklist))
+#    def convert_name(name):
+#        return "{0}:{1}".format(name[-4:-1].upper(), name[2:-4])
+#
+#    # Load peak intensities from spectra
+#    def calc_intensity(peak, **kwargs):
+#        H_index = np.argmin((hydrogen - peak["1H"])  ** 2)
+#        N_index = np.argmin((nitrogen - peak["15N"]) ** 2)
+#        return intensity[N_index, H_index]
+
+    if verbose >= 1:
+        print("Loading diamagnetic relaxation rates from '{0}'".format(
+          dia_infile))
+    dia_relax = pd.read_csv(dia_infile, index_col=0, delimiter=r"\s\s+")
+    dia_relax.index.name = "residue"
+    if verbose >= 1:
+        print("Loading paramagnetic relaxation rates from '{0}'".format(
+          para_infile))
+    para_relax = pd.read_csv(para_infile, index_col=0, delimiter=r"\s\s+")
+    para_relax.index.name = "residue"
+
+    print(para_relax)
+    print(dia_relax)
+
+    relax = dia_relax[["1H", "15N", "dia", "dia_se"]]
+    relax = pd.concat((relax, para_relax[["para", "para_se"]]), axis=1)
+
+    relax["pre"] = relax["dia"] / relax["para"]
+    relax["pre_se"] = np.sqrt((relax["dia_se"] / relax["dia"]) ** 2 +
+      (relax["para_se"] / relax["para"]) ** 2) * relax["pre"]
+    relax["pre"][np.isinf(relax["pre"])] = 0
+    relax["pre_se"][np.isnan(relax["pre_se"])] = 0
+    print(relax)
+
+    # Write outfile
+    if verbose >= 1:
+        print("Writing outfile '{0}'".format(outfile))
+    columns = [relax.index.name] + list(relax.columns.values)
+    header = "{0:<11s}".format(columns.pop(0))
+    for column in columns:
+        header += "{0:>12s}".format(column)
+    fmt = ["%12s"] + ["%11.4f"]*8
+    np.savetxt(outfile, np.column_stack((relax.index.values,
+      relax.values)), fmt=fmt, header=header, comments='#')
+
 #################################### MAIN #####################################
 if __name__ == "__main__":
     import argparse
@@ -661,6 +722,20 @@ if __name__ == "__main__":
       default  = "r1",
       dest     = "relax_type",
       help     = "process R2 relaxation data")
+    relax_type.add_argument(
+      "--pre-dia",
+      action   = "store_const",
+      const    = "dia",
+      default  = "r1",
+      dest     = "relax_type",
+      help     = "process PRE diamagnetic relaxation data")
+    relax_type.add_argument(
+      "--pre-para",
+      action   = "store_const",
+      const    = "para",
+      default  = "r1",
+      dest     = "relax_type",
+      help     = "process PRE paramagnetic relaxation data")
     input_group.add_argument(
       "-peaklist",
       required = True,
@@ -732,6 +807,35 @@ if __name__ == "__main__":
       nargs    = 2,
       type     = str,
       help     = "NMR spectra (NMRPipe format)")
+    output_group.add_argument(
+      "-outfile",
+      required = True,
+      type     = str,
+      help     = "text file to which processed data will be output")
+
+    # Prepare pre subparser
+    pre_subparser  = subparsers.add_parser(
+      name     = "pre",
+      help     = "Process experimental heteronuclear NOE relaxation data")
+    pre_subparser.set_defaults(
+      function   = process_pre)
+    input_group  = pre_subparser.add_argument_group("input")
+    action_group = pre_subparser.add_argument_group("action")
+    output_group = pre_subparser.add_argument_group("output")
+    input_group.add_argument(
+      "-dia",
+      required = True,
+      dest     = "dia_infile",
+      metavar  = "DIA_INFILE",
+      type     = str,
+      help     = "Diamagnetic relaxation rates")
+    input_group.add_argument(
+      "-para",
+      required = True,
+      dest     = "para_infile",
+      metavar  = "PARA_INFILE",
+      type     = str,
+      help     = "Paramagnetic relaxation rates")
     output_group.add_argument(
       "-outfile",
       required = True,
