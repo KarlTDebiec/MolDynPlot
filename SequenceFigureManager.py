@@ -137,6 +137,19 @@ class SequenceFigureManager(FigureManager):
           draw_fill_between: False
           draw_errorbar:     False
           draw_plot:         True
+      pre:
+        class: content
+        help: Format subplot for Paramagnetic Relaxation Enhancement
+        draw_subplot:
+          ylabel: "$\\\\frac{diamagnetic}{paramagnetic}$"
+          ylabel_fp: 12b
+          ylabel_kw:
+            rotation: vertical
+            labelpad: 12
+          yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
+        draw_dataset:
+          ykey:   pre
+          ysekey: pre_se
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
