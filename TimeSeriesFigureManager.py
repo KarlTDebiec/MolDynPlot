@@ -117,7 +117,7 @@ class TimeSeriesFigureManager(FigureManager):
             drawstyle: steps
       rmsd:
         class: content
-        help: Root Mean Standard Deviation (RMSD) vs. time
+        help: Root Mean Standard Deviation (RMSD)
         draw_subplot:
           ylabel: RMSD (Å)
           yticks: [0,2,4,6,8,10]
@@ -135,7 +135,7 @@ class TimeSeriesFigureManager(FigureManager):
               names: [frame, rmsd]
       rg:
         class: content
-        help: Radius of Gyration (Rg) vs. time
+        help: Radius of Gyration (Rg)
         draw_subplot:
           ylabel: $R_g$ (Å)
           yticks: [0,5,10,15,20,25,30]

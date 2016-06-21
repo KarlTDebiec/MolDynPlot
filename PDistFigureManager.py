@@ -73,31 +73,19 @@ class PDistFigureManager(FigureManager):
           fill_between_kw:
             color: [0.7, 0.7, 0.7]
             lw: 0
+            ylb: 0
+            yub: 1
           handle_kw:
             ls: none
             marker: s
             mec: black
     """
     available_presets = """
-      rmsd:
-        class: content
-        help: Root Mean Standard Deviation (RMSD)
-        draw_subplot:
-          xlabel: RMSD (Å)
-          xticks: [0,2,4,6,8,10]
-        draw_dataset:
-          ykey: rmsd
-          dataset_kw:
-            cls: moldynplot.Dataset.TimeSeriesDataset
-            calc_pdist: True
-            read_csv_kw:
-              delim_whitespace: True
-              header: 0
-              index_col: 0
-              names: [frame, rmsd]
       rg:
         class: content
         help: Radius of Gyration (Rg)
+        draw_figure:
+          multi_xticklabels: [0,5,10,15,20,25,30]
         draw_subplot:
           xlabel: $R_g$ (Å)
           xticks: [0,5,10,15,20,25,30]
@@ -106,11 +94,34 @@ class PDistFigureManager(FigureManager):
           dataset_kw:
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
+            pdist_kw:
+                bandwidth: 0.1
             read_csv_kw:
               delim_whitespace: True
               header: 0
               index_col: 0
               names: [frame, rg, rgmax]
+      rmsd:
+        class: content
+        help: Root Mean Standard Deviation (RMSD)
+        draw_figure:
+          multi_xticklabels: [0,1,2,3,4,5]
+        draw_subplot:
+          xlabel: RMSD (Å)
+          xticks: [0,1,2,3,4,5]
+        draw_dataset:
+          ykey: rmsd
+          dataset_kw:
+            cls: moldynplot.Dataset.TimeSeriesDataset
+            calc_pdist: True
+            pdist_kw:
+                bandwidth: 0.1
+                grid: !!python/object/apply:numpy.linspace [0,5,1000]
+            read_csv_kw:
+              delim_whitespace: True
+              header: 0
+              index_col: 0
+              names: [frame, rmsd]
       manuscript:
         class: target
         inherits: manuscript
