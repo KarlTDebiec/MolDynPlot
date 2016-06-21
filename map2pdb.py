@@ -73,19 +73,7 @@ def run(input_pdb, input_data, output_pdb, field, verbose=1, **kwargs):
     for residue, row in data.iterrows():
         residue = int(residue.split(":")[1])
         pdb[field][pdb["residue_number"].astype(int) == residue] = \
-          (row["pre"])
-    pdb[field][pdb["residue_number"].astype(int) ==  56] = 1
-    pdb[field][pdb["residue_number"].astype(int) ==  57] = 1
-    pdb[field][pdb["residue_number"].astype(int) ==  58] = 1
-    pdb[field][pdb["residue_number"].astype(int) ==  59] = 1
-    pdb[field][pdb["residue_number"].astype(int) ==  60] = 1
-    pdb[field][pdb["residue_number"].astype(int) ==  61] = 1
-    pdb[field][pdb["residue_number"].astype(int) ==  91] = 1
-    pdb[field][pdb["residue_number"].astype(int) == 101] = 1
-    pdb[field][pdb["residue_number"].astype(int) == 108] = 1
-    pdb[field][pdb["residue_number"].astype(int) == 110] = 1
-    pdb[field][pdb["residue_number"].astype(int) == 112] = 1
-    pdb[field][pdb["residue_number"].astype(int) == 115] = 1
+          0.5 + (row["pre"] / 2)
     pdb[field][np.isnan(pdb[field])] = 0
     pdb[field][pdb[field] >= 1] = 1
     print(pdb[field])
