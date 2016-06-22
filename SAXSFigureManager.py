@@ -41,6 +41,11 @@ class SAXSFigureManager(FigureManager):
                               "0.08","0.10","0.12"]
           shared_legend: True
           shared_legend_kw:
+            spines: False
+            handle_kw:
+              ls: none
+              marker: s
+              mec: black
             legend_kw:
               frameon: False
               loc: 9
