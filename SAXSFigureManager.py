@@ -133,6 +133,20 @@ class SAXSFigureManager(FigureManager):
           yticks: [-4,-3,-2,-1,0]
         draw_dataset:
           logy: True
+      kratky:
+        class: appearance
+        help: Plot y axis using intensity*q^2
+        draw_figure:
+          subplot_kw:
+            autoscale_on: False
+          multi_yticklabels: null
+          multi_yticklabels: [0, 5, 10, 15, 20, 25, 30]
+        draw_subplot:
+          ylabel: "Intensity*$q^2$ ($x10^{-5}$)"
+          yticks: [0, 0.00005, 0.00010, 0.00015, 0.00020, 0.00025, 0.00030]
+          yticklabels: [0, 5, 10, 15, 20, 25, 30]
+        draw_dataset:
+          kratky: True
       diffy:
         class: appearance
         help: Plot difference on y axis
@@ -245,8 +259,8 @@ class SAXSFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None, handles=None, logx=False,
-        logy=False, draw_fill_between=False, draw_plot=True, draw_handle=True,
-        draw_label=True, verbose=1, debug=0, **kwargs):
+        logy=False, kratky=False, draw_fill_between=False, draw_plot=True,
+        draw_handle=True, draw_label=True, verbose=1, debug=0, **kwargs):
         import numpy as np
         import pandas as pd
         from .myplotspec import get_colors, multi_get_copy
@@ -273,7 +287,10 @@ class SAXSFigureManager(FigureManager):
             y_se = dataframe["intensity_se"]
             if logy:
                 y_se = (y_se / (y * np.log(10)))
-                y = np.log10(y)
+                y    = np.log10(y)
+            elif kratky:
+                y_se = y_se*x*x
+                y    = y*x*x
             y_lb = y - 1.96 * y_se
             y_ub = y + 1.96 * y_se
             subplot.fill_between(x, y_lb, y_ub, **fill_between_kw)
@@ -286,6 +303,8 @@ class SAXSFigureManager(FigureManager):
             y = dataframe["intensity"]
             if logy:
                 y = np.log10(y)
+            elif kratky:
+                y = y*x*x
             plot = subplot.plot(x, y, **plot_kw)[0]
 
         if draw_handle:
