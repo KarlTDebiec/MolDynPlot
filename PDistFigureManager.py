@@ -50,7 +50,7 @@ class PDistFigureManager(FigureManager):
         draw_subplot:
           title_kw:
             verticalalignment: bottom
-          ylabel:      "Distribution"
+          ylabel:      "Probability Distribution"
           yticklabels: []
           tick_params:
             direction: out
@@ -122,6 +122,39 @@ class PDistFigureManager(FigureManager):
               header: 0
               index_col: 0
               names: [frame, rmsd]
+      r1:
+        class: content
+        help: Format subplot for R1 relaxation
+        draw_subplot:
+          xlabel:      "$R_1$"
+          xticks:      [0.0,0.5,1.0,1.5,2.0,2.5,3.0]
+      r2:
+        class: content
+        help: Format subplot for R2 relaxation
+        draw_subplot:
+          xlabel: "$R_2$"
+          xticks: [0,2,4,6,8,10,12,14,16,18,20]
+      hetnoe:
+        class: content
+        help: Format subplot for Heteronuclear NOE relaxation
+        draw_subplot:
+          xlabel: "Heteronuclear NOE"
+          xticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+      relaxation_3:
+        class: content
+        help: Three stacked plots including R1, R2, and HetNOE
+        draw_figure:
+          nrows: 3
+          shared_ylabel: "Prbability Distribution"
+          subplots:
+            all:
+              ylabel: null
+            0:
+              preset: r1
+            1:
+              preset: r2
+            2:
+              preset: hetnoe
       manuscript:
         class: target
         inherits: manuscript

@@ -190,6 +190,8 @@ class SequenceFigureManager(FigureManager):
           sub_height: 1.00
           hspace:     0.10
           top:        0.25
+          title_kw:
+            top:     -0.125
           shared_legend_kw:
             left:       0.60
             sub_width:  6.00
@@ -351,7 +353,7 @@ class SequenceFigureManager(FigureManager):
                     fb_x.append(None)
                     fb_lb.append(None)
                     fb_ub.append(None)
-            fb_x = np.array(fb_x, np.float)
+            fb_x  = np.array(fb_x, np.float)
             fb_lb = np.array(fb_lb, np.float)
             fb_ub = np.array(fb_ub, np.float)
                 
