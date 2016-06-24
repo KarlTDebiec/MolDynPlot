@@ -75,10 +75,16 @@ class PDistFigureManager(FigureManager):
             lw: 0
             ylb: 0
             yub: 1
+            zorder: 1
           handle_kw:
             ls: none
             marker: s
             mec: black
+          mean_kw:
+            ls: none
+            marker: o
+            mec: black
+            zorder: 11
     """
     available_presets = """
       rg:
@@ -209,6 +215,8 @@ class PDistFigureManager(FigureManager):
               width: 1
           plot_kw:
             lw: 1
+          mean_kw:
+            ms: 2
           handle_kw:
             ms: 6
             mew: 1
@@ -217,11 +225,12 @@ class PDistFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None, ykey=None, handles=None,
-        draw_pdist=True, draw_fill_between=False, verbose=1, debug=0,
-        **kwargs):
+        draw_pdist=True, draw_fill_between=False, draw_mean=False,verbose=1,
+        debug=0, **kwargs):
         """
         """
         from warnings import warn
+        import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
         # Load data
@@ -262,7 +271,7 @@ class PDistFigureManager(FigureManager):
                 pdist_kw.update(kwargs.get("pdist_kw", {}))
 
                 pd_x = pdist.index.values
-                pd_y = pdist.values
+                pd_y = np.squeeze(pdist.values)
 
                 subplot.plot(pd_x, pd_y, **pdist_kw)
                 pdist_rescale = True
@@ -276,9 +285,13 @@ class PDistFigureManager(FigureManager):
                           pdist_max*0.75, pdist_max, pdist_max*1.25]
                         subplot.set_yticks(yticks)
                         subplot._mps_rescaled = True
-
-            if draw_fill_between:
-                subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
+                if draw_mean:
+                    mean_kw = plot_kw.copy()
+                    mean_kw.update(kwargs.get("mean_kw", {}))
+                    mean = np.sum(np.array(pd_x, np.float64)
+                                 *np.array(pd_y, np.float64))
+                    subplot.plot(mean, pd_y[np.abs(pd_x - mean).argmin()],
+                      **mean_kw)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
