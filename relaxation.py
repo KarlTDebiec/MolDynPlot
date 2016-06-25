@@ -518,18 +518,6 @@ def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
     dia_infile  = glob(expandvars(dia_infile))[0]
     para_infile = glob(expandvars(para_infile))[0]
 
-    # Load peaklist
-#    if verbose >= 1:
-#        print("Loading peaklist from '{0}'".format(peaklist))
-#    def convert_name(name):
-#        return "{0}:{1}".format(name[-4:-1].upper(), name[2:-4])
-#
-#    # Load peak intensities from spectra
-#    def calc_intensity(peak, **kwargs):
-#        H_index = np.argmin((hydrogen - peak["1H"])  ** 2)
-#        N_index = np.argmin((nitrogen - peak["15N"]) ** 2)
-#        return intensity[N_index, H_index]
-
     if verbose >= 1:
         print("Loading diamagnetic relaxation rates from '{0}'".format(
           dia_infile))
@@ -540,9 +528,6 @@ def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
           para_infile))
     para_relax = pd.read_csv(para_infile, index_col=0, delimiter=r"\s\s+")
     para_relax.index.name = "residue"
-
-    print(para_relax)
-    print(dia_relax)
 
     relax = dia_relax[["1H", "15N", "dia", "dia_se"]]
     relax = pd.concat((relax, para_relax[["para", "para_se"]]), axis=1)
