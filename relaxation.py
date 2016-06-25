@@ -195,9 +195,9 @@ def process_ired(infiles, outfile, indexfile=None, **kwargs):
         r1r2noe_mean = pd.concat(r1r2noe_datasets).groupby(level=0).mean()
         r1r2noe_std  = pd.concat(r1r2noe_datasets).groupby(level=0).std()
         items.extend(
-            [("r1",  r1r2noe_mean["r1"]),  ("r1_se",  r1r2noe_std["r1"]),
-             ("r2",  r1r2noe_mean["r2"]),  ("r2_se",  r1r2noe_std["r2"]),
-             ("noe", r1r2noe_mean["noe"]), ("noe_se", r1r2noe_std["noe"])])
+            [("r1",  r1r2noe_mean["r1"]),  ("r1 se",  r1r2noe_std["r1"]),
+             ("r2",  r1r2noe_mean["r2"]),  ("r2 se",  r1r2noe_std["r2"]),
+             ("noe", r1r2noe_mean["noe"]), ("noe se", r1r2noe_std["noe"])])
         fmt.extend(["%11.5f", "%11.5f", "%11.5f",
                     "%11.5f", "%11.5f", "%11.5f"])
     elif len(r1r2noe_datasets) == 1:
@@ -211,7 +211,7 @@ def process_ired(infiles, outfile, indexfile=None, **kwargs):
         s2_mean      = pd.concat(s2_datasets).groupby(level=0).mean()
         s2_std       = pd.concat(s2_datasets).groupby(level=0).std()
         items.extend(
-            [("s2",  s2_mean["s2"]),       ("s2_se",  s2_std["s2"])])
+            [("s2",  s2_mean["s2"]),       ("s2 se",  s2_std["s2"])])
         fmt.extend(["%11.5f", "%11.5f"])
     elif len(s2_datasets) == 1:
         s2_mean      = s2_datasets[0]
@@ -263,11 +263,11 @@ def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
         sim = sim.loc[overlap]
         exp = exp.loc[overlap]
         err_cols = [c for c in sim.columns.values
-                      if not c.endswith("_se")
+                      if not c.endswith(" se")
                       and c in exp.columns.values]
-        err_se_cols = [c + "_se" for c in err_cols
-                       if  c + "_se" in sim.columns.values
-                       and c + "_se" in exp.columns.values]
+        err_se_cols = [c + " se" for c in err_cols
+                       if  c + " se" in sim.columns.values
+                       and c + " se" in exp.columns.values]
         print("   Files share fields {0} and {1} for {2} residues".format(
             str(map(str, err_cols)).replace("'", ""),
             str(map(str, err_se_cols)).replace("'", ""),
@@ -302,7 +302,7 @@ def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
     counts = pd.DataFrame(0, index=final_index, columns=final_cols)
     for err in errs:
         for col in err.columns.values:
-            if not col.endswith("_se"):
+            if not col.endswith(" se"):
                 final[col].loc[err.index] += err[col].loc[err.index]
             else:
                 final[col].loc[err.index] += err[col].loc[err.index] ** 2
@@ -311,7 +311,7 @@ def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
     # Average the columns
     print("Averaging fields:")
     for col in final_cols:
-        if not col.endswith("_se"):
+        if not col.endswith(" se"):
             print("    Averaging field '{0}'".format(col))
             final[col] /= counts[col]
         else:
@@ -419,7 +419,7 @@ def process_relax(relax_type, peaklist, infiles, delays, error_method,
 
     # Calculate relaxation rates and standard errors
     fit = relax.apply(calc_relax, axis=1)
-    fit.columns = ["I0", relax_type, relax_type + "_se"]
+    fit.columns = ["I0", relax_type, relax_type + " se"]
     relax = relax.join(fit)
 
     # Write outfile
