@@ -359,7 +359,7 @@ class TimeSeriesDataset(Dataset):
 
         return timeseries
 
-    def calc_error(self, error_mode="std", **kwargs):
+    def calc_error(self, error_method="std", **kwargs):
         """
         Calculates standard error using time series data.
 
@@ -374,18 +374,18 @@ class TimeSeriesDataset(Dataset):
         timeseries=self.timeseries
 
         # Calculate standard error
-        if error_mode == "std":
+        if error_method == "std":
             if verbose >= 1:
                 print("calculating standard error using standard deviation")
             se = timeseries.std()
-        elif error_mode == "block":
+        elif error_method == "block":
             if verbose >= 1:
                 print("calculating standard error using block averaging")
             ba = FPBlockAverager(timeseries, **kwargs)
             se = ba.parameters.loc["exp", "a (se)"]
         else:
             if verbose >= 1:
-                print("error_mode '{0}' not understood, ".format(scale) +
+                print("error_method '{0}' not understood, ".format(scale) +
                       "must be one of 'std', 'block'; not calculating error.")
             return
 
@@ -564,7 +564,7 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
     """
 
     def __init__(self, infile, address="saxs", downsample=None,
-        calc_mean=False, calc_error=True, error_mode="std", scale=False,
+        calc_mean=False, calc_error=True, error_method="std", scale=False,
         **kwargs):
         """
         Initializes dataset.
@@ -618,7 +618,7 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         elif scale:
             self.timeseries *= scale
         if calc_error:
-            se = self.calc_error(error_mode="block", **kwargs)
+            se = self.calc_error(error_method="block", **kwargs)
             se.name = "intensity_se"
             dataframe = self.dataframe = pd.concat([dataframe, se], axis=1)
 

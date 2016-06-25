@@ -11,14 +11,11 @@
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
-if __name__ == "__main__":
-    __package__ = str("moldynplot")
-    import moldynplot
 import numpy as np
 import h5py
 ################################## FUNCTIONS ##################################
 def process_cpptraj(infile, outfile, address, dtype, scaleoffset,
-    verbose=1, debug=0, **kwargs):
+    verbose=1, **kwargs):
     """
     .. todo:
         - Support multiple infiles
@@ -30,8 +27,6 @@ def process_cpptraj(infile, outfile, address, dtype, scaleoffset,
         raw = np.genfromtxt(infile, skip_header=13,
                   skip_footer=2,invalid_raise=False,
                   dtype=np.float64)
-        dim_1 = int(np.max(raw[:,0]))
-        dim_2 = int(np.max(raw[:,1]))
         data = np.zeros((int(np.max(raw[:,0])), int(np.max(raw[:,1]))), dtype)
         for frame in raw:
             data[int(frame[0]) - 1, int(frame[1]) - 1] = dtype(frame[2])
@@ -73,11 +68,26 @@ def process_cpptraj(infile, outfile, address, dtype, scaleoffset,
             hdf5_file[address].attrs["fields"] = list(fields)
 
 def process_saxs(package, infiles, outfile, address, dtype, scaleoffset,
-    verbose=1, debug=0, **kwargs):
+    verbose=1, **kwargs):
     """
+    Processes SAXS data calcualted from MD simulations using saxs_md,
+    crysol, and foxs
+
+    Arguments:
+      package (str):
+      infiles (list): Path(s) to input file(s), may contain environment
+        variables and wildcards
+      outfile (str): Path to output hdf5 file, may contain environment
+        variables
+      address (str): Address within output hdf5 file at which to save
+        dataset
+      dtype (dtype): Output data type
+      scaleoffset (int): Number of decimal places to retain
+      verbose (int): Level of verbose output
+      kwargs (dict): Additional keyword arguments
     """
-    from os.path import expandvars
     from glob import glob
+    from os.path import expandvars
 
     # Process arguments
     processed_infiles = []
@@ -92,6 +102,7 @@ def process_saxs(package, infiles, outfile, address, dtype, scaleoffset,
               "starting with '{0}'".format(infiles[0]))
     outfile = expandvars(outfile)
 
+    # Load data from saxs_md
     if package == "saxs_md":
         q = None
         data = None
@@ -113,7 +124,8 @@ def process_saxs(package, infiles, outfile, address, dtype, scaleoffset,
                 data = np.zeros((len(infiles), q.size))
             data[i,:] = datum[:,1]
 
-    elif package == "foxs" or package == "crysol":
+    # Load data from crysol or foxs
+    elif package == "crysol" or package == "foxs":
         q = None
         data = None
         j = 0
