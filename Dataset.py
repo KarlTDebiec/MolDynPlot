@@ -16,6 +16,153 @@ import numpy as np
 import pandas as pd
 from .myplotspec.Dataset import Dataset
 ################################### CLASSES ###################################
+class SequenceDataset(Dataset):
+    """
+    Manages sequence datasets.
+    """
+
+    @classmethod
+    def get_cache_key(cls, infile=None, *args, **kwargs):
+        """
+        Generates tuple of arguments to be used as key for dataset
+        cache.
+
+        .. todo:
+          - Verify that keyword arguments passed to pandas may be safely
+            converted to hashable tuple, and if they cannot throw a
+            warning and load dataset without caching
+        """
+        from os.path import expandvars
+
+        if infile is None:
+            return None
+        read_csv_kw = []
+        if "use_indexes" in kwargs:
+            use_indexes = tuple(kwargs.get("use_indexes"))
+        else:
+            use_indexes = None
+        for key, value in kwargs.get("read_csv_kw", {}).items():
+            if isinstance(value, list):
+                value = tuple(value)
+            read_csv_kw.append((key, value))
+        return (cls, expandvars(infile), use_indexes, tuple(read_csv_kw))
+
+    def __init__(self, downsample=None, calc_pdist=False, **kwargs):
+        """
+        Initializes dataset.
+
+        Arguments:
+          infile (str): Path to input file, may contain environment
+            variables
+          usecols (list): Columns to select from DataFrame, once
+            dataframe has already been loaded
+          pdist (bool): Calculate probability distribution
+          pdist_key (str): Column of which to calculate probability
+            distribution
+          kde_kw (dict): Keyword arguments passed to
+            sklearn.neighbors.KernelDensity; key arguments are 'bandwidth' and
+            'grid'
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+
+        # Arguments
+        pd.set_option('display.width', 123)
+        verbose = kwargs.get("verbose", 1)
+
+        # Load
+        super(SequenceDataset, self).__init__( **kwargs)
+        dataframe = self.dataframe
+        dataframe.index.name = "residue"
+        dataframe["amino acid"] = [str(i.split(":")[0])
+                                     for i in dataframe.index.values]
+        dataframe["index"] = [int(i.split(":")[1])
+                               for i in dataframe.index.values]
+        if "use_indexes" in kwargs:
+            dataframe = self.dataframe = dataframe[
+                          dataframe["index"].isin(kwargs.pop("use_indexes"))]
+        if True:
+            dataframe["r1/r2"]    = dataframe["r1"] / dataframe["r2"]
+            dataframe["r1/r2 se"] = np.sqrt((dataframe["r1 se"] /
+            dataframe["r1"]) ** 2 + (dataframe["r2 se"] / dataframe["r2"]) **
+            2) * dataframe["r1/r2"]
+
+        print(dataframe)
+        if calc_pdist:
+            self.calc_pdist(**kwargs)
+
+    def calc_pdist(self, **kwargs):
+        """
+        Calcualtes probability distribution of time series.
+
+        Arguments:
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from collections import OrderedDict
+        from scipy.stats import norm
+
+        # Arguments
+        verbose = kwargs.get("verbose", 1)
+        dataframe = self.dataframe
+
+        pdist_kw = kwargs.get("pdist_kw", {})
+        pdist_cols = [a for a in dataframe.columns.values
+                      if not a.endswith(" se")
+                      and str(dataframe[a].dtype).startswith("float")
+                      and a + " se" in dataframe.columns.values]
+        mode = "kde"
+        if mode == "kde":
+
+            # Prepare grids
+            grid = pdist_kw.pop("grid", None)
+            if grid is None:
+                all_grid = None
+                grid = {}
+            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
+                all_grid = np.array(grid)
+                grid = {}
+            elif isinstance(grid, dict):
+                all_grid = None
+                pass
+            for column, series in dataframe[pdist_cols].iteritems():
+                if column in grid:
+                    grid[column] = np.array(grid[column])
+                elif all_grid is not None:
+                    grid[column] = all_grid
+                else:
+                    grid[column] = np.linspace(series.min() - series.std(),
+                                      series.max() + series.std(), 100)
+            scale = {"r1":0.05, "r2":0.4, "noe":0.05, "r1/r2": 0.1}
+
+            # Calculate probability distributions
+            pdist = OrderedDict()
+            for column in pdist_cols:
+                asdf = dataframe[[column, column + " se"]]
+                if verbose >= 1:
+                    print("calculating probability distribution of "
+                    "{0} using a kernel density estimate".format(column))
+                g = grid[column]
+                s = scale[column]
+                pdf = np.zeros_like(g)
+                for residue, b in asdf.iterrows():
+                    if np.any(np.isnan(b.values)):
+                        continue
+#                    c = norm(loc=b[column], scale=b[column+" se"])
+                    c = norm(loc=b[column], scale=s)
+                    d = c.pdf(g)
+                    pdf += c.pdf(g)
+                pdf /= pdf.sum()
+                series_pdist = pd.DataFrame(pdf, index=grid[column],
+                  columns=["probability"])
+                series_pdist.index.name = column
+                pdist[column] = series_pdist
+
+            self.pdist = pdist
+            return pdist
+
 class TimeSeriesDataset(Dataset):
     """
     Manages time series datasets.
