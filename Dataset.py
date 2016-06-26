@@ -140,14 +140,14 @@ class SequenceDataset(Dataset):
             # Calculate probability distributions
             pdist = OrderedDict()
             for column in pdist_cols:
-                asdf = dataframe[[column, column + " se"]]
+                qwer = dataframe[[column, column + " se"]]
                 if verbose >= 1:
                     print("calculating probability distribution of "
                     "{0} using a kernel density estimate".format(column))
                 g = grid[column]
                 s = scale[column]
                 pdf = np.zeros_like(g)
-                for residue, b in asdf.iterrows():
+                for residue, b in qwer.iterrows():
                     if np.any(np.isnan(b.values)):
                         continue
 #                    c = norm(loc=b[column], scale=b[column+" se"])
@@ -233,6 +233,85 @@ class TimeSeriesDataset(Dataset):
         if calc_pdist:
             self.calc_pdist(**kwargs)
 
+    def downsample(self, downsample, downsample_mode="mean", **kwargs):
+        """
+        Downsamples time series.
+
+        Arguments:
+          downsample (int): Interval by which to downsample points
+          downsample_mode (str): Method of downsampling; may be 'mean'
+            or 'mode'
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from scipy.stats.mstats import mode
+
+        # Arguments
+        verbose = kwargs.get("verbose", 1)
+        timeseries = self.timeseries
+
+        # Truncate dataset
+        reduced = timeseries.values[
+          :timeseries.shape[0] - (timeseries.shape[0] % downsample),:]
+        new_shape = (int(reduced.shape[0]/downsample), downsample,
+          reduced.shape[1])
+        index = np.reshape(timeseries.index.values[
+          :timeseries.shape[0]-(timeseries.shape[0] % downsample)],
+          new_shape[:-1]).mean(axis=1)
+        reduced = np.reshape(reduced, new_shape)
+
+        # Downsample
+        if downsample_mode == "mean":
+            if verbose >= 1:
+                print("downsampling by factor of {0} using mean".format(
+                  downsample))
+            reduced = np.squeeze(reduced.mean(axis=1))
+        elif downsample_mode == "mode":
+            if verbose >= 1:
+                print("downsampling by factor of {0} using mode".format(
+                  downsample))
+            reduced = np.squeeze(mode(reduced, axis=1)[0])
+
+        # Store downsampled time series
+        reduced = pd.DataFrame(data=reduced, index=index,
+          columns=timeseries.columns.values)
+        reduced.index.name = "time"
+        timeseries = self.timeseries = reduced
+
+        return timeseries
+
+    def calc_error(self, error_method="std", **kwargs):
+        """
+        Calculates standard error using time series data.
+
+        .. todo:
+          - Support breaking into blocks (essentially downsampling,
+            then calculating standard error)
+        """
+
+        # Arguments
+        verbose = kwargs.get("verbose", 1)
+        timeseries=self.timeseries
+
+        # Calculate standard error
+        if error_method == "std":
+            if verbose >= 1:
+                print("calculating standard error using standard deviation")
+            se = timeseries.std()
+        elif error_method == "block":
+            from .fpblockaverager.FPBlockAverager import FPBlockAverager
+            if verbose >= 1:
+                print("calculating standard error using block averaging")
+            ba = FPBlockAverager(timeseries, **kwargs)
+            se = ba.parameters.loc["exp", "a (se)"]
+        else:
+            if verbose >= 1:
+                print("error_method '{0}' not understood, ".format(scale) +
+                      "must be one of 'std', 'block'; not calculating error.")
+            return
+
+        return se
+
     def calc_pdist(self, **kwargs):
         """
         Calcualtes probability distribution of time series.
@@ -311,85 +390,6 @@ class TimeSeriesDataset(Dataset):
 
             self.pdist = pdist
             return pdist
-
-    def downsample(self, downsample, downsample_mode="mean", **kwargs):
-        """
-        Downsamples time series.
-
-        Arguments:
-          downsample (int): Interval by which to downsample points
-          downsample_mode (str): Method of downsampling; may be 'mean'
-            or 'mode'
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        from scipy.stats.mstats import mode
-
-        # Arguments
-        verbose = kwargs.get("verbose", 1)
-        timeseries = self.timeseries
-
-        # Truncate dataset
-        reduced = timeseries.values[
-          :timeseries.shape[0] - (timeseries.shape[0] % downsample),:]
-        new_shape = (int(reduced.shape[0]/downsample), downsample,
-          reduced.shape[1])
-        index = np.reshape(timeseries.index.values[
-          :timeseries.shape[0]-(timeseries.shape[0] % downsample)],
-          new_shape[:-1]).mean(axis=1)
-        reduced = np.reshape(reduced, new_shape)
-
-        # Downsample
-        if downsample_mode == "mean":
-            if verbose >= 1:
-                print("downsampling by factor of {0} using mean".format(
-                  downsample))
-            reduced = np.squeeze(reduced.mean(axis=1))
-        elif downsample_mode == "mode":
-            if verbose >= 1:
-                print("downsampling by factor of {0} using mode".format(
-                  downsample))
-            reduced = np.squeeze(mode(reduced, axis=1)[0])
-
-        # Store downsampled time series
-        reduced = pd.DataFrame(data=reduced, index=index,
-          columns=timeseries.columns.values)
-        reduced.index.name = "time"
-        timeseries = self.timeseries = reduced
-
-        return timeseries
-
-    def calc_error(self, error_method="std", **kwargs):
-        """
-        Calculates standard error using time series data.
-
-        .. todo:
-            - Support breaking into sections (essentially downsampling,
-              then calculating standard error
-        """
-        from .fpblockaverager.FPBlockAverager import FPBlockAverager
-
-        # Arguments
-        verbose = kwargs.get("verbose", 1)
-        timeseries=self.timeseries
-
-        # Calculate standard error
-        if error_method == "std":
-            if verbose >= 1:
-                print("calculating standard error using standard deviation")
-            se = timeseries.std()
-        elif error_method == "block":
-            if verbose >= 1:
-                print("calculating standard error using block averaging")
-            ba = FPBlockAverager(timeseries, **kwargs)
-            se = ba.parameters.loc["exp", "a (se)"]
-        else:
-            if verbose >= 1:
-                print("error_method '{0}' not understood, ".format(scale) +
-                      "must be one of 'std', 'block'; not calculating error.")
-            return
-
-        return se
 
 class SAXSDataset(Dataset):
     """
@@ -480,6 +480,119 @@ class SAXSDataset(Dataset):
             self.dataframe["intensity_se"] *= scale
 
         return scale
+
+class IREDDataset(SequenceDataset):
+
+    @staticmethod
+    def add_subparser(subparsers, **kwargs):
+        subparser = subparsers.add_parser(
+          name = "ired",
+          help = """Process relaxation data calculated from MD simulation using
+                 the iRED method as implemented in cpptraj; treat infiles as
+                 independent simulations; processed results are the average
+                 across the simulations, including standard errors calculated
+                 using the standard deviation)""")
+
+        # Locked defaults
+        subparser.set_defaults(
+          cls = IREDDataset)
+
+        # Arguments from superclass
+        super(IREDDataset, IREDDataset).add_shared_args(subparser)
+
+        # Input arguments
+        input_group = subparser.add_argument_group("input")
+        input_group.add_argument(
+          "-infiles",
+          required = True,
+          dest     = "infiles",
+          metavar  = "INFILE",
+          nargs    = "+",
+          type     = str,
+          help     = "cpptraj iRED output file(s) from which to load datasets; " +
+                     "may be plain text or compressed, and may contain "
+                     "environment variables and wildcards")
+        input_group.add_argument(
+          "-indexfile",
+          required = False,
+          type     = str,
+          help     = "text file from which to load residue names; should list "
+                     "amino acids in the form 'XAA:#' separated by whitespace; if "
+                     "omitted will be taken from rows of first infile; may "
+                     "contain environment variables")
+
+        # Action arguments
+        action_group = subparser.add_argument_group("action")
+
+        # Output arguments
+        output_group = subparser.add_argument_group("output")
+        output_group.add_argument(
+          "-outfile",
+          required = False,
+          type     = str,
+          help     = "text or hdf5 file to which processed results will be "
+                     "output; may contain environment variables")
+
+    def __init__(**kwargs):
+        pass
+
+class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
+
+    @staticmethod
+    def add_subparser(subparsers, **kwargs):
+        subparser = subparsers.add_parser(
+          name = "ired_timeseries",
+          help = """Process relaxation data calculated from MD simulation using
+                 the iRED method as implemented in cpptraj; treat infiles as
+                 consecutive (potentially overlapping) excerpts of a longer
+                 simulation; processed results are a timeseries and the average
+                 across the timeseries, including standard errors calculated
+                 using block averaging)""")
+
+        # Locked defaults
+        subparser.set_defaults(
+          cls = IREDTimeSeriesDataset)
+
+        # Arguments from superclass
+        super(IREDTimeSeriesDataset, IREDTimeSeriesDataset).add_shared_args(
+          subparser)
+
+        # Input arguments
+        input_group  = subparser.add_argument_group("input")
+        input_group.add_argument(
+          "-infiles",
+          required = True,
+          dest     = "infiles",
+          metavar  = "INFILE",
+          nargs    = "+",
+          type     = str,
+          help     = """cpptraj iRED output file(s) from which to load
+                     datasets; may be plain text or compressed, and may
+                     contain environment variables and wildcards""")
+        input_group.add_argument(
+          "-indexfile",
+          required = False,
+          type     = str,
+          help     = """text file from which to load residue names; should list
+                     amino acids in the form 'XAA:#' separated by whitespace;
+                     if omitted will be taken from rows of first infile; may
+                     contain environment variables""")
+
+        # Action arguments
+        action_group = subparser.add_argument_group("action")
+
+        # Output arguments
+        output_group = subparser.add_argument_group("output")
+        output_group.add_argument(
+          "-outfile",
+          required = False,
+          type     = str,
+          help     = "text or hdf5 file to which processed results will be "
+                     "output; may contain environment variables")
+
+    def __init__(**kwargs):
+        pass
+
 
 class NatConDataset(TimeSeriesDataset):
     """
@@ -587,40 +700,40 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         """
         from os.path import expandvars
 
-        # Arguments
-        verbose = kwargs.get("verbose", 1)
-
-        # Load
-        with h5py.File(expandvars(infile)) as h5_file:
-            q = ["{0:5.3f}".format(a) for a in np.array(h5_file[address+"/q"])]
-        super(SAXSTimeSeriesDataset, self).__init__(infile=infile,
-          address=address+"/intensity", dataframe_kw=dict(columns=q), **kwargs)
-        timeseries = self.timeseries = self.dataframe
-
-        # Downsample
-        if downsample:
-            self.downsample(downsample, downsample_mode="mean", **kwargs)
-
-        # Average over time series
-        if calc_mean:
-            self.dataframe = dataframe = pd.DataFrame(
-              data=timeseries.mean(axis=0), columns=["intensity"])
-            dataframe.index.name = "q"
-            dataframe.index = np.array(timeseries.columns.values, np.float)
-
-            # Scale
-            if scale:
-#                curve_fit_kw = dict(p0=(2e-9), bounds=(0.0,0.35))
-                curve_fit_kw = dict(p0=(2e-9))  # Not clear why bounds broke
-                curve_fit_kw.update(kwargs.get("curve_fit_kw", {}))
-                scale = self.scale(scale, curve_fit_kw=curve_fit_kw, **kwargs)
-                self.timeseries *= scale
-        elif scale:
-            self.timeseries *= scale
-        if calc_error:
-            se = self.calc_error(error_method="block", **kwargs)
-            se.name = "intensity_se"
-            dataframe = self.dataframe = pd.concat([dataframe, se], axis=1)
+#        # Arguments
+#        verbose = kwargs.get("verbose", 1)
+#
+#        # Load
+#        with h5py.File(expandvars(infile)) as h5_file:
+#            q = ["{0:5.3f}".format(a) for a in np.array(h5_file[address+"/q"])]
+#        super(SAXSTimeSeriesDataset, self).__init__(infile=infile,
+#          address=address+"/intensity", dataframe_kw=dict(columns=q), **kwargs)
+#        timeseries = self.timeseries = self.dataframe
+#
+#        # Downsample
+#        if downsample:
+#            self.downsample(downsample, downsample_mode="mean", **kwargs)
+#
+#        # Average over time series
+#        if calc_mean:
+#            self.dataframe = dataframe = pd.DataFrame(
+#              data=timeseries.mean(axis=0), columns=["intensity"])
+#            dataframe.index.name = "q"
+#            dataframe.index = np.array(timeseries.columns.values, np.float)
+#
+#            # Scale
+#            if scale:
+##                curve_fit_kw = dict(p0=(2e-9), bounds=(0.0,0.35))
+#                curve_fit_kw = dict(p0=(2e-9))  # Not clear why bounds broke
+#                curve_fit_kw.update(kwargs.get("curve_fit_kw", {}))
+#                scale = self.scale(scale, curve_fit_kw=curve_fit_kw, **kwargs)
+#                self.timeseries *= scale
+#        elif scale:
+#            self.timeseries *= scale
+#        if calc_error:
+#            se = self.calc_error(error_method="block", **kwargs)
+#            se.name = "intensity_se"
+#            dataframe = self.dataframe = pd.concat([dataframe, se], axis=1)
 
 class SAXSExperimentDataset(SAXSDataset):
     """
@@ -646,6 +759,57 @@ class SAXSExperimentDataset(SAXSDataset):
         # Scale
         if scale:
             self.scale(scale, **kwargs)
+
+class SAXSDiffDataset(SAXSDataset):
+    """
+    Manages Small Angle X-ray Scattering difference datasets.
+    """
+
+#    @classmethod
+#    def get_cache_key(cls, dataset_classes=None, *args, **kwargs):
+#        """
+#        Generates tuple of arguments to be used as key for dataset
+#        cache.
+#
+#        Arguments documented under :func:`__init__`.
+#        """
+#        from .myplotspec import multi_get_copy
+#
+#        minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})
+#        minuend_class = dataset_classes[minuend_kw["kind"].lower()]
+#        key = [cls, mask_cutoff, minuend_class.get_cache_key(**minuend_kw)]
+#
+#        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"],
+#          kwargs, {})
+#        if isinstance(subtrahend_kw, dict):
+#            subtrahend_kw = [subtrahend_kw]
+#        for sh_kw in subtrahend_kw:
+#            sh_class = dataset_classes[sh_kw.pop("kind").lower()]
+#            key.append(sh_class.get_cache_key(**sh_kw))
+#
+#        return tuple(key)
+
+    def __init__(self, dataset_cache=None, **kwargs):
+        from sys import exit
+        from .myplotspec import multi_get_copy
+
+        self.dataset_cache = dataset_cache
+
+        minuend_kw    = multi_get_copy(["minuend", "minuend_kw"],
+                          kwargs, {})
+        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"],
+                          kwargs, {})
+        minuend    = self.load_dataset(loose=True, **minuend_kw)
+        subtrahend = self.load_dataset(loose=True, **subtrahend_kw)
+        m_I    = minuend.dataframe["intensity"]
+        m_I_se = minuend.dataframe["intensity_se"]
+        s_I    = subtrahend.dataframe["intensity"]
+        s_I_se = subtrahend.dataframe["intensity_se"]
+        diff_I    = (m_I - s_I)
+        diff_I_se = np.sqrt(m_I_se**2 +s_I_se**2)
+        diff_I.name = "intensity"
+        diff_I_se.name = "intensity_se"
+        self.dataframe = pd.concat([diff_I, diff_I_se], axis=1)
 
 class H5Dataset(object):
     """
@@ -720,54 +884,3 @@ class H5Dataset(object):
                 self.attrs[key]    = dict(dataset.attrs)
             print("Loaded Dataset {0}[{1}]; Stored at {2}".format(
               path, address, key))
-
-class SAXSDiffDataset(SAXSDataset):
-    """
-    Manages Small Angle X-ray Scattering difference datasets.
-    """
-
-#    @classmethod
-#    def get_cache_key(cls, dataset_classes=None, *args, **kwargs):
-#        """
-#        Generates tuple of arguments to be used as key for dataset
-#        cache.
-#
-#        Arguments documented under :func:`__init__`.
-#        """
-#        from .myplotspec import multi_get_copy
-#
-#        minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})
-#        minuend_class = dataset_classes[minuend_kw["kind"].lower()]
-#        key = [cls, mask_cutoff, minuend_class.get_cache_key(**minuend_kw)]
-#
-#        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"],
-#          kwargs, {})
-#        if isinstance(subtrahend_kw, dict):
-#            subtrahend_kw = [subtrahend_kw]
-#        for sh_kw in subtrahend_kw:
-#            sh_class = dataset_classes[sh_kw.pop("kind").lower()]
-#            key.append(sh_class.get_cache_key(**sh_kw))
-#
-#        return tuple(key)
-
-    def __init__(self, dataset_cache=None, **kwargs):
-        from sys import exit
-        from .myplotspec import multi_get_copy
-
-        self.dataset_cache = dataset_cache
-
-        minuend_kw    = multi_get_copy(["minuend", "minuend_kw"],
-                          kwargs, {})
-        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"],
-                          kwargs, {})
-        minuend    = self.load_dataset(loose=True, **minuend_kw)
-        subtrahend = self.load_dataset(loose=True, **subtrahend_kw)
-        m_I    = minuend.dataframe["intensity"]
-        m_I_se = minuend.dataframe["intensity_se"]
-        s_I    = subtrahend.dataframe["intensity"]
-        s_I_se = subtrahend.dataframe["intensity_se"]
-        diff_I    = (m_I - s_I)
-        diff_I_se = np.sqrt(m_I_se**2 +s_I_se**2)
-        diff_I.name = "intensity"
-        diff_I_se.name = "intensity_se"
-        self.dataframe = pd.concat([diff_I, diff_I_se], axis=1)

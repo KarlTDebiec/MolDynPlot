@@ -11,6 +11,9 @@
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
+if __name__ == "__main__":
+    __package__ = str("moldynplot")
+    import moldynplot
 import numpy as np
 import h5py
 ################################## FUNCTIONS ##################################
@@ -156,7 +159,7 @@ def process_saxs(package, infiles, outfile, address, dtype, scaleoffset,
         print("Intensity:\n{0}".format(data))
         print(data.shape)
 
-    # Open hdf5 file
+    # Output data
     with h5py.File(outfile) as hdf5_file:
         if verbose >= 1:
             print("Writing q to '{0}[{1}/q]'".format(outfile, address))
