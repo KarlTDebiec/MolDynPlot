@@ -1,0 +1,7 @@
+*.pyc
+*.swp
+*.swo
+.DS_Store
+doc/_build
+fpblockaverager
+myplotspec
