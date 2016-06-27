@@ -134,7 +134,7 @@ def process_ired(infiles, outfile, indexfile=None, mode="mean",
 #    outfile = expandvars(outfile)
 #
 #
-#    # Load residue index
+#    # Load residue itndex
 #    if indexfile is not None:
 #        if verbose >= 1:
 #            print("Loading residue indexes from '{0}'".format( indexfile))
@@ -630,10 +630,10 @@ if __name__ == "__main__":
                    dest        = "mode",
                    description = "")
 
-    from .Dataset import IREDDataset, IREDTimeSeriesDataset
+    from .Dataset import IREDSequenceDataset, IREDTimeSeriesDataset
 
-    IREDDataset.add_subparser(subparsers)
-    IREDTimeSeriesDataset.add_subparser(subparsers)
+    IREDSequenceDataset.construct_argparser(subparsers)
+    IREDTimeSeriesDataset.construct_argparser(subparsers)
 
 #    # Prepare iRED subparser
 #    ired_subparser = subparsers.add_parser(
@@ -936,4 +936,4 @@ if __name__ == "__main__":
 
     # Parse arguments and run selected function
     kwargs  = vars(parser.parse_args())
-    kwargs.pop("function")(**kwargs)
+    kwargs.pop("cls")(**kwargs)

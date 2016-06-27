@@ -8,18 +8,30 @@
 #   BSD license. See the LICENSE file for details.
 """
 Manages Moldynplot datasets.
+
+.. todo:
+  - Fix ordering of argument groups: input, action, output
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
 import h5py
 import numpy as np
 import pandas as pd
+pd.set_option('display.width', 120)
 from .myplotspec.Dataset import Dataset
+from .myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class SequenceDataset(Dataset):
     """
     Manages sequence datasets.
     """
+
+    default_h5_address = "/"
+    default_h5_kw = dict(
+      chunks      = True,
+      compression = "gzip",
+      dtype       = np.float32,
+      scaleoffset = 5)
 
     @classmethod
     def get_cache_key(cls, infile=None, *args, **kwargs):
@@ -47,6 +59,33 @@ class SequenceDataset(Dataset):
             read_csv_kw.append((key, value))
         return (cls, expandvars(infile), use_indexes, tuple(read_csv_kw))
 
+    @staticmethod
+    def add_shared_args(parser, **kwargs):
+        """
+        Adds command line arguments shared by all subclasses.
+
+        Arguments:
+          parser (ArgumentParser): Nascent argument parser to which to
+            add arguments
+          kwargs (dict): Additional keyword arguments
+        """
+
+        # Process arguments
+        arg_groups = {ag.title: ag for ag in parser._action_groups}
+
+        # Output arguments
+        output_group = arg_groups.get("output", 
+          parser.add_argument_group("output"))
+        output_group.add_argument(
+          "-outfile",
+          required = False,
+          type     = str,
+          help     = """text or hdf5 file to which processed results will be
+                     output; may contain environment variables""")
+
+        # Arguments from superclass
+        super(SequenceDataset, SequenceDataset).add_shared_args(parser)
+
     def __init__(self, downsample=None, calc_pdist=False, **kwargs):
         """
         Initializes dataset.
@@ -67,7 +106,6 @@ class SequenceDataset(Dataset):
         """
 
         # Arguments
-        pd.set_option('display.width', 123)
         verbose = kwargs.get("verbose", 1)
 
         # Load
@@ -81,13 +119,12 @@ class SequenceDataset(Dataset):
         if "use_indexes" in kwargs:
             dataframe = self.dataframe = dataframe[
                           dataframe["index"].isin(kwargs.pop("use_indexes"))]
-        if True:
-            dataframe["r1/r2"]    = dataframe["r1"] / dataframe["r2"]
-            dataframe["r1/r2 se"] = np.sqrt((dataframe["r1 se"] /
-            dataframe["r1"]) ** 2 + (dataframe["r2 se"] / dataframe["r2"]) **
-            2) * dataframe["r1/r2"]
+#        if True:
+#            dataframe["r1/r2"]    = dataframe["r1"] / dataframe["r2"]
+#            dataframe["r1/r2 se"] = np.sqrt((dataframe["r1 se"] /
+#            dataframe["r1"]) ** 2 + (dataframe["r2 se"] / dataframe["r2"]) **
+#            2) * dataframe["r1/r2"]
 
-        print(dataframe)
         if calc_pdist:
             self.calc_pdist(**kwargs)
 
@@ -162,6 +199,48 @@ class SequenceDataset(Dataset):
 
             self.pdist = pdist
             return pdist
+
+    def read(self, infile, **kwargs):
+        """
+        """
+        pass
+
+    def write(self, outfile, **kwargs):
+        """
+        """
+        from os.path import expandvars
+        import re
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        outfile = expandvars(outfile)
+
+        if verbose >= 1:
+            print("Writing sequence dataframe to '{0}'".format(outfile))
+
+        # Check for /path/to/outfile.h5:/address
+        is_h5 = re.match(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          outfile, flags=re.UNICODE)
+        if is_h5:
+            path    = is_h5.groupdict()["path"]
+            address = is_h5.groupdict()["address"]
+            if address is None or address == "":
+                address = self.default_h5_address
+            with h5py.File(path) as hdf5_file:
+                h5_kw = self.default_h5_kw
+                h5_kw.update(kwargs.get("h5_kw", {}))
+                hdf5_file.create_dataset("{0}/values".format(address),
+                  data=self.sequence_df.values, **h5_kw)
+                hdf5_file.create_dataset("{0}/index".format(address),
+                  data=np.array(self.sequence_df.index.values, np.str))
+                hdf5_file[address].attrs["columns"] = str(
+                  self.sequence_df.columns.tolist())
+        else:
+            with open(outfile, "w") as text_file:
+                text_file.write(
+                  self.sequence_df.to_string(col_space=12, sparsify=False))
+
 
 class TimeSeriesDataset(Dataset):
     """
@@ -481,27 +560,51 @@ class SAXSDataset(Dataset):
 
         return scale
 
-class IREDDataset(SequenceDataset):
+class IREDSequenceDataset(SequenceDataset):
+    """
+    Manages iRED sequence datasets.
+    """
 
     @staticmethod
-    def add_subparser(subparsers, **kwargs):
-        subparser = subparsers.add_parser(
-          name = "ired",
-          help = """Process relaxation data calculated from MD simulation using
-                 the iRED method as implemented in cpptraj; treat infiles as
-                 independent simulations; processed results are the average
-                 across the simulations, including standard errors calculated
-                 using the standard deviation)""")
+    def construct_argparser(subparsers=None, **kwargs):
+        """
+        Constructs argument parser, either new or as a subparser.
+
+        Arguments:
+          subparsers (_SubParsersAction, optional): Nascent collection
+            of subparsers to which to add; if omitted, a new parser will
+            be generated
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          parser (ArgumentParser): Argument parser or subparser
+        """
+        import argparse
+
+        # Process arguments
+        help_message = """Process relaxation data calculated from MD
+          simulation using the iRED method as implemented in cpptraj;
+          treat infiles as independent simulations; processed results
+          are the average across the simulations, including standard
+          errors calculated using standard deviation"""
+        if subparsers is not None:
+            parser = subparsers.add_parser(
+              name        = "ired",
+              description = help_message,
+              help        = help_message)
+        else:
+            parser = argparse.ArgumentParser(
+              description = help_message)
 
         # Locked defaults
-        subparser.set_defaults(
-          cls = IREDDataset)
+        parser.set_defaults(cls=IREDSequenceDataset)
+        input_group  = parser.add_argument_group("input")
 
         # Arguments from superclass
-        super(IREDDataset, IREDDataset).add_shared_args(subparser)
+        super(IREDSequenceDataset, IREDSequenceDataset).add_shared_args(parser)
 
         # Input arguments
-        input_group = subparser.add_argument_group("input")
+        input_group = parser.add_argument_group("input")
         input_group.add_argument(
           "-infiles",
           required = True,
@@ -509,56 +612,279 @@ class IREDDataset(SequenceDataset):
           metavar  = "INFILE",
           nargs    = "+",
           type     = str,
-          help     = "cpptraj iRED output file(s) from which to load datasets; " +
-                     "may be plain text or compressed, and may contain "
-                     "environment variables and wildcards")
+          help     = """cpptraj iRED output file(s) from which to load
+                     datasets; may be plain text or compressed, and may contain
+                     environment variables and wildcards""")
         input_group.add_argument(
           "-indexfile",
           required = False,
           type     = str,
-          help     = "text file from which to load residue names; should list "
-                     "amino acids in the form 'XAA:#' separated by whitespace; if "
-                     "omitted will be taken from rows of first infile; may "
-                     "contain environment variables")
+          help     = """text file from which to load residue names; should list
+                    amino acids in the form 'XAA:#' separated by whitespace; if
+                    omitted will be taken from rows of first infile; may
+                    contain environment variables""")
 
-        # Action arguments
-        action_group = subparser.add_argument_group("action")
-
-        # Output arguments
-        output_group = subparser.add_argument_group("output")
-        output_group.add_argument(
-          "-outfile",
-          required = False,
-          type     = str,
-          help     = "text or hdf5 file to which processed results will be "
-                     "output; may contain environment variables")
-
-    def __init__(**kwargs):
-        pass
-
-class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
+        return parser
 
     @staticmethod
-    def add_subparser(subparsers, **kwargs):
-        subparser = subparsers.add_parser(
-          name = "ired_timeseries",
-          help = """Process relaxation data calculated from MD simulation using
-                 the iRED method as implemented in cpptraj; treat infiles as
-                 consecutive (potentially overlapping) excerpts of a longer
-                 simulation; processed results are a timeseries and the average
-                 across the timeseries, including standard errors calculated
-                 using block averaging)""")
+    def identify_infile(infile, **kwargs):
+        """
+        Determines if an infile contains iRED relaxation data, iRED
+        order parameters, or neither
+
+        Arguments:
+          infile (str): Path to input file
+
+        Returns:
+          kind (str): Kind of data in *infile*; may be 'ired_relax',
+            'ired_order', or 'other'
+
+        .. todo:
+          - Identify pandas files and hdf5 files
+        """
+        import six
+        from os import devnull
+        import re
+        from subprocess import Popen, PIPE
+
+        re_t1t2noe = re.compile(
+          r"^#Vec\s+[\w_]+\[T1\]\s+[\w_]+\[\T2\]\s+[\w_]+\[NOE\]$",
+          flags=re.UNICODE)
+        re_order = re.compile(
+          r"^#Vec\s+[\w_]+\[S2\]$", flags=re.UNICODE)
+
+        with open(devnull, "w") as fnull:
+            header = Popen("head -n 1 {0}".format(infile),
+              stdout=PIPE, stderr=fnull, shell=True).stdout.read().strip()
+            if six.PY3:
+                header = str(header, "utf-8")
+
+        if re.match(re_t1t2noe, header):
+            return "ired_relax"
+        elif re.match(re_order, header):
+            return "ired_order"
+        else:
+            return "other"
+
+    @staticmethod
+    def parse_ired(infiles, **kwargs):
+        """
+        Parses a series of cpptraj iRED files.
+
+        Arguments:
+          infiles (list): Path(s) to input file(s)
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          relax_dfs (list): DataFrames containing data from relax infiles
+          order_dfs (list): DataFrames containing data from order infiles
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        # Load data
+        relax_dfs = []
+        order_dfs = []
+        for i, infile in enumerate(infiles):
+
+            # Determine if infile contains relaxation or order parameters
+            kind = IREDSequenceDataset.identify_infile(infile)
+
+            # Parse relaxation
+            if kind == "ired_relax":
+                if verbose >= 1:
+                    wiprint("""Loading iRED relaxation data from '{0}'
+                            """.format(infile))
+                raw_data = pd.read_csv(infile, delim_whitespace=True,
+                  header=0, index_col=0, names=["r1","r2","noe"])
+                raw_data["r1"] = 1 / raw_data["r1"]
+                raw_data["r2"] = 1 / raw_data["r2"]
+                relax_dfs.append(raw_data)
+
+            # Parse order parameters
+            elif kind == "ired_order":
+                if verbose >= 1:
+                    wiprint("""Loading iRED order parameter data from '{0}'
+                            """.format(infile))
+                raw_data = pd.read_csv(infile, delim_whitespace=True,
+                  header=0, index_col=0, names=["s2"])
+                order_dfs.append(raw_data)
+
+            # Input file not understood
+            else:
+                raise Exception(sformat("""parse_ired() cannot read infile
+                  '{0}'; if loading iREDdata from cpptaj, all infiles must
+                  contain either iRED relaxation data or order parameters
+                  """.format(infile)))
+
+        return relax_dfs, order_dfs
+
+    @staticmethod
+    def average_independent(relax_dfs=None, order_dfs=None, **kwargs):
+        """
+        Calculates the average and standard error of a set of independent
+        datasets.
+
+        Arguments:
+          relax_dfs (list): DataFrames containing data from relax infiles
+          order_dfs (list): DataFrames containing data from order infiles
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          df (DataFrame): Averaged dataframe including relax and order
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        df = pd.DataFrame()
+
+        # Process relaxation
+        if len(relax_dfs) == 1:
+            if verbose >= 1:
+                wiprint("""Single relaxation infile provided; skipping error
+                        calculation""")
+            df["r1"]  = relax_dfs[0]["r1"]
+            df["r2"]  = relax_dfs[0]["r2"]
+            df["noe"] = relax_dfs[0]["noe"]
+        elif len(relax_dfs) >= 2:
+            if verbose >= 1:
+                wiprint("""Calculating mean and standard error of {0}
+                        relaxation infiles""".format(len(relax_dfs)))
+            relax_dfs = pd.concat(relax_dfs)
+            relax_mean     = relax_dfs.groupby(level=0).mean()
+            relax_se       = relax_dfs.groupby(level=0).std() / \
+                               np.sqrt(len(relax_dfs))
+            df["r1"]     = relax_mean["r1"]
+            df["r1 se"]  = relax_se["r1"]
+            df["r2"]     = relax_mean["r2"]
+            df["r2 se"]  = relax_se["r2"]
+            df["noe"]    = relax_mean["noe"]
+            df["noe se"] = relax_se["noe"]
+
+        # Process order parameters
+        if len(order_dfs) == 1:
+            if verbose >= 1:
+                wiprint("""Single order parameter infile provided; skipping
+                        error calculation""")
+            df["s2"] = order_dfs[0]["s2"]
+        elif len(order_dfs) >= 2:
+            if verbose >= 1:
+                wiprint("""Calculating mean and standard error of {0} order
+                        parameter infiles""".format(len(order_dfs)))
+            order_dfs   = pd.concat(order_dfs)
+            order_mean  = order_dfs.groupby(level=0).mean()
+            order_se    = order_dfs.groupby(level=0).std() / \
+                          np.sqrt(len(order_dfs))
+            df["s2"]    = order_mean["s2"]
+            df["s2 se"] = order_se["s2"]
+
+        return df
+
+    def __init__(self, infiles, indexfile=None, outfile=None, **kwargs):
+        """
+        Initializes.
+
+        Arguments:
+          infiles (list): Path(s) to input file(s); may contain
+            environment variables and wildcards
+          indexfile (str): Path to index file used to map vector numbers
+            listed in *infiles* to amino acid residues. Should contain
+            one amino acid per line in the form 'XAA:#'
+          outfile (str): Path to output text or hdf5 file
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        infiles = self.process_infiles(infiles)
+        if len(infiles) == 0:
+            raise Exception(sformat("""No infiles found matching '{0}'
+              """.format(kwargs.get("infiles"))))
+        elif verbose >= 1:
+            if len(infiles) == 1:
+                wiprint("""Loading iRED data from '{0}'
+                        """.format(len(infiles), infiles[0]))
+            elif len(infiles) >= 2:
+                wiprint("""Loading iRED data from {0} infiles, starting with
+                        '{1}' """.format(len(infiles), infiles[0]))
+
+        # Load as dataframe or cpptraj
+        if len(infiles) == 1:
+            pass
+            # Check if infile is a pandas-format text file or hdf5 etc.
+        else:
+            relax_dfs, order_dfs = self.parse_ired(infiles, **kwargs)
+            df = self.average_independent(relax_dfs, order_dfs, **kwargs)
+
+        # Apply index
+        if indexfile is not None:
+            indexfile = self.process_infiles(indexfile)[0]
+            if verbose >= 1:
+                wiprint("""Loading residue indexes from '{0}'
+                        """.format(indexfile))
+            res_index = np.loadtxt(indexfile, dtype=np.str).flatten()
+            df.set_index(res_index, inplace=True)
+            df.index.name = "residue" 
+        else:
+            df.index.name = "vector"
+
+        if verbose >= 2:
+            if verbose >= 1:
+                print("Processed sequence dataframe:")
+                print(df)
+        self.sequence_df = df
+
+        # Write outfile
+        if outfile is not None:
+            self.write(outfile)
+
+class IREDTimeSeriesDataset(TimeSeriesDataset):
+    """
+    Manages iRED time series datasets.
+    """
+
+    @staticmethod
+    def construct_argparser(subparsers=None, **kwargs):
+        """
+        Constructs argument parser, either new or as a subparser.
+
+        Arguments:
+          subparsers (_SubParsersAction, optional): Nascent collection
+            of subparsers to which to add; if omitted, a new parser will
+            be generated
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          parser (ArgumentParser): Argument parser or subparser
+        """
+        import argparse
+
+        # Process arguments
+        help_message = """Process relaxation data calculated from MD
+          simulation using the iRED method as implemented in cpptraj;
+          treat infiles as consecutive (potentially overlapping)
+          excerpts of a longer simulation; processed results are a
+          timeseries and the average across the timeseries, including
+          standard errors calculated using block averaging"""
+        if subparsers is not None:
+            parser = subparsers.add_parser(
+              name = "ired_timeseries",
+              description = help_message,
+              help        = help_message)
+        else:
+            parser = argparse.ArgumentParser(
+              description = help_message)
 
         # Locked defaults
-        subparser.set_defaults(
-          cls = IREDTimeSeriesDataset)
+        parser.set_defaults(cls=IREDTimeSeriesDataset)
 
         # Arguments from superclass
         super(IREDTimeSeriesDataset, IREDTimeSeriesDataset).add_shared_args(
-          subparser)
+          parser)
 
         # Input arguments
-        input_group  = subparser.add_argument_group("input")
+        input_group  = parser.add_argument_group("input")
         input_group.add_argument(
           "-infiles",
           required = True,
@@ -578,17 +904,16 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
                      if omitted will be taken from rows of first infile; may
                      contain environment variables""")
 
-        # Action arguments
-        action_group = subparser.add_argument_group("action")
-
         # Output arguments
-        output_group = subparser.add_argument_group("output")
+        output_group = parser.add_argument_group("output")
         output_group.add_argument(
           "-outfile",
           required = False,
           type     = str,
-          help     = "text or hdf5 file to which processed results will be "
-                     "output; may contain environment variables")
+          help     = """text or hdf5 file to which processed results will be
+                     output; may contain environment variables""")
+
+        return parser
 
     def __init__(**kwargs):
         pass
