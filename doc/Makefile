@@ -40,7 +40,7 @@ gh-pages:
 	make html
 	git checkout gh-pages
 	cd .. && \
-    rm -vr _images _sources _static && \
+    rm -vr _sources _static && \
     mv doc/_build/html/* . && \
     rm -vr doc *.pyc && \
     git add -A && \
