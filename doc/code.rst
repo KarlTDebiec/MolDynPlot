@@ -56,7 +56,19 @@ Datasets
 SequenceDataset
 ---------------
 .. autoclass::  moldynplot.Dataset.SequenceDataset
+.. automethod:: moldynplot.Dataset.SequenceDataset.add_shared_args
+.. automethod:: moldynplot.Dataset.SequenceDataset.get_cache_key
+.. automethod:: moldynplot.Dataset.SequenceDataset.read
+.. automethod:: moldynplot.Dataset.SequenceDataset.write
 .. automethod:: moldynplot.Dataset.SequenceDataset.calc_pdist
+
+IREDSequenceDataset
+___________________
+.. autoclass::  moldynplot.Dataset.IREDSequenceDataset
+.. automethod:: moldynplot.Dataset.IREDSequenceDataset.construct_argparser
+.. automethod:: moldynplot.Dataset.IREDSequenceDataset.identify_infile
+.. automethod:: moldynplot.Dataset.IREDSequenceDataset.parse_ired
+.. automethod:: moldynplot.Dataset.IREDSequenceDataset.average_independent
 
 TimeSeriesDataset
 -----------------
@@ -65,13 +77,24 @@ TimeSeriesDataset
 .. automethod:: moldynplot.Dataset.TimeSeriesDataset.calc_pdist
 .. automethod:: moldynplot.Dataset.TimeSeriesDataset.calc_error
 
-NatConDataset
+IREDTimeSeriesDataset
 _____________________
-.. autoclass::  moldynplot.Dataset.NatConDataset
+.. autoclass::  moldynplot.Dataset.IREDTimeSeriesDataset
+.. automethod:: moldynplot.Dataset.IREDTimeSeriesDataset.construct_argparser
+
+NatConTimeSeriesDataset
+_______________________
+.. autoclass::  moldynplot.Dataset.NatConTimeSeriesDataset
 
 SAXSTimeSeriesDataset
 _____________________
 .. autoclass::  moldynplot.Dataset.SAXSTimeSeriesDataset
+
+CorrDataset
+-----------
+.. autoclass::  moldynplot.Dataset.CorrDataset
+.. automethod:: moldynplot.Dataset.CorrDataset.get_cache_key
+.. automethod:: moldynplot.Dataset.CorrDataset.get_cache_message
 
 SAXSDataset
 -----------
@@ -89,6 +112,11 @@ _____________________
 SAXSDiffDataset
 _______________
 .. autoclass::  moldynplot.Dataset.SAXSDiffDataset
+
+MDGXDataset
+-----------
+.. autoclass::  moldynplot.Dataset.MDGXDataset
+.. automethod:: moldynplot.Dataset.MDGXDataset.get_cache_key
 
 H5Dataset
 ---------

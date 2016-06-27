@@ -109,7 +109,7 @@ class TimeSeriesFigureManager(FigureManager):
         draw_dataset:
           ykey: percent_native_contacts
           dataset_kw:
-            cls: moldynplot.Dataset.NatConDataset
+            cls: moldynplot.Dataset.NatConTimeSeriesDataset
             downsample_mode: mean
           partner_kw:
             yticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
