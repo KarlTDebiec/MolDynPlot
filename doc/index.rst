@@ -3,6 +3,8 @@ moldynplot
 .. include:: ../README.rst
 .. include:: ../LICENSE
 
+Test
+
 Code
 ====
 .. toctree::
