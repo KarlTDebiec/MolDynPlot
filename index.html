@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldynplot &mdash; moldynplot 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="moldynplot 0.1 documentation" href="#"/>
+        <link rel="next" title="Figure Managers" href="code.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> moldynplot
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Figure Managers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-moldynplot.Dataset">Datasets</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">moldynplot</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>moldynplot</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="moldynplot">
+<h1>moldynplot<a class="headerlink" href="#moldynplot" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Moldynplot is a Python package used to design matplotlib-based figures of
+Molecular Dynamics (MD) simulation data using the simple text format YAML.</p>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Moldynplot supports Python 2.7 and 3.4, and requires the following
+packages:</p>
+<ul class="simple">
+<li>matplotlib</li>
+<li>numpy</li>
+<li>six</li>
+<li>yaml</li>
+</ul>
+<p>Moldynplot has been tested with Anaconda python 2.1.0 on Arch Linux, OSX
+Yosemite, and Windows 8.1.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Put in your <code class="docutils literal"><span class="pre">$PYTHONPATH</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>export PYTHONPATH=/path/to/my/python/modules:$PYTHONPATH
+</pre></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">/path/to/my/python/modules</span></code> contains <code class="docutils literal"><span class="pre">myplotspec_nmr</span></code>.</p>
+</div>
+<div class="section" id="authorship">
+<h2>Authorship<a class="headerlink" href="#authorship" title="Permalink to this headline">¶</a></h2>
+<p>Moldynplot is developed by Karl T. Debiec, a graduate student at the
+University of Pittsburgh advised by Professors Lillian T. Chong and Angela M.
+Gronenborn.</p>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>Released under a 3-clause BSD license.</p>
+<p>Copyright (c) 2015-2016, Karl T. Debiec, Lillian T. Chong, and Angela M.
+Gronenborn</p>
+<p>All rights reserved.</p>
+<p>Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:</p>
+<ul class="simple">
+<li>Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.</li>
+<li>Neither the name Moldynplot nor the names of its contributors may be
+used to endorse or promote products derived from this software without
+specific prior written permission.</li>
+</ul>
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &#8220;AS IS&#8221; AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+</div>
+</div>
+<div class="section" id="code">
+<h1>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Figure Managers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.CorrFigureManager">CorrFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.MDGXFigureManager">MDGXFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.PDistFigureManager">PDistFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.SAXSFigureManager">SAXSFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.SequenceFigureManager">SequenceFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.StateProbFigureManager">StateProbFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.TimeSeriesFigureManager">TimeSeriesFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.TimeSeries2DFigureManager">TimeSeries2DFigureManager</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code.html#module-moldynplot.Dataset">Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code.html#sequencedataset">SequenceDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#timeseriesdataset">TimeSeriesDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code.html#natcondataset">NatConDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code.html#saxstimeseriesdataset">SAXSTimeSeriesDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#saxsdataset">SAXSDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="code.html#saxsexperimentdataset">SAXSExperimentDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code.html#id1">SAXSTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code.html#saxsdiffdataset">SAXSDiffDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#h5dataset">H5Dataset</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="index">
+<h1>Index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="genindex.html"><span>Index</span></a></p>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="code.html" class="btn btn-neutral float-right" title="Figure Managers" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015-2016, Karl T Debiec.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

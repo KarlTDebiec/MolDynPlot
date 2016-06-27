@@ -1,0 +1,562 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Figure Managers &mdash; moldynplot 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="moldynplot 0.1 documentation" href="index.html"/>
+        <link rel="prev" title="moldynplot" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> moldynplot
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Figure Managers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.CorrFigureManager">CorrFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.MDGXFigureManager">MDGXFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.PDistFigureManager">PDistFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.SAXSFigureManager">SAXSFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.SequenceFigureManager">SequenceFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.StateProbFigureManager">StateProbFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.TimeSeriesFigureManager">TimeSeriesFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.TimeSeries2DFigureManager">TimeSeries2DFigureManager</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#module-moldynplot.Dataset">Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sequencedataset">SequenceDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#timeseriesdataset">TimeSeriesDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#natcondataset">NatConDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#saxstimeseriesdataset">SAXSTimeSeriesDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#saxsdataset">SAXSDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#saxsexperimentdataset">SAXSExperimentDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">SAXSTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#saxsdiffdataset">SAXSDiffDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#h5dataset">H5Dataset</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">moldynplot</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Figure Managers</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/code.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="figure-managers">
+<h1>Figure Managers<a class="headerlink" href="#figure-managers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-moldynplot.CorrFigureManager">
+<span id="corrfiguremanager"></span><h2>CorrFigureManager<a class="headerlink" href="#module-moldynplot.CorrFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more correlation figures to specifications in a YAML file.</p>
+<dl class="class">
+<dt id="moldynplot.CorrFigureManager.CorrFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.CorrFigureManager.</code><code class="descname">CorrFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.CorrFigureManager.CorrFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages the generation of correlation figures.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.CorrFigureManager.CorrFigureManager.draw_dataset">
+<code class="descclassname">CorrFigureManager.</code><code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.CorrFigureManager.CorrFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.MDGXFigureManager">
+<span id="mdgxfiguremanager"></span><h2>MDGXFigureManager<a class="headerlink" href="#module-moldynplot.MDGXFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more MDGX figures to specifications provided in a YAML
+file.</p>
+<dl class="class">
+<dt id="moldynplot.MDGXFigureManager.MDGXFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.MDGXFigureManager.</code><code class="descname">MDGXFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.MDGXFigureManager.MDGXFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages the generation of MDGX figures.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.MDGXFigureManager.MDGXFigureManager.draw_dataset">
+<code class="descclassname">MDGXFigureManager.</code><code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.MDGXFigureManager.MDGXFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.PDistFigureManager">
+<span id="pdistfiguremanager"></span><h2>PDistFigureManager<a class="headerlink" href="#module-moldynplot.PDistFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more probability distribution figures to specifications
+in a YAML file.</p>
+<dl class="class">
+<dt id="moldynplot.PDistFigureManager.PDistFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.PDistFigureManager.</code><code class="descname">PDistFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.PDistFigureManager.PDistFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages the generation of probability distribution figures.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.PDistFigureManager.PDistFigureManager.draw_dataset">
+<code class="descclassname">PDistFigureManager.</code><code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.PDistFigureManager.PDistFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.SAXSFigureManager">
+<span id="saxsfiguremanager"></span><h2>SAXSFigureManager<a class="headerlink" href="#module-moldynplot.SAXSFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more time series figures to specifications in a YAML
+file.</p>
+<dl class="class">
+<dt id="moldynplot.SAXSFigureManager.SAXSFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.SAXSFigureManager.</code><code class="descname">SAXSFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.SAXSFigureManager.SAXSFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages the generation of time series figures</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.SAXSFigureManager.SAXSFigureManager.draw_dataset">
+<code class="descclassname">SAXSFigureManager.</code><code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.SAXSFigureManager.SAXSFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.SequenceFigureManager">
+<span id="sequencefiguremanager"></span><h2>SequenceFigureManager<a class="headerlink" href="#module-moldynplot.SequenceFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more sequence figures to specifications in a YAML file.</p>
+<dl class="class">
+<dt id="moldynplot.SequenceFigureManager.SequenceFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.SequenceFigureManager.</code><code class="descname">SequenceFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.SequenceFigureManager.SequenceFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages the generation of sequence figures.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.SequenceFigureManager.SequenceFigureManager.draw_dataset">
+<code class="descclassname">SequenceFigureManager.</code><code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.SequenceFigureManager.SequenceFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.StateProbFigureManager">
+<span id="stateprobfiguremanager"></span><h2>StateProbFigureManager<a class="headerlink" href="#module-moldynplot.StateProbFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more state probability figures to specifications in a
+YAML file.</p>
+<dl class="class">
+<dt id="moldynplot.StateProbFigureManager.StateProbFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.StateProbFigureManager.</code><code class="descname">StateProbFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.StateProbFigureManager.StateProbFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to manage the generation of probability distribution figures</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.StateProbFigureManager.StateProbFigureManager.draw_dataset">
+<code class="descclassname">StateProbFigureManager.</code><code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.StateProbFigureManager.StateProbFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws a dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>subplot</strong> (<em>Axes</em>) &#8211; Axes on which to draw</li>
+<li><strong>x</strong> (<em>float</em>) &#8211; X coordinate of bar</li>
+<li><strong>label</strong> (<em>str, optional</em>) &#8211; Dataset label</li>
+<li><strong>color</strong> (<em>str, list, ndarray, float, optional</em>) &#8211; Dataset color</li>
+<li><strong>bar_kw</strong> (<em>dict, optional</em>) &#8211; Additional keyword arguments passed
+to subplot.plot()</li>
+<li><strong>handles</strong> (<em>OrderedDict, optional</em>) &#8211; Nascent OrderedDict of
+[labels]: handles on subplot</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.TimeSeriesFigureManager">
+<span id="timeseriesfiguremanager"></span><h2>TimeSeriesFigureManager<a class="headerlink" href="#module-moldynplot.TimeSeriesFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more time series figures to specifications in a YAML
+file.</p>
+<dl class="class">
+<dt id="moldynplot.TimeSeriesFigureManager.TimeSeriesFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.TimeSeriesFigureManager.</code><code class="descname">TimeSeriesFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.TimeSeriesFigureManager.TimeSeriesFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages the generation of time series figures</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.TimeSeriesFigureManager.TimeSeriesFigureManager.draw_dataset">
+<code class="descclassname">TimeSeriesFigureManager.</code><code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.TimeSeriesFigureManager.TimeSeriesFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.TimeSeries2DFigureManager">
+<span id="timeseries2dfiguremanager"></span><h2>TimeSeries2DFigureManager<a class="headerlink" href="#module-moldynplot.TimeSeries2DFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more 2D time series figures to specifications in a YAML
+file.</p>
+<dl class="class">
+<dt id="moldynplot.TimeSeries2DFigureManager.TimeSeries2DFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.TimeSeries2DFigureManager.</code><code class="descname">TimeSeries2DFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.TimeSeries2DFigureManager.TimeSeries2DFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages the generation of 2D time series figures.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.TimeSeries2DFigureManager.TimeSeries2DFigureManager.draw_dataset">
+<code class="descclassname">TimeSeries2DFigureManager.</code><code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.TimeSeries2DFigureManager.TimeSeries2DFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-moldynplot.Dataset">
+<span id="datasets"></span><h1>Datasets<a class="headerlink" href="#module-moldynplot.Dataset" title="Permalink to this headline">¶</a></h1>
+<p>Manages Moldynplot datasets.</p>
+<div class="section" id="sequencedataset">
+<h2>SequenceDataset<a class="headerlink" href="#sequencedataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.SequenceDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SequenceDataset</code><span class="sig-paren">(</span><em>downsample=None</em>, <em>calc_pdist=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SequenceDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages sequence datasets.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.SequenceDataset.calc_pdist">
+<code class="descclassname">SequenceDataset.</code><code class="descname">calc_pdist</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SequenceDataset.calc_pdist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calcualtes probability distribution of time series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pdist_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure
+probability distribution calculation</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="timeseriesdataset">
+<h2>TimeSeriesDataset<a class="headerlink" href="#timeseriesdataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.TimeSeriesDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">TimeSeriesDataset</code><span class="sig-paren">(</span><em>downsample=None</em>, <em>calc_pdist=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.TimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages time series datasets.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.TimeSeriesDataset.downsample">
+<code class="descclassname">TimeSeriesDataset.</code><code class="descname">downsample</code><span class="sig-paren">(</span><em>downsample</em>, <em>downsample_mode=u'mean'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.TimeSeriesDataset.downsample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downsamples time series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>downsample</strong> (<em>int</em>) &#8211; Interval by which to downsample points</li>
+<li><strong>downsample_mode</strong> (<em>str</em>) &#8211; Method of downsampling; may be &#8216;mean&#8217;
+or &#8216;mode&#8217;</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.TimeSeriesDataset.calc_pdist">
+<code class="descclassname">TimeSeriesDataset.</code><code class="descname">calc_pdist</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.TimeSeriesDataset.calc_pdist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calcualtes probability distribution of time series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pdist_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure
+probability distribution calculation</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.TimeSeriesDataset.calc_error">
+<code class="descclassname">TimeSeriesDataset.</code><code class="descname">calc_error</code><span class="sig-paren">(</span><em>error_method=u'std'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.TimeSeriesDataset.calc_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates standard error using time series data.</p>
+</dd></dl>
+
+<div class="section" id="natcondataset">
+<h3>NatConDataset<a class="headerlink" href="#natcondataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.NatConDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">NatConDataset</code><span class="sig-paren">(</span><em>downsample=None</em>, <em>calc_pdist=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.NatConDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages native contact datasets.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="saxstimeseriesdataset">
+<h3>SAXSTimeSeriesDataset<a class="headerlink" href="#saxstimeseriesdataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.SAXSTimeSeriesDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SAXSTimeSeriesDataset</code><span class="sig-paren">(</span><em>infile</em>, <em>address=u'saxs'</em>, <em>downsample=None</em>, <em>calc_mean=False</em>, <em>calc_error=True</em>, <em>error_method=u'std'</em>, <em>scale=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSTimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages Small Angle X-ray Scattering time series datasets.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="saxsdataset">
+<h2>SAXSDataset<a class="headerlink" href="#saxsdataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.SAXSDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SAXSDataset</code><span class="sig-paren">(</span><em>infile</em>, <em>address=None</em>, <em>dataset_cache=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages Small Angle X-ray Scattering datasets.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.SAXSDataset.scale">
+<code class="descclassname">SAXSDataset.</code><code class="descname">scale</code><span class="sig-paren">(</span><em>scale</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSDataset.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scales SAXS intensity, either by a constant or to match the
+intensity of a target dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>scale</strong> (<em>float, str</em>) &#8211; If float, proportion by which to scale
+intensity; if str, path to input file to which intensity
+will be scaled, may contain environment variables</li>
+<li><strong>curve_fit_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+scipy.optimize.curve_fit (scale to match target dataset
+only)</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="section" id="saxsexperimentdataset">
+<h3>SAXSExperimentDataset<a class="headerlink" href="#saxsexperimentdataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.SAXSExperimentDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SAXSExperimentDataset</code><span class="sig-paren">(</span><em>scale=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSExperimentDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages Small Angle X-ray Scattering experimental datasets.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h3>SAXSTimeSeriesDataset<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SAXSTimeSeriesDataset</code><span class="sig-paren">(</span><em>infile</em>, <em>address=u'saxs'</em>, <em>downsample=None</em>, <em>calc_mean=False</em>, <em>calc_error=True</em>, <em>error_method=u'std'</em>, <em>scale=False</em>, <em>**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Manages Small Angle X-ray Scattering time series datasets.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="saxsdiffdataset">
+<h3>SAXSDiffDataset<a class="headerlink" href="#saxsdiffdataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.SAXSDiffDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SAXSDiffDataset</code><span class="sig-paren">(</span><em>dataset_cache=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSDiffDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manages Small Angle X-ray Scattering difference datasets.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="h5dataset">
+<h2>H5Dataset<a class="headerlink" href="#h5dataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.H5Dataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">H5Dataset</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.H5Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for managing hdf5 datasets</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.H5Dataset.load">
+<code class="descclassname">H5Dataset.</code><code class="descname">load</code><span class="sig-paren">(</span><em>infiles</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.H5Dataset.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads data from h5 files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>infiles</strong> (<em>list</em>) &#8211; infiles</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="moldynplot" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015-2016, Karl T Debiec.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
