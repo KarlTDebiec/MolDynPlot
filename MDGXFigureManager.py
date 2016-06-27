@@ -25,7 +25,6 @@ class MDGXFigureManager(FigureManager):
     """
     from .myplotspec.manage_defaults_presets import manage_defaults_presets
     from .myplotspec.manage_kwargs import manage_kwargs
-    from myplotspec.debug import debug_arguments
 
     defaults = """
         draw_figure:
