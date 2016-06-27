@@ -24,6 +24,16 @@ from .myplotspec import sformat, wiprint
 class SequenceDataset(Dataset):
     """
     Manages sequence datasets.
+
+    Seqeunce dataframes have to following form::
+
+                       r1     r1 se        r2     r2 se  ...
+        residue
+        GLN:2    2.451434  0.003734  5.041334  0.024776  ...
+        TYR:3    2.443613  0.004040  5.138383  0.025376  ...
+        LYS:4    2.511626  0.004341  5.589428  0.026236  ...
+        ...      ...       ...       ...       ...       ...
+
     """
 
     default_h5_address = "/"
@@ -202,11 +212,52 @@ class SequenceDataset(Dataset):
 
     def read(self, infile, **kwargs):
         """
+        Reads sequence dataframe from text or hdf5.
+
+        Arguments:
+          infile (str): Path to input file; may be complete path to text file
+            or path to hdf5 file in the form
+            '/path/to/hdf5/file.h5:/address/within/hdf5/file'; may contain
+            envornment variables
         """
-        pass
+        from os.path import expandvars
+        import re
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        infile = expandvars(igfile)
+        if verbose >= 1:
+            print("Reading sequence dataframe from '{0}'".format(infile))
+        is_h5 = re.match(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          outfile, flags=re.UNICODE)
+        if is_h5:
+            path    = is_h5.groupdict()["path"]
+            address = is_h5.groupdict()["address"]
+            if address is None or address == "":
+                address = self.default_h5_address
+        else:
+            read_csv_kw = dict(index_col=0, delimiter="\s\s+")
+            read_csv_kw.update(kwargs.get("read_csv_kw", {}))
+            if ("delimiter"        in read_csv_kw
+            and "delim_whitespace" in read_csv_kw):
+                del(read_csv_kw["delimiter"])
+            self.dataframe = pd.read_csv(expandvars(infile), **read_csv_kw)
+            if (self.dataframe.index.name is not None
+            and self.dataframe.index.name.startswith("#")):
+                self.dataframe.index.name = \
+                  self.dataframe.index.name.lstrip("#")
+
 
     def write(self, outfile, **kwargs):
         """
+        Writes sequence dataframe to text or hdf5.
+
+        Arguments:
+          outfile (str): Path to output file; may be complete path to
+            text file or path to hdf5 file in the form
+            '/path/to/hdf5/file.h5:/address/within/hdf5/file'; may
+            contain environment variables
         """
         from os.path import expandvars
         import re
