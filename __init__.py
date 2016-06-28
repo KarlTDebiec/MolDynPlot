@@ -15,10 +15,18 @@ from __future__ import absolute_import,division,print_function,unicode_literals
 ################################### CLASSES ###################################
 def dssp_cmap(z=None, vmin=None, vmax=None):
     """
-    Generates colormap for dssp
+    Generates colormap for Dictionary of Secondary Structure Prediction
+    (DSSP) figures.
+
+    Arguments:
+      z (float, optional): Position along color axis
+      vmin (float, optional): Lower bound of color axis
+      vmax (float, optional): Upper bound of color axis
 
     Returns:
-      cmap (LinearSegmentedColormap): colormap
+      LinearSegmentedColormap: DSSP color map; if *z*, *vmin*, and
+      *vmax* are provided, provides the color at position *z* along the
+      axis between *vmin* and *vmax*
     """
     from matplotlib.colors import LinearSegmentedColormap
 

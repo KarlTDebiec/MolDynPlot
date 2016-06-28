@@ -18,13 +18,13 @@ if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
 from myplotspec.FigureManager import FigureManager
+from .myplotspec.manage_defaults_presets import manage_defaults_presets
+from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
 class MDGXFigureManager(FigureManager):
     """
     Manages the generation of MDGX figures.
     """
-    from .myplotspec.manage_defaults_presets import manage_defaults_presets
-    from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
         draw_figure:
