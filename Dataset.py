@@ -25,7 +25,7 @@ from .myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class SequenceDataset(Dataset):
     """
-    Used to represent data as a function of residue number.
+    Represents data that is as a function of residue number.
 
     Attributes:
       sequence_df (DataFrame): DataFrame whose index corresponds to
@@ -48,35 +48,6 @@ class SequenceDataset(Dataset):
       compression = "gzip",
       dtype       = np.float32,
       scaleoffset = 5)
-
-    @classmethod
-    def get_cache_key(cls, infile=None, *args, **kwargs):
-        """
-        Generates tuple of arguments to be used as key for dataset
-        cache.
-
-        Returns:
-          tuple: Cache key
-
-        .. todo:
-          - Verify that keyword arguments passed to pandas may be safely
-            converted to hashable tuple, and if they cannot throw a
-            warning and load dataset without caching
-        """
-        from os.path import expandvars
-
-        if infile is None:
-            return None
-        read_csv_kw = []
-        if "use_indexes" in kwargs:
-            use_indexes = tuple(kwargs.get("use_indexes"))
-        else:
-            use_indexes = None
-        for key, value in kwargs.get("read_csv_kw", {}).items():
-            if isinstance(value, list):
-                value = tuple(value)
-            read_csv_kw.append((key, value))
-        return (cls, expandvars(infile), use_indexes, tuple(read_csv_kw))
 
     @staticmethod
     def add_shared_args(parser, **kwargs):
@@ -104,6 +75,30 @@ class SequenceDataset(Dataset):
 
         # Arguments from superclass
         super(SequenceDataset, SequenceDataset).add_shared_args(parser)
+
+    @classmethod
+    def get_cache_key(cls, infile=None, *args, **kwargs):
+        """
+        Generates key for dataset cache.
+
+        Returns:
+          tuple: Cache key; contains arguments sufficient to reconstruct
+          dataset
+        """
+        from os.path import expandvars
+
+        if infile is None:
+            return None
+        read_csv_kw = []
+        if "use_indexes" in kwargs:
+            use_indexes = tuple(kwargs.get("use_indexes"))
+        else:
+            use_indexes = None
+        for key, value in kwargs.get("read_csv_kw", {}).items():
+            if isinstance(value, list):
+                value = tuple(value)
+            read_csv_kw.append((key, value))
+        return (cls, expandvars(infile), use_indexes, tuple(read_csv_kw))
 
     def __init__(self, downsample=None, calc_pdist=False, **kwargs):
         """
@@ -302,7 +297,7 @@ class SequenceDataset(Dataset):
 
 class TimeSeriesDataset(Dataset):
     """
-    Used to represent data as a function of time.
+    Represents data that is a function of time.
 
     Attributes:
       timeseries_df (DataFrame): Dataframe whose index corresponds to
@@ -705,7 +700,7 @@ class CorrDataset(Dataset):
 
 class IREDSequenceDataset(SequenceDataset):
     """
-    Manages iRED sequence datasets.
+    Represents iRED NMR relaxation data as a function of residue number
     """
 
     @staticmethod
@@ -927,8 +922,6 @@ class IREDSequenceDataset(SequenceDataset):
 
     def __init__(self, infiles, indexfile=None, outfile=None, **kwargs):
         """
-        Initializes.
-
         Arguments:
           infiles (list): Path(s) to input file(s); may contain
             environment variables and wildcards
@@ -1069,8 +1062,6 @@ class NatConTimeSeriesDataset(TimeSeriesDataset):
 
     def __init__(self, downsample=None, calc_pdist=True, **kwargs):
         """
-        Initializes dataset.
-
         Arguments:
           infile (str): Path to input file, may contain environment
             variables
@@ -1148,8 +1139,6 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         calc_mean=False, calc_error=True, error_method="std", scale=False,
         **kwargs):
         """
-        Initializes dataset.
-
         Arguments:
           infile (str): Path to input file, may contain environment
             variables
@@ -1210,8 +1199,6 @@ class SAXSExperimentDataset(SAXSDataset):
 
     def __init__(self, scale=False, **kwargs):
         """
-        Initializes dataset.
-
         Arguments:
           infile (str): Path to input file, may contain environment
             variables
@@ -1258,6 +1245,8 @@ class SAXSDiffDataset(SAXSDataset):
 #        return tuple(key)
 
     def __init__(self, dataset_cache=None, **kwargs):
+        """
+        """
         from sys import exit
         from .myplotspec import multi_get_copy
 
@@ -1304,13 +1293,10 @@ class MDGXDataset(Dataset):
             read_csv_kw.append((key, value))
         return (cls, expandvars(infile), tuple(selections), tuple(read_csv_kw))
 
-    def __init__(self, infile,
-        selections=None,
-        verbose=1, debug=0, **kwargs):
+    def __init__(self, infile, selections=None, verbose=1, debug=0, **kwargs):
+        """
+        """
         from os.path import expandvars
-        import numpy as np
-        import pandas as pd
-        pd.set_option('display.width', 1000)
 
         # Load
         super(MDGXDataset, self).__init__(infile=infile,
@@ -1338,8 +1324,6 @@ class H5Dataset(object):
 
     def __init__(self, **kwargs):
         """
-        Initializes dataset.
-
         Arguments:
           infiles (list): List of infiles
           infile (str): Alternatively, single infile
