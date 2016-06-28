@@ -25,7 +25,7 @@ from .myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class SequenceDataset(Dataset):
     """
-    Represents data that is as a function of residue number.
+    Represents data that is a function of residue number.
 
     Attributes:
       sequence_df (DataFrame): DataFrame whose index corresponds to
@@ -80,6 +80,11 @@ class SequenceDataset(Dataset):
     def get_cache_key(cls, infile=None, *args, **kwargs):
         """
         Generates key for dataset cache.
+
+        See :meth:`SequenceDataset<moldynplot.Dataset.SequenceDataset>`
+        for argument details.
+
+        Set :attr:`sequence_df`
 
         Returns:
           tuple: Cache key; contains arguments sufficient to reconstruct
@@ -526,7 +531,7 @@ class TimeSeriesDataset(Dataset):
 
 class SAXSDataset(Dataset):
     """
-    Manages Small Angle X-ray Scattering datasets.
+    Represents Small-Angle X-ray Scattering Data.
     """
 
     def scale(self, scale, **kwargs):
@@ -616,6 +621,7 @@ class SAXSDataset(Dataset):
 
 class CorrDataset(Dataset):
     """
+    Represents correlations between different datasets.
     """
 
     @classmethod
@@ -700,7 +706,7 @@ class CorrDataset(Dataset):
 
 class IREDSequenceDataset(SequenceDataset):
     """
-    Represents iRED NMR relaxation data as a function of residue number
+    Represents iRED NMR relaxation data as a function of residue number.
     """
 
     @staticmethod
@@ -715,7 +721,7 @@ class IREDSequenceDataset(SequenceDataset):
           kwargs (dict): Additional keyword arguments
 
         Returns:
-          parser (ArgumentParser): Argument parser or subparser
+          ArgumentParser: Argument parser or subparser
         """
         import argparse
 
@@ -929,6 +935,8 @@ class IREDSequenceDataset(SequenceDataset):
             listed in *infiles* to amino acid residues. Should contain
             one amino acid per line in the form 'XAA:#'
           outfile (str): Path to output text or hdf5 file
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
         """
 
         # Process arguments
@@ -975,9 +983,10 @@ class IREDSequenceDataset(SequenceDataset):
         if outfile is not None:
             self.write(outfile)
 
-class IREDTimeSeriesDataset(TimeSeriesDataset):
+class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
     """
-    Manages iRED time series datasets.
+    Represents iRED NMR relaxation data as a function of time and
+    residue number.
     """
 
     @staticmethod
@@ -992,7 +1001,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset):
           kwargs (dict): Additional keyword arguments
 
         Returns:
-          parser (ArgumentParser): Argument parser or subparser
+          ArgumentParser: Argument parser or subparser
         """
         import argparse
 
@@ -1270,7 +1279,7 @@ class SAXSDiffDataset(SAXSDataset):
 
 class MDGXDataset(Dataset):
     """
-    Manages MDGX datasets
+    Represents MDGX force field parameterization data.
     """
 
     @classmethod
