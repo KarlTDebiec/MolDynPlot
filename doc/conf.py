@@ -23,6 +23,7 @@ source_suffix = ".rst"
 source_encoding = "utf-8"
 napoleon_use_rtype = False
 intersphinx_mapping = {
+  "h5py":       ("http://docs.h5py.org/en/latest", None),
   "myplotspec": ("http://karltdebiec.github.io/myplotspec", None),
   "pandas":     ("http://pandas.pydata.org/pandas-docs/stable", None)}
 master_doc = "index"

@@ -42,8 +42,8 @@ class SequenceDataset(Dataset):
           ...      ...       ...       ...       ...       ...
     """
 
-    default_h5_address = "/"
-    default_h5_kw = dict(
+    default_hdf5_address = "/"
+    default_hdf5_kw = dict(
       chunks      = True,
       compression = "gzip",
       dtype       = np.float32,
@@ -81,10 +81,8 @@ class SequenceDataset(Dataset):
         """
         Generates key for dataset cache.
 
-        See :meth:`SequenceDataset<moldynplot.Dataset.SequenceDataset>`
+        See :class:`SequenceDataset<moldynplot.Dataset.SequenceDataset>`
         for argument details.
-
-        Set :attr:`sequence_df`
 
         Returns:
           tuple: Cache key; contains arguments sufficient to reconstruct
@@ -105,14 +103,14 @@ class SequenceDataset(Dataset):
             read_csv_kw.append((key, value))
         return (cls, expandvars(infile), use_indexes, tuple(read_csv_kw))
 
-    def __init__(self, downsample=None, calc_pdist=False, **kwargs):
+    def __init__(self, calc_pdist=False, **kwargs):
         """
         Arguments:
           infile (str): Path to input file, may contain environment
             variables
           usecols (list): Columns to select from DataFrame, once
-            dataframe has already been loaded
-          pdist (bool): Calculate probability distribution
+            DataFrame has already been loaded
+          calc_pdist (bool): Calculate probability distribution
           pdist_key (str): Column of which to calculate probability
             distribution
           kde_kw (dict): Keyword arguments passed to
@@ -147,27 +145,42 @@ class SequenceDataset(Dataset):
 
     def _read_hdf5(self, infile, **kwargs):
         """
-        Reads sequene dataframe from hdf5
+        Reads sequence DataFrame from hdf5.
+
+        Arguments:
+          infile (str): Path to input hdf5 file and (optionally) address
+            within the file in the form
+            ``/path/to/file.h5:/address/within/file``; may contain
+            environment variables
+          dataframe_kw (dict): Keyword arguments passed to
+            :class:`DataFrame<pandas:pandas.DataFrame>`
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          DataFrame: Sequence DataFrame
         """
+        from os.path import expandvars
         import re
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
-
         re_h5 = re.match(
           r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
           infile, flags=re.UNICODE)
-        path    = re_h5.groupdict()["path"]
+        path    = expandvars(re_h5.groupdict()["path"])
         address = re_h5.groupdict()["address"]
         dataframe_kw = kwargs.get("dataframe_kw", {})
+
+        # Read DataFrame
         with h5py.File(path) as h5_file:
             if address is None or address == "":
-                if hasattr(self, "default_h5_address"):
-                    address = self.default_h5_address
+                if hasattr(self, "default_hdf5_address"):
+                    address = self.default_hdf5_address
                 else:
                     address = sorted(list(h5_file.keys()))[0]
                 if verbose >= 1:
-                    wiprint("""Reading sequence dataframe from '{0}:{1}'
+                    wiprint("""Reading sequence DataFrame from '{0}:{1}'
                             """.format(path, address))
                 values = np.array(h5_file["{0}/values".format(address)])
                 index  = np.array(h5_file["{0}/index".format(address)])
@@ -181,37 +194,62 @@ class SequenceDataset(Dataset):
                 elif "columns" in attrs:
                     dataframe_kw["columns"] = list(attrs["columns"])
                 df = pd.DataFrame(data=values, index=index, **dataframe_kw)
-                if "index.name" in attrs:
-                    df.index.name = attrs["index.name"]
+                if "index_name" in attrs:
+                    df.index.name = attrs["index_name"]
 
         return df
 
     def _read_text(self, infile, **kwargs):
         """
+        Reads sequence DataFrame from text.
+
+        Arguments:
+          infile (str): Path to input file; may contain environment
+            variables
+          read_csv_kw (dict): Keyword arguments passed to
+            :func:`read_csv<pandas.read_csv>`
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          DataFrame: Sequence DataFrame
         """
+        from os.path import expandvars
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
-
-        if verbose >= 1:
-            wiprint("""Reading sequence dataframe from '{0}'
-                    """.format(infile))
+        infile = expandvars(infile)
         read_csv_kw = dict(index_col=0, delimiter="\s\s+", engine="python")
         read_csv_kw.update(kwargs.get("read_csv_kw", {}))
         if ("delimiter"        in read_csv_kw
         and "delim_whitespace" in read_csv_kw):
             del(read_csv_kw["delimiter"])
+
+        # Read DataFrame
+        if verbose >= 1:
+            wiprint("""Reading sequence DataFrame from '{0}'
+                    """.format(infile))
         df = pd.read_csv(infile, **read_csv_kw)
         if (df.index.name is not None and df.index.name.startswith("#")):
             df.index.name = df.index.name.lstrip("#")
-
-        df = self._set_index(df, **kwargs)
 
         return df
 
     def _set_index(self, df, indexfile=None, **kwargs):
         """
+        Reads index for sequence DataFrame.
+
+        Arguments:
+          df (DataFrame): Nascent sequence DataFrame
+          indexfile (str): Path to index file; may contain environment
+            variables
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          DataFrame: sequence DataFrame with updated index
         """
+        from os.path import expandvars
         import re
 
         # Process arguments
@@ -219,7 +257,7 @@ class SequenceDataset(Dataset):
         re_res = re.compile("[a-zA-Z]+:?[0-9]+")
 
         if indexfile is not None:
-            indexfile = self.process_infiles(indexfile)[0]
+            indexfile = expandvars(indexfile)
             if verbose >= 1:
                 wiprint("""Loading residue indexes from '{0}'
                         """.format(indexfile))
@@ -234,10 +272,190 @@ class SequenceDataset(Dataset):
 
         return df
 
+    def _write_hdf5(self, outfile, **kwargs):
+        """
+        Writes sequence DataFrame to hdf5.
+
+        Arguments:
+          df (DataFrame): Sequence DataFrame to write
+          outfile (str): Path to output hdf5 file and (optionally)
+            address within the file in the form
+            ``/path/to/file.h5:/address/within/file``; may contain
+            environment variables
+          hdf5_kw (dict): Keyword arguments passed to
+            :meth:`create_dataset<h5py:Group.create_dataset>`
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from os.path import expandvars
+        import re
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        df      = kwargs.get("df", self.sequence_df)
+        re_h5 = re.match(
+          r"^(?P<path>(.+)\.(h4|hdf5))((:)?(/)?(?P<address>.+))?$",
+          outfile, flags=re.UNICODE)
+        path    = expandvars(re_h5.groupdict()["path"])
+        address = re_h5.groupdict()["address"]
+        if (address is None or address == ""
+        and hasattr(self, "default_hdf5_address")):
+            address = self.default_hdf5_address
+        if hasattr(self, "default_hdf5_kw"):
+            h5_kw = self.default_hdf5_kw
+        else:
+            h5_kw = {}
+        h5_kw.update(kwargs.get("hdf5_kw", {}))
+
+        # Write DataFrame
+        if verbose >= 1:
+            print("Writing sequence DataFrame to '{0}'".format(outfile))
+        with h5py.File(path) as hdf5_file:
+            hdf5_file.create_dataset("{0}/values".format(address),
+              data=df.values, **h5_kw)
+            hdf5_file.create_dataset("{0}/index".format(address),
+              data=np.array(df.index.values, np.str))
+            hdf5_file[address].attrs["columns"] = \
+              map(str, df.columns.tolist())
+            hdf5_file[address].attrs["index_name"] = \
+              str(df.index.name)
+
+
+    def _write_text(self, outfile, **kwargs):
+        """
+        Writes sequence DataFrame to hdf5
+
+        Arguments:
+          df (DataFrame): Sequence DataFrame to write
+          outfile (str): Path to output file; may contain environment
+            variables
+          read_csv_kw (dict): Keyword arguments passed to
+            :func:`to_string<pandas.DataFrame.to_string>`
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from os.path import expandvars
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        df      = kwargs.get("df", self.sequence_df)
+        outfile = expandvars(outfile)
+        to_string_kw = dict(col_space=12, sparsify=False)
+        to_string_kw.update(kwargs.get("to_string_kw", {}))
+
+        # Write DataFrame
+        if verbose >= 1:
+            print("Writing sequence DataFrame to '{0}'".format(outfile))
+        with open(outfile, "w") as text_file:
+            text_file.write(df.to_string(**to_string_kw))
+
+    def read(self, infile, **kwargs):
+        """
+        Reads sequence DataFrame from text or hdf5.
+
+        If *infile* is an hdf5 file path and (optionally) address within
+        the file in the form ``/path/to/file.h5:/address/within/file``,
+        DataFrame's values will be loaded from
+        ``/address/within/file/values``, index will be loaded from
+        ``/address/within/file/index``, column names will be loaded from
+        the 'columns' attribute of ``/address/within/file`` if present,
+        and index name will be loaded from the 'index.name' attribute of
+        ``/address/within/file`` if preset. Additional arguments
+        provided in *dataframe_kw* will be passes to
+        :class:`DataFrame<pandas:pandas.DataFrame>`.
+
+        If *infile* is the path to a text file, DataFrame will be loaded
+        using :func:`read_csv<pandas.read_csv>`, including additional
+        arguments provided in *read_csv_kw*.
+
+        After loading from hdf5 or text, the index may be result by
+        loading a list of residue names and numbers in the form
+        ``XAA:#`` from *indexfile*. This is useful when loading data
+        from files that do not specify residue names.
+
+        Arguments:
+          infile (str): Path to input file; may contain envornment
+            variables
+          dataframe_kw (dict): Keyword arguments passed to
+            :class:`DataFrame<pandas:pandas.DataFrame>` (hdf5 only)
+          read_csv_kw (dict): Keyword arguments passed to
+            :func:`read_csv<pandas.read_csv>` (text only)
+          indexfile (str): Path to index file; may contain environment
+            variables
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          DataFrame: Sequence DataFrame
+        """
+        from os.path import expandvars
+        import re
+
+        # Process arguments
+        infile = expandvars(infile)
+        re_h5 = re.match(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          infile, flags=re.UNICODE)
+
+        # Read DataFrame
+        if re_h5:
+            df = self._read_hdf5(infile, **kwargs)
+        else:
+            df = self._read_text(infile, **kwargs)
+        df = self._set_index(df, **kwargs)
+
+        return df
+
+    def write(self, outfile, **kwargs):
+        """
+        Writes sequence DataFrame to text or hdf5.
+
+        If *outfile* is an hdf5 file path and (optionally) address
+        within the file in the form
+        ``/path/to/file.h5:/address/within/file``, DataFrame's values
+        will be written to ``/address/within/file/values``, index will
+        be written to ``/address/within/file/index``, column names will
+        be written to the 'columns' attribute of
+        ``/address/within/file``, and index name will be written to the
+        'index.name' attribute of ``/address/within/file``.
+
+        If *outfile* is the path to a text file, DataFrame will be
+        written using
+        :meth:`to_string<pandas:pandas.DataFrame.to_string>`,
+        including additional arguments provided in *read_csv_kw*.
+
+        Arguments:
+          outfile (str): Path to output file; may be path to text file
+            or path to hdf5 file in the form
+            '/path/to/hdf5/file.h5:/address/within/hdf5/file'; may
+            contain environment variables
+          hdf5_kw (dict): Keyword arguments passed to
+            :meth:`create_dataset<h5py:Group.create_dataset>` (hdf5
+            only)
+          read_csv_kw (dict): Keyword arguments passed to
+            :meth:`to_string<pandas:pandas.DataFrame.to_string>` (text
+            only)
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from os.path import expandvars
+        import re
+
+        # Process arguments
+        outfile = expandvars(outfile)
+        re_h5 = re.match(
+          r"^(?P<path>(.+)\.(h4|hdf5))((:)?(/)?(?P<address>.+))?$",
+          outfile, flags=re.UNICODE)
+
+        # Write DataFrame
+        if re_h5:
+            self._write_hdf5(outfile, **kwargs)
+        else:
+            self._write_text(outfile, **kwargs)
 
     def calc_pdist(self, **kwargs):
         """
-        Calcualtes probability distribution of time series.
+        Calculates probability distribution across sequence.
 
         Arguments:
           pdist_kw (dict): Keyword arguments used to configure
@@ -307,83 +525,12 @@ class SequenceDataset(Dataset):
             self.pdist = pdist
             return pdist
 
-    def read(self, infile, **kwargs):
-        """
-        Reads sequence dataframe from text or hdf5.
-
-        Arguments:
-          infile (str): Path to input file; may be complete path to text file
-            or path to hdf5 file in the form
-            '/path/to/hdf5/file.h5:/address/within/hdf5/file'; may contain
-            envornment variables
-        """
-        from os.path import expandvars
-        import re
-
-        # Process arguments
-        infile = expandvars(infile)
-
-        re_h5 = re.match(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          infile, flags=re.UNICODE)
-        if re_h5:
-            df = self._read_hdf5(infile, **kwargs)
-        else:
-            df = self._read_text(infile, **kwargs)
-
-        return df
-
-    def write(self, outfile, **kwargs):
-        """
-        Writes sequence dataframe to text or hdf5.
-
-        Arguments:
-          outfile (str): Path to output file; may be complete path to
-            text file or path to hdf5 file in the form
-            '/path/to/hdf5/file.h5:/address/within/hdf5/file'; may
-            contain environment variables
-        """
-        from os.path import expandvars
-        import re
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        outfile = expandvars(outfile)
-
-        if verbose >= 1:
-            print("Writing sequence dataframe to '{0}'".format(outfile))
-
-        # Check for /path/to/outfile.h5:/address
-        re_h5 = re.match(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          outfile, flags=re.UNICODE)
-        if re_h5:
-            path    = re_h5.groupdict()["path"]
-            address = re_h5.groupdict()["address"]
-            if address is None or address == "":
-                address = self.default_h5_address
-            with h5py.File(path) as hdf5_file:
-                h5_kw = self.default_h5_kw
-                h5_kw.update(kwargs.get("h5_kw", {}))
-                hdf5_file.create_dataset("{0}/values".format(address),
-                  data=self.sequence_df.values, **h5_kw)
-                hdf5_file.create_dataset("{0}/index".format(address),
-                  data=np.array(self.sequence_df.index.values, np.str))
-                hdf5_file[address].attrs["columns"] = \
-                  map(str, self.sequence_df.columns.tolist())
-                hdf5_file[address].attrs["index.name"] = \
-                  str(self.sequence_df.index.name)
-        else:
-            with open(outfile, "w") as text_file:
-                text_file.write(
-                  self.sequence_df.to_string(col_space=12, sparsify=False))
-
 class TimeSeriesDataset(Dataset):
     """
     Represents data that is a function of time.
 
     Attributes:
-      timeseries_df (DataFrame): Dataframe whose index corresponds to
+      timeseries_df (DataFrame): DataFrame whose index corresponds to
         time as represented by frame number or chemical time and whose
         columns are a series of quantities as a function of time. 
     """
@@ -394,7 +541,7 @@ class TimeSeriesDataset(Dataset):
           infile (str): Path to input file, may contain environment
             variables
           usecols (list): Columns to select from DataFrame, once
-            dataframe has already been loaded
+            DataFrame has already been loaded
           dt (float): Time interval between points; units unspecified
           toffset (float): Time offset to be added to all points (i.e.
             time of first point)
@@ -414,7 +561,7 @@ class TimeSeriesDataset(Dataset):
           .. todo:
             - 'y' argument does not belong here; make sure it is
               removable
-            - Make pdist a dataframe rather than explicit x and y
+            - Make pdist a DataFrame rather than explicit x and y
             - Calculate pdist using histogram
             - Verbose pdist
         """
@@ -879,10 +1026,11 @@ class IREDSequenceDataset(SequenceDataset):
             if verbose >= 1:
                 wiprint("""Calculating mean and standard error of {0}
                         relaxation infiles""".format(len(relax_dfs)))
+            n_relax_dfs  = len(relax_dfs)
             relax_dfs    = pd.concat(relax_dfs)
             relax_mean   = relax_dfs.groupby(level=0).mean()
             relax_se     = relax_dfs.groupby(level=0).std() / \
-                             np.sqrt(len(relax_dfs))
+                             np.sqrt(n_relax_dfs)
             df["r1"]     = relax_mean["r1"]
             df["r1 se"]  = relax_se["r1"]
             df["r2"]     = relax_mean["r2"]
@@ -900,10 +1048,11 @@ class IREDSequenceDataset(SequenceDataset):
             if verbose >= 1:
                 wiprint("""Calculating mean and standard error of {0} order
                         parameter infiles""".format(len(order_dfs)))
+            n_order_dfs = len(order_dfs)
             order_dfs   = pd.concat(order_dfs)
             order_mean  = order_dfs.groupby(level=0).mean()
             order_se    = order_dfs.groupby(level=0).std() / \
-                          np.sqrt(len(order_dfs))
+                          np.sqrt(n_order_dfs)
             df["s2"]    = order_mean["s2"]
             df["s2 se"] = order_se["s2"]
 
