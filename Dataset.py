@@ -120,28 +120,28 @@ class SequenceDataset(Dataset):
           kwargs (dict): Additional keyword arguments
         """
 
-        # Arguments
+        # Process arguments
         verbose = kwargs.get("verbose", 1)
 
         # Load
         super(SequenceDataset, self).__init__( **kwargs)
-        dataframe = self.dataframe
-        dataframe.index.name = "residue"
-        dataframe["amino acid"] = [str(i.split(":")[0])
-                                     for i in dataframe.index.values]
-        dataframe["index"] = [int(i.split(":")[1])
-                               for i in dataframe.index.values]
-        if "use_indexes" in kwargs:
-            dataframe = self.dataframe = dataframe[
-                          dataframe["index"].isin(kwargs.pop("use_indexes"))]
+#        dataframe = self.dataframe
+#        dataframe.index.name = "residue"
+#        dataframe["amino acid"] = [str(i.split(":")[0])
+#                                     for i in dataframe.index.values]
+#        dataframe["index"] = [int(i.split(":")[1])
+#                               for i in dataframe.index.values]
+#        if "use_indexes" in kwargs:
+#            dataframe = self.dataframe = dataframe[
+#                          dataframe["index"].isin(kwargs.pop("use_indexes"))]
 #        if True:
 #            dataframe["r1/r2"]    = dataframe["r1"] / dataframe["r2"]
 #            dataframe["r1/r2 se"] = np.sqrt((dataframe["r1 se"] /
 #            dataframe["r1"]) ** 2 + (dataframe["r2 se"] / dataframe["r2"]) **
 #            2) * dataframe["r1/r2"]
-
-        if calc_pdist:
-            self.calc_pdist(**kwargs)
+#
+#        if calc_pdist:
+#            self.calc_pdist(**kwargs)
 
     def _read_hdf5(self, infile, **kwargs):
         """
@@ -1152,10 +1152,24 @@ class IREDSequenceDataset(SequenceDataset):
 
     def _read_text(self, infile, **kwargs):
         """
+        Reads iRED sequence DataFrame from text.
+
+        Arguments:
+          infile (str): Path to input file; may contain environment
+            variables
+          read_csv_kw (dict): Keyword arguments passed to
+            :func:`read_csv<pandas.read_csv>`
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          DataFrame: Sequence DataFrame
         """
+        from os.path import expandvars
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
+        infile = expandvars(infile)
         kind = IREDSequenceDataset._identify_infile(infile)
 
         if kind == "ired_relax":                    # Parse relaxation

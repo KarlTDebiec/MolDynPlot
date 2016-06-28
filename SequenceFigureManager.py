@@ -64,8 +64,9 @@ class SequenceFigureManager(FigureManager):
             verticalalignment: top
         draw_dataset:
           dataset_kw:
+            cls: moldynplot.Dataset.SequenceDataset
             read_csv_kw:
-              delim_whitespace: True
+              delimiter: "\\\\s\\\\s+"
               index_col: 0
           fill_between_kw:
             zorder: 9
@@ -95,8 +96,8 @@ class SequenceFigureManager(FigureManager):
           ylabel:      "$R_1$"
           yticks:      [0,1,2,3,4,5]
         draw_dataset:
-          ykey:   r1
-          ysekey: r1_se
+          ykey:   "r1"
+          ysekey: "r1 se"
       r2:
         class: content
         help: Format subplot for R2 relaxation
@@ -104,8 +105,8 @@ class SequenceFigureManager(FigureManager):
           ylabel: "$R_2$"
           yticks: [0,2,4,6,8,10,12,14,16,18,20]
         draw_dataset:
-          ykey:   r2
-          ysekey: r2_se
+          ykey:   "r2"
+          ysekey: "r2 se"
       hetnoe:
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
@@ -113,8 +114,8 @@ class SequenceFigureManager(FigureManager):
           ylabel: "Het\n\nNOE"
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          ykey:   noe
-          ysekey: noe_se
+          ykey:   "noe"
+          ysekey: "noe se"
       s2:
         class: content
         help: Format subplot for S2 order parameter
@@ -122,8 +123,8 @@ class SequenceFigureManager(FigureManager):
           ylabel: "$S^2$"
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          ykey:   s2
-          ysekey: s2_se
+          ykey:   "s2"
+          ysekey: "s2 se"
       error:
         class: content
         help: Format subplot for normalized error
@@ -335,6 +336,7 @@ class SequenceFigureManager(FigureManager):
                     fb_x.extend([residue-0.5, residue+0.5])
                     index = np.argmax(x==residue)
                     if ysekey is not None:
+                        print(dataframe)
                         yse = dataframe[ysekey][index]
                         if yse_min is not None and yse < yse_min:
                             yse = yse_min
