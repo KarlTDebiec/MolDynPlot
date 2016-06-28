@@ -7,7 +7,9 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Manages Moldynplot datasets.
+Moldynplot includes several dataset classes that build on
+:class:`Dataset<myplotspec:myplotspec.Dataset.Dataset>` with additions
+specific for molecular dynamics simulation data.
 
 .. todo:
   - Fix ordering of argument groups: input, action, output
@@ -23,17 +25,21 @@ from .myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class SequenceDataset(Dataset):
     """
-    Manages sequence datasets.
+    Used to represent data as a function of residue number.
 
-    Seqeunce dataframes have to following form::
+    Attributes:
+      sequence_df (DataFrame): DataFrame whose index corresponds to
+        amino acid residue number in the form ``XAA:#`` and whose
+        columns are a series of quantities specific to each residue.
+        Standard errors of these quantities may be represented by
+        adjacent columns with ' se' appended to their names. ::
 
-                       r1     r1 se        r2     r2 se  ...
-        residue
-        GLN:2    2.451434  0.003734  5.041334  0.024776  ...
-        TYR:3    2.443613  0.004040  5.138383  0.025376  ...
-        LYS:4    2.511626  0.004341  5.589428  0.026236  ...
-        ...      ...       ...       ...       ...       ...
-
+                         r1     r1 se        r2     r2 se  ...
+          residue
+          GLN:2    2.451434  0.003734  5.041334  0.024776  ...
+          TYR:3    2.443613  0.004040  5.138383  0.025376  ...
+          LYS:4    2.511626  0.004341  5.589428  0.026236  ...
+          ...      ...       ...       ...       ...       ...
     """
 
     default_h5_address = "/"
@@ -48,6 +54,9 @@ class SequenceDataset(Dataset):
         """
         Generates tuple of arguments to be used as key for dataset
         cache.
+
+        Returns:
+          tuple: Cache key
 
         .. todo:
           - Verify that keyword arguments passed to pandas may be safely
@@ -98,8 +107,6 @@ class SequenceDataset(Dataset):
 
     def __init__(self, downsample=None, calc_pdist=False, **kwargs):
         """
-        Initializes dataset.
-
         Arguments:
           infile (str): Path to input file, may contain environment
             variables
@@ -109,8 +116,8 @@ class SequenceDataset(Dataset):
           pdist_key (str): Column of which to calculate probability
             distribution
           kde_kw (dict): Keyword arguments passed to
-            sklearn.neighbors.KernelDensity; key arguments are 'bandwidth' and
-            'grid'
+            sklearn.neighbors.KernelDensity; key arguments are
+            'bandwidth' and 'grid'
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
         """
@@ -295,13 +302,16 @@ class SequenceDataset(Dataset):
 
 class TimeSeriesDataset(Dataset):
     """
-    Manages time series datasets.
+    Used to represent data as a function of time.
+
+    Attributes:
+      timeseries_df (DataFrame): Dataframe whose index corresponds to
+        time as represented by frame number or chemical time and whose
+        columns are a series of quantities as a function of time. 
     """
 
     def __init__(self, downsample=None, calc_pdist=False, **kwargs):
         """
-        Initializes dataset.
-
         Arguments:
           infile (str): Path to input file, may contain environment
             variables
@@ -326,8 +336,6 @@ class TimeSeriesDataset(Dataset):
           .. todo:
             - 'y' argument does not belong here; make sure it is
               removable
-            - move downsampling to function
-            - Calculate pdist for multiple columns
             - Make pdist a dataframe rather than explicit x and y
             - Calculate pdist using histogram
             - Verbose pdist
@@ -1324,8 +1332,8 @@ class H5Dataset(object):
     """
     Class for managing hdf5 datasets
 
-    .. todo:
-      - Reimplement or depreciate
+    .. warning::
+      Will be reimplemented or removed eventually
     """
 
     def __init__(self, **kwargs):

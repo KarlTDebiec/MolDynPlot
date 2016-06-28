@@ -3,12 +3,15 @@ moldynplot
 .. include:: ../README.rst
 .. include:: ../LICENSE
 
-Code
-====
 .. toctree::
     :maxdepth: 4
 
-    code
+    figure_managers
+
+.. toctree::
+    :maxdepth: 4
+
+    datasets
 
 .. only:: html
 
