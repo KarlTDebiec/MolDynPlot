@@ -12,6 +12,7 @@ IREDSequenceDataset
 ___________________
 .. autoclass::  moldynplot.Dataset.IREDSequenceDataset
 
+
 TimeSeriesDataset
 -----------------
 .. autoclass::  moldynplot.Dataset.TimeSeriesDataset
@@ -28,9 +29,11 @@ SAXSTimeSeriesDataset
 _____________________
 .. autoclass::  moldynplot.Dataset.SAXSTimeSeriesDataset
 
+
 CorrDataset
 -----------
 .. autoclass::  moldynplot.Dataset.CorrDataset
+
 
 SAXSDataset
 -----------
@@ -42,15 +45,17 @@ _____________________
 
 SAXSTimeSeriesDataset
 _____________________
-.. autoclass::  moldynplot.Dataset.SAXSTimeSeriesDataset
+See :class:`moldynplot.Dataset.SAXSTimeSeriesDataset`.
 
 SAXSDiffDataset
 _______________
 .. autoclass::  moldynplot.Dataset.SAXSDiffDataset
 
+
 MDGXDataset
 -----------
 .. autoclass::  moldynplot.Dataset.MDGXDataset
+
 
 H5Dataset
 ---------
