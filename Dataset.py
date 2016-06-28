@@ -231,30 +231,106 @@ class SequenceDataset(Dataset):
         import re
 
         # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        infile = expandvars(igfile)
-        if verbose >= 1:
-            print("Reading sequence dataframe from '{0}'".format(infile))
-        is_h5 = re.match(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          outfile, flags=re.UNICODE)
-        if is_h5:
-            path    = is_h5.groupdict()["path"]
-            address = is_h5.groupdict()["address"]
-            if address is None or address == "":
-                address = self.default_h5_address
-        else:
-            read_csv_kw = dict(index_col=0, delimiter="\s\s+")
-            read_csv_kw.update(kwargs.get("read_csv_kw", {}))
-            if ("delimiter"        in read_csv_kw
-            and "delim_whitespace" in read_csv_kw):
-                del(read_csv_kw["delimiter"])
-            self.dataframe = pd.read_csv(expandvars(infile), **read_csv_kw)
-            if (self.dataframe.index.name is not None
-            and self.dataframe.index.name.startswith("#")):
-                self.dataframe.index.name = \
-                  self.dataframe.index.name.lstrip("#")
+        infile = expandvars(infile)
 
+        re_h5 = re.match(
+        r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          infile, flags=re.UNICODE)
+        if re_h5:
+            df = self._read_hdf5(infile, **kwargs)
+        else:
+            df = self._read_text(infile, **kwargs)
+
+        return df
+
+    def _read_hdf5(self, infile, **kwargs):
+        """
+        Reads sequene dataframe from hdf5
+        """
+        import re
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        re_h5 = re.match(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          infile, flags=re.UNICODE)
+        path    = re_h5.groupdict()["path"]
+        address = re_h5.groupdict()["address"]
+        dataframe_kw = kwargs.get("dataframe_kw", {})
+        with h5py.File(path) as h5_file:
+            if address is None or address == "":
+                if hasattr(self, "default_h5_address"):
+                    address = self.default_h5_address
+                else:
+                    address = sorted(list(h5_file.keys()))[0]
+                if verbose >= 1:
+                    wiprint("""Reading sequence dataframe from '{0}:{1}'
+                            """.format(path, address))
+                values = np.array(h5_file["{0}/values".format(address)])
+                index  = np.array(h5_file["{0}/index".format(address)])
+                attrs  = dict(h5_file[address].attrs)
+                if "fields"  in dataframe_kw:
+                    dataframe_kw["columns"] = dataframe_kw.pop("fields")
+                elif "columns" in dataframe_kw:
+                    pass
+                elif "fields" in attrs:
+                    dataframe_kw["columns"] = list(attrs["fields"])
+                elif "columns" in attrs:
+                    dataframe_kw["columns"] = list(attrs["columns"])
+                df = pd.DataFrame(data=values, index=index, **dataframe_kw)
+                if "index.name" in attrs:
+                    df.index.name = attrs["index.name"]
+
+        return df
+
+    def _read_text(self, infile, **kwargs):
+        """
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        if verbose >= 1:
+            wiprint("""Reading sequence dataframe from '{0}'
+                    """.format(infile))
+        read_csv_kw = dict(index_col=0, delimiter="\s\s+", engine="python")
+        read_csv_kw.update(kwargs.get("read_csv_kw", {}))
+        if ("delimiter"        in read_csv_kw
+        and "delim_whitespace" in read_csv_kw):
+            del(read_csv_kw["delimiter"])
+        df = pd.read_csv(infile, **read_csv_kw)
+        if (df.index.name is not None and df.index.name.startswith("#")):
+            df.index.name = df.index.name.lstrip("#")
+
+        df = self._set_index(df, **kwargs)
+
+        return df
+
+    def _set_index(self, df, indexfile=None, **kwargs):
+        """
+        """
+        import re
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        re_res = re.compile("[a-zA-Z]+:?[0-9]+")
+
+        if indexfile is not None:
+            indexfile = self.process_infiles(indexfile)[0]
+            if verbose >= 1:
+                wiprint("""Loading residue indexes from '{0}'
+                        """.format(indexfile))
+            res_index = np.loadtxt(indexfile, dtype=np.str).flatten()
+            df.set_index(res_index, inplace=True)
+            df.index.name = "residue" 
+        elif (sum([1 for a in [re_res.match(str(b)) for b in df.index.values]
+              if a is not None]) == len(df.index.values)):
+            df.index.name = "residue"
+        else:
+            df.index.name = "index"
+
+        return df
 
     def write(self, outfile, **kwargs):
         """
@@ -277,12 +353,12 @@ class SequenceDataset(Dataset):
             print("Writing sequence dataframe to '{0}'".format(outfile))
 
         # Check for /path/to/outfile.h5:/address
-        is_h5 = re.match(
+        re_h5 = re.match(
           r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
           outfile, flags=re.UNICODE)
-        if is_h5:
-            path    = is_h5.groupdict()["path"]
-            address = is_h5.groupdict()["address"]
+        if re_h5:
+            path    = re_h5.groupdict()["path"]
+            address = re_h5.groupdict()["address"]
             if address is None or address == "":
                 address = self.default_h5_address
             with h5py.File(path) as hdf5_file:
@@ -292,13 +368,14 @@ class SequenceDataset(Dataset):
                   data=self.sequence_df.values, **h5_kw)
                 hdf5_file.create_dataset("{0}/index".format(address),
                   data=np.array(self.sequence_df.index.values, np.str))
-                hdf5_file[address].attrs["columns"] = str(
-                  self.sequence_df.columns.tolist())
+                hdf5_file[address].attrs["columns"] = \
+                  map(str, self.sequence_df.columns.tolist())
+                hdf5_file[address].attrs["index.name"] = \
+                  str(self.sequence_df.index.name)
         else:
             with open(outfile, "w") as text_file:
                 text_file.write(
                   self.sequence_df.to_string(col_space=12, sparsify=False))
-
 
 class TimeSeriesDataset(Dataset):
     """
@@ -726,11 +803,11 @@ class IREDSequenceDataset(SequenceDataset):
         import argparse
 
         # Process arguments
-        help_message = """Process relaxation data calculated from MD
-          simulation using the iRED method as implemented in cpptraj;
-          treat infiles as independent simulations; processed results
-          are the average across the simulations, including standard
-          errors calculated using standard deviation"""
+        help_message = """Process relaxation data calculated from MD simulation
+            using the iRED method as implemented in cpptraj; treat infiles as
+            independent simulations; processed results are the average across
+            the simulations, including standard errors calculated using
+            standard deviation"""
         if subparsers is not None:
             parser = subparsers.add_parser(
               name        = "ired",
@@ -771,7 +848,7 @@ class IREDSequenceDataset(SequenceDataset):
         return parser
 
     @staticmethod
-    def identify_infile(infile, **kwargs):
+    def _identify_infile(infile, **kwargs):
         """
         Determines if an infile contains iRED relaxation data, iRED
         order parameters, or neither
@@ -796,6 +873,9 @@ class IREDSequenceDataset(SequenceDataset):
           flags=re.UNICODE)
         re_order = re.compile(
           r"^#Vec\s+[\w_]+\[S2\]$", flags=re.UNICODE)
+        re_h5 = re.compile(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          flags=re.UNICODE)
 
         with open(devnull, "w") as fnull:
             header = Popen("head -n 1 {0}".format(infile),
@@ -807,11 +887,13 @@ class IREDSequenceDataset(SequenceDataset):
             return "ired_relax"
         elif re.match(re_order, header):
             return "ired_order"
+        elif re.match(re_h5, infile):
+            return "hdf5"
         else:
             return "other"
 
     @staticmethod
-    def parse_ired(infiles, **kwargs):
+    def read_infiles(infiles, **kwargs):
         """
         Parses a series of cpptraj iRED files.
 
@@ -834,36 +916,52 @@ class IREDSequenceDataset(SequenceDataset):
         for i, infile in enumerate(infiles):
 
             # Determine if infile contains relaxation or order parameters
-            kind = IREDSequenceDataset.identify_infile(infile)
+            kind = IREDSequenceDataset._identify_infile(infile)
 
             # Parse relaxation
             if kind == "ired_relax":
-                if verbose >= 1:
-                    wiprint("""Loading iRED relaxation data from '{0}'
-                            """.format(infile))
-                raw_data = pd.read_csv(infile, delim_whitespace=True,
-                  header=0, index_col=0, names=["r1","r2","noe"])
-                raw_data["r1"] = 1 / raw_data["r1"]
-                raw_data["r2"] = 1 / raw_data["r2"]
-                relax_dfs.append(raw_data)
+                relax_dfs.append(IREDSequenceDataset._read_relax(infile))
 
             # Parse order parameters
             elif kind == "ired_order":
-                if verbose >= 1:
-                    wiprint("""Loading iRED order parameter data from '{0}'
-                            """.format(infile))
-                raw_data = pd.read_csv(infile, delim_whitespace=True,
-                  header=0, index_col=0, names=["s2"])
-                order_dfs.append(raw_data)
+                order_dfs.append(IREDSequenceDataset._read_order(infile))
 
             # Input file not understood
             else:
-                raise Exception(sformat("""parse_ired() cannot read infile
+                raise Exception(sformat("""read_infiles() cannot read infile
                   '{0}'; if loading iREDdata from cpptaj, all infiles must
                   contain either iRED relaxation data or order parameters
                   """.format(infile)))
 
         return relax_dfs, order_dfs
+
+    def _read_text(self, infile, **kwargs):
+        """
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        kind = IREDSequenceDataset._identify_infile(infile)
+
+        if kind == "ired_relax":                    # Parse relaxation
+            if verbose >= 1:
+                wiprint("""Loading iRED relaxation data from '{0}'
+                        """.format(infile))
+            df = pd.read_csv(infile, delim_whitespace=True, header=0,
+              index_col=0, names=["r1","r2","noe"])
+            df["r1"] = 1 / df["r1"]
+            df["r2"] = 1 / df["r2"]
+        elif kind == "ired_order":                  # Parse order parameters
+            if verbose >= 1:
+                wiprint("""Loading iRED order parameter data from '{0}'
+                        """.format(infile))
+            df = pd.read_csv(infile, delim_whitespace=True, header=0,
+              index_col=0, names=["s2"])
+        else:                                       # Parse other
+            df = super(IREDSequenceDataset, self)._read_text(infile, *kwargs)
+        df = self._set_index(df, **kwargs)
+
+        return df
 
     @staticmethod
     def average_independent(relax_dfs=None, order_dfs=None, **kwargs):
@@ -926,7 +1024,7 @@ class IREDSequenceDataset(SequenceDataset):
 
         return df
 
-    def __init__(self, infiles, indexfile=None, outfile=None, **kwargs):
+    def __init__(self, infiles, outfile=None, **kwargs):
         """
         Arguments:
           infiles (list): Path(s) to input file(s); may contain
@@ -941,37 +1039,21 @@ class IREDSequenceDataset(SequenceDataset):
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
+        raw_infiles = infiles
         infiles = self.process_infiles(infiles)
         if len(infiles) == 0:
             raise Exception(sformat("""No infiles found matching '{0}'
-              """.format(kwargs.get("infiles"))))
-        elif verbose >= 1:
-            if len(infiles) == 1:
-                wiprint("""Loading iRED data from '{0}'
-                        """.format(len(infiles), infiles[0]))
-            elif len(infiles) >= 2:
-                wiprint("""Loading iRED data from {0} infiles, starting with
-                        '{1}' """.format(len(infiles), infiles[0]))
+              """.format(raw_infiles)))
+        if verbose >= 1 and len(infiles) >= 2:
+            wiprint("""Loading from {0} infiles, starting with '{1}'
+                    """.format(len(infiles), infiles[0]))
 
-        # Load as dataframe or cpptraj
+        # Load single dataset from text or hdf5
         if len(infiles) == 1:
-            pass
-            # Check if infile is a pandas-format text file or hdf5 etc.
+            df = self.read(infiles[0])
         else:
-            relax_dfs, order_dfs = self.parse_ired(infiles, **kwargs)
+            relax_dfs, order_dfs = self.read_infiles(infiles, **kwargs)
             df = self.average_independent(relax_dfs, order_dfs, **kwargs)
-
-        # Apply index
-        if indexfile is not None:
-            indexfile = self.process_infiles(indexfile)[0]
-            if verbose >= 1:
-                wiprint("""Loading residue indexes from '{0}'
-                        """.format(indexfile))
-            res_index = np.loadtxt(indexfile, dtype=np.str).flatten()
-            df.set_index(res_index, inplace=True)
-            df.index.name = "residue" 
-        else:
-            df.index.name = "vector"
 
         if verbose >= 2:
             if verbose >= 1:
@@ -1054,6 +1136,83 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
     def __init__(**kwargs):
         pass
 
+class ErrorSequenceDataset(SequenceDataset):
+    """
+    Represents error in simulated relaxation data relative to experiment
+    as a function of residue number.
+    """
+
+    @staticmethod
+    def construct_argparser(subparsers=None, **kwargs):
+        """
+        Constructs argument parser, either new or as a subparser.
+
+        Arguments:
+          subparsers (_SubParsersAction, optional): Nascent collection
+            of subparsers to which to add; if omitted, a new parser will
+            be generated
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          ArgumentParser: Argument parser or subparser
+        """
+        import argparse
+
+        # Process arguments
+        help_message = """Calculate error of simulated relaxation relative to
+          experiment. The intended use case is to break down errors relative to
+          experimental data collected at multiple magnetic fields or by
+          multiple groups, error(residue, measurement, magnet/group), into a
+          form that is easier to visualize and communicate, error(residue,
+          measurement). Reads in a series of input files containing simulated
+          data and a series of files containing corresponding experimental
+          data. These files are treated in pairs and the error between all data
+          points present in both (e.g. row 'GLN:2', column 'r1') calculated.
+          Columns ending in ' se' are treated as uncertainties, and are
+          propogated into uncertainties in the resulting errors. Take caution
+          when processing datasets that omit uncertainties alongside those that
+          do (experimental uncertainties are not always reported), as the
+          resulting uncertainties in the residuals will be incorrect."""
+        if subparsers is not None:
+            parser = subparsers.add_parser(
+              name        = "error",
+              description = help_message,
+              help        = help_message)
+        else:
+            parser = argparse.ArgumentParser(
+              description = help_message)
+
+        # Locked defaults
+        parser.set_defaults(cls=IREDSequenceDataset)
+        input_group  = parser.add_argument_group("input")
+
+        # Arguments from superclass
+        super(IREDSequenceDataset, IREDSequenceDataset).add_shared_args(parser)
+
+        # Input arguments
+        input_group = parser.add_argument_group("input")
+        input_group.add_argument(
+          "-sim-infiles",
+          required = True,
+          dest     = "sim_infiles",
+          metavar  = "SIM_INFILE",
+          nargs    = "+",
+          type     = str,
+          help     = """Input file(s) from which to load simulation datasets;
+                     may be plain text or compressed, and may contain
+                     environment variables and wildcards""")
+        input_group.add_argument(
+          "-exp-infiles",
+          required = True,
+          dest     = "exp_infiles",
+          metavar  = "EXP_INFILE",
+          nargs    = "+",
+          type     = str,
+          help     = """Input file(s) from which to load experimental datasets;
+                     may be plain text or compressed, and may contain
+                     environment variables and wildcards""")
+
+        return parser
 
 class NatConTimeSeriesDataset(TimeSeriesDataset):
     """

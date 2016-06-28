@@ -613,131 +613,19 @@ if __name__ == "__main__":
     import argparse
 
     # Prepare argument parser
-    epilog = """
-      Computer systems can fail at any time—crashes, bugs, power outages,
-      whatever—so file systems need to anticipate and recover from these
-      scenarios. The old-old-old school method is to plod along and then have a
-      special utility to check and repair the file system during boot (fsck,
-      short for file system check). More modern systems labor to achieve an
-      always-consistent format, or only narrow windows of inconsistency,
-      obviating the need for the full, expensive fsck. ZFS, for example, builds
-      up new state on disk and then atomically transitions from the previous
-      state to the new one with a single atomic operation."""
     parser = argparse.ArgumentParser(
-      description     = """Processes datasets""",
-      epilog          = epilog)
+      description = """Processes datasets""")
     subparsers = parser.add_subparsers(
-                   dest        = "mode",
-                   description = "")
+      dest        = "mode",
+      description = "")
 
-    from .Dataset import IREDSequenceDataset, IREDTimeSeriesDataset
+    from .Dataset import (IREDSequenceDataset, IREDTimeSeriesDataset,
+      ErrorSequenceDataset)
 
     IREDSequenceDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
+    ErrorSequenceDataset.construct_argparser(subparsers)
 
-#    # Prepare iRED subparser
-#    ired_subparser = subparsers.add_parser(
-#      name     = "ired",
-#      help     = "Process simulated iRED relaxation data")
-#    ired_subparser.set_defaults(
-#      function   = process_ired)
-#    input_group  = ired_subparser.add_argument_group("input")
-#    action_group = ired_subparser.add_argument_group("action")
-#    output_group = ired_subparser.add_argument_group("output")
-#    input_group.add_argument(
-#      "-infiles",
-#      required = True,
-#      dest     = "infiles",
-#      metavar  = "INFILE",
-#      nargs    = "+",
-#      type     = str,
-#      help     = "cpptraj iRED output file(s) from which to load datasets; " +
-#                 "may be plain text or compressed, and may contain "
-#                 "environment variables and wildcards")
-#    input_group.add_argument(
-#      "-indexfile",
-#      required = False,
-#      type     = str,
-#      help     = "text file from which to load residue names; should list "
-#                 "amino acids in the form 'XAA:#' separated by whitespace; if "
-#                 "omitted will be taken from rows of first infile; may "
-#                 "contain environment variables")
-#
-#    mode = input_group.add_mutually_exclusive_group()
-#    mode.add_argument(
-#      "--mean",
-#      action   = "store_const",
-#      const    = "mean",
-#      default  = "mean",
-#      dest     = "mode",
-#      help     = "treat infiles as independent simulations; processed results "
-#                 "will be the average across the simulations, including "
-#                 "standard errors calculated using the standard deviation")
-#    mode.add_argument(
-#      "--timeseries",
-#      action   = "store_const",
-#      const    = "timeseries",
-#      default  = "mean",
-#      dest     = "mode",
-#      help     = "treat infiles as consecutive (potentially overlapping) "
-#                 "excerpts of a longer simulation; processed results will be "
-#                 "a timeseries")
-#    output_group.add_argument(
-#      "-outfile",
-#      required = True,
-#      type     = str,
-#      help     = "text or hdf5 file to which processed results will be "
-#                 "output; may contain environment variables")
-
-#    # Prepare error subparser
-#    error_subparser  = subparsers.add_parser(
-#      name        = "error",
-#      help        = "Calculate error of simulated relaxation relative to " +
-#                    "experiment",
-#      description = "Calculates error of simulated relaxation relative to " +
-#                    "experiment. The intended use case is to break down " +
-#                    "errors relative to experimental data collected at " +
-#                    "multiple magnetic fields or by multiple groups, " +
-#                    "error(residue, measurement, magnet/group), into a form " +
-#                    "that is easier to visualize and communicate, " +
-#                    "error(residue, measurement). " +
-#                    "Reads in a series of input files containing simulated " +
-#                    "data and a series of files containing corresponding " +
-#                    "experimental data. These files are treated in pairs " +
-#                    "and the error between all data points present in both " +
-#                    "(e.g. row 'GLN:2', column 'r1') calculated. " +
-#                    "Columns ending in '_se' are treated as uncertainties, " +
-#                    "and are propogated into uncertainties in the resulting " +
-#                    "errors rather than being averaged. Take caution when " +
-#                    "processing datasets that omit uncertainties alongside " +
-#                    "those that do (experimental uncertainties are not " +
-#                    "always reported), as the resulting uncertainties in " +
-#                    "the residuals will be incorrect.")
-#    error_subparser.set_defaults(
-#      function   = process_error)
-#    input_group  = error_subparser.add_argument_group("input")
-#    action_group = error_subparser.add_argument_group("action")
-#    output_group = error_subparser.add_argument_group("output")
-#    input_group.add_argument(
-#      "-sim_infile",
-#      required = True,
-#      dest     = "sim_infiles",
-#      nargs    = "+",
-#      type     = str,
-#      help     = "input file(s) from which to load simulation datasets")
-#    input_group.add_argument(
-#      "-exp_infile",
-#      required = True,
-#      dest     = "exp_infiles",
-#      nargs    = "+",
-#      type     = str,
-#      help     = "input file(s) from which to load experimental datasets")
-#    output_group.add_argument(
-#      "-outfile",
-#      required = True,
-#      type     = str,
-#      help     = "Text file to which processed data will be output")
-#
 #    # Prepare relax subparser
 #    relax_subparser  = subparsers.add_parser(
 #      name     = "relax",
