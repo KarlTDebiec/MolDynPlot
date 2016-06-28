@@ -1049,15 +1049,6 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
                      if omitted will be taken from rows of first infile; may
                      contain environment variables""")
 
-        # Output arguments
-        output_group = parser.add_argument_group("output")
-        output_group.add_argument(
-          "-outfile",
-          required = False,
-          type     = str,
-          help     = """text or hdf5 file to which processed results will be
-                     output; may contain environment variables""")
-
         return parser
 
     def __init__(**kwargs):
