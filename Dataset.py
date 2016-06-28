@@ -145,6 +145,96 @@ class SequenceDataset(Dataset):
         if calc_pdist:
             self.calc_pdist(**kwargs)
 
+    def _read_hdf5(self, infile, **kwargs):
+        """
+        Reads sequene dataframe from hdf5
+        """
+        import re
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        re_h5 = re.match(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          infile, flags=re.UNICODE)
+        path    = re_h5.groupdict()["path"]
+        address = re_h5.groupdict()["address"]
+        dataframe_kw = kwargs.get("dataframe_kw", {})
+        with h5py.File(path) as h5_file:
+            if address is None or address == "":
+                if hasattr(self, "default_h5_address"):
+                    address = self.default_h5_address
+                else:
+                    address = sorted(list(h5_file.keys()))[0]
+                if verbose >= 1:
+                    wiprint("""Reading sequence dataframe from '{0}:{1}'
+                            """.format(path, address))
+                values = np.array(h5_file["{0}/values".format(address)])
+                index  = np.array(h5_file["{0}/index".format(address)])
+                attrs  = dict(h5_file[address].attrs)
+                if "fields"  in dataframe_kw:
+                    dataframe_kw["columns"] = dataframe_kw.pop("fields")
+                elif "columns" in dataframe_kw:
+                    pass
+                elif "fields" in attrs:
+                    dataframe_kw["columns"] = list(attrs["fields"])
+                elif "columns" in attrs:
+                    dataframe_kw["columns"] = list(attrs["columns"])
+                df = pd.DataFrame(data=values, index=index, **dataframe_kw)
+                if "index.name" in attrs:
+                    df.index.name = attrs["index.name"]
+
+        return df
+
+    def _read_text(self, infile, **kwargs):
+        """
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        if verbose >= 1:
+            wiprint("""Reading sequence dataframe from '{0}'
+                    """.format(infile))
+        read_csv_kw = dict(index_col=0, delimiter="\s\s+", engine="python")
+        read_csv_kw.update(kwargs.get("read_csv_kw", {}))
+        if ("delimiter"        in read_csv_kw
+        and "delim_whitespace" in read_csv_kw):
+            del(read_csv_kw["delimiter"])
+        df = pd.read_csv(infile, **read_csv_kw)
+        if (df.index.name is not None and df.index.name.startswith("#")):
+            df.index.name = df.index.name.lstrip("#")
+
+        df = self._set_index(df, **kwargs)
+
+        return df
+
+    def _set_index(self, df, indexfile=None, **kwargs):
+        """
+        """
+        import re
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        re_res = re.compile("[a-zA-Z]+:?[0-9]+")
+
+        if indexfile is not None:
+            indexfile = self.process_infiles(indexfile)[0]
+            if verbose >= 1:
+                wiprint("""Loading residue indexes from '{0}'
+                        """.format(indexfile))
+            res_index = np.loadtxt(indexfile, dtype=np.str).flatten()
+            df.set_index(res_index, inplace=True)
+            df.index.name = "residue" 
+        elif (sum([1 for a in [re_res.match(str(b)) for b in df.index.values]
+              if a is not None]) == len(df.index.values)):
+            df.index.name = "residue"
+        else:
+            df.index.name = "index"
+
+        return df
+
+
     def calc_pdist(self, **kwargs):
         """
         Calcualtes probability distribution of time series.
@@ -234,101 +324,12 @@ class SequenceDataset(Dataset):
         infile = expandvars(infile)
 
         re_h5 = re.match(
-        r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
           infile, flags=re.UNICODE)
         if re_h5:
             df = self._read_hdf5(infile, **kwargs)
         else:
             df = self._read_text(infile, **kwargs)
-
-        return df
-
-    def _read_hdf5(self, infile, **kwargs):
-        """
-        Reads sequene dataframe from hdf5
-        """
-        import re
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-
-        re_h5 = re.match(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          infile, flags=re.UNICODE)
-        path    = re_h5.groupdict()["path"]
-        address = re_h5.groupdict()["address"]
-        dataframe_kw = kwargs.get("dataframe_kw", {})
-        with h5py.File(path) as h5_file:
-            if address is None or address == "":
-                if hasattr(self, "default_h5_address"):
-                    address = self.default_h5_address
-                else:
-                    address = sorted(list(h5_file.keys()))[0]
-                if verbose >= 1:
-                    wiprint("""Reading sequence dataframe from '{0}:{1}'
-                            """.format(path, address))
-                values = np.array(h5_file["{0}/values".format(address)])
-                index  = np.array(h5_file["{0}/index".format(address)])
-                attrs  = dict(h5_file[address].attrs)
-                if "fields"  in dataframe_kw:
-                    dataframe_kw["columns"] = dataframe_kw.pop("fields")
-                elif "columns" in dataframe_kw:
-                    pass
-                elif "fields" in attrs:
-                    dataframe_kw["columns"] = list(attrs["fields"])
-                elif "columns" in attrs:
-                    dataframe_kw["columns"] = list(attrs["columns"])
-                df = pd.DataFrame(data=values, index=index, **dataframe_kw)
-                if "index.name" in attrs:
-                    df.index.name = attrs["index.name"]
-
-        return df
-
-    def _read_text(self, infile, **kwargs):
-        """
-        """
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-
-        if verbose >= 1:
-            wiprint("""Reading sequence dataframe from '{0}'
-                    """.format(infile))
-        read_csv_kw = dict(index_col=0, delimiter="\s\s+", engine="python")
-        read_csv_kw.update(kwargs.get("read_csv_kw", {}))
-        if ("delimiter"        in read_csv_kw
-        and "delim_whitespace" in read_csv_kw):
-            del(read_csv_kw["delimiter"])
-        df = pd.read_csv(infile, **read_csv_kw)
-        if (df.index.name is not None and df.index.name.startswith("#")):
-            df.index.name = df.index.name.lstrip("#")
-
-        df = self._set_index(df, **kwargs)
-
-        return df
-
-    def _set_index(self, df, indexfile=None, **kwargs):
-        """
-        """
-        import re
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        re_res = re.compile("[a-zA-Z]+:?[0-9]+")
-
-        if indexfile is not None:
-            indexfile = self.process_infiles(indexfile)[0]
-            if verbose >= 1:
-                wiprint("""Loading residue indexes from '{0}'
-                        """.format(indexfile))
-            res_index = np.loadtxt(indexfile, dtype=np.str).flatten()
-            df.set_index(res_index, inplace=True)
-            df.index.name = "residue" 
-        elif (sum([1 for a in [re_res.match(str(b)) for b in df.index.values]
-              if a is not None]) == len(df.index.values)):
-            df.index.name = "residue"
-        else:
-            df.index.name = "index"
 
         return df
 
@@ -848,6 +849,73 @@ class IREDSequenceDataset(SequenceDataset):
         return parser
 
     @staticmethod
+    def average_independent(relax_dfs=None, order_dfs=None, **kwargs):
+        """
+        Calculates the average and standard error of a set of independent
+        datasets.
+
+        Arguments:
+          relax_dfs (list): DataFrames containing data from relax infiles
+          order_dfs (list): DataFrames containing data from order infiles
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          df (DataFrame): Averaged dataframe including relax and order
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        df = pd.DataFrame()
+
+        # Process relaxation
+        if len(relax_dfs) == 1:
+            if verbose >= 1:
+                wiprint("""Single relaxation infile provided; skipping error
+                        calculation""")
+            df["r1"]  = relax_dfs[0]["r1"]
+            df["r2"]  = relax_dfs[0]["r2"]
+            df["noe"] = relax_dfs[0]["noe"]
+        elif len(relax_dfs) >= 2:
+            if verbose >= 1:
+                wiprint("""Calculating mean and standard error of {0}
+                        relaxation infiles""".format(len(relax_dfs)))
+            relax_dfs    = pd.concat(relax_dfs)
+            relax_mean   = relax_dfs.groupby(level=0).mean()
+            relax_se     = relax_dfs.groupby(level=0).std() / \
+                             np.sqrt(len(relax_dfs))
+            df["r1"]     = relax_mean["r1"]
+            df["r1 se"]  = relax_se["r1"]
+            df["r2"]     = relax_mean["r2"]
+            df["r2 se"]  = relax_se["r2"]
+            df["noe"]    = relax_mean["noe"]
+            df["noe se"] = relax_se["noe"]
+
+        # Process order parameters
+        if len(order_dfs) == 1:
+            if verbose >= 1:
+                wiprint("""Single order parameter infile provided; skipping
+                        error calculation""")
+            df["s2"] = order_dfs[0]["s2"]
+        elif len(order_dfs) >= 2:
+            if verbose >= 1:
+                wiprint("""Calculating mean and standard error of {0} order
+                        parameter infiles""".format(len(order_dfs)))
+            order_dfs   = pd.concat(order_dfs)
+            order_mean  = order_dfs.groupby(level=0).mean()
+            order_se    = order_dfs.groupby(level=0).std() / \
+                          np.sqrt(len(order_dfs))
+            df["s2"]    = order_mean["s2"]
+            df["s2 se"] = order_se["s2"]
+
+        if df.index.name == "residue":
+            df = df.loc[sorted(df.index.values,
+                   key=lambda x: int(x.split(":")[1]))]
+        else:
+            df = df.loc[sorted(df.index.values)]
+
+        return df
+
+    @staticmethod
     def _identify_infile(infile, **kwargs):
         """
         Determines if an infile contains iRED relaxation data, iRED
@@ -892,138 +960,6 @@ class IREDSequenceDataset(SequenceDataset):
         else:
             return "other"
 
-    @staticmethod
-    def read_infiles(infiles, **kwargs):
-        """
-        Parses a series of cpptraj iRED files.
-
-        Arguments:
-          infiles (list): Path(s) to input file(s)
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-
-        Returns:
-          relax_dfs (list): DataFrames containing data from relax infiles
-          order_dfs (list): DataFrames containing data from order infiles
-        """
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-
-        # Load data
-        relax_dfs = []
-        order_dfs = []
-        for i, infile in enumerate(infiles):
-
-            # Determine if infile contains relaxation or order parameters
-            kind = IREDSequenceDataset._identify_infile(infile)
-
-            # Parse relaxation
-            if kind == "ired_relax":
-                relax_dfs.append(IREDSequenceDataset._read_relax(infile))
-
-            # Parse order parameters
-            elif kind == "ired_order":
-                order_dfs.append(IREDSequenceDataset._read_order(infile))
-
-            # Input file not understood
-            else:
-                raise Exception(sformat("""read_infiles() cannot read infile
-                  '{0}'; if loading iREDdata from cpptaj, all infiles must
-                  contain either iRED relaxation data or order parameters
-                  """.format(infile)))
-
-        return relax_dfs, order_dfs
-
-    def _read_text(self, infile, **kwargs):
-        """
-        """
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        kind = IREDSequenceDataset._identify_infile(infile)
-
-        if kind == "ired_relax":                    # Parse relaxation
-            if verbose >= 1:
-                wiprint("""Loading iRED relaxation data from '{0}'
-                        """.format(infile))
-            df = pd.read_csv(infile, delim_whitespace=True, header=0,
-              index_col=0, names=["r1","r2","noe"])
-            df["r1"] = 1 / df["r1"]
-            df["r2"] = 1 / df["r2"]
-        elif kind == "ired_order":                  # Parse order parameters
-            if verbose >= 1:
-                wiprint("""Loading iRED order parameter data from '{0}'
-                        """.format(infile))
-            df = pd.read_csv(infile, delim_whitespace=True, header=0,
-              index_col=0, names=["s2"])
-        else:                                       # Parse other
-            df = super(IREDSequenceDataset, self)._read_text(infile, *kwargs)
-        df = self._set_index(df, **kwargs)
-
-        return df
-
-    @staticmethod
-    def average_independent(relax_dfs=None, order_dfs=None, **kwargs):
-        """
-        Calculates the average and standard error of a set of independent
-        datasets.
-
-        Arguments:
-          relax_dfs (list): DataFrames containing data from relax infiles
-          order_dfs (list): DataFrames containing data from order infiles
-          kwargs (dict): Additional keyword arguments
-
-        Returns:
-          df (DataFrame): Averaged dataframe including relax and order
-        """
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        df = pd.DataFrame()
-
-        # Process relaxation
-        if len(relax_dfs) == 1:
-            if verbose >= 1:
-                wiprint("""Single relaxation infile provided; skipping error
-                        calculation""")
-            df["r1"]  = relax_dfs[0]["r1"]
-            df["r2"]  = relax_dfs[0]["r2"]
-            df["noe"] = relax_dfs[0]["noe"]
-        elif len(relax_dfs) >= 2:
-            if verbose >= 1:
-                wiprint("""Calculating mean and standard error of {0}
-                        relaxation infiles""".format(len(relax_dfs)))
-            relax_dfs = pd.concat(relax_dfs)
-            relax_mean     = relax_dfs.groupby(level=0).mean()
-            relax_se       = relax_dfs.groupby(level=0).std() / \
-                               np.sqrt(len(relax_dfs))
-            df["r1"]     = relax_mean["r1"]
-            df["r1 se"]  = relax_se["r1"]
-            df["r2"]     = relax_mean["r2"]
-            df["r2 se"]  = relax_se["r2"]
-            df["noe"]    = relax_mean["noe"]
-            df["noe se"] = relax_se["noe"]
-
-        # Process order parameters
-        if len(order_dfs) == 1:
-            if verbose >= 1:
-                wiprint("""Single order parameter infile provided; skipping
-                        error calculation""")
-            df["s2"] = order_dfs[0]["s2"]
-        elif len(order_dfs) >= 2:
-            if verbose >= 1:
-                wiprint("""Calculating mean and standard error of {0} order
-                        parameter infiles""".format(len(order_dfs)))
-            order_dfs   = pd.concat(order_dfs)
-            order_mean  = order_dfs.groupby(level=0).mean()
-            order_se    = order_dfs.groupby(level=0).std() / \
-                          np.sqrt(len(order_dfs))
-            df["s2"]    = order_mean["s2"]
-            df["s2 se"] = order_se["s2"]
-
-        return df
-
     def __init__(self, infiles, outfile=None, **kwargs):
         """
         Arguments:
@@ -1064,6 +1000,66 @@ class IREDSequenceDataset(SequenceDataset):
         # Write outfile
         if outfile is not None:
             self.write(outfile)
+
+    def _read_text(self, infile, **kwargs):
+        """
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        kind = IREDSequenceDataset._identify_infile(infile)
+
+        if kind == "ired_relax":                    # Parse relaxation
+            if verbose >= 1:
+                wiprint("""Loading iRED relaxation data from '{0}'
+                        """.format(infile))
+            df = pd.read_csv(infile, delim_whitespace=True, header=0,
+              index_col=0, names=["r1","r2","noe"])
+            df["r1"] = 1 / df["r1"]
+            df["r2"] = 1 / df["r2"]
+        elif kind == "ired_order":                  # Parse order parameters
+            if verbose >= 1:
+                wiprint("""Loading iRED order parameter data from '{0}'
+                        """.format(infile))
+            df = pd.read_csv(infile, delim_whitespace=True, header=0,
+              index_col=0, names=["s2"])
+        else:                                       # Parse other
+            df = super(IREDSequenceDataset, self)._read_text(infile, *kwargs)
+        df = self._set_index(df, **kwargs)
+
+        return df
+
+    def read_infiles(self, infiles, **kwargs):
+        """
+        Parses a series of cpptraj iRED files.
+
+        Arguments:
+          infiles (list): Path(s) to input file(s)
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          relax_dfs (list): DataFrames containing data from relax infiles
+          order_dfs (list): DataFrames containing data from order infiles
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        # Load data
+        relax_dfs = []
+        order_dfs = []
+        for i, infile in enumerate(infiles):
+            df = self.read(infile, **kwargs)
+            columns = df.columns.values
+            if "r1" in columns and "r2" in columns and "noe" in columns:
+                relax_dfs.append(df)
+            elif "s2" in columns:
+                order_dfs.append(df)
+            else:
+                raise Exception()
+
+        return relax_dfs, order_dfs
 
 class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
     """
