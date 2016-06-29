@@ -108,7 +108,7 @@ class SequenceDataset(Dataset):
         **kwargs):
         """
         Arguments:
-          infiles (list): Path(s) to input file(s); may contain
+          infile[s] (list): Path(s) to input file(s); may contain
             environment variables and wildcards
           usecols (list): Columns to select from DataFrame, once
             DataFrame has already been loaded
@@ -1177,10 +1177,10 @@ class IREDSequenceDataset(SequenceDataset):
 
     def read(self, **kwargs):
         """
-        Parses a series of cpptraj iRED files.
+        Reads a series of iRED files into a DataFrame.
 
         Arguments:
-          infiles (list): Path(s) to input file(s)
+          infile[s] (list): Path(s) to input file(s)
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
 
