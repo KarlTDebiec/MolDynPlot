@@ -336,7 +336,6 @@ class SequenceFigureManager(FigureManager):
                     fb_x.extend([residue-0.5, residue+0.5])
                     index = np.argmax(x==residue)
                     if ysekey is not None:
-                        print(dataframe)
                         yse = dataframe[ysekey][index]
                         if yse_min is not None and yse < yse_min:
                             yse = yse_min

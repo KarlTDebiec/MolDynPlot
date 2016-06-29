@@ -78,7 +78,7 @@ class SequenceDataset(Dataset):
         super(SequenceDataset, SequenceDataset).add_shared_args(parser)
 
     @classmethod
-    def get_cache_key(cls, infile=None, *args, **kwargs):
+    def get_cache_key(cls, *args, **kwargs):
         """
         Generates key for dataset cache.
 
@@ -89,9 +89,12 @@ class SequenceDataset(Dataset):
           tuple: Cache key; contains arguments sufficient to reconstruct
           dataset
         """
-        from os.path import expandvars
+        from .myplotspec import multi_pop_merged
 
-        if infile is None:
+        # Process arguments
+        infiles = multi_pop_merged(["infile", "infiles"], kwargs)
+        infiles = SequenceDataset.process_infiles(infiles=infiles)
+        if infiles is None:
             return None
         read_csv_kw = []
         if "use_indexes" in kwargs:
@@ -102,7 +105,7 @@ class SequenceDataset(Dataset):
             if isinstance(value, list):
                 value = tuple(value)
             read_csv_kw.append((key, value))
-        return (cls, expandvars(infile), use_indexes, tuple(read_csv_kw))
+        return (cls, tuple(infiles), use_indexes, tuple(read_csv_kw))
 
     def __init__(self, calc_pdist=False, outfile=None, interactive=False,
         **kwargs):
@@ -368,33 +371,38 @@ class SequenceDataset(Dataset):
 
     def read(self, **kwargs):
         """
-        Reads sequence DataFrame from text or hdf5.
+        Reads sequence from one or more *infiles* into a DataFrame.
 
-        If *infile* is an hdf5 file path and (optionally) address within
-        the file in the form ``/path/to/file.h5:/address/within/file``,
+        If more than on *infile* is provided, the resulting DataFrame
+        will consist of their merged data.
+
+        If an *infile* is an hdf5 file path and (optionally) address
+        within the file in the form
+        ``/path/to/file.h5:/address/within/file``, the corresponding
         DataFrame's values will be loaded from
-        ``/address/within/file/values``, index will be loaded from
-        ``/address/within/file/index``, column names will be loaded from
-        the 'columns' attribute of ``/address/within/file`` if present,
-        and index name will be loaded from the 'index.name' attribute of
-        ``/address/within/file`` if preset. Additional arguments
-        provided in *dataframe_kw* will be passes to
+        ``/address/within/file/values``, its index will be loaded from
+        ``/address/within/file/index``, its column names will be loaded
+        from the 'columns' attribute of ``/address/within/file`` if
+        present, and index name will be loaded from the 'index_name'
+        attribute of ``/address/within/file`` if present. Additional
+        arguments provided in *dataframe_kw* will be passes to
         :class:`DataFrame<pandas:pandas.DataFrame>`.
 
-        If *infile* is the path to a text file, DataFrame will be loaded
-        using :func:`read_csv<pandas.read_csv>`, including additional
+        If an *infile* is the path to a text file, the corresponding
+        DataFrame will be loaded using
+        :func:`read_csv<pandas.read_csv>`, including additional
         arguments provided in *read_csv_kw*.
 
-        After loading from hdf5 or text, the index may be result by
-        loading a list of residue names and numbers in the form
+        After generating the DataFrame from *infiles*, the index may be
+        set by loading a list of residue names and numbers in the form
         ``XAA:#`` from *indexfile*. This is useful when loading data
         from files that do not specify residue names.
 
         Arguments:
-          infile[s] (str): Path(s) to input file(s); may contain environment
-            variables and wildcards
+          infile[s] (str): Path(s) to input file(s); may contain
+            environment variables and wildcards
           dataframe_kw (dict): Keyword arguments passed to
-            :class:`DataFrame<pandas:pandas.DataFrame>` (hdf5 only)
+            :class:`DataFrame<pandas.DataFrame>` (hdf5 only)
           read_csv_kw (dict): Keyword arguments passed to
             :func:`read_csv<pandas.read_csv>` (text only)
           indexfile (str): Path to index file; may contain environment
@@ -419,11 +427,16 @@ class SequenceDataset(Dataset):
           flags=re.UNICODE)
 
         # Load Data
+        dfs = []
         for infile in infiles:
             if re_h5.match(infile):
                 df = self._read_hdf5(infile, **kwargs)
             else:
                 df = self._read_text(infile, **kwargs)
+            dfs.append(df)
+        df = dfs.pop(0)
+        for df_i in dfs:
+            df.merge(df_i)
 
         # Load index, if applicable
         df = self._set_index(df, **kwargs)
@@ -444,8 +457,7 @@ class SequenceDataset(Dataset):
         'index.name' attribute of ``/address/within/file``.
 
         If *outfile* is the path to a text file, DataFrame will be
-        written using
-        :meth:`to_string<pandas:pandas.DataFrame.to_string>`,
+        written using :meth:`to_string<pandas.DataFrame.to_string>`,
         including additional arguments provided in *read_csv_kw*.
 
         Arguments:
@@ -457,8 +469,7 @@ class SequenceDataset(Dataset):
             :meth:`create_dataset<h5py:Group.create_dataset>` (hdf5
             only)
           read_csv_kw (dict): Keyword arguments passed to
-            :meth:`to_string<pandas:pandas.DataFrame.to_string>` (text
-            only)
+            :meth:`to_string<pandas.DataFrame.to_string>` (text only)
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
         """
@@ -1178,7 +1189,7 @@ class IREDSequenceDataset(SequenceDataset):
 
     def read(self, **kwargs):
         """
-        Reads iRED sequence data from one or more infiles into a
+        Reads iRED sequence data from one or more *infiles* into a
         DataFrame.
 
         *infiles* may contain relaxation data, order parameters, or
@@ -1207,14 +1218,13 @@ class IREDSequenceDataset(SequenceDataset):
         After generating the DataFrame from *infiles*, the index may be
         set by loading a list of residue names and numbers in the form
         ``XAA:#`` from *indexfile*. This is useful when loading data
-        from files that do not specify residue names, such as cpptraj's
-        iRED output.
+        from files that do not specify residue names.
 
         Arguments:
           infile[s] (list): Path(s) to input file(s); may contain
             environment variables and wildcards
           dataframe_kw (dict): Keyword arguments passed to
-            :class:`DataFrame<pandas:pandas.DataFrame>` (hdf5 only)
+            :class:`DataFrame<pandas.DataFrame>` (hdf5 only)
           read_csv_kw (dict): Keyword arguments passed to
             :func:`read_csv<pandas.read_csv>` (text only)
           indexfile (str): Path to index file; may contain environment
