@@ -31,7 +31,7 @@ project   = "moldynplot"
 copyright = "2015-2016, Karl T Debiec"
 author    = "Karl T Debiec"
 version   = "0.1.0"
-release   = "16-06-24"
+release   = "16-06-29"
 
 exclude_patterns  = ["_build"]
 pygments_style    = "sphinx"

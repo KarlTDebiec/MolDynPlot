@@ -8,7 +8,7 @@
 #   BSD license. See the LICENSE file for details.
 """
 Moldynplot includes several dataset classes that build on
-:class:`Dataset<myplotspec:myplotspec.Dataset.Dataset>` with additions
+:class:`Dataset<myplotspec.Dataset.Dataset>` with additions
 specific for molecular dynamics simulation data.
 
 .. todo:
@@ -130,16 +130,15 @@ class SequenceDataset(Dataset):
         self.dataset_cache = kwargs.get("dataset_cache", None)
 
         # Read data
-        df = self.read(**kwargs)
+        self.sequence_df = self.read(**kwargs)
         if verbose >= 2:
             if verbose >= 1:
                 print("Processed sequence DataFrame:")
-                print(df)
-        self.sequence_df = df
+                print(self.sequence_df)
 
         # Write data
         if outfile is not None:
-            self.write(outfile)
+            self.write(df=self.sequence_df, outfile=outfile, **kwargs)
 
         # Interactive prompt
         if interactive:
@@ -163,99 +162,7 @@ class SequenceDataset(Dataset):
 #        if calc_pdist:
 #            self.calc_pdist(**kwargs)
 
-    def _read_hdf5(self, infile, **kwargs):
-        """
-        Reads sequence DataFrame from hdf5.
-
-        Arguments:
-          infile (str): Path to input hdf5 file and (optionally) address
-            within the file in the form
-            ``/path/to/file.h5:/address/within/file``; may contain
-            environment variables
-          dataframe_kw (dict): Keyword arguments passed to
-            :class:`DataFrame<pandas:pandas.DataFrame>`
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-
-        Returns:
-          DataFrame: Sequence DataFrame
-        """
-        from os.path import expandvars
-        import re
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        re_h5 = re.match(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          infile, flags=re.UNICODE)
-        path    = expandvars(re_h5.groupdict()["path"])
-        address = re_h5.groupdict()["address"]
-        dataframe_kw = kwargs.get("dataframe_kw", {})
-
-        # Read DataFrame
-        with h5py.File(path) as h5_file:
-            if address is None or address == "":
-                if hasattr(self, "default_hdf5_address"):
-                    address = self.default_hdf5_address
-                else:
-                    address = sorted(list(h5_file.keys()))[0]
-                if verbose >= 1:
-                    wiprint("""Reading sequence DataFrame from '{0}:{1}'
-                            """.format(path, address))
-                values = np.array(h5_file["{0}/values".format(address)])
-                index  = np.array(h5_file["{0}/index".format(address)])
-                attrs  = dict(h5_file[address].attrs)
-                if "fields"  in dataframe_kw:
-                    dataframe_kw["columns"] = dataframe_kw.pop("fields")
-                elif "columns" in dataframe_kw:
-                    pass
-                elif "fields" in attrs:
-                    dataframe_kw["columns"] = list(attrs["fields"])
-                elif "columns" in attrs:
-                    dataframe_kw["columns"] = list(attrs["columns"])
-                df = pd.DataFrame(data=values, index=index, **dataframe_kw)
-                if "index_name" in attrs:
-                    df.index.name = attrs["index_name"]
-
-        return df
-
-    def _read_text(self, infile, **kwargs):
-        """
-        Reads sequence DataFrame from text.
-
-        Arguments:
-          infile (str): Path to input file; may contain environment
-            variables
-          read_csv_kw (dict): Keyword arguments passed to
-            :func:`read_csv<pandas.read_csv>`
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-
-        Returns:
-          DataFrame: Sequence DataFrame
-        """
-        from os.path import expandvars
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        infile = expandvars(infile)
-        read_csv_kw = dict(index_col=0, delimiter="\s\s+", engine="python")
-        read_csv_kw.update(kwargs.get("read_csv_kw", {}))
-        if ("delimiter"        in read_csv_kw
-        and "delim_whitespace" in read_csv_kw):
-            del(read_csv_kw["delimiter"])
-
-        # Read DataFrame
-        if verbose >= 1:
-            wiprint("""Reading sequence DataFrame from '{0}'
-                    """.format(infile))
-        df = pd.read_csv(infile, **read_csv_kw)
-        if (df.index.name is not None and df.index.name.startswith("#")):
-            df.index.name = df.index.name.lstrip("#")
-
-        return df
-
-    def _set_index(self, df, indexfile=None, **kwargs):
+    def _read_index(self, df, indexfile=None, **kwargs):
         """
         Reads index for sequence DataFrame.
 
@@ -292,273 +199,92 @@ class SequenceDataset(Dataset):
 
         return df
 
-    def _write_hdf5(self, outfile, **kwargs):
-        """
-        Writes sequence DataFrame to hdf5.
-
-        Arguments:
-          df (DataFrame): Sequence DataFrame to write
-          outfile (str): Path to output hdf5 file and (optionally)
-            address within the file in the form
-            ``/path/to/file.h5:/address/within/file``; may contain
-            environment variables
-          hdf5_kw (dict): Keyword arguments passed to
-            :meth:`create_dataset<h5py:Group.create_dataset>`
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        from os.path import expandvars
-        import re
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        df      = kwargs.get("df", self.sequence_df)
-        re_h5 = re.match(
-          r"^(?P<path>(.+)\.(h4|hdf5))((:)?(/)?(?P<address>.+))?$",
-          outfile, flags=re.UNICODE)
-        path    = expandvars(re_h5.groupdict()["path"])
-        address = re_h5.groupdict()["address"]
-        if (address is None or address == ""
-        and hasattr(self, "default_hdf5_address")):
-            address = self.default_hdf5_address
-        if hasattr(self, "default_hdf5_kw"):
-            h5_kw = self.default_hdf5_kw
-        else:
-            h5_kw = {}
-        h5_kw.update(kwargs.get("hdf5_kw", {}))
-
-        # Write DataFrame
-        if verbose >= 1:
-            print("Writing sequence DataFrame to '{0}'".format(outfile))
-        with h5py.File(path) as hdf5_file:
-            hdf5_file.create_dataset("{0}/values".format(address),
-              data=df.values, **h5_kw)
-            hdf5_file.create_dataset("{0}/index".format(address),
-              data=np.array(df.index.values, np.str))
-            hdf5_file[address].attrs["columns"] = \
-              map(str, df.columns.tolist())
-            hdf5_file[address].attrs["index_name"] = \
-              str(df.index.name)
-
-
-    def _write_text(self, outfile, **kwargs):
-        """
-        Writes sequence DataFrame to hdf5
-
-        Arguments:
-          df (DataFrame): Sequence DataFrame to write
-          outfile (str): Path to output file; may contain environment
-            variables
-          read_csv_kw (dict): Keyword arguments passed to
-            :func:`to_string<pandas.DataFrame.to_string>`
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        from os.path import expandvars
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        df      = kwargs.get("df", self.sequence_df)
-        outfile = expandvars(outfile)
-        to_string_kw = dict(col_space=12, sparsify=False)
-        to_string_kw.update(kwargs.get("to_string_kw", {}))
-
-        # Write DataFrame
-        if verbose >= 1:
-            print("Writing sequence DataFrame to '{0}'".format(outfile))
-        with open(outfile, "w") as text_file:
-            text_file.write(df.to_string(**to_string_kw))
-
     def read(self, **kwargs):
         """
         Reads sequence from one or more *infiles* into a DataFrame.
 
-        If more than on *infile* is provided, the resulting DataFrame
-        will consist of their merged data.
-
-        If an *infile* is an hdf5 file path and (optionally) address
-        within the file in the form
-        ``/path/to/file.h5:/address/within/file``, the corresponding
-        DataFrame's values will be loaded from
-        ``/address/within/file/values``, its index will be loaded from
-        ``/address/within/file/index``, its column names will be loaded
-        from the 'columns' attribute of ``/address/within/file`` if
-        present, and index name will be loaded from the 'index_name'
-        attribute of ``/address/within/file`` if present. Additional
-        arguments provided in *dataframe_kw* will be passes to
-        :class:`DataFrame<pandas:pandas.DataFrame>`.
-
-        If an *infile* is the path to a text file, the corresponding
-        DataFrame will be loaded using
-        :func:`read_csv<pandas.read_csv>`, including additional
-        arguments provided in *read_csv_kw*.
-
-        After generating the DataFrame from *infiles*, the index may be
-        set by loading a list of residue names and numbers in the form
-        ``XAA:#`` from *indexfile*. This is useful when loading data
-        from files that do not specify residue names.
-
-        Arguments:
-          infile[s] (str): Path(s) to input file(s); may contain
-            environment variables and wildcards
-          dataframe_kw (dict): Keyword arguments passed to
-            :class:`DataFrame<pandas.DataFrame>` (hdf5 only)
-          read_csv_kw (dict): Keyword arguments passed to
-            :func:`read_csv<pandas.read_csv>` (text only)
-          indexfile (str): Path to index file; may contain environment
-            variables
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-
-        Returns:
-          DataFrame: Sequence DataFrame
+        Extends :class:`Dataset<myplotspec.Dataset.Dataset>` with
+        option to read in residue indexes.
         """
-        import re
-        from .myplotspec import multi_pop_merged
-
-        # Process arguments
-        infile_args = multi_pop_merged(["infile", "infiles"], kwargs)
-        infiles = self.infiles = self.process_infiles(infiles=infile_args)
-        if len(infiles) == 0:
-            raise Exception(sformat("""No infiles found matching
-            '{0}'""".format(infile_args)))
-        re_h5 = re.compile(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          flags=re.UNICODE)
-
         # Load Data
-        dfs = []
-        for infile in infiles:
-            if re_h5.match(infile):
-                df = self._read_hdf5(infile, **kwargs)
-            else:
-                df = self._read_text(infile, **kwargs)
-            dfs.append(df)
-        df = dfs.pop(0)
-        for df_i in dfs:
-            df.merge(df_i)
+        df = super(SequenceDataset, self).read(**kwargs)
 
         # Load index, if applicable
-        df = self._set_index(df, **kwargs)
+        df = self._read_index(df, **kwargs)
 
         return df
 
-    def write(self, outfile, **kwargs):
-        """
-        Writes sequence DataFrame to text or hdf5.
-
-        If *outfile* is an hdf5 file path and (optionally) address
-        within the file in the form
-        ``/path/to/file.h5:/address/within/file``, DataFrame's values
-        will be written to ``/address/within/file/values``, index will
-        be written to ``/address/within/file/index``, column names will
-        be written to the 'columns' attribute of
-        ``/address/within/file``, and index name will be written to the
-        'index.name' attribute of ``/address/within/file``.
-
-        If *outfile* is the path to a text file, DataFrame will be
-        written using :meth:`to_string<pandas.DataFrame.to_string>`,
-        including additional arguments provided in *read_csv_kw*.
-
-        Arguments:
-          outfile (str): Path to output file; may be path to text file
-            or path to hdf5 file in the form
-            '/path/to/hdf5/file.h5:/address/within/hdf5/file'; may
-            contain environment variables
-          hdf5_kw (dict): Keyword arguments passed to
-            :meth:`create_dataset<h5py:Group.create_dataset>` (hdf5
-            only)
-          read_csv_kw (dict): Keyword arguments passed to
-            :meth:`to_string<pandas.DataFrame.to_string>` (text only)
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        from os.path import expandvars
-        import re
-
-        # Process arguments
-        outfile = expandvars(outfile)
-        re_h5 = re.match(
-          r"^(?P<path>(.+)\.(h4|hdf5))((:)?(/)?(?P<address>.+))?$",
-          outfile, flags=re.UNICODE)
-
-        # Write DataFrame
-        if re_h5:
-            self._write_hdf5(outfile, **kwargs)
-        else:
-            self._write_text(outfile, **kwargs)
-
-    def calc_pdist(self, **kwargs):
-        """
-        Calculates probability distribution across sequence.
-
-        Arguments:
-          pdist_kw (dict): Keyword arguments used to configure
-            probability distribution calculation
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        from collections import OrderedDict
-        from scipy.stats import norm
-
-        # Arguments
-        verbose = kwargs.get("verbose", 1)
-        dataframe = self.dataframe
-
-        pdist_kw = kwargs.get("pdist_kw", {})
-        pdist_cols = [a for a in dataframe.columns.values
-                      if not a.endswith(" se")
-                      and str(dataframe[a].dtype).startswith("float")
-                      and a + " se" in dataframe.columns.values]
-        mode = "kde"
-        if mode == "kde":
-
-            # Prepare grids
-            grid = pdist_kw.pop("grid", None)
-            if grid is None:
-                all_grid = None
-                grid = {}
-            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
-                all_grid = np.array(grid)
-                grid = {}
-            elif isinstance(grid, dict):
-                all_grid = None
-                pass
-            for column, series in dataframe[pdist_cols].iteritems():
-                if column in grid:
-                    grid[column] = np.array(grid[column])
-                elif all_grid is not None:
-                    grid[column] = all_grid
-                else:
-                    grid[column] = np.linspace(series.min() - series.std(),
-                                      series.max() + series.std(), 100)
-            scale = {"r1":0.05, "r2":0.4, "noe":0.05, "r1/r2": 0.1}
-
-            # Calculate probability distributions
-            pdist = OrderedDict()
-            for column in pdist_cols:
-                qwer = dataframe[[column, column + " se"]]
-                if verbose >= 1:
-                    print("calculating probability distribution of "
-                    "{0} using a kernel density estimate".format(column))
-                g = grid[column]
-                s = scale[column]
-                pdf = np.zeros_like(g)
-                for residue, b in qwer.iterrows():
-                    if np.any(np.isnan(b.values)):
-                        continue
-#                    c = norm(loc=b[column], scale=b[column+" se"])
-                    c = norm(loc=b[column], scale=s)
-                    d = c.pdf(g)
-                    pdf += c.pdf(g)
-                pdf /= pdf.sum()
-                series_pdist = pd.DataFrame(pdf, index=grid[column],
-                  columns=["probability"])
-                series_pdist.index.name = column
-                pdist[column] = series_pdist
-
-            self.pdist = pdist
-            return pdist
+#    def calc_pdist(self, **kwargs):
+#        """
+#        Calculates probability distribution across sequence.
+#
+#        Arguments:
+#          pdist_kw (dict): Keyword arguments used to configure
+#            probability distribution calculation
+#          verbose (int): Level of verbose output
+#          kwargs (dict): Additional keyword arguments
+#        """
+#        from collections import OrderedDict
+#        from scipy.stats import norm
+#
+#        # Arguments
+#        verbose = kwargs.get("verbose", 1)
+#        dataframe = self.dataframe
+#
+#        pdist_kw = kwargs.get("pdist_kw", {})
+#        pdist_cols = [a for a in dataframe.columns.values
+#                      if not a.endswith(" se")
+#                      and str(dataframe[a].dtype).startswith("float")
+#                      and a + " se" in dataframe.columns.values]
+#        mode = "kde"
+#        if mode == "kde":
+#
+#            # Prepare grids
+#            grid = pdist_kw.pop("grid", None)
+#            if grid is None:
+#                all_grid = None
+#                grid = {}
+#            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
+#                all_grid = np.array(grid)
+#                grid = {}
+#            elif isinstance(grid, dict):
+#                all_grid = None
+#                pass
+#            for column, series in dataframe[pdist_cols].iteritems():
+#                if column in grid:
+#                    grid[column] = np.array(grid[column])
+#                elif all_grid is not None:
+#                    grid[column] = all_grid
+#                else:
+#                    grid[column] = np.linspace(series.min() - series.std(),
+#                                      series.max() + series.std(), 100)
+#            scale = {"r1":0.05, "r2":0.4, "noe":0.05, "r1/r2": 0.1}
+#
+#            # Calculate probability distributions
+#            pdist = OrderedDict()
+#            for column in pdist_cols:
+#                qwer = dataframe[[column, column + " se"]]
+#                if verbose >= 1:
+#                    print("calculating probability distribution of "
+#                    "{0} using a kernel density estimate".format(column))
+#                g = grid[column]
+#                s = scale[column]
+#                pdf = np.zeros_like(g)
+#                for residue, b in qwer.iterrows():
+#                    if np.any(np.isnan(b.values)):
+#                        continue
+##                    c = norm(loc=b[column], scale=b[column+" se"])
+#                    c = norm(loc=b[column], scale=s)
+#                    d = c.pdf(g)
+#                    pdf += c.pdf(g)
+#                pdf /= pdf.sum()
+#                series_pdist = pd.DataFrame(pdf, index=grid[column],
+#                  columns=["probability"])
+#                series_pdist.index.name = column
+#                pdist[column] = series_pdist
+#
+#            self.pdist = pdist
+#            return pdist
 
 class TimeSeriesDataset(Dataset):
     """
@@ -654,185 +380,185 @@ class TimeSeriesDataset(Dataset):
         timeseries = self.timeseries = self.dataframe
         timeseries.index.name = "time"
 
-        if "usecols" in kwargs:
-            timeseries = timeseries[timeseries.columns[kwargs.pop("usecols")]]
-
-        # Convert from frame index to time
-        if "dt" in kwargs:
-            timeseries.index *= kwargs.pop("dt")
-
-        # Offset time
-        if "toffset" in kwargs:
-            timeseries.index += kwargs.pop("toffset")
+#        if "usecols" in kwargs:
+#            timeseries = timeseries[timeseries.columns[kwargs.pop("usecols")]]
+#
+#        # Convert from frame index to time
+#        if "dt" in kwargs:
+#            timeseries.index *= kwargs.pop("dt")
+#
+#        # Offset time
+#        if "toffset" in kwargs:
+#            timeseries.index += kwargs.pop("toffset")
 #
 #        # Store y, if applicable
 #        if "y" in kwargs:
 #            self.y = kwargs.pop("y")
+#
+#        # Downsample
+#        if downsample:
+#            self.downsample(downsample, **kwargs)
+#
+#        if calc_pdist:
+#            self.calc_pdist(**kwargs)
 
-        # Downsample
-        if downsample:
-            self.downsample(downsample, **kwargs)
-
-        if calc_pdist:
-            self.calc_pdist(**kwargs)
-
-    def downsample(self, downsample, downsample_mode="mean", **kwargs):
-        """
-        Downsamples time series.
-
-        Arguments:
-          downsample (int): Interval by which to downsample points
-          downsample_mode (str): Method of downsampling; may be 'mean'
-            or 'mode'
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        from scipy.stats.mstats import mode
-
-        # Arguments
-        verbose = kwargs.get("verbose", 1)
-        timeseries = self.timeseries
-
-        # Truncate dataset
-        reduced = timeseries.values[
-          :timeseries.shape[0] - (timeseries.shape[0] % downsample),:]
-        new_shape = (int(reduced.shape[0]/downsample), downsample,
-          reduced.shape[1])
-        index = np.reshape(timeseries.index.values[
-          :timeseries.shape[0]-(timeseries.shape[0] % downsample)],
-          new_shape[:-1]).mean(axis=1)
-        reduced = np.reshape(reduced, new_shape)
-
-        # Downsample
-        if downsample_mode == "mean":
-            if verbose >= 1:
-                print("downsampling by factor of {0} using mean".format(
-                  downsample))
-            reduced = np.squeeze(reduced.mean(axis=1))
-        elif downsample_mode == "mode":
-            if verbose >= 1:
-                print("downsampling by factor of {0} using mode".format(
-                  downsample))
-            reduced = np.squeeze(mode(reduced, axis=1)[0])
-
-        # Store downsampled time series
-        reduced = pd.DataFrame(data=reduced, index=index,
-          columns=timeseries.columns.values)
-        reduced.index.name = "time"
-        timeseries = self.timeseries = reduced
-
-        return timeseries
-
-    def calc_error(self, error_method="std", **kwargs):
-        """
-        Calculates standard error using time series data.
-
-        .. todo:
-          - Support breaking into blocks (essentially downsampling,
-            then calculating standard error)
-        """
-
-        # Arguments
-        verbose = kwargs.get("verbose", 1)
-        timeseries=self.timeseries
-
-        # Calculate standard error
-        if error_method == "std":
-            if verbose >= 1:
-                print("calculating standard error using standard deviation")
-            se = timeseries.std()
-        elif error_method == "block":
-            from .fpblockaverager.FPBlockAverager import FPBlockAverager
-            if verbose >= 1:
-                print("calculating standard error using block averaging")
-            ba = FPBlockAverager(timeseries, **kwargs)
-            se = ba.parameters.loc["exp", "a (se)"]
-        else:
-            if verbose >= 1:
-                print("error_method '{0}' not understood, ".format(scale) +
-                      "must be one of 'std', 'block'; not calculating error.")
-            return
-
-        return se
-
-    def calc_pdist(self, **kwargs):
-        """
-        Calcualtes probability distribution of time series.
-
-        Arguments:
-          pdist_kw (dict): Keyword arguments used to configure
-            probability distribution calculation
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        from collections import OrderedDict
-        from sklearn.neighbors import KernelDensity
-
-        # Arguments
-        verbose = kwargs.get("verbose", 1)
-        timeseries = self.timeseries
-
-        pdist_kw = kwargs.get("pdist_kw", {"bandwidth": 0.1})
-        mode = "kde"
-        if mode == "kde":
-
-            # Prepare bandwidths
-            bandwidth = pdist_kw.pop("bandwidth", None)
-            if bandwidth is None:
-                all_bandwidth = None
-                bandwidth = {}
-            elif isinstance(bandwidth, float):
-                all_bandwidth = bandwidth
-                bandwidth = {}
-            elif isinstance(bandwidth, dict):
-                all_bandwidth = None
-                pass
-            for column, series in timeseries.iteritems():
-                if column in bandwidth:
-                    bandwidth[column] = float(bandwidth[column])
-                elif all_bandwidth is not None:
-                    bandwidth[column] = all_bandwidth
-                else:
-                    bandwidth[column] = series.std() / 10.0
-
-            # Prepare grids
-            grid = pdist_kw.pop("grid", None)
-            if grid is None:
-                all_grid = None
-                grid = {}
-            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
-                all_grid = np.array(grid)
-                grid = {}
-            elif isinstance(grid, dict):
-                all_grid = None
-                pass
-            for column, series in timeseries.iteritems():
-                if column in grid:
-                    grid[column] = np.array(grid[column])
-                elif all_grid is not None:
-                    grid[column] = all_grid
-                else:
-                    grid[column] = np.linspace(series.min() - series.std(),
-                                      series.max() + series.std(), 100)
-
-            # Calculate probability distributions
-            kde_kw = pdist_kw.get("kde_kw", {})
-            pdist = OrderedDict()
-            for column, series in timeseries.iteritems():
-                if verbose >= 1:
-                    print("calculating probability distribution of "
-                    "{0} using a kernel density estimate".format(column))
-                kde = KernelDensity(bandwidth=bandwidth[column], **kde_kw)
-                kde.fit(series[:, np.newaxis])
-                pdf = np.exp(kde.score_samples(grid[column][:, np.newaxis]))
-                pdf /= pdf.sum()
-                series_pdist = pd.DataFrame(pdf, index=grid[column],
-                  columns=["probability"])
-                series_pdist.index.name = column
-                pdist[column] = series_pdist
-
-            self.pdist = pdist
-            return pdist
+#    def downsample(self, downsample, downsample_mode="mean", **kwargs):
+#        """
+#        Downsamples time series.
+#
+#        Arguments:
+#          downsample (int): Interval by which to downsample points
+#          downsample_mode (str): Method of downsampling; may be 'mean'
+#            or 'mode'
+#          verbose (int): Level of verbose output
+#          kwargs (dict): Additional keyword arguments
+#        """
+#        from scipy.stats.mstats import mode
+#
+#        # Arguments
+#        verbose = kwargs.get("verbose", 1)
+#        timeseries = self.timeseries
+#
+#        # Truncate dataset
+#        reduced = timeseries.values[
+#          :timeseries.shape[0] - (timeseries.shape[0] % downsample),:]
+#        new_shape = (int(reduced.shape[0]/downsample), downsample,
+#          reduced.shape[1])
+#        index = np.reshape(timeseries.index.values[
+#          :timeseries.shape[0]-(timeseries.shape[0] % downsample)],
+#          new_shape[:-1]).mean(axis=1)
+#        reduced = np.reshape(reduced, new_shape)
+#
+#        # Downsample
+#        if downsample_mode == "mean":
+#            if verbose >= 1:
+#                print("downsampling by factor of {0} using mean".format(
+#                  downsample))
+#            reduced = np.squeeze(reduced.mean(axis=1))
+#        elif downsample_mode == "mode":
+#            if verbose >= 1:
+#                print("downsampling by factor of {0} using mode".format(
+#                  downsample))
+#            reduced = np.squeeze(mode(reduced, axis=1)[0])
+#
+#        # Store downsampled time series
+#        reduced = pd.DataFrame(data=reduced, index=index,
+#          columns=timeseries.columns.values)
+#        reduced.index.name = "time"
+#        timeseries = self.timeseries = reduced
+#
+#        return timeseries
+#
+#    def calc_error(self, error_method="std", **kwargs):
+#        """
+#        Calculates standard error using time series data.
+#
+#        .. todo:
+#          - Support breaking into blocks (essentially downsampling,
+#            then calculating standard error)
+#        """
+#
+#        # Arguments
+#        verbose = kwargs.get("verbose", 1)
+#        timeseries=self.timeseries
+#
+#        # Calculate standard error
+#        if error_method == "std":
+#            if verbose >= 1:
+#                print("calculating standard error using standard deviation")
+#            se = timeseries.std()
+#        elif error_method == "block":
+#            from .fpblockaverager.FPBlockAverager import FPBlockAverager
+#            if verbose >= 1:
+#                print("calculating standard error using block averaging")
+#            ba = FPBlockAverager(timeseries, **kwargs)
+#            se = ba.parameters.loc["exp", "a (se)"]
+#        else:
+#            if verbose >= 1:
+#                print("error_method '{0}' not understood, ".format(scale) +
+#                      "must be one of 'std', 'block'; not calculating error.")
+#            return
+#
+#        return se
+#
+#    def calc_pdist(self, **kwargs):
+#        """
+#        Calcualtes probability distribution of time series.
+#
+#        Arguments:
+#          pdist_kw (dict): Keyword arguments used to configure
+#            probability distribution calculation
+#          verbose (int): Level of verbose output
+#          kwargs (dict): Additional keyword arguments
+#        """
+#        from collections import OrderedDict
+#        from sklearn.neighbors import KernelDensity
+#
+#        # Arguments
+#        verbose = kwargs.get("verbose", 1)
+#        timeseries = self.timeseries
+#
+#        pdist_kw = kwargs.get("pdist_kw", {"bandwidth": 0.1})
+#        mode = "kde"
+#        if mode == "kde":
+#
+#            # Prepare bandwidths
+#            bandwidth = pdist_kw.pop("bandwidth", None)
+#            if bandwidth is None:
+#                all_bandwidth = None
+#                bandwidth = {}
+#            elif isinstance(bandwidth, float):
+#                all_bandwidth = bandwidth
+#                bandwidth = {}
+#            elif isinstance(bandwidth, dict):
+#                all_bandwidth = None
+#                pass
+#            for column, series in timeseries.iteritems():
+#                if column in bandwidth:
+#                    bandwidth[column] = float(bandwidth[column])
+#                elif all_bandwidth is not None:
+#                    bandwidth[column] = all_bandwidth
+#                else:
+#                    bandwidth[column] = series.std() / 10.0
+#
+#            # Prepare grids
+#            grid = pdist_kw.pop("grid", None)
+#            if grid is None:
+#                all_grid = None
+#                grid = {}
+#            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
+#                all_grid = np.array(grid)
+#                grid = {}
+#            elif isinstance(grid, dict):
+#                all_grid = None
+#                pass
+#            for column, series in timeseries.iteritems():
+#                if column in grid:
+#                    grid[column] = np.array(grid[column])
+#                elif all_grid is not None:
+#                    grid[column] = all_grid
+#                else:
+#                    grid[column] = np.linspace(series.min() - series.std(),
+#                                      series.max() + series.std(), 100)
+#
+#            # Calculate probability distributions
+#            kde_kw = pdist_kw.get("kde_kw", {})
+#            pdist = OrderedDict()
+#            for column, series in timeseries.iteritems():
+#                if verbose >= 1:
+#                    print("calculating probability distribution of "
+#                    "{0} using a kernel density estimate".format(column))
+#                kde = KernelDensity(bandwidth=bandwidth[column], **kde_kw)
+#                kde.fit(series[:, np.newaxis])
+#                pdf = np.exp(kde.score_samples(grid[column][:, np.newaxis]))
+#                pdf /= pdf.sum()
+#                series_pdist = pd.DataFrame(pdf, index=grid[column],
+#                  columns=["probability"])
+#                series_pdist.index.name = column
+#                pdist[column] = series_pdist
+#
+#            self.pdist = pdist
+#            return pdist
 
 class SAXSDataset(Dataset):
     """
@@ -1098,9 +824,15 @@ class IREDSequenceDataset(SequenceDataset):
             if verbose >= 1:
                 wiprint("""Single relaxation infile provided; skipping error
                         calculation""")
-            df["r1"]  = relax_dfs[0]["r1"]
-            df["r2"]  = relax_dfs[0]["r2"]
-            df["noe"] = relax_dfs[0]["noe"]
+            df["r1"]         = relax_dfs[0]["r1"]
+            if "r1 se" in relax_dfs[0]:
+                df["r1 se"]  = relax_dfs[0]["r1 se"]
+            df["r2"]         = relax_dfs[0]["r2"]
+            if "r2 se" in relax_dfs[0]:
+                df["r2 se"]  = relax_dfs[0]["r2 se"]
+            df["noe"]        = relax_dfs[0]["noe"]
+            if "noe se" in relax_dfs[0]:
+                df["noe se"] = relax_dfs[0]["noe se"]
         elif len(relax_dfs) >= 2:
             if verbose >= 1:
                 wiprint("""Calculating mean and standard error of {0}
@@ -1123,6 +855,8 @@ class IREDSequenceDataset(SequenceDataset):
                 wiprint("""Single order parameter infile provided; skipping
                         error calculation""")
             df["s2"] = order_dfs[0]["s2"]
+            if "s2 se" in order_dfs[0]:
+                df["s2 se"] = order_dfs[0]["s2 se"]
         elif len(order_dfs) >= 2:
             if verbose >= 1:
                 wiprint("""Calculating mean and standard error of {0} order
@@ -1227,7 +961,7 @@ class IREDSequenceDataset(SequenceDataset):
               index_col=0, names=["s2"])
         else:                                       # Parse other
             df = super(IREDSequenceDataset, self)._read_text(infile, **kwargs)
-        df = self._set_index(df, **kwargs)
+        df = self._read_index(df, **kwargs)
 
         return df
 
@@ -1241,23 +975,6 @@ class IREDSequenceDataset(SequenceDataset):
         DataFrame will contain their average, and the standard error
         will be calculated assuming the *infiles* represent independent
         samples.
-
-        If an *infile* is an hdf5 file path and (optionally) address
-        within the file in the form
-        ``/path/to/file.h5:/address/within/file``, the corresponding
-        DataFrame's values will be loaded from
-        ``/address/within/file/values``, its index will be loaded from
-        ``/address/within/file/index``, its column names will be loaded
-        from the 'columns' attribute of ``/address/within/file`` if
-        present, and its index name will be loaded from the 'index_name'
-        attribute of ``/address/within/file``, if present. Additional
-        arguments provided in *dataframe_kw* will be passed to
-        :class:`DataFrame<pandas:pandas.DataFrame>`.
-
-        If an *infile* is the path to a text file, the corresponding
-        DataFrame will be loaded using
-        :func:`read_csv<pandas.read_csv>`, including additional
-        arguments provided in *read_csv_kw*.
 
         After generating the DataFrame from *infiles*, the index may be
         set by loading a list of residue names and numbers in the form
@@ -1315,7 +1032,6 @@ class IREDSequenceDataset(SequenceDataset):
         df = self.average_independent(relax_dfs, order_dfs)
 
         return df
-
 
 class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
     """
@@ -1469,17 +1185,17 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
                 print("Processed timeseries DataFrame:")
                 print(self.timeseries_df)
 
-        # Prepare sequence dataframe using averages and block standard errors
-        self.sequence_df = self.timeseries_to_sequence(self.timeseries_df,
-                             **kwargs)
-        if verbose >= 2:
-            if verbose >= 1:
-                print("Processed timeseries DataFrame:")
-                print(self.sequence_df)
+#        # Prepare sequence dataframe using averages and block standard errors
+#        self.sequence_df = self.timeseries_to_sequence(self.timeseries_df,
+#                             **kwargs)
+#        if verbose >= 2:
+#            if verbose >= 1:
+#                print("Processed timeseries DataFrame:")
+#                print(self.sequence_df)
 
         # Write data
         if outfile is not None:
-            self.write(outfile, **kwargs)
+            self.write(df=self.timeseries_df, outfile=outfile, **kwargs)
 
         # Interactive prompt
         if interactive:
