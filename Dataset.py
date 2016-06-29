@@ -1409,20 +1409,25 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
 
         # Process relaxation
         if len(relax_dfs) >= 1:
-            print(relax_dfs[0])
+            if verbose >= 1:
+                wiprint("""Concatenating timesires from {0}
+                        relaxation infiles""".format(len(relax_dfs)))
             relax_df = pd.concat([df.stack() for df in relax_dfs],
-                           axis=1).transpose()
+                         axis=1).transpose()
         else:
             relax_df = None
 
         # Process order parameters
         if len(order_dfs) >= 1:
-            print(order_dfs[0])
+            if verbose >= 1:
+                wiprint("""Concatenating timesires from {0}
+                        order parameter infiles""".format(len(order_dfs)))
             order_df = pd.concat([df.stack() for df in order_dfs],
-                           axis=1).transpose()
+                         axis=1).transpose()
         else:
             order_df = None
 
+        # Merge and sort
         if relax_df is not None and order_df is not None:
             df = pd.merge(relax_df, order_df, how="outer", left_index=True,
                            right_index=True)
@@ -1432,8 +1437,23 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
         elif order_df is None:
             df = relax_df
 
-        print(df)
         return df
+
+    @staticmethod
+    def timeseries_to_sequence(timeseries_df, **kwargs):
+        """
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        print(timeseries_df)
+        sequence_df = pd.DataFrame(data=timeseries_df.mean(axis=0))
+        print(sequence_df)
+        from .fpblockaverager.FPBlockAverager import FPBlockAverager
+        ba = FPBlockAverager(timeseries_df, **kwargs)
+
+        return None
 
     def __init__(self, outfile=None, interactive=False, **kwargs):
         """
@@ -1443,15 +1463,19 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
         self.dataset_cache = kwargs.get("dataset_cache", None)
 
         # Read data
-        df = self.read(**kwargs)
+        self.timeseries_df = self.read(**kwargs)
         if verbose >= 2:
             if verbose >= 1:
                 print("Processed timeseries DataFrame:")
-                print(df)
-        self.timeseries_df = df
+                print(self.timeseries_df)
 
         # Prepare sequence dataframe using averages and block standard errors
-#        self.sequence_df = self.timeseries_to_sequence(**kwargs)
+        self.sequence_df = self.timeseries_to_sequence(self.timeseries_df,
+                             **kwargs)
+        if verbose >= 2:
+            if verbose >= 1:
+                print("Processed timeseries DataFrame:")
+                print(self.sequence_df)
 
         # Write data
         if outfile is not None:
