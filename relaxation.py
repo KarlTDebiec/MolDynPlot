@@ -620,11 +620,12 @@ if __name__ == "__main__":
       description = "")
 
     from .Dataset import (IREDSequenceDataset, IREDTimeSeriesDataset,
-      ErrorSequenceDataset)
+      ErrorSequenceDataset, TimeSeriesDataset)
 
     IREDSequenceDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
     ErrorSequenceDataset.construct_argparser(subparsers)
+    TimeSeriesDataset.construct_argparser(subparsers)
 
 #    # Prepare relax subparser
 #    relax_subparser  = subparsers.add_parser(

@@ -562,13 +562,58 @@ class SequenceDataset(Dataset):
 
 class TimeSeriesDataset(Dataset):
     """
-    Represents data that is a function of time.
+    Represents data as a function of time.
 
     Attributes:
       timeseries_df (DataFrame): DataFrame whose index corresponds to
         time as represented by frame number or chemical time and whose
         columns are a series of quantities as a function of time. 
     """
+
+    @staticmethod
+    def construct_argparser(subparsers=None, **kwargs):
+        """
+        Constructs argument parser, either new or as a subparser.
+
+        Arguments:
+          subparsers (_SubParsersAction, optional): Nascent collection
+            of subparsers to which to add; if omitted, a new parser will
+            be generated
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          ArgumentParser: Argument parser or subparser
+        """
+        import argparse
+
+        # Process arguments
+        help_message = """Process time series data"""
+        if subparsers is not None:
+            parser = subparsers.add_parser(
+              name        = "timeseries",
+              description = help_message,
+              help        = help_message)
+        else:
+            parser = argparse.ArgumentParser(
+              description = help_message)
+
+        # Locked defaults
+        parser.set_defaults(cls=TimeSeriesDataset)
+
+        # Arguments from superclass
+        super(IREDSequenceDataset, IREDSequenceDataset).add_shared_args(parser)
+
+        # Input arguments
+        input_group  = parser.add_argument_group("input")
+        input_group.add_argument(
+          "-infiles",
+          required = True,
+          dest     = "infiles",
+          metavar  = "INFILE",
+          nargs    = "+",
+          type     = str,
+          help     = """File(s) from which to load data; may be text or hdf5 ;
+                     may contain environment variables and wildcards""")
 
     def __init__(self, downsample=None, calc_pdist=False, **kwargs):
         """
@@ -1016,9 +1061,8 @@ class IREDSequenceDataset(SequenceDataset):
           metavar  = "INFILE",
           nargs    = "+",
           type     = str,
-          help     = """cpptraj iRED output file(s) from which to load
-                     datasets; may be plain text or compressed, and may contain
-                     environment variables and wildcards""")
+          help     = """File(s) from which to load data; may be text or hdf5 ;
+                     may contain environment variables and wildcards""")
         input_group.add_argument(
           "-indexfile",
           required = False,
@@ -1367,24 +1411,26 @@ class ErrorSequenceDataset(SequenceDataset):
         import argparse
 
         # Process arguments
-        help_message = """Calculate error of simulated relaxation relative to
-          experiment. The intended use case is to break down errors relative to
-          experimental data collected at multiple magnetic fields or by
-          multiple groups, error(residue, measurement, magnet/group), into a
-          form that is easier to visualize and communicate, error(residue,
-          measurement). Reads in a series of input files containing simulated
-          data and a series of files containing corresponding experimental
-          data. These files are treated in pairs and the error between all data
-          points present in both (e.g. row 'GLN:2', column 'r1') calculated.
-          Columns ending in ' se' are treated as uncertainties, and are
-          propogated into uncertainties in the resulting errors. Take caution
-          when processing datasets that omit uncertainties alongside those that
-          do (experimental uncertainties are not always reported), as the
-          resulting uncertainties in the residuals will be incorrect."""
+        help_message = """Calculate error of simulated relaxation
+          relative to experiment."""
+        desc_message = help_message + """ The intended use case is to break
+          down errors relative to experimental data collected at multiple
+          magnetic fields or by multiple groups, error(residue, measurement,
+          magnet/group), into a form that is easier to visualize and
+          communicate, error(residue, measurement). Reads in a series of input
+          files containing simulated data and a series of files containing
+          corresponding experimental data. These files are treated in pairs and
+          the error between all data points present in both (e.g. row 'GLN:2',
+          column 'r1') calculated. Columns ending in ' se' are treated as
+          uncertainties, and are propogated into uncertainties in the resulting
+          errors. Take caution when processing datasets that omit uncertainties
+          alongside those that do (experimental uncertainties are not always
+          reported), as the resulting uncertainties in the residuals will be
+          incorrect."""
         if subparsers is not None:
             parser = subparsers.add_parser(
               name        = "error",
-              description = help_message,
+              description = desc_message,
               help        = help_message)
         else:
             parser = argparse.ArgumentParser(
