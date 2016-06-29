@@ -9,58 +9,43 @@
 #   BSD license. See the LICENSE file for details.
 """
 Processes NMR relaxation and related data
-
-.. todo:
-  - document
-  - Support rotational diffusion from simulation, including error from
-    either block averaging of consecutive segments or standard error of
-    independent simulations
-  - Support rotational diffusion from experiment, including error from
-    jackknife
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
-if __name__ == "__main__":
-    __package__ = str("moldynplot")
-    import moldynplot
-import h5py
-import pandas as pd
-import numpy as np
 ################################## FUNCTIONS ##################################
 def spawn(function):
     """
-    Wraps functions for use with :func:`multiprocess_map`
-
-    Arguments:
-      function (function): Function to run
-
-    Returns:
-      wrapped_function (function): wrapped function that accepts
-        arguments from *queue_in* and outputs results of *function* to
-        *queue_out*
+    **Arguments:**
+        :*function*: Function to run
+    **Returns:**
+        :*run_function*: New Function that accepts arguments from
+                         *queue_in* and outputs results of *function*
+                         to *queue_out*
     """
-    def wrapped_function(queue_in, queue_out):
+    def run_function(queue_in, queue_out):
         while True:
             i, argument = queue_in.get()
             if i is None: break         # 'None' signals that queue is empty
             queue_out.put((i, function(argument)))
-
-    return wrapped_function
+    return run_function
 
 def multiprocess_map(function, arguments, n_processes=1):
     """
-    Runs *function* with *arguments* using *n_processes*.
+    Runs a *function* with *arguments* using *n_processes*
+    Meant as a replacement for multiproccessing.Pool.imap_unordered,
+    which can only accept module-level functions.
+    **Arguments:**
+        :*function*:    Function to run
+        :*arguments*:   Iterable of arguments to pass to function
+        :*n_processes:  Number of processes to use
 
-    Replacement for multiproccessing.Pool.imap_unordered, which can only
-    accept module-level functions.
-
-    Arguments:
-      function (function): Function to run
-      arguments (iterable): Iterable of arguments to pass to function
-      n_processes (int): Number of processes to use
-
-    Returns:
-      results (list): Results returned from *function*
+    **Returns:**
+        :*results*:     List of results returned from *function*
+    .. todo:
+        - Does this work, or can it be made to smoothly work, with more
+          complex arguments?
+        - Accept multiple functions, in addition to arguments
+        - Additional improvements likely possible
     """
     from multiprocessing import Queue, Process
 
@@ -88,210 +73,171 @@ def multiprocess_map(function, arguments, n_processes=1):
     for p in processes: p.join()
     return [x for i, x in sorted(output)]
 
-def process_ired(infiles, outfile, indexfile=None, mode="mean",
-    **kwargs):
-    """
-    Processes relaxation data calculated from MD simulations using the
-    iRED method.
+#def process_acf():
+#    from os import devnull
+#    from subprocess import Popen, PIPE
+#    from scipy.interpolate import interp1d
+#    import numpy as np
+#    headerfile = kwargs["headerfile"]
+#    infiles  = kwargs["infile"]
+#    interpolation = kwargs["interpolation"]
+#    outfile = kwargs["outfile"]
+#    freqs_MHz = np.squeeze(np.array(kwargs["frequency"]))
+#    freqs_rad_ps = freqs_MHz*1e6*1e-12*2*np.pi
+#    if headerfile is None:
+#        headerfile = infiles[0]
+#    header = None
+#    data = None
 
-    Arguments:
-      infiles (list): Path(s) to input file(s), may contain environment
-        variables and wildcards
-      outfile (str): Path to output text or hdf5 file
-      indexfile (str): Path to index file used to map vector numbers
-        listed in *infiles* to amino acid residues. Should contain one
-        amino acid per line in the form 'XAA:#'
-      mode (str): Relationship between input files; may be 'mean' if
-        each infile represents an independent simulation, or
-        'timeseries' if each infile represents a consecutive
-        (potentially overlapping) excerpt of a longer simulation. If
-        *mode* is 'mean', processed results will be the average across
-        the simulations, including standard errors calculated using the
-        standard deviation, if *mode* is 'timeseries', processed results
-        will be a timeseries
-      verbose (int): Level of verbose output
-      kwargs (dict): Additional keyword arguments
+#    for i, infile in enumerate(infiles):
+#        print("Loading from '{0}'".format(infile))
+#
+#        # Load column names from first infile (residue names and numbers)
+#        if header is None:
+#            with open(devnull, "w") as fnull:
+#                command = "head -n 1 {0}".format(headerfile)
+#                process = Popen(command, stdout=PIPE, stderr=fnull,
+#                shell=True)
+#            fields = process.stdout.read().split()
+#            if fields[0] in ["#", "#Frame"]:
+#                fields.pop(0)
+#            header = "#           "
+#            for field in fields:
+#                header += "{0:>12}".format(field)
+#            header += "\n"
+#
+#        # Read input file(s) containing autocorrelation function from cpptraj
+#        raw_data = np.loadtxt(infile, dtype=np.float32)
+#        acf = raw_data[:,1:]
+#        dt = np.mean(raw_data[1:,0] - raw_data[:-1,0])
+
+#        # Initialize data, now that output is known
+#        if data is None:
+#            data = np.zeros((len(infiles), freqs_rad_ps.size, acf.shape[1]),
+#                     np.float64)
+#
+#        # Calculate fft of autocorrelation function to obtain spectral density
+#        sdf = np.real(np.fft.rfft(acf, axis=0))
+#
+#        # Calculate appropriate frequencies for desired spectral density
+#        sdf_freq = np.fft.fftfreq(sdf.shape[0], d=1/dt)
+#
+#        # Interpolate calculated spectral density
+#        for k in range(sdf.shape[1]):
+#            max_index = np.abs(sdf_freq - freqs_rad_ps.max()).argmin() + 10
+#            interpolated_sdf = interp1d(sdf_freq[:max_index],
+#              sdf[:max_index,k], kind=interpolation)
+#            data[i,:,k] = interpolated_sdf(freqs_rad_ps)
+#    mean = np.mean(data, axis=0)
+#    std = np.std(data, axis=0)
+#
+#    with open(outfile, "w") as output:
+#        print("Writing results to '{0}'".format(outfile))
+#        output.write(header)
+#        for i, freq_MHz in enumerate(freqs_MHz):
+#            output.write("{0:<12}".format("J({0})".format(freq_MHz)))
+#            for j in range(mean.shape[1]):
+#                output.write("{0:>12.2f}".format(mean[i,j]))
+#            output.write("\n")
+#            output.write("{0:<12}".format("J({0})se".format(freq_MHz)))
+#            for j in range(mean.shape[1]):
+#                output.write("{0:>12.2f}".format(std[i,j]))
+#            output.write("\n")
+
+def process_ired(infiles, outfile, indexfile=None, **kwargs):
     """
-    from glob import glob
+    """
     from os import devnull
-    from os.path import expandvars
     import re
     from subprocess import Popen, PIPE
+    import pandas as pd
+    import numpy as np
 
-#    # Process arguments
-#    verbose = kwargs.get("verbose", 1)
-#    processed_infiles = []
-#    for infile in infiles:
-#        print(infile)
-#        processed_infiles.extend(sorted(glob(expandvars(infile))))
-#    if len(processed_infiles) == 0:
-#        print("No infiles found matching '{0}', exiting".format(infiles))
-#        return
-#    infiles = processed_infiles
-#    if verbose >= 1:
-#        print("Loading iRED data from {0} infiles, ".format(len(infiles)) +
-#              "starting with '{0}'".format(infiles[0]))
-#    outfile = expandvars(outfile)
-#
-#
-#    # Load residue itndex
-#    if indexfile is not None:
-#        if verbose >= 1:
-#            print("Loading residue indexes from '{0}'".format( indexfile))
-#        res_index = np.loadtxt(expandvars(indexfile), dtype=np.str).flatten()
-#
-#    # Load data
-#    r1r2noe_datasets = []
-#    s2_datasets      = []
-#    re_t1t2noe = re.compile(
-#      "^#Vec\s+[\w_]+\[T1\]\s+[\w_]+\[\T2\]\s+[\w_]+\[NOE\]$")
-#    re_s2 = re.compile("^#Vec\s+[\w_]+\[S2\]$")
-#    for i, infile in enumerate(infiles):
-#
-#        # Determine if infile contains relaxation or order parameters
-#        with open(devnull, "w") as fnull:
-#            fields = Popen("head -n 1 {0}".format(infile),
-#              stdout=PIPE, stderr=fnull, shell=True).stdout.read().strip()
-#
-#        # Parse relaxation
-#        if re.match(re_t1t2noe, fields):
-#            if verbose >= 1:
-#                print("Loading iRED relaxation data from '{0}'".format(
-#                  infile))
-#            raw_data = np.loadtxt(infile, dtype=np.float32)
-#            read_csv_kw = kwargs.get("read_csv_kw", dict(delim_whitespace=True,
-#              header=0, index_col=0, names=["r1","r2","noe"]))
-#            raw_data = pd.read_csv(infile, **read_csv_kw)
-#            raw_data["r1"] = 1 / raw_data["r1"]
-#            raw_data["r2"] = 1 / raw_data["r2"]
-#            r1r2noe_datasets.append(raw_data)
-#
-#        # Parse order parameters
-#        elif re.match(re_s2, fields):
-#            if verbose >= 1:
-#                print("Loading iRED order parameter data from '{0}'".format(
-#                  infile))
-#            raw_data = np.loadtxt(infile, dtype=np.float32)
-#            read_csv_kw = kwargs.get("read_csv_kw", dict(delim_whitespace=True,
-#              header=0, index_col=0, names=["s2"]))
-#            raw_data = pd.read_csv(infile, **read_csv_kw)
-#            s2_datasets.append(raw_data)
-#
-#        # Input file not understood
-#        else:
-#            raise Exception()
-#
-##    # Process index
-##    items = []
-##    fmt = []
-##    if indexfile is not None:
-##        items.append(("residue", residue))
-##        fmt.append("%12s")
-##    else:
-##        fmt.append("%12d")
-#
-#    # Process relaxation
-#    if mode == "mean":
-#        if len(r1r2noe_datasets) == 1:
-#            if verbose >= 1:
-#                print("One one relaxation infile provided; skipping "
-#                      "error calculation")
-##            items.extend(
-##                [("r1",  r1r2noe_datasets[0]["r1"]),
-##                 ("r2",  r1r2noe_datasets[0]["r2"]),
-##                 ("noe", r1r2noe_datasets[0]["noe"])])
-##            fmt.extend(["%11.4f", "%11.4f", "%11.4f"])
-#        elif len(r1r2noe_datasets) >= 2:
-#            if verbose >= 1:
-#                print("Calculating mean and standard error of "
-#                      "{0} relaxation infiles".format(len(r1r2noe_datasets)))
-##            r1r2noe_mean = pd.concat(r1r2noe_datasets).groupby(level=0).mean()
-##            r1r2noe_se   = pd.concat(r1r2noe_datasets).groupby(
-##                             level=0).std() / np.sqrt(len(r1r2noe_datasets))
-##            items.extend(
-##                [("r1",  r1r2noe_mean["r1"]),  ("r1 se",  r1r2noe_se["r1"]),
-##                 ("r2",  r1r2noe_mean["r2"]),  ("r2 se",  r1r2noe_se["r2"]),
-##                 ("noe", r1r2noe_mean["noe"]), ("noe se", r1r2noe_se["noe"])])
-##            fmt.extend(["%11.4f", "%11.4f", "%11.4f",
-##                        "%11.4f", "%11.4f", "%11.4f"])
-#    elif mode == "timeseries":
-#        if verbose >= 1:
-#            print("Constructing timeseries from "
-#                  "{0} relaxation infiles".format(len(r1r2noe_datasets)))
-#            r1r2noe_ts = pd.concat([ds.stack() for ds in r1r2noe_datasets],
-#                           axis=1).transpose()
-#
-#    # Process order parameters
-#    if mode == "mean":
-#        if len(s2_datasets) == 1:
-#            if verbose >= 1:
-#                print("One one order parameter infile provided; skipping "
-#                      "error calculation")
-##            items.extend([("s2",  s2_datasets[0]["s2"])])
-##            fmt.extend(["%11.4f"])
-#        elif len(s2_datasets) >= 2:
-#            if verbose >= 1:
-#                print("Calculating mean and standard error of "
-#                      "{0} order parameter infiles".format(len(s2_datasets)))
-##            s2_mean = pd.concat(s2_datasets).groupby(level=0).mean()
-##            s2_se = pd.concat(s2_datasets).groupby(
-##                      level=0).std() / np.sqrt(len(s2_datasets))
-##            items.extend([("s2", s2_mean["s2"]), ("s2 se", s2_se["s2"])])
-##            fmt.extend(["%11.4f", "%11.4f"])
-#    elif mode == "timeseries":
-#        if verbose >= 1:
-#            print("Constructing timeseries from "
-#                  "{0} order parameter infiles".format(len(r1r2noe_datasets)))
-#            s2_ts = pd.concat([ds.stack() for ds in s2_datasets],
-#                      axis=1).transpose()
-#
-#    # Organize data
-#
-#
-#    # Organize data
-#    if mode == "mean":
-#        pass
-#    elif mode == "timeseries":
-#        timeseries = pd.merge(r1r2noe_ts, s2_ts, how="outer", left_index=True,
-#                       right_index=True)
-#
-#        timeseries = timeseries[sorted(timeseries.columns.tolist(),
-#                       key=lambda x: x[0])]
-#        if res_index is not None:
-#            timeseries.columns = timeseries.columns.set_levels(res_index,
-#                                   level=0)
-#        if verbose >= 1:
-#            print("Writing timeseries to '{0}'".format(outfile))
-#        if outfile.endswith(".h5") or outfile.endswith(".hdf5"):
-#            with h5py.File(outfile) as hdf5_file:
-#                hdf5_file.create_dataset("relax", data=timeseries,
-#                  dtype=np.float32, chunks=True, compression="gzip",
-#                  scaleoffset=5)
-#                hdf5_file["relax"].attrs["columns"] = str(
-#                  timeseries.columns.tolist())
-#        else:
-#            with open(outfile, "w") as text_file:
-#                text_file.write(timeseries.to_string(col_space=12,
-#                  sparsify=False))
-#
-#    data = pd.DataFrame.from_items(items)
-#    if indexfile is not None:
-#        data.set_index("residue", inplace=True)
-#    else:
-#        data.index.name = "vector"
-#    columns = [data.index.name] + list(data.columns.values)
-#    header = "{0:<11s}".format(columns.pop(0))
-#    for column in columns:
-#        header += "{0:>12s}".format(column)
-#
-#    # Output data
-#    np.savetxt(outfile, np.column_stack((data.index.values, data.values)),
-#      fmt=fmt, header=header, comments='#')
+    r1r2noe_datasets = []
+    s2_datasets = []
+
+    # Load data
+    for i, infile in enumerate(infiles):
+        with open(devnull, "w") as fnull:
+            fields = Popen("head -n 1 {0}".format(infile),
+              stdout=PIPE, stderr=fnull, shell=True).stdout.read().strip()
+        re_t1t2noe = re.compile(
+          "^#Vec\s+[\w_]+\[T1\]\s+[\w_]+\[\T2\]\s+[\w_]+\[NOE\]$")
+        re_s2 = re.compile("^#Vec\s+[\w_]+\[S2\]$")
+        if re.match(re_t1t2noe, fields):
+            raw_data = np.loadtxt(infile, dtype=np.float32)
+            read_csv_kw = kwargs.get("read_csv_kw", dict(delim_whitespace=True,
+              header=0, index_col=0, names=["r1","r2","noe"]))
+            raw_data = pd.read_csv(infile, **read_csv_kw)
+            raw_data["r1"] = 1 / raw_data["r1"]
+            raw_data["r2"] = 1 / raw_data["r2"]
+            r1r2noe_datasets.append(raw_data)
+        elif re.match(re_s2, fields):
+            raw_data = np.loadtxt(infile, dtype=np.float32)
+            read_csv_kw = kwargs.get("read_csv_kw", dict(delim_whitespace=True,
+              header=0, index_col=0, names=["s2"]))
+            raw_data = pd.read_csv(infile, **read_csv_kw)
+            s2_datasets.append(raw_data)
+        else:
+            raise Exception()
+    if indexfile is not None:
+        residue = np.loadtxt(indexfile, dtype=np.str).flatten()
+
+    # Process data
+    items = []
+    fmt = []
+    if indexfile is not None:
+        items.append(("residue", residue))
+        fmt.append("%12s")
+    else:
+        fmt.append("%12d")
+    if   len(r1r2noe_datasets) >= 2:
+        r1r2noe_mean = pd.concat(r1r2noe_datasets).groupby(level=0).mean()
+        r1r2noe_std  = pd.concat(r1r2noe_datasets).groupby(level=0).std()
+        items.extend(
+            [("r1",  r1r2noe_mean["r1"]),  ("r1 se",  r1r2noe_std["r1"]),
+             ("r2",  r1r2noe_mean["r2"]),  ("r2 se",  r1r2noe_std["r2"]),
+             ("noe", r1r2noe_mean["noe"]), ("noe se", r1r2noe_std["noe"])])
+        fmt.extend(["%11.5f", "%11.5f", "%11.5f",
+                    "%11.5f", "%11.5f", "%11.5f"])
+    elif len(r1r2noe_datasets) == 1:
+        r1r2noe_mean = r1r2noe_datasets[0]
+        items.extend(
+            [("r1",  r1r2noe_mean["r1"]),
+             ("r2",  r1r2noe_mean["r2"]),
+             ("noe", r1r2noe_mean["noe"])])
+        fmt.extend(["%11.5f", "%11.5f", "%11.5f"])
+    if   len(s2_datasets) >= 2:
+        s2_mean      = pd.concat(s2_datasets).groupby(level=0).mean()
+        s2_std       = pd.concat(s2_datasets).groupby(level=0).std()
+        items.extend(
+            [("s2",  s2_mean["s2"]),       ("s2 se",  s2_std["s2"])])
+        fmt.extend(["%11.5f", "%11.5f"])
+    elif len(s2_datasets) == 1:
+        s2_mean      = s2_datasets[0]
+        items.extend(
+            [("s2",  s2_mean["s2"])])
+        fmt.extend(["%11.5f"])
+
+    data = pd.DataFrame.from_items(items)
+    if indexfile is not None:
+        data.set_index("residue", inplace=True)
+    else:
+        data.index.name = "vector"
+    columns = [data.index.name] + list(data.columns.values)
+    header = "{0:<10s}".format(columns.pop(0))
+    for column in columns:
+        header += "{0:>12s}".format(column)
+
+    np.savetxt(outfile, np.column_stack((data.index.values, data.values)),
+      fmt=fmt, header=header, comments='#')
 
 def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
     """
     """
     from os import devnull
+    import pandas as pd
+    import numpy as np
 
     if len(sim_infiles) != len(exp_infiles):
         raise ValueError("Number of simulation input files must match number "+
@@ -384,23 +330,14 @@ def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
       final.values)), fmt=fmt, header=header, comments='#')
 
 def process_relax(relax_type, peaklist, infiles, delays, error_method,
-    n_synth_datasets, outfile, verbose=1, **kwargs):
+    n_synth_datasets, outfile, verbose=1, debug=0, **kwargs):
     """
-    Processes experimental relaxation data.
-
-    Arguments:
-      relax_type (str):
-      peaklist (str):
-      delays (list):
-      error_
-      infiles (list): Path(s) to input file(s), may contain environment
-        variables and wildcards
-      outfile (str): Path to output text file
-
     """
     from glob import glob
     from os.path import expandvars
     import nmrglue
+    import numpy as np
+    import pandas as pd
     from scipy.interpolate import RectBivariateSpline
     from scipy.optimize import curve_fit
 
@@ -497,12 +434,14 @@ def process_relax(relax_type, peaklist, infiles, delays, error_method,
     np.savetxt(outfile, np.column_stack((relax.index.values,
       relax.values)), fmt=fmt, header=header, comments='#')
 
-def process_hetnoe(peaklist, infiles, outfile, verbose=1, **kwargs):
+def process_hetnoe(peaklist, infiles, outfile, verbose=1, debug=0, **kwargs):
     """
     """
     from glob import glob
     from os.path import expandvars
     import nmrglue
+    import numpy as np
+    import pandas as pd
 
     # Process arguments
     processed_infiles = []
@@ -565,12 +504,15 @@ def process_hetnoe(peaklist, infiles, outfile, verbose=1, **kwargs):
     np.savetxt(outfile, np.column_stack((relax.index.values,
       relax.values)), fmt=fmt, header=header, comments='#')
 
-def process_pre(dia_infile, para_infile, outfile, verbose=1, **kwargs):
+def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
+    **kwargs):
     """
     """
     from glob import glob
     from os.path import expandvars
     import nmrglue
+    import numpy as np
+    import pandas as pd
 
     # Process arguments
     dia_infile  = glob(expandvars(dia_infile))[0]
@@ -613,216 +555,294 @@ if __name__ == "__main__":
     import argparse
 
     # Prepare argument parser
-    parser = argparse.ArgumentParser(
-      description = """Processes datasets""")
+    parser            = argparse.ArgumentParser(
+      description     = __doc__,
+      formatter_class = argparse.RawTextHelpFormatter)
     subparsers = parser.add_subparsers(
-      dest        = "mode",
-      description = "")
+                   dest            = "mode",
+                   description     = "")
 
-    from .Dataset import (IREDSequenceDataset, IREDTimeSeriesDataset,
-      ErrorSequenceDataset, TimeSeriesDataset)
-
-    IREDSequenceDataset.construct_argparser(subparsers)
-    IREDTimeSeriesDataset.construct_argparser(subparsers)
-#    ErrorSequenceDataset.construct_argparser(subparsers)
-#    TimeSeriesDataset.construct_argparser(subparsers)
-
-#    # Prepare relax subparser
-#    relax_subparser  = subparsers.add_parser(
-#      name     = "relax",
-#      help     = "Process experimental R1 or R2 relaxation data")
-#    relax_subparser.set_defaults(
-#      function   = process_relax)
-#    input_group  = relax_subparser.add_argument_group("input")
-#    action_group = relax_subparser.add_argument_group("action")
-#    output_group = relax_subparser.add_argument_group("output")
-#    relax_type = input_group.add_mutually_exclusive_group()
-#    relax_type.add_argument(
-#      "--r1",
-#      action   = "store_const",
-#      const    = "r1",
-#      default  = "r1",
-#      dest     = "relax_type",
-#      help     = "process R1 relaxation data")
-#    relax_type.add_argument(
-#      "--r2",
-#      action   = "store_const",
-#      const    = "r2",
-#      default  = "r1",
-#      dest     = "relax_type",
-#      help     = "process R2 relaxation data")
-#    relax_type.add_argument(
-#      "--pre-dia",
-#      action   = "store_const",
-#      const    = "dia",
-#      default  = "r1",
-#      dest     = "relax_type",
-#      help     = "process PRE diamagnetic relaxation data")
-#    relax_type.add_argument(
-#      "--pre-para",
-#      action   = "store_const",
-#      const    = "para",
-#      default  = "r1",
-#      dest     = "relax_type",
-#      help     = "process PRE paramagnetic relaxation data")
-#    input_group.add_argument(
-#      "-peaklist",
-#      required = True,
-#      type     = str,
-#      help     = "peak list (exported from ccpnmr)")
+#    # Prepare autocorrelation function subparser
+#    acf_subparser  = subparsers.add_parser(
+#      name     = "acf",
+#      help     = "Process N-H vector autocorrelation function data")
+#    input_group  = acf_subparser.add_argument_group("input")
+#    action_group = acf_subparser.add_argument_group("action")
+#    output_group = acf_subparser.add_argument_group("output")
+#
 #    input_group.add_argument(
 #      "-infile",
 #      required = True,
-#      dest     = "infiles",
-#      metavar  = "INFILE",
 #      nargs    = "+",
 #      type     = str,
-#      help     = "NMR spectra (NMRPipe format)")
+#      help     = "cpptraj output file(s) from which to load datasets; " +
+#                 "may be plain text or compressed")
 #    input_group.add_argument(
-#      "-delay",
-#      required = True,
-#      dest     = "delays",
-#      metavar  = "DELAY",
-#      nargs    = "+",
-#      type     = str,
-#      help     = "delays (ms); number of delays must match number of infiles")
-#    action_group.add_argument(
-#      "-synthetics",
+#      "-headerfile",
 #      required = False,
-#      dest     = "n_synth_datasets",
-#      default  = 100,
+#      type     = str,
+#      help     = "Text file from which to load column names; if omitted " +
+#                 "will be taken from columns of first infile")
+#    action_group.add_argument(
+#      "-frequency",
+#      required = True,
+#      nargs    = "+",
 #      type     = int,
-#      help     = "number of synthetic datasets to use to calculate error")
-#    error_method = action_group.add_mutually_exclusive_group()
-#    error_method.add_argument(
-#      "--rmse",
-#      action   = "store_const",
-#      const    = "rmse",
-#      default  = "rmse",
-#      dest     = "error_method",
-#      help     = "use root mean square error to generate synthetic datasets")
-#    error_method.add_argument(
-#      "--mae",
-#      action   = "store_const",
-#      const    = "mae",
-#      default  = "rmse",
-#      dest     = "error_method",
-#      help     = "use mean absolute error to generate synthetic datasets")
+#      action   = "append",
+#      help     = "Frequency(ies) at which to calculate spectral density (MHz)")
+#    action_group.add_argument(
+#      "-interpolation",
+#      required = False,
+#      type     = str,
+#      choices  = ["linear", "nearest", "zero",
+#                  "slinear", "quadratic", "cubic"],
+#      default  = "cubic",
+#      help     = "Method of interpolating spectral density function; " +
+#                 "passed to scipy.interpolate.interp1d")
 #    output_group.add_argument(
 #      "-outfile",
 #      required = True,
 #      type     = str,
-#      help     = "text file to which processed data will be output")
-#
-#    # Prepare hetnoe subparser
-#    hetnoe_subparser  = subparsers.add_parser(
-#      name     = "hetnoe",
-#      help     = "Process experimental heteronuclear NOE relaxation data")
-#    hetnoe_subparser.set_defaults(
-#      function   = process_hetnoe)
-#    input_group  = hetnoe_subparser.add_argument_group("input")
-#    action_group = hetnoe_subparser.add_argument_group("action")
-#    output_group = hetnoe_subparser.add_argument_group("output")
-#    input_group.add_argument(
-#      "-peaklist",
-#      required = True,
-#      type     = str,
-#      help     = "peak list (exported from ccpnmr)")
-#    input_group.add_argument(
-#      "-infile",
-#      required = True,
-#      dest     = "infiles",
-#      metavar  = "INFILE",
-#      nargs    = 2,
-#      type     = str,
-#      help     = "NMR spectra (NMRPipe format)")
-#    output_group.add_argument(
-#      "-outfile",
-#      required = True,
-#      type     = str,
-#      help     = "text file to which processed data will be output")
-#
-#    # Prepare pre subparser
-#    pre_subparser  = subparsers.add_parser(
-#      name     = "pre",
-#      help     = "Process experimental heteronuclear NOE relaxation data")
-#    pre_subparser.set_defaults(
-#      function   = process_pre)
-#    input_group  = pre_subparser.add_argument_group("input")
-#    action_group = pre_subparser.add_argument_group("action")
-#    output_group = pre_subparser.add_argument_group("output")
-#    input_group.add_argument(
-#      "-dia",
-#      required = True,
-#      dest     = "dia_infile",
-#      metavar  = "DIA_INFILE",
-#      type     = str,
-#      help     = "Diamagnetic relaxation rates")
-#    input_group.add_argument(
-#      "-para",
-#      required = True,
-#      dest     = "para_infile",
-#      metavar  = "PARA_INFILE",
-#      type     = str,
-#      help     = "Paramagnetic relaxation rates")
-#    output_group.add_argument(
-#      "-outfile",
-#      required = True,
-#      type     = str,
-#      help     = "text file to which processed data will be output")
-#
-#    # Prepare pre subparser
-#    format_subparser = subparsers.add_parser(
-#      name     = "format",
-#      help     = "Formats r1, r2, and heteronuclear NOE data")
-#    format_subparser.set_defaults(
-#      function   = process_format)
-#    input_group  = format_subparser.add_argument_group("input")
-#    action_group = format_subparser.add_argument_group("action")
-#    output_group = format_subparser.add_argument_group("output")
-#    input_group.add_argument(
-#      "-r1",
-#      required = True,
-#      dest     = "r1_infile",
-#      metavar  = "R1_INFILE",
-#      type     = str,
-#      help     = "R1 relaxation infile")
-#    input_group.add_argument(
-#      "-r2",
-#      required = True,
-#      dest     = "r2_infile",
-#      metavar  = "R2_INFILE",
-#      type     = str,
-#      help     = "R2 relaxation infile")
-#    input_group.add_argument(
-#      "-hetnoe",
-#      required = True,
-#      dest     = "hetnoe_infile",
-#      metavar  = "hetnoe_INFILE",
-#      type     = str,
-#      help     = "Heteronuclear NOE relaxation infile")
-#    output_group.add_argument(
-#      "-outfile",
-#      required = True,
-#      type     = str,
-#      help     = "text file to which processed data will be output")
-#
-#    # Verbosity
-#    for p in subparsers.choices.values():
-#        verbosity = p.add_mutually_exclusive_group()
-#        verbosity.add_argument(
-#          "-v", "--verbose",
-#          action   = "count",
-#          default  = 1,
-#          help     = "enable verbose output, may be specified more than once")
-#        verbosity.add_argument(
-#          "-q", "--quiet",
-#          action   = "store_const",
-#          const    = 0,
-#          default  = 1,
-#          dest     = "verbose",
-#          help     = "disable verbose output")
+#      help     = "Text file to which processed data will be output")
+
+    # Prepare iRED subparser
+    ired_subparser  = subparsers.add_parser(
+      name     = "ired",
+      help     = "Process iRED data")
+    ired_subparser.set_defaults(
+      function   = process_ired)
+    input_group  = ired_subparser.add_argument_group("input")
+    action_group = ired_subparser.add_argument_group("action")
+    output_group = ired_subparser.add_argument_group("output")
+    input_group.add_argument(
+      "-infile",
+      required = True,
+      dest     = "infiles",
+      nargs    = "+",
+      type     = str,
+      help     = "cpptraj output file(s) from which to load datasets; " +
+                 "may be plain text or compressed")
+    input_group.add_argument(
+      "-indexfile",
+      required = False,
+      type     = str,
+      help     = "Text file from which to load residue names; if omitted " +
+                 "will be taken from columns of first infile")
+    output_group.add_argument(
+      "-outfile",
+      required = True,
+      type     = str,
+      help     = "Text file to which processed data will be output")
+
+    # Prepare error subparser
+    error_subparser  = subparsers.add_parser(
+      name        = "error",
+      help        = "Calculates error of simulated relaxation relative to " +
+                    "experiment",
+      description = "Calculates error of simulated relaxation relative to " +
+                    "experiment. The intended use case is to break down " +
+                    "errors relative to experimental data collected at " +
+                    "multiple magnetic fields or by multiple groups, " +
+                    "error(residue, measurement, magnet/group), into a form " +
+                    "that is easier to visualize and communicate, " +
+                    "error(residue, measurement). " +
+                    "Reads in a series of input files containing simulated " +
+                    "data and a series of files containing corresponding " +
+                    "experimental data. These files are treated in pairs " +
+                    "and the error between all data points present in both " +
+                    "(e.g. row 'GLN:2', column 'r1') calculated. " +
+                    "Columns ending in '_se' are treated as uncertainties, " +
+                    "and are propogated into uncertainties in the resulting " +
+                    "errors rather than being averaged. Take caution when " +
+                    "processing datasets that omit uncertainties alongside " +
+                    "those that do (experimental uncertainties are not " +
+                    "always reported), as the resulting uncertainties in " +
+                    "the residuals will be incorrect.")
+    error_subparser.set_defaults(
+      function   = process_error)
+    input_group  = error_subparser.add_argument_group("input")
+    action_group = error_subparser.add_argument_group("action")
+    output_group = error_subparser.add_argument_group("output")
+    input_group.add_argument(
+      "-sim_infile",
+      required = True,
+      dest     = "sim_infiles",
+      nargs    = "+",
+      type     = str,
+      help     = "input file(s) from which to load simulation datasets")
+    input_group.add_argument(
+      "-exp_infile",
+      required = True,
+      dest     = "exp_infiles",
+      nargs    = "+",
+      type     = str,
+      help     = "input file(s) from which to load experimental datasets")
+    output_group.add_argument(
+      "-outfile",
+      required = True,
+      type     = str,
+      help     = "Text file to which processed data will be output")
+
+    # Prepare relax subparser
+    relax_subparser  = subparsers.add_parser(
+      name     = "relax",
+      help     = "Process experimental R1 or R2 relaxation data")
+    relax_subparser.set_defaults(
+      function   = process_relax)
+    input_group  = relax_subparser.add_argument_group("input")
+    action_group = relax_subparser.add_argument_group("action")
+    output_group = relax_subparser.add_argument_group("output")
+    relax_type = input_group.add_mutually_exclusive_group()
+    relax_type.add_argument(
+      "--r1",
+      action   = "store_const",
+      const    = "r1",
+      default  = "r1",
+      dest     = "relax_type",
+      help     = "process R1 relaxation data")
+    relax_type.add_argument(
+      "--r2",
+      action   = "store_const",
+      const    = "r2",
+      default  = "r1",
+      dest     = "relax_type",
+      help     = "process R2 relaxation data")
+    relax_type.add_argument(
+      "--pre-dia",
+      action   = "store_const",
+      const    = "dia",
+      default  = "r1",
+      dest     = "relax_type",
+      help     = "process PRE diamagnetic relaxation data")
+    relax_type.add_argument(
+      "--pre-para",
+      action   = "store_const",
+      const    = "para",
+      default  = "r1",
+      dest     = "relax_type",
+      help     = "process PRE paramagnetic relaxation data")
+    input_group.add_argument(
+      "-peaklist",
+      required = True,
+      type     = str,
+      help     = "peak list (exported from ccpnmr)")
+    input_group.add_argument(
+      "-infile",
+      required = True,
+      dest     = "infiles",
+      metavar  = "INFILE",
+      nargs    = "+",
+      type     = str,
+      help     = "NMR spectra (NMRPipe format)")
+    input_group.add_argument(
+      "-delay",
+      required = True,
+      dest     = "delays",
+      metavar  = "DELAY",
+      nargs    = "+",
+      type     = str,
+      help     = "delays (ms); number of delays must match number of infiles")
+    action_group.add_argument(
+      "-synthetics",
+      required = False,
+      dest     = "n_synth_datasets",
+      default  = 100,
+      type     = int,
+      help     = "number of synthetic datasets to use to calculate error")
+    error_method = action_group.add_mutually_exclusive_group()
+    error_method.add_argument(
+      "--rmse",
+      action   = "store_const",
+      const    = "rmse",
+      default  = "rmse",
+      dest     = "error_method",
+      help     = "use root mean square error to generate synthetic datasets")
+    error_method.add_argument(
+      "--mae",
+      action   = "store_const",
+      const    = "mae",
+      default  = "rmse",
+      dest     = "error_method",
+      help     = "use mean absolute error to generate synthetic datasets")
+    output_group.add_argument(
+      "-outfile",
+      required = True,
+      type     = str,
+      help     = "text file to which processed data will be output")
+
+    # Prepare hetnoe subparser
+    hetnoe_subparser  = subparsers.add_parser(
+      name     = "hetnoe",
+      help     = "Process experimental heteronuclear NOE relaxation data")
+    hetnoe_subparser.set_defaults(
+      function   = process_hetnoe)
+    input_group  = hetnoe_subparser.add_argument_group("input")
+    action_group = hetnoe_subparser.add_argument_group("action")
+    output_group = hetnoe_subparser.add_argument_group("output")
+    input_group.add_argument(
+      "-peaklist",
+      required = True,
+      type     = str,
+      help     = "peak list (exported from ccpnmr)")
+    input_group.add_argument(
+      "-infile",
+      required = True,
+      dest     = "infiles",
+      metavar  = "INFILE",
+      nargs    = 2,
+      type     = str,
+      help     = "NMR spectra (NMRPipe format)")
+    output_group.add_argument(
+      "-outfile",
+      required = True,
+      type     = str,
+      help     = "text file to which processed data will be output")
+
+    # Prepare pre subparser
+    pre_subparser  = subparsers.add_parser(
+      name     = "pre",
+      help     = "Process experimental heteronuclear NOE relaxation data")
+    pre_subparser.set_defaults(
+      function   = process_pre)
+    input_group  = pre_subparser.add_argument_group("input")
+    action_group = pre_subparser.add_argument_group("action")
+    output_group = pre_subparser.add_argument_group("output")
+    input_group.add_argument(
+      "-dia",
+      required = True,
+      dest     = "dia_infile",
+      metavar  = "DIA_INFILE",
+      type     = str,
+      help     = "Diamagnetic relaxation rates")
+    input_group.add_argument(
+      "-para",
+      required = True,
+      dest     = "para_infile",
+      metavar  = "PARA_INFILE",
+      type     = str,
+      help     = "Paramagnetic relaxation rates")
+    output_group.add_argument(
+      "-outfile",
+      required = True,
+      type     = str,
+      help     = "text file to which processed data will be output")
+
+    # Verbosity
+    for p in subparsers.choices.values():
+        verbosity = p.add_mutually_exclusive_group()
+        verbosity.add_argument(
+          "-v", "--verbose",
+          action   = "count",
+          default  = 1,
+          help     = "enable verbose output, may be specified more than once")
+        verbosity.add_argument(
+          "-q", "--quiet",
+          action   = "store_const",
+          const    = 0,
+          default  = 1,
+          dest     = "verbose",
+          help     = "disable verbose output")
 
     # Parse arguments and run selected function
     kwargs  = vars(parser.parse_args())
-    kwargs.pop("cls")(**kwargs)
+    kwargs.pop("function")(**kwargs)

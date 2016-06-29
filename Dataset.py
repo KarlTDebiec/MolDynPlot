@@ -16,6 +16,9 @@ specific for molecular dynamics simulation data.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
+if __name__ == "__main__":
+    __package__ = str("moldynplot")
+    import moldynplot
 from IPython import embed
 import h5py
 import numpy as np
@@ -1663,3 +1666,19 @@ class H5Dataset(object):
                 self.attrs[key]    = dict(dataset.attrs)
             print("Loaded Dataset {0}[{1}]; Stored at {2}".format(
               path, address, key))
+
+#################################### MAIN #####################################
+if __name__ == "__main__":
+    import argparse
+
+    # Prepare argument parser
+    parser = argparse.ArgumentParser(
+      description = """Processes datasets""")
+    subparsers = parser.add_subparsers(
+      dest        = "mode",
+      description = "")
+
+    IREDSequenceDataset.construct_argparser(subparsers)
+    IREDTimeSeriesDataset.construct_argparser(subparsers)
+    kwargs  = vars(parser.parse_args())
+    kwargs.pop("cls")(**kwargs)
