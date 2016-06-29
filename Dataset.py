@@ -126,15 +126,15 @@ class SequenceDataset(Dataset):
         verbose = kwargs.get("verbose", 1)
         self.dataset_cache = kwargs.get("dataset_cache", None)
 
-        # Load (should be able to move to superclass eventurally)
+        # Read data
         df = self.read(**kwargs)
         if verbose >= 2:
             if verbose >= 1:
-                print("Processed sequence dataframe:")
+                print("Processed sequence DataFrame:")
                 print(df)
         self.sequence_df = df
 
-        # Write outfile
+        # Write data
         if outfile is not None:
             self.write(outfile)
 
@@ -406,16 +406,14 @@ class SequenceDataset(Dataset):
           DataFrame: Sequence DataFrame
         """
         import re
+        from .myplotspec import multi_pop_merged
 
         # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        infiles = self.process_infiles(**kwargs)
+        infile_args = multi_pop_merged(["infile", "infiles"], kwargs)
+        infiles = self.infiles = self.process_infiles(infiles=infile_args)
         if len(infiles) == 0:
-            raise Exception(sformat("""No infiles found"""))
-        if verbose >= 1 and len(infiles) >= 2:
-            wiprint("""Loading from {0} infiles, starting with '{1}'
-                    """.format(len(infiles), infiles[0]))
-
+            raise Exception(sformat("""No infiles found matching
+            '{0}'""".format(infile_args)))
         re_h5 = re.match(
           r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
           infile, flags=re.UNICODE)
@@ -1022,7 +1020,7 @@ class IREDSequenceDataset(SequenceDataset):
     def average_independent(relax_dfs=None, order_dfs=None, **kwargs):
         """
         Calculates the average and standard error of a set of independent
-        datasets.
+        iRED datasets.
 
         Arguments:
           relax_dfs (list): DataFrames containing data from relax infiles
@@ -1030,7 +1028,7 @@ class IREDSequenceDataset(SequenceDataset):
           kwargs (dict): Additional keyword arguments
 
         Returns:
-          df (DataFrame): Averaged dataframe including relax and order
+          df (DataFrame): Averaged DataFrame including relax and order
         """
 
         # Process arguments
@@ -1177,27 +1175,62 @@ class IREDSequenceDataset(SequenceDataset):
 
     def read(self, **kwargs):
         """
-        Reads a series of iRED files into a DataFrame.
+        Reads iRED sequence data from one or more infiles into a
+        DataFrame.
+
+        *infiles* may contain relaxation data, order parameters, or
+        both. If more than one *infile* is provided, the resulting
+        DataFrame will contain their average, and the standard error
+        will be calculated assuming the *infiles* represent independent
+        samples.
+
+        If an *infile* is an hdf5 file path and (optionally) address
+        within the file in the form
+        ``/path/to/file.h5:/address/within/file``, the corresponding
+        DataFrame's values will be loaded from
+        ``/address/within/file/values``, its index will be loaded from
+        ``/address/within/file/index``, its column names will be loaded
+        from the 'columns' attribute of ``/address/within/file`` if
+        present, and its index name will be loaded from the 'index_name'
+        attribute of ``/address/within/file``, if present. Additional
+        arguments provided in *dataframe_kw* will be passed to
+        :class:`DataFrame<pandas:pandas.DataFrame>`.
+
+        If an *infile* is the path to a text file, the corresponding
+        DataFrame will be loaded using
+        :func:`read_csv<pandas.read_csv>`, including additional
+        arguments provided in *read_csv_kw*.
+
+        After generating the DataFrame from *infiles*, the index may be
+        set by loading a list of residue names and numbers in the form
+        ``XAA:#`` from *indexfile*. This is useful when loading data
+        from files that do not specify residue names, such as cpptraj's
+        iRED output.
 
         Arguments:
-          infile[s] (list): Path(s) to input file(s)
+          infile[s] (list): Path(s) to input file(s); may contain
+            environment variables and wildcards
+          dataframe_kw (dict): Keyword arguments passed to
+            :class:`DataFrame<pandas:pandas.DataFrame>` (hdf5 only)
+          read_csv_kw (dict): Keyword arguments passed to
+            :func:`read_csv<pandas.read_csv>` (text only)
+          indexfile (str): Path to index file; may contain environment
+            variables
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
 
         Returns:
-          relax_dfs (list): DataFrames containing data from relax infiles
-          order_dfs (list): DataFrames containing data from order infiles
+          df (DataFrame): DataFrame generated from *infiles*
         """
         import re
+        from .myplotspec import multi_pop_merged
 
         # Process arguments
-        infiles = self.process_infiles(**kwargs)
-        if "infiles" in kwargs:
-            del(kwargs["infiles"])
-        if "infile" in kwargs:
-            del(kwargs["infile"])
+        infile_args = multi_pop_merged(["infile", "infiles"], kwargs)
+        infiles = self.infiles = self.process_infiles(infiles=infile_args)
         if len(infiles) == 0:
-            raise Exception(sformat("""No infiles found"""))
+            raise Exception(sformat("""No infiles found matching
+            '{0}'""".format(infile_args)))
         re_h5 = re.compile(
           r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
           flags=re.UNICODE)
