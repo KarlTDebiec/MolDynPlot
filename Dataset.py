@@ -16,6 +16,7 @@ specific for molecular dynamics simulation data.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
+from IPython import embed
 import h5py
 import numpy as np
 import pandas as pd
@@ -103,11 +104,12 @@ class SequenceDataset(Dataset):
             read_csv_kw.append((key, value))
         return (cls, expandvars(infile), use_indexes, tuple(read_csv_kw))
 
-    def __init__(self, calc_pdist=False, **kwargs):
+    def __init__(self, calc_pdist=False, outfile=None, interactive=False,
+        **kwargs):
         """
         Arguments:
-          infile (str): Path to input file, may contain environment
-            variables
+          infiles (list): Path(s) to input file(s); may contain
+            environment variables and wildcards
           usecols (list): Columns to select from DataFrame, once
             DataFrame has already been loaded
           calc_pdist (bool): Calculate probability distribution
@@ -122,9 +124,24 @@ class SequenceDataset(Dataset):
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
+        self.dataset_cache = kwargs.get("dataset_cache", None)
 
-        # Load
-        super(SequenceDataset, self).__init__( **kwargs)
+        # Load (should be able to move to superclass eventurally)
+        df = self.read(**kwargs)
+        if verbose >= 2:
+            if verbose >= 1:
+                print("Processed sequence dataframe:")
+                print(df)
+        self.sequence_df = df
+
+        # Write outfile
+        if outfile is not None:
+            self.write(outfile)
+
+        # Interactive prompt
+        if interactive:
+            embed()
+
 #        dataframe = self.dataframe
 #        dataframe.index.name = "residue"
 #        dataframe["amino acid"] = [str(i.split(":")[0])
@@ -349,7 +366,7 @@ class SequenceDataset(Dataset):
         with open(outfile, "w") as text_file:
             text_file.write(df.to_string(**to_string_kw))
 
-    def read(self, infile, **kwargs):
+    def read(self, **kwargs):
         """
         Reads sequence DataFrame from text or hdf5.
 
@@ -388,11 +405,17 @@ class SequenceDataset(Dataset):
         Returns:
           DataFrame: Sequence DataFrame
         """
-        from os.path import expandvars
         import re
 
         # Process arguments
-        infile = expandvars(infile)
+        verbose = kwargs.get("verbose", 1)
+        infiles = self.process_infiles(**kwargs)
+        if len(infiles) == 0:
+            raise Exception(sformat("""No infiles found"""))
+        if verbose >= 1 and len(infiles) >= 2:
+            wiprint("""Loading from {0} infiles, starting with '{1}'
+                    """.format(len(infiles), infiles[0]))
+
         re_h5 = re.match(
           r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
           infile, flags=re.UNICODE)
@@ -1056,6 +1079,7 @@ class IREDSequenceDataset(SequenceDataset):
             df["s2"]    = order_mean["s2"]
             df["s2 se"] = order_se["s2"]
 
+        # Sort by index
         if df.index.name == "residue":
             df = df.loc[sorted(df.index.values,
                    key=lambda x: int(x.split(":")[1]))]
@@ -1109,47 +1133,6 @@ class IREDSequenceDataset(SequenceDataset):
         else:
             return "other"
 
-    def __init__(self, infiles, outfile=None, **kwargs):
-        """
-        Arguments:
-          infiles (list): Path(s) to input file(s); may contain
-            environment variables and wildcards
-          indexfile (str): Path to index file used to map vector numbers
-            listed in *infiles* to amino acid residues. Should contain
-            one amino acid per line in the form 'XAA:#'
-          outfile (str): Path to output text or hdf5 file
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        raw_infiles = infiles
-        infiles = self.process_infiles(infiles)
-        if len(infiles) == 0:
-            raise Exception(sformat("""No infiles found matching '{0}'
-              """.format(raw_infiles)))
-        if verbose >= 1 and len(infiles) >= 2:
-            wiprint("""Loading from {0} infiles, starting with '{1}'
-                    """.format(len(infiles), infiles[0]))
-
-        # Load single dataset from text or hdf5
-        if len(infiles) == 1:
-            df = self.read(infiles[0])
-        else:
-            relax_dfs, order_dfs = self.read_infiles(infiles, **kwargs)
-            df = self.average_independent(relax_dfs, order_dfs, **kwargs)
-
-        if verbose >= 2:
-            if verbose >= 1:
-                print("Processed sequence dataframe:")
-                print(df)
-        self.sequence_df = df
-
-        # Write outfile
-        if outfile is not None:
-            self.write(outfile)
-
     def _read_text(self, infile, **kwargs):
         """
         Reads iRED sequence DataFrame from text.
@@ -1187,12 +1170,12 @@ class IREDSequenceDataset(SequenceDataset):
             df = pd.read_csv(infile, delim_whitespace=True, header=0,
               index_col=0, names=["s2"])
         else:                                       # Parse other
-            df = super(IREDSequenceDataset, self)._read_text(infile, *kwargs)
+            df = super(IREDSequenceDataset, self)._read_text(infile, **kwargs)
         df = self._set_index(df, **kwargs)
 
         return df
 
-    def read_infiles(self, infiles, **kwargs):
+    def read(self, **kwargs):
         """
         Parses a series of cpptraj iRED files.
 
@@ -1205,24 +1188,44 @@ class IREDSequenceDataset(SequenceDataset):
           relax_dfs (list): DataFrames containing data from relax infiles
           order_dfs (list): DataFrames containing data from order infiles
         """
+        import re
 
         # Process arguments
-        verbose = kwargs.get("verbose", 1)
+        infiles = self.process_infiles(**kwargs)
+        if "infiles" in kwargs:
+            del(kwargs["infiles"])
+        if "infile" in kwargs:
+            del(kwargs["infile"])
+        if len(infiles) == 0:
+            raise Exception(sformat("""No infiles found"""))
+        re_h5 = re.compile(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          flags=re.UNICODE)
 
         # Load data
         relax_dfs = []
         order_dfs = []
-        for i, infile in enumerate(infiles):
-            df = self.read(infile, **kwargs)
+        for infile in infiles:
+            if re_h5.match(infile):
+                df = self._read_hdf5(infile, **kwargs)
+            else:
+                df = self._read_text(infile, **kwargs)
             columns = df.columns.values
             if "r1" in columns and "r2" in columns and "noe" in columns:
                 relax_dfs.append(df)
-            elif "s2" in columns:
+            if "s2" in columns:
                 order_dfs.append(df)
-            else:
-                raise Exception()
+            if not (("r1" in columns and "r2" in columns and "noe" in columns)
+            or      ("s2" in columns)):
+                raise Exception(sformat("""DataFrame loaded from '{0}' does not
+                  appear to contain either relaxation ('r1', 'r2', 'noe') or
+                  order parameter ('s2') columns""".format(infile)))
 
-        return relax_dfs, order_dfs
+        # Average, if applicable
+        df = self.average_independent(relax_dfs, order_dfs)
+
+        return df
+
 
 class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
     """
@@ -1372,6 +1375,16 @@ class ErrorSequenceDataset(SequenceDataset):
                      environment variables and wildcards""")
 
         return parser
+
+    def __init__(self, calc_pdist=False, **kwargs):
+        """
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        # Load
+        super(SequenceDataset, self).__init__( **kwargs)
 
 class NatConTimeSeriesDataset(TimeSeriesDataset):
     """
