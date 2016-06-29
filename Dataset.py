@@ -646,7 +646,7 @@ class TimeSeriesDataset(Dataset):
             - Verbose pdist
         """
 
-        # Arguments
+        # Process arguments
         verbose = kwargs.get("verbose", 1)
 
         # Load
@@ -1385,8 +1385,123 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
 
         return parser
 
-    def __init__(**kwargs):
-        pass
+    @staticmethod
+    def concatenate_timeseries(relax_dfs=None, order_dfs=None, **kwargs):
+        """
+        Concatenates a series of iRED datasets.
+
+        Arguments:
+          relax_dfs (list): DataFrames containing data from relax infiles
+          order_dfs (list): DataFrames containing data from order infiles
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          df (DataFrame): Averaged DataFrame including relax and order
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        df = pd.DataFrame()
+
+        if ((len(relax_dfs) != 0 and len(order_dfs) != 0)
+        and (len(relax_dfs) != len(order_dfs))):
+            raise()
+
+        # Process relaxation
+        if len(relax_dfs) >= 1:
+            print(relax_dfs[0])
+            relax_df = pd.concat([df.stack() for df in relax_dfs],
+                           axis=1).transpose()
+        else:
+            relax_df = None
+
+        # Process order parameters
+        if len(order_dfs) >= 1:
+            print(order_dfs[0])
+            order_df = pd.concat([df.stack() for df in order_dfs],
+                           axis=1).transpose()
+        else:
+            order_df = None
+
+        if relax_df is not None and order_df is not None:
+            df = pd.merge(relax_df, order_df, how="outer", left_index=True,
+                           right_index=True)
+            df = df[sorted(df.columns.tolist(), key=lambda x: x[0])]
+        elif relax_df is None:
+            df = order_df
+        elif order_df is None:
+            df = relax_df
+
+        print(df)
+        return df
+
+    def __init__(self, outfile=None, interactive=False, **kwargs):
+        """
+        """
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        self.dataset_cache = kwargs.get("dataset_cache", None)
+
+        # Read data
+        df = self.read(**kwargs)
+        if verbose >= 2:
+            if verbose >= 1:
+                print("Processed timeseries DataFrame:")
+                print(df)
+        self.timeseries_df = df
+
+        # Prepare sequence dataframe using averages and block standard errors
+#        self.sequence_df = self.timeseries_to_sequence(**kwargs)
+
+        # Write data
+        if outfile is not None:
+            self.write(outfile, **kwargs)
+
+        # Interactive prompt
+        if interactive:
+            embed()
+
+    def read(self, **kwargs):
+        """
+        Reads iRED time series data from one or more *infiles* into a
+        DataFrame.
+        """
+        import re
+        from .myplotspec import multi_pop_merged
+
+        # Process arguments
+        infile_args = multi_pop_merged(["infile", "infiles"], kwargs)
+        infiles = self.infiles = self.process_infiles(infiles=infile_args)
+        if len(infiles) == 0:
+            raise Exception(sformat("""No infiles found matching
+            '{0}'""".format(infile_args)))
+        re_h5 = re.compile(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          flags=re.UNICODE)
+
+        # Load data
+        relax_dfs = []
+        order_dfs = []
+        for infile in infiles:
+            if re_h5.match(infile):
+                df = self._read_hdf5(infile, **kwargs)
+            else:
+                df = self._read_text(infile, **kwargs)
+            columns = df.columns.values
+            if "r1" in columns and "r2" in columns and "noe" in columns:
+                relax_dfs.append(df)
+            if "s2" in columns:
+                order_dfs.append(df)
+            if not (("r1" in columns and "r2" in columns and "noe" in columns)
+            or      ("s2" in columns)):
+                raise Exception(sformat("""DataFrame loaded from '{0}' does not
+                  appear to contain either relaxation ('r1', 'r2', 'noe') or
+                  order parameter ('s2') columns""".format(infile)))
+
+        # Concatenate into timeseries
+        df = self.concatenate_timeseries(relax_dfs, order_dfs)
+
+        return df
 
 class ErrorSequenceDataset(SequenceDataset):
     """
