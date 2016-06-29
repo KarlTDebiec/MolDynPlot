@@ -316,8 +316,8 @@ class SequenceFigureManager(FigureManager):
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataframe= self.load_dataset(verbose=verbose, debug=debug,
-          **dataset_kw).dataframe
+        dataframe = self.load_dataset(verbose=verbose, debug=debug,
+          **dataset_kw).sequence_df
         x = np.array([filter(lambda x: x in '0123456789.', s)
               for s in dataframe.index.values], np.int)
 

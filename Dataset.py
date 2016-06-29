@@ -391,8 +391,8 @@ class SequenceDataset(Dataset):
         from files that do not specify residue names.
 
         Arguments:
-          infile (str): Path to input file; may contain envornment
-            variables
+          infile[s] (str): Path(s) to input file(s); may contain environment
+            variables and wildcards
           dataframe_kw (dict): Keyword arguments passed to
             :class:`DataFrame<pandas:pandas.DataFrame>` (hdf5 only)
           read_csv_kw (dict): Keyword arguments passed to
@@ -414,15 +414,18 @@ class SequenceDataset(Dataset):
         if len(infiles) == 0:
             raise Exception(sformat("""No infiles found matching
             '{0}'""".format(infile_args)))
-        re_h5 = re.match(
+        re_h5 = re.compile(
           r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          infile, flags=re.UNICODE)
+          flags=re.UNICODE)
 
-        # Read DataFrame
-        if re_h5:
-            df = self._read_hdf5(infile, **kwargs)
-        else:
-            df = self._read_text(infile, **kwargs)
+        # Load Data
+        for infile in infiles:
+            if re_h5.match(infile):
+                df = self._read_hdf5(infile, **kwargs)
+            else:
+                df = self._read_text(infile, **kwargs)
+
+        # Load index, if applicable
         df = self._set_index(df, **kwargs)
 
         return df
@@ -1220,7 +1223,7 @@ class IREDSequenceDataset(SequenceDataset):
           kwargs (dict): Additional keyword arguments
 
         Returns:
-          df (DataFrame): DataFrame generated from *infiles*
+          df (DataFrame): iRED sequence DataFrame
         """
         import re
         from .myplotspec import multi_pop_merged
