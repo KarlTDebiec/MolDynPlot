@@ -29,7 +29,7 @@ from .myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class SequenceDataset(Dataset):
     """
-    Represents data that is a function of residue number.
+    Represents data that is a function of amino acid sequence.
 
     Attributes:
       sequence_df (DataFrame): DataFrame whose index corresponds to
@@ -52,6 +52,63 @@ class SequenceDataset(Dataset):
       compression = "gzip",
       dtype       = np.float32,
       scaleoffset = 5)
+
+    @staticmethod
+    def construct_argparser(subparsers=None, **kwargs):
+        """
+        Constructs argument parser, either new or as a subparser.
+
+        Arguments:
+          subparsers (_SubParsersAction, optional): Nascent collection
+            of subparsers to which to add; if omitted, a new parser will
+            be generated
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          ArgumentParser: Argument parser or subparser
+        """
+        import argparse
+
+        # Process arguments
+        help_message = """Process data that is a function of amino acid
+          sequence"""
+        if subparsers is not None:
+            parser = subparsers.add_parser(
+              name        = "sequence",
+              description = help_message,
+              help        = help_message)
+        else:
+            parser = argparse.ArgumentParser(
+              description = help_message)
+
+        # Locked defaults
+        parser.set_defaults(cls=SequenceDataset)
+        input_group  = parser.add_argument_group("input")
+
+        # Arguments from superclass
+        super(SequenceDataset, SequenceDataset).add_shared_args(parser)
+
+        # Input arguments
+        input_group = parser.add_argument_group("input")
+        input_group.add_argument(
+          "-infiles",
+          required = True,
+          dest     = "infiles",
+          metavar  = "INFILE",
+          nargs    = "+",
+          type     = str,
+          help     = """File(s) from which to load data; may be text or hdf5 ;
+                     may contain environment variables and wildcards""")
+        input_group.add_argument(
+          "-indexfile",
+          required = False,
+          type     = str,
+          help     = """text file from which to load residue names; should list
+                    amino acids in the form 'XAA:#' separated by whitespace; if
+                    omitted will be taken from rows of first infile; may
+                    contain environment variables""")
+
+        return parser
 
     @staticmethod
     def add_shared_args(parser, **kwargs):
@@ -316,7 +373,7 @@ class TimeSeriesDataset(Dataset):
         import argparse
 
         # Process arguments
-        help_message = """Process time series data"""
+        help_message = """Process data that is a function of time"""
         if subparsers is not None:
             parser = subparsers.add_parser(
               name        = "timeseries",
@@ -330,7 +387,7 @@ class TimeSeriesDataset(Dataset):
         parser.set_defaults(cls=TimeSeriesDataset)
 
         # Arguments from superclass
-        super(IREDSequenceDataset, IREDSequenceDataset).add_shared_args(parser)
+        super(TimeSeriesDataset, TimeSeriesDataset).add_shared_args(parser)
 
         # Input arguments
         input_group  = parser.add_argument_group("input")
@@ -1105,7 +1162,8 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
         return parser
 
     @staticmethod
-    def concatenate_timeseries(relax_dfs=None, order_dfs=None, **kwargs):
+    def concatenate_timeseries(timeseries_dfs=None, relax_dfs=None,
+        order_dfs=None, **kwargs):
         """
         Concatenates a series of iRED datasets.
 
@@ -1120,17 +1178,21 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
-        df = pd.DataFrame()
 
-        if ((len(relax_dfs) != 0 and len(order_dfs) != 0)
-        and (len(relax_dfs) != len(order_dfs))):
-            raise()
+        # Process timeseris
+        if len(timeseries_dfs) >= 1:
+            if verbose >= 1:
+                wiprint("""Concatenating timeseries from {0} timeseries
+                        infiles""".format(len(timeseries_dfs)))
+            df = pd.concat(timeseries_dfs)
+        else:
+            df = pd.DataFrame()
 
         # Process relaxation
         if len(relax_dfs) >= 1:
             if verbose >= 1:
-                wiprint("""Concatenating timesires from {0}
-                        relaxation infiles""".format(len(relax_dfs)))
+                wiprint("""Concatenating timeseries from {0} relaxation
+                        infiles""".format(len(relax_dfs)))
             relax_df = pd.concat([df.stack() for df in relax_dfs],
                          axis=1).transpose()
         else:
@@ -1139,8 +1201,8 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
         # Process order parameters
         if len(order_dfs) >= 1:
             if verbose >= 1:
-                wiprint("""Concatenating timesires from {0}
-                        order parameter infiles""".format(len(order_dfs)))
+                wiprint("""Concatenating timeseries from {0} order parameter
+                        infiles""".format(len(order_dfs)))
             order_df = pd.concat([df.stack() for df in order_dfs],
                          axis=1).transpose()
         else:
@@ -1150,16 +1212,16 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
         if relax_df is not None and order_df is not None:
             df = pd.merge(relax_df, order_df, how="outer", left_index=True,
                            right_index=True)
-            df = df[sorted(df.columns.tolist(), key=lambda x: x[0])]
-        elif relax_df is None:
+            df = df[sorted(list(set(df.columns.get_level_values(0))),
+                   key=lambda x: int(x.split(":")[1]))]
+        elif relax_df is None and order_df is not None:
             df = order_df
-        elif order_df is None:
+        elif order_df is None and relax_df is not None:
             df = relax_df
 
         return df
 
-    @staticmethod
-    def timeseries_to_sequence(timeseries_df, **kwargs):
+    def timeseries_to_sequence(self, timeseries_df, **kwargs):
         """
         """
 
@@ -1168,11 +1230,25 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
 
         print(timeseries_df)
         sequence_df = pd.DataFrame(data=timeseries_df.mean(axis=0))
-        print(sequence_df)
+#        sequence_df = sequence_df.squeeze().unstack()
+
         from .fpblockaverager.FPBlockAverager import FPBlockAverager
         ba = FPBlockAverager(timeseries_df, **kwargs)
+        self.ba = ba
+        self.p = self.ba.parameters.loc[("exp", "a (se)")]
+        self.p.index = pd.MultiIndex.from_tuples(map(eval, self.p.index.values))
+        self.p.index = self.p.index.set_levels([c+" se" for c in
+        self.p.index.levels[1].values], level=1)
 
-        return None
+        a =sequence_df.squeeze().unstack()
+        b = self.p.unstack()
+        c = a.join(b)
+        c = c[["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
+        self.sequence_df = c
+        c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
+        sequence_df = c
+        
+        return sequence_df
 
     def __init__(self, outfile=None, interactive=False, **kwargs):
         """
@@ -1188,13 +1264,13 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
                 print("Processed timeseries DataFrame:")
                 print(self.timeseries_df)
 
-#        # Prepare sequence dataframe using averages and block standard errors
-#        self.sequence_df = self.timeseries_to_sequence(self.timeseries_df,
-#                             **kwargs)
-#        if verbose >= 2:
-#            if verbose >= 1:
-#                print("Processed timeseries DataFrame:")
-#                print(self.sequence_df)
+        # Prepare sequence dataframe using averages and block standard errors
+        self.sequence_df = self.timeseries_to_sequence(self.timeseries_df,
+                             **kwargs)
+        if verbose >= 2:
+            if verbose >= 1:
+                print("Processed timeseries DataFrame:")
+                print(self.sequence_df)
 
         # Write data
         if outfile is not None:
@@ -1223,6 +1299,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
           flags=re.UNICODE)
 
         # Load data
+        timeseries_dfs = []
         relax_dfs = []
         order_dfs = []
         for infile in infiles:
@@ -1230,20 +1307,25 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
                 df = self._read_hdf5(infile, **kwargs)
             else:
                 df = self._read_text(infile, **kwargs)
-            columns = df.columns.values
-            if "r1" in columns and "r2" in columns and "noe" in columns:
-                relax_dfs.append(df)
-            if "s2" in columns:
-                order_dfs.append(df)
-            if not (("r1" in columns and "r2" in columns and "noe" in columns)
-            or      ("s2" in columns)):
-                raise Exception(sformat("""DataFrame loaded from '{0}' does not
-                  appear to contain either relaxation ('r1', 'r2', 'noe') or
-                  order parameter ('s2') columns""".format(infile)))
+            if df.columns.nlevels == 2:
+                timeseries_dfs.append(df)
+            else:
+                columns = df.columns.values
+
+                if "r1" in columns and "r2" in columns and "noe" in columns:
+                    relax_dfs.append(df)
+                if "s2" in columns:
+                    order_dfs.append(df)
+                if not (("r1" in columns and "r2" in columns
+                and "noe" in columns) or ("s2" in columns)):
+                    raise Exception(sformat("""DataFrame loaded from '{0}' does
+                      not appear to contain either relaxation ('r1', 'r2',
+                      'noe') or order parameter ('s2')
+                      columns""".format(infile)))
 
         # Concatenate into timeseries
-        df = self.concatenate_timeseries(relax_dfs, order_dfs)
-
+        df = self.concatenate_timeseries(timeseries_dfs, relax_dfs, order_dfs)
+        df.index.name = "frame"
         return df
 
 class ErrorSequenceDataset(SequenceDataset):
@@ -1678,6 +1760,8 @@ if __name__ == "__main__":
       dest        = "mode",
       description = "")
 
+    SequenceDataset.construct_argparser(subparsers)
+    TimeSeriesDataset.construct_argparser(subparsers)
     IREDSequenceDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
     kwargs  = vars(parser.parse_args())
