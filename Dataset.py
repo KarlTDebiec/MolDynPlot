@@ -413,7 +413,8 @@ class TimeSeriesDataset(Dataset):
           help     = """File(s) from which to load data; may be text or hdf5 ;
                      may contain environment variables and wildcards""")
 
-    def __init__(self, downsample=None, calc_pdist=False, **kwargs):
+    def __init__(self, downsample=None, calc_pdist=False, outfile=None,
+        interactive=False, **kwargs):
         """
         Arguments:
           infile (str): Path to input file, may contain environment
@@ -448,19 +449,19 @@ class TimeSeriesDataset(Dataset):
         verbose = kwargs.get("verbose", 1)
 
         # Load
-        super(TimeSeriesDataset, self).__init__( **kwargs)
-        timeseries = self.timeseries_df = self.dataframe
+#        super(TimeSeriesDataset, self).__init__( **kwargs)
+        self.timeseries_df = self.read(**kwargs)
 
 #        if "usecols" in kwargs:
 #            timeseries = timeseries[timeseries.columns[kwargs.pop("usecols")]]
 
         # Convert from frame index to time
         if "dt" in kwargs:
-            timeseries.index *= kwargs.pop("dt")
+            self.timeseries_df.index *= kwargs.pop("dt")
 
         # Offset time
         if "toffset" in kwargs:
-            timeseries.index += kwargs.pop("toffset")
+            self.timeseries_df.index += kwargs.pop("toffset")
 
 #        # Store y, if applicable
 #        if "y" in kwargs:
@@ -470,9 +471,24 @@ class TimeSeriesDataset(Dataset):
         if downsample:
             self.timeseries_df = self.downsample(downsample, **kwargs)
 
+        # Calculate probability distibution
         if calc_pdist:
             self.pdist_df = self.calc_pdist(**kwargs)
+        print(self.timeseries_df)
 
+        # Output to screen
+        if verbose >= 2:
+            if verbose >= 1:
+                print("Processed timeseries DataFrame:")
+                print(self.sequence_df)
+
+        # Write data
+        if outfile is not None:
+            self.write(df=self.timeseries_df, outfile=outfile, **kwargs)
+
+        # Interactive prompt
+        if interactive:
+            embed()
     def downsample(self, downsample, downsample_mode="mean", **kwargs):
         """
         Downsamples time series.
@@ -1291,6 +1307,8 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
         # Prepare sequence dataframe using averages and block standard errors
         self.sequence_df = self.timeseries_to_sequence(self.timeseries_df,
                              **kwargs)
+
+        # Output to screen
         if verbose >= 2:
             if verbose >= 1:
                 print("Processed timeseries DataFrame:")
