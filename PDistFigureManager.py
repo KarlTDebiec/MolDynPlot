@@ -133,18 +133,32 @@ class PDistFigureManager(FigureManager):
         draw_subplot:
           xlabel:      "$R_1$"
           xticks:      [0.0,0.5,1.0,1.5,2.0,2.5,3.0]
+        draw_dataset:
+          ykey: r1
       r2:
         class: content
         help: Format subplot for R2 relaxation
         draw_subplot:
           xlabel: "$R_2$"
           xticks: [0,2,4,6,8,10,12,14,16,18,20]
+        draw_dataset:
+          ykey: r2
+      r2/r1:
+        class: content
+        help: Format subplot for R2/R1 relaxation
+        draw_subplot:
+          xlabel: "$R_2$/$R_1$"
+          xticks: [0,2,4,6,8,10,12]
+        draw_dataset:
+          ykey: r2/r1
       hetnoe:
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
         draw_subplot:
           xlabel: "Heteronuclear NOE"
           xticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+        draw_dataset:
+          ykey: noe
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -159,6 +173,23 @@ class PDistFigureManager(FigureManager):
             1:
               preset: r2
             2:
+              preset: hetnoe
+      relaxation_4:
+        class: content
+        help: Four stacked plots including R1, R2, R2/R1, and HetNOE
+        draw_figure:
+          nrows: 4
+          shared_ylabel: "Prbability Distribution"
+          subplots:
+            all:
+              ylabel: null
+            0:
+              preset: r1
+            1:
+              preset: r2
+            2:
+              preset: r2/r1
+            3:
               preset: hetnoe
       manuscript:
         class: target
@@ -224,9 +255,21 @@ class PDistFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None, ykey=None, handles=None,
-        draw_pdist=True, draw_fill_between=False, draw_mean=False,verbose=1,
-        debug=0, **kwargs):
+        draw_pdist=True, draw_fill_between=False, draw_mean=False, **kwargs):
         """
+        Draws a dataset on a subplot.
+
+        Arguments:
+          subplot (Axes): Axes on which to draw
+          draw_pdist (bool): Draw probability distribution for this dataset
+          draw_fill_between (bool): Fill between specified region for this
+            dataset
+          draw_mean (bool): Draw point at mean value of this dataset
+          plot_kw (dict): Keyword arguments
+          fill_between_kw (dict): Keyword arguments
+          pdist_kw (dict): Keyword arguments
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
         """
         from warnings import warn
         import numpy as np
@@ -236,11 +279,12 @@ class PDistFigureManager(FigureManager):
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
-        if dataset is not None and hasattr(dataset, "pdist"):
-            pdist = dataset.pdist
+        dataset = self.load_dataset(**dataset_kw)
+        if dataset is not None and hasattr(dataset, "pdist_df"):
+            pdist_df = dataset.pdist_df
         else:
-            pdist = None
+            pdist_df = None
+
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -261,11 +305,11 @@ class PDistFigureManager(FigureManager):
 
         # Plot pdist
         if draw_pdist:
-            if not hasattr(dataset, "pdist"):
+            if not hasattr(dataset, "pdist_df"):
                 warn("'draw_pdist' is enabled but dataset does not have the "
-                     "necessary attribute 'pdist', skipping.")
+                     "necessary attribute 'pdist_df', skipping.")
             else:
-                pdist = pdist[ykey]
+                pdist = pdist_df[ykey]
                 pdist_kw = plot_kw.copy()
                 pdist_kw.update(kwargs.get("pdist_kw", {}))
 

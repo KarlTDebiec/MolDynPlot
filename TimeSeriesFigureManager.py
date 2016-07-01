@@ -288,20 +288,20 @@ class TimeSeriesFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None, ykey=None, handles=None,
-        draw_pdist=False, draw_fill_between=False, draw_plot=True,
-        verbose=1, debug=0, **kwargs):
+        draw_pdist=False, draw_fill_between=False, draw_plot=True, **kwargs):
         """
         """
         from warnings import warn
         from .myplotspec import get_colors, multi_get_copy
 
-        # Load data
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
-        if dataset is not None and hasattr(dataset, "timeseries"):
-            timeseries = dataset.timeseries
+        dataset = self.load_dataset(**dataset_kw)
+        if dataset is not None and hasattr(dataset, "timeseries_df"):
+            timeseries = dataset.timeseries_df
         else:
             timeseries = None
 
@@ -349,14 +349,13 @@ class TimeSeriesFigureManager(FigureManager):
             if not hasattr(subplot, "_mps_partner_subplot"):
                 from .myplotspec.axes import add_partner_subplot
 
-                add_partner_subplot(subplot, verbose=verbose,
-                  debug=debug, **kwargs)
+                add_partner_subplot(subplot, **kwargs)
 
-            if not hasattr(dataset, "pdist"):
+            if not hasattr(dataset, "pdist_df"):
                 warn("'draw_pdist' is enabled but dataset does not have the "
-                     "necessary attribute 'pdist', skipping.")
+                     "necessary attribute 'pdist_df', skipping.")
             else:
-                pdist = dataset.pdist[ykey]
+                pdist = dataset.pdist_df[ykey]
                 pdist_kw = plot_kw.copy()
                 pdist_kw.update(kwargs.get("pdist_kw", {}))
 

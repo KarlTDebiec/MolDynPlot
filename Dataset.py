@@ -196,6 +196,24 @@ class SequenceDataset(Dataset):
                 print("Processed sequence DataFrame:")
                 print(self.sequence_df)
 
+        # Cut data
+        if "use_indexes" in kwargs:
+            use_indexes = np.array(kwargs.pop("use_indexes"))
+            res_index = np.array([int(i.split(":")[1])
+              for i in self.sequence_df.index.values])
+            self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
+
+        if "r1" in self.sequence_df and "r2" in self.sequence_df:
+            self.sequence_df["r2/r1"] = self.sequence_df["r2"] / \
+                                        self.sequence_df["r1"]
+            self.sequence_df["r2/r1 se"] = np.sqrt((self.sequence_df["r2 se"] /
+              self.sequence_df["r2"]) ** 2 + (self.sequence_df["r1 se"] /
+              self.sequence_df["r1"]) ** 2) * self.sequence_df["r2/r1"]
+
+        # Calculate probability distribution
+        if calc_pdist:
+            self.pdist_df = self.calc_pdist(df=self.sequence_df, **kwargs)
+
         # Write data
         if outfile is not None:
             self.write(df=self.sequence_df, outfile=outfile, **kwargs)
@@ -208,17 +226,7 @@ class SequenceDataset(Dataset):
 #        dataframe.index.name = "residue"
 #        dataframe["amino acid"] = [str(i.split(":")[0])
 #                                     for i in dataframe.index.values]
-#        dataframe["index"] = [int(i.split(":")[1])
-#                               for i in dataframe.index.values]
-#        if "use_indexes" in kwargs:
-#            dataframe = self.dataframe = dataframe[
-#                          dataframe["index"].isin(kwargs.pop("use_indexes"))]
-#        if True:
-#            dataframe["r1/r2"]    = dataframe["r1"] / dataframe["r2"]
-#            dataframe["r1/r2 se"] = np.sqrt((dataframe["r1 se"] /
-#            dataframe["r1"]) ** 2 + (dataframe["r2 se"] / dataframe["r2"]) **
-#            2) * dataframe["r1/r2"]
-#
+
 #        if calc_pdist:
 #            self.calc_pdist(**kwargs)
 
@@ -274,77 +282,81 @@ class SequenceDataset(Dataset):
 
         return df
 
-#    def calc_pdist(self, **kwargs):
-#        """
-#        Calculates probability distribution across sequence.
-#
-#        Arguments:
-#          pdist_kw (dict): Keyword arguments used to configure
-#            probability distribution calculation
-#          verbose (int): Level of verbose output
-#          kwargs (dict): Additional keyword arguments
-#        """
-#        from collections import OrderedDict
-#        from scipy.stats import norm
-#
-#        # Arguments
-#        verbose = kwargs.get("verbose", 1)
-#        dataframe = self.dataframe
-#
-#        pdist_kw = kwargs.get("pdist_kw", {})
-#        pdist_cols = [a for a in dataframe.columns.values
-#                      if not a.endswith(" se")
-#                      and str(dataframe[a].dtype).startswith("float")
-#                      and a + " se" in dataframe.columns.values]
-#        mode = "kde"
-#        if mode == "kde":
-#
-#            # Prepare grids
-#            grid = pdist_kw.pop("grid", None)
-#            if grid is None:
-#                all_grid = None
-#                grid = {}
-#            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
-#                all_grid = np.array(grid)
-#                grid = {}
-#            elif isinstance(grid, dict):
-#                all_grid = None
-#                pass
-#            for column, series in dataframe[pdist_cols].iteritems():
-#                if column in grid:
-#                    grid[column] = np.array(grid[column])
-#                elif all_grid is not None:
-#                    grid[column] = all_grid
-#                else:
-#                    grid[column] = np.linspace(series.min() - series.std(),
-#                                      series.max() + series.std(), 100)
-#            scale = {"r1":0.05, "r2":0.4, "noe":0.05, "r1/r2": 0.1}
-#
-#            # Calculate probability distributions
-#            pdist = OrderedDict()
-#            for column in pdist_cols:
-#                qwer = dataframe[[column, column + " se"]]
-#                if verbose >= 1:
-#                    print("calculating probability distribution of "
-#                    "{0} using a kernel density estimate".format(column))
-#                g = grid[column]
-#                s = scale[column]
-#                pdf = np.zeros_like(g)
-#                for residue, b in qwer.iterrows():
-#                    if np.any(np.isnan(b.values)):
-#                        continue
-##                    c = norm(loc=b[column], scale=b[column+" se"])
-#                    c = norm(loc=b[column], scale=s)
-#                    d = c.pdf(g)
-#                    pdf += c.pdf(g)
-#                pdf /= pdf.sum()
-#                series_pdist = pd.DataFrame(pdf, index=grid[column],
-#                  columns=["probability"])
-#                series_pdist.index.name = column
-#                pdist[column] = series_pdist
-#
-#            self.pdist = pdist
-#            return pdist
+    def calc_pdist(self, **kwargs):
+        """
+        Calculates probability distribution across sequence.
+
+        Arguments:
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from collections import OrderedDict
+        from scipy.stats import norm
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        df      = kwargs.get("df")
+        if df is None:
+            if hasattr(self, "sequence_df"):
+                df = self.sequence_df
+            else:
+                raise()
+
+        pdist_kw = kwargs.get("pdist_kw", {})
+        pdist_cols = [a for a in df.columns.values
+                      if not a.endswith(" se")
+                      and str(df[a].dtype).startswith("float")
+                      and a + " se" in df.columns.values]
+        mode = "kde"
+        if mode == "kde":
+
+            # Prepare grids
+            grid = pdist_kw.pop("grid", None)
+            if grid is None:
+                all_grid = None
+                grid = {}
+            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
+                all_grid = np.array(grid)
+                grid = {}
+            elif isinstance(grid, dict):
+                all_grid = None
+                pass
+            for column, series in df[pdist_cols].iteritems():
+                if column in grid:
+                    grid[column] = np.array(grid[column])
+                elif all_grid is not None:
+                    grid[column] = all_grid
+                else:
+                    grid[column] = np.linspace(series.min() - series.std(),
+                                      series.max() + series.std(), 100)
+            scale = {"r1":0.02, "r2":0.3, "noe":0.03, "r2/r1": 0.3, "s2": 0.05}
+
+            # Calculate probability distributions
+            pdist = OrderedDict()
+            for column in pdist_cols:
+                qwer = df[[column, column + " se"]]
+                if verbose >= 1:
+                    print("calculating probability distribution of "
+                    "{0} using a kernel density estimate".format(column))
+                g = grid[column]
+                s = scale[column]
+                pdf = np.zeros_like(g)
+                for residue, b in qwer.iterrows():
+                    if np.any(np.isnan(b.values)):
+                        continue
+#                    c = norm(loc=b[column], scale=b[column+" se"])
+                    c = norm(loc=b[column], scale=s)
+                    d = c.pdf(g)
+                    pdf += c.pdf(g)
+                pdf /= pdf.sum()
+                series_pdist = pd.DataFrame(pdf, index=grid[column],
+                  columns=["probability"])
+                series_pdist.index.name = column
+                pdist[column] = series_pdist
+
+            return pdist
 
 class TimeSeriesDataset(Dataset):
     """
@@ -437,78 +449,81 @@ class TimeSeriesDataset(Dataset):
 
         # Load
         super(TimeSeriesDataset, self).__init__( **kwargs)
-        timeseries = self.timeseries = self.dataframe
-        timeseries.index.name = "time"
+        timeseries = self.timeseries_df = self.dataframe
 
 #        if "usecols" in kwargs:
 #            timeseries = timeseries[timeseries.columns[kwargs.pop("usecols")]]
-#
-#        # Convert from frame index to time
-#        if "dt" in kwargs:
-#            timeseries.index *= kwargs.pop("dt")
-#
-#        # Offset time
-#        if "toffset" in kwargs:
-#            timeseries.index += kwargs.pop("toffset")
-#
+
+        # Convert from frame index to time
+        if "dt" in kwargs:
+            timeseries.index *= kwargs.pop("dt")
+
+        # Offset time
+        if "toffset" in kwargs:
+            timeseries.index += kwargs.pop("toffset")
+
 #        # Store y, if applicable
 #        if "y" in kwargs:
 #            self.y = kwargs.pop("y")
-#
-#        # Downsample
-#        if downsample:
-#            self.downsample(downsample, **kwargs)
-#
-#        if calc_pdist:
-#            self.calc_pdist(**kwargs)
 
-#    def downsample(self, downsample, downsample_mode="mean", **kwargs):
-#        """
-#        Downsamples time series.
-#
-#        Arguments:
-#          downsample (int): Interval by which to downsample points
-#          downsample_mode (str): Method of downsampling; may be 'mean'
-#            or 'mode'
-#          verbose (int): Level of verbose output
-#          kwargs (dict): Additional keyword arguments
-#        """
-#        from scipy.stats.mstats import mode
-#
-#        # Arguments
-#        verbose = kwargs.get("verbose", 1)
-#        timeseries = self.timeseries
-#
-#        # Truncate dataset
-#        reduced = timeseries.values[
-#          :timeseries.shape[0] - (timeseries.shape[0] % downsample),:]
-#        new_shape = (int(reduced.shape[0]/downsample), downsample,
-#          reduced.shape[1])
-#        index = np.reshape(timeseries.index.values[
-#          :timeseries.shape[0]-(timeseries.shape[0] % downsample)],
-#          new_shape[:-1]).mean(axis=1)
-#        reduced = np.reshape(reduced, new_shape)
-#
-#        # Downsample
-#        if downsample_mode == "mean":
-#            if verbose >= 1:
-#                print("downsampling by factor of {0} using mean".format(
-#                  downsample))
-#            reduced = np.squeeze(reduced.mean(axis=1))
-#        elif downsample_mode == "mode":
-#            if verbose >= 1:
-#                print("downsampling by factor of {0} using mode".format(
-#                  downsample))
-#            reduced = np.squeeze(mode(reduced, axis=1)[0])
-#
-#        # Store downsampled time series
-#        reduced = pd.DataFrame(data=reduced, index=index,
-#          columns=timeseries.columns.values)
-#        reduced.index.name = "time"
-#        timeseries = self.timeseries = reduced
-#
-#        return timeseries
-#
+        # Downsample
+        if downsample:
+            self.timeseries_df = self.downsample(downsample, **kwargs)
+
+        if calc_pdist:
+            self.pdist_df = self.calc_pdist(**kwargs)
+
+    def downsample(self, downsample, downsample_mode="mean", **kwargs):
+        """
+        Downsamples time series.
+
+        Arguments:
+          downsample (int): Interval by which to downsample points
+          downsample_mode (str): Method of downsampling; may be 'mean'
+            or 'mode'
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from scipy.stats.mstats import mode
+
+        # Process rguments
+        verbose = kwargs.get("verbose", 1)
+        df      = kwargs.get("df")
+        if df is None:
+            if hasattr(self, "timeseries_df"):
+                df = self.timeseries_df
+            else:
+                raise()
+
+        # Truncate dataset
+        reduced = df.values[:df.shape[0] - (df.shape[0] % downsample),:]
+        new_shape = (int(reduced.shape[0]/downsample), downsample,
+          reduced.shape[1])
+        index = np.reshape(df.index.values[
+          :df.shape[0]-(df.shape[0] % downsample)],
+          new_shape[:-1]).mean(axis=1)
+        reduced = np.reshape(reduced, new_shape)
+
+        # Downsample
+        if downsample_mode == "mean":
+            if verbose >= 1:
+                print("downsampling by factor of {0} using mean".format(
+                  downsample))
+            reduced = np.squeeze(reduced.mean(axis=1))
+        elif downsample_mode == "mode":
+            if verbose >= 1:
+                print("downsampling by factor of {0} using mode".format(
+                  downsample))
+            reduced = np.squeeze(mode(reduced, axis=1)[0])
+
+        # Store downsampled time series
+        reduced = pd.DataFrame(data=reduced, index=index,
+          columns=df.columns.values)
+        reduced.index.name = "time"
+        df = reduced
+
+        return df
+
 #    def calc_error(self, error_method="std", **kwargs):
 #        """
 #        Calculates standard error using time series data.
@@ -540,85 +555,89 @@ class TimeSeriesDataset(Dataset):
 #            return
 #
 #        return se
-#
-#    def calc_pdist(self, **kwargs):
-#        """
-#        Calcualtes probability distribution of time series.
-#
-#        Arguments:
-#          pdist_kw (dict): Keyword arguments used to configure
-#            probability distribution calculation
-#          verbose (int): Level of verbose output
-#          kwargs (dict): Additional keyword arguments
-#        """
-#        from collections import OrderedDict
-#        from sklearn.neighbors import KernelDensity
-#
-#        # Arguments
-#        verbose = kwargs.get("verbose", 1)
-#        timeseries = self.timeseries
-#
-#        pdist_kw = kwargs.get("pdist_kw", {"bandwidth": 0.1})
-#        mode = "kde"
-#        if mode == "kde":
-#
-#            # Prepare bandwidths
-#            bandwidth = pdist_kw.pop("bandwidth", None)
-#            if bandwidth is None:
-#                all_bandwidth = None
-#                bandwidth = {}
-#            elif isinstance(bandwidth, float):
-#                all_bandwidth = bandwidth
-#                bandwidth = {}
-#            elif isinstance(bandwidth, dict):
-#                all_bandwidth = None
-#                pass
-#            for column, series in timeseries.iteritems():
-#                if column in bandwidth:
-#                    bandwidth[column] = float(bandwidth[column])
-#                elif all_bandwidth is not None:
-#                    bandwidth[column] = all_bandwidth
-#                else:
-#                    bandwidth[column] = series.std() / 10.0
-#
-#            # Prepare grids
-#            grid = pdist_kw.pop("grid", None)
-#            if grid is None:
-#                all_grid = None
-#                grid = {}
-#            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
-#                all_grid = np.array(grid)
-#                grid = {}
-#            elif isinstance(grid, dict):
-#                all_grid = None
-#                pass
-#            for column, series in timeseries.iteritems():
-#                if column in grid:
-#                    grid[column] = np.array(grid[column])
-#                elif all_grid is not None:
-#                    grid[column] = all_grid
-#                else:
-#                    grid[column] = np.linspace(series.min() - series.std(),
-#                                      series.max() + series.std(), 100)
-#
-#            # Calculate probability distributions
-#            kde_kw = pdist_kw.get("kde_kw", {})
-#            pdist = OrderedDict()
-#            for column, series in timeseries.iteritems():
-#                if verbose >= 1:
-#                    print("calculating probability distribution of "
-#                    "{0} using a kernel density estimate".format(column))
-#                kde = KernelDensity(bandwidth=bandwidth[column], **kde_kw)
-#                kde.fit(series[:, np.newaxis])
-#                pdf = np.exp(kde.score_samples(grid[column][:, np.newaxis]))
-#                pdf /= pdf.sum()
-#                series_pdist = pd.DataFrame(pdf, index=grid[column],
-#                  columns=["probability"])
-#                series_pdist.index.name = column
-#                pdist[column] = series_pdist
-#
-#            self.pdist = pdist
-#            return pdist
+
+    def calc_pdist(self, **kwargs):
+        """
+        Calcualtes probability distribution of time series.
+
+        Arguments:
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from collections import OrderedDict
+        from sklearn.neighbors import KernelDensity
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        df      = kwargs.get("df")
+        if df is None:
+            if hasattr(self, "timeseries_df"):
+                df = self.timeseries_df
+            else:
+                raise()
+
+        pdist_kw = kwargs.get("pdist_kw", {"bandwidth": 0.1})
+        mode = "kde"
+        if mode == "kde":
+
+            # Prepare bandwidths
+            bandwidth = pdist_kw.pop("bandwidth", None)
+            if bandwidth is None:
+                all_bandwidth = None
+                bandwidth = {}
+            elif isinstance(bandwidth, float):
+                all_bandwidth = bandwidth
+                bandwidth = {}
+            elif isinstance(bandwidth, dict):
+                all_bandwidth = None
+                pass
+            for column, series in df.iteritems():
+                if column in bandwidth:
+                    bandwidth[column] = float(bandwidth[column])
+                elif all_bandwidth is not None:
+                    bandwidth[column] = all_bandwidth
+                else:
+                    bandwidth[column] = series.std() / 10.0
+
+            # Prepare grids
+            grid = pdist_kw.pop("grid", None)
+            if grid is None:
+                all_grid = None
+                grid = {}
+            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
+                all_grid = np.array(grid)
+                grid = {}
+            elif isinstance(grid, dict):
+                all_grid = None
+                pass
+            for column, series in df.iteritems():
+                if column in grid:
+                    grid[column] = np.array(grid[column])
+                elif all_grid is not None:
+                    grid[column] = all_grid
+                else:
+                    grid[column] = np.linspace(series.min() - series.std(),
+                                      series.max() + series.std(), 100)
+
+            # Calculate probability distributions
+            kde_kw = pdist_kw.get("kde_kw", {})
+            pdist = OrderedDict()
+            for column, series in df.iteritems():
+                if verbose >= 1:
+                    print("calculating probability distribution of "
+                    "{0} using a kernel density estimate".format(column))
+                kde = KernelDensity(bandwidth=bandwidth[column], **kde_kw)
+                kde.fit(series[:, np.newaxis])
+                pdf = np.exp(kde.score_samples(grid[column][:, np.newaxis]))
+                pdf /= pdf.sum()
+                series_pdist = pd.DataFrame(pdf, index=grid[column],
+                  columns=["probability"])
+                series_pdist.index.name = column
+                pdist[column] = series_pdist
+
+            return pdist
 
 class SAXSDataset(Dataset):
     """
@@ -1223,14 +1242,19 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
 
     def timeseries_to_sequence(self, timeseries_df, **kwargs):
         """
+        Calculates the average and standard error of relaxation, prepares
+        sequence DataFrame.
+
+        .. todo:
+          - Make this general case, should be able to unstack properly
         """
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
+        wiprint("""Calculating average and standard error of time series
+                infiles""")
 
-        print(timeseries_df)
         sequence_df = pd.DataFrame(data=timeseries_df.mean(axis=0))
-#        sequence_df = sequence_df.squeeze().unstack()
 
         from .fpblockaverager.FPBlockAverager import FPBlockAverager
         ba = FPBlockAverager(timeseries_df, **kwargs)
