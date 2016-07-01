@@ -134,7 +134,7 @@ class TimeSeriesFigureManager(FigureManager):
               names: [frame, rmsd]
       rg:
         class: content
-        help: Radius of Gyration (Rg)
+        help: Radius of gyration (Rg)
         draw_subplot:
           ylabel: $R_g$ (Å)
           yticks: [0,5,10,15,20,25,30]
@@ -150,6 +150,24 @@ class TimeSeriesFigureManager(FigureManager):
               header: 0
               index_col: 0
               names: [frame, rg, rgmax]
+      rotdif:
+        class: content
+        help: Rotational correlatio time (τc)
+        draw_subplot:
+          ylabel: $τ_c$ (ns)
+          yticks: [0,5,10,15]
+        draw_dataset:
+          ykey: rotdif
+          partner_kw:
+            yticks: [0,5,10,15]
+          dataset_kw:
+            cls: moldynplot.Dataset.TimeSeriesDataset
+            calc_pdist: True
+            read_csv_kw:
+              delim_whitespace: True
+              header: 0
+              index_col: 0
+              names: [frame, rotdif]
       presentation:
         class: target
         inherits: presentation
