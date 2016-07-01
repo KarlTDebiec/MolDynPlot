@@ -50,3 +50,12 @@ def dssp_cmap(z=None, vmin=None, vmax=None):
         return LinearSegmentedColormap("test", cdict)
     else:
         return LinearSegmentedColormap("test", cdict)(z / (vmax - vmin))
+
+def three_one(three):
+    return {"ALA": "A", "ARG": "R", "ASN": "N", "ASP": "D", "ASH": "D",
+            "CYS": "C", "CYM": "C", "CYX": "C", "GLN": "Q", "GLU": "E",
+            "GLH": "E", "GLY": "G", "HIS": "H", "HID": "H", "HIE": "H",
+            "HIP": "H", "HSD": "H", "HSE": "H", "HSP": "H", "ILE": "I",
+            "LEU": "L", "LYS": "K", "LYN": "K", "MET": "M", "PHE": "F",
+            "PRO": "P", "SER": "S", "THR": "T", "TRP": "W", "TYR": "Y",
+            "VAL": "V" }[three.upper()]

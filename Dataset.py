@@ -173,14 +173,12 @@ class SequenceDataset(Dataset):
         Arguments:
           infile[s] (list): Path(s) to input file(s); may contain
             environment variables and wildcards
-          usecols (list): Columns to select from DataFrame, once
-            DataFrame has already been loaded
+          use_indexes (list): Residue indexes to select from DataFrame,
+            once DataFrame has already been loaded
           calc_pdist (bool): Calculate probability distribution
-          pdist_key (str): Column of which to calculate probability
-            distribution
-          kde_kw (dict): Keyword arguments passed to
-            sklearn.neighbors.KernelDensity; key arguments are
-            'bandwidth' and 'grid'
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
+          dataset_cache (dict): Cache of previously-loaded Datasets
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
         """
@@ -203,13 +201,6 @@ class SequenceDataset(Dataset):
               for i in self.sequence_df.index.values])
             self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
 
-        if "r1" in self.sequence_df and "r2" in self.sequence_df:
-            self.sequence_df["r2/r1"] = self.sequence_df["r2"] / \
-                                        self.sequence_df["r1"]
-            self.sequence_df["r2/r1 se"] = np.sqrt((self.sequence_df["r2 se"] /
-              self.sequence_df["r2"]) ** 2 + (self.sequence_df["r1 se"] /
-              self.sequence_df["r1"]) ** 2) * self.sequence_df["r2/r1"]
-
         # Calculate probability distribution
         if calc_pdist:
             self.pdist_df = self.calc_pdist(df=self.sequence_df, **kwargs)
@@ -221,14 +212,6 @@ class SequenceDataset(Dataset):
         # Interactive prompt
         if interactive:
             embed()
-
-#        dataframe = self.dataframe
-#        dataframe.index.name = "residue"
-#        dataframe["amino acid"] = [str(i.split(":")[0])
-#                                     for i in dataframe.index.values]
-
-#        if calc_pdist:
-#            self.calc_pdist(**kwargs)
 
     def _read_index(self, df, indexfile=None, **kwargs):
         """
@@ -830,7 +813,158 @@ class CorrDataset(Dataset):
 
         self.dataframe = corr
 
-class IREDSequenceDataset(SequenceDataset):
+class RelaxSequenceDataset(SequenceDataset):
+    """
+    Represents NMR relaxation data as a function of residue number.
+    """
+
+    @staticmethod
+    def construct_argparser(subparsers=None, **kwargs):
+        """
+        Constructs argument parser, either new or as a subparser.
+
+        Arguments:
+          subparsers (_SubParsersAction, optional): Nascent collection
+            of subparsers to which to add; if omitted, a new parser will
+            be generated
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          ArgumentParser: Argument parser or subparser
+        """
+        import argparse
+
+        # Process arguments
+        help_message = """Process relaxation data"""
+        if subparsers is not None:
+            parser = subparsers.add_parser(
+              name        = "relax",
+              description = help_message,
+              help        = help_message)
+        else:
+            parser = argparse.ArgumentParser(
+              description = help_message)
+
+        # Locked defaults
+        parser.set_defaults(cls=RelaxSequenceDataset)
+        input_group  = parser.add_argument_group("input")
+
+        # Arguments from superclass
+        super(RelaxSequenceDataset,
+          RelaxSequenceDataset).add_shared_args(parser)
+
+        # Input arguments
+        input_group = parser.add_argument_group("input")
+        input_group.add_argument(
+          "-infiles",
+          required = True,
+          dest     = "infiles",
+          metavar  = "INFILE",
+          nargs    = "+",
+          type     = str,
+          help     = """File(s) from which to load data; may be text or hdf5 ;
+                     may contain environment variables and wildcards""")
+        input_group.add_argument(
+          "-indexfile",
+          required = False,
+          type     = str,
+          help     = """text file from which to load residue names; should list
+                    amino acids in the form 'XAA:#' separated by whitespace; if
+                    omitted will be taken from rows of first infile; may
+                    contain environment variables""")
+
+        return parser
+
+    def __init__(self, calc_pdist=False, outfile=None, interactive=False,
+        **kwargs):
+        """
+        Arguments:
+          infile[s] (list): Path(s) to input file(s); may contain
+            environment variables and wildcards
+          use_indexes (list): Residue indexes to select from DataFrame,
+            once DataFrame has already been loaded
+          calc_pdist (bool): Calculate probability distribution
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
+          dataset_cache (dict): Cache of previously-loaded Datasets
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        self.dataset_cache = kwargs.get("dataset_cache", None)
+
+        # Read data
+        self.sequence_df = self.read(**kwargs)
+        if verbose >= 2:
+            if verbose >= 1:
+                print("Processed sequence DataFrame:")
+                print(self.sequence_df)
+
+        # Cut data
+        if "use_indexes" in kwargs:
+            use_indexes = np.array(kwargs.pop("use_indexes"))
+            res_index = np.array([int(i.split(":")[1])
+              for i in self.sequence_df.index.values])
+            self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
+
+        # Calculate r2/r1 ratio
+        if "r1" in self.sequence_df and "r2" in self.sequence_df:
+            self.sequence_df["r2/r1"] = self.sequence_df["r2"] / \
+                                        self.sequence_df["r1"]
+            self.sequence_df["r2/r1 se"] = np.sqrt((self.sequence_df["r2 se"] /
+              self.sequence_df["r2"]) ** 2 + (self.sequence_df["r1 se"] /
+              self.sequence_df["r1"]) ** 2) * self.sequence_df["r2/r1"]
+
+        # Calculate probability distribution
+        if calc_pdist:
+            self.pdist_df = self.calc_pdist(df=self.sequence_df, **kwargs)
+
+        # Write data
+        if outfile is not None:
+            self.write(df=self.sequence_df, outfile=outfile, **kwargs)
+
+        # Interactive prompt
+        if interactive:
+            embed()
+
+    def write_for_relax(self, outfile, **kwargs):
+        """
+        Writes sequence DataFrame in format readable by relax.
+        """
+        from os.path import expandvars
+        from . import three_one
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        df      = kwargs.get("df")
+        if df is None:
+            if hasattr(self, "sequence_df"):
+                df = self.sequence_df
+            else:
+                raise()
+        outfile = expandvars(outfile)
+        res_index = np.array([int(i.split(":")[1]) for i in df.index.values])
+        print(res_index)
+        res_code = np.array([three_one(i.split(":")[0]) for i in df.index.values])
+        print(res_code)
+
+        df["index"] = res_index
+        df["code"] = res_code
+
+        with open(outfile + "r1", "w") as r1_file:
+            with open(outfile + "r2", "w") as r2_file:
+                with open(outfile + "noe", "w") as noe_file:
+                    for _, row in df.iterrows():
+                        r1_file.write("{0}\t{1}\t{2}\t{3}\n".format(
+                          row["index"],row["code"],row["r1"],row["r1 se"]))
+                        r2_file.write("{0}\t{1}\t{2}\t{3}\n".format(
+                          row["index"],row["code"],row["r2"],row["r2 se"]))
+                        noe_file.write("{0}\t{1}\t{2}\t{3}\n".format(
+                          row["index"],row["code"],row["noe"],row["noe se"]))
+
+class IREDSequenceDataset(RelaxSequenceDataset):
     """
     Represents iRED NMR relaxation data as a function of residue number.
     """
@@ -1804,6 +1938,7 @@ if __name__ == "__main__":
 
     SequenceDataset.construct_argparser(subparsers)
     TimeSeriesDataset.construct_argparser(subparsers)
+    RelaxSequenceDataset.construct_argparser(subparsers)
     IREDSequenceDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
     kwargs  = vars(parser.parse_args())
