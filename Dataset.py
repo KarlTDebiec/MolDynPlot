@@ -212,7 +212,7 @@ class TimeSeriesDataset(Dataset):
         timeseries.index.name = "time"
 
         if "usecols" in kwargs:
-            timeseries = timeseries[timeseries.columns[kwargs.pop("usecols")]]
+            self.timeseries = timeseries = timeseries[timeseries.columns[kwargs.pop("usecols")]]
 
         # Convert from frame index to time
         if "dt" in kwargs:
