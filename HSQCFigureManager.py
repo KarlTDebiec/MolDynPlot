@@ -175,7 +175,7 @@ class HSQCFigureManager(FigureManager):
         """
         import numpy as np
 #        from . import get_cmap
-        from .myplotspec import get_colors, multi_get_copy
+        from .myplotspec import get_cmap, get_colors, multi_get_copy
 
         # Cheap way to invert axes without overriding draw_subplot
         if not subplot.xaxis_inverted():
@@ -220,7 +220,9 @@ class HSQCFigureManager(FigureManager):
                      hsqc.index.levels[1].size)).T
             if "levels" not in contour_kw:
                 contour_kw["levels"] = self.get_contour_levels(ct_I, **kwargs)
-
+            if "cmap" not in contour_kw:
+                if "color"in contour_kw:
+                    contour_kw["cmap"] = get_cmap(contour_kw.pop("color"))
             contour = subplot.contour(ct_H, ct_N, ct_I, **contour_kw)
             # Close bottom of contours
             for collection in contour.collections:
