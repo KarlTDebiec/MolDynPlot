@@ -190,9 +190,8 @@ class SequenceDataset(Dataset):
         # Read data
         self.sequence_df = self.read(**kwargs)
         if verbose >= 2:
-            if verbose >= 1:
-                print("Processed sequence DataFrame:")
-                print(self.sequence_df)
+            wiprint("Processed sequence DataFrame:")
+            print(self.sequence_df)
 
         # Cut data
         if "use_indexes" in kwargs:
@@ -514,13 +513,11 @@ class TimeSeriesDataset(Dataset):
         # Calculate probability distibution
         if calc_pdist:
             self.pdist_df = self.calc_pdist(**kwargs)
-        print(self.timeseries_df)
 
         # Output to screen
         if verbose >= 2:
-            if verbose >= 1:
-                print("Processed timeseries DataFrame:")
-                print(self.sequence_df)
+            print("Processed timeseries DataFrame:")
+            print(self.sequence_df)
 
         # Write data
         if outfile is not None:

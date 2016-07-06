@@ -128,9 +128,7 @@ class TimeSeriesFigureManager(FigureManager):
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
             read_csv_kw:
-              delim_whitespace: True
               header: 0
-              index_col: 0
               names: [frame, rmsd]
       rg:
         class: content
