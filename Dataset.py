@@ -1723,6 +1723,8 @@ class NatConTimeSeriesDataset(TimeSeriesDataset):
             self.pdist_x = pdist_x
             self.pdist_y = pdist_y
 
+        self.timeseries = dataframe
+
 class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
     """
     Manages Small Angle X-ray Scattering time series datasets.
