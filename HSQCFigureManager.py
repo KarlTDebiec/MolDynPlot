@@ -28,7 +28,7 @@ class HSQCFigureManager(FigureManager):
     defaults = """
         draw_figure:
           subplot_kw:
-            autoscale_on: True
+            autoscale_on: False
             axisbg: none
         draw_subplot:
           xlabel: $^{1}H$ (ppm)
@@ -221,7 +221,16 @@ class HSQCFigureManager(FigureManager):
             if "levels" not in contour_kw:
                 contour_kw["levels"] = self.get_contour_levels(ct_I, **kwargs)
 
-            subplot.contour(ct_H, ct_N, ct_I, **contour_kw)
+            contour = subplot.contour(ct_H, ct_N, ct_I, **contour_kw)
+            # Close bottom of contours
+            for collection in contour.collections:
+                for path in collection.get_paths():
+                    if np.all(path.vertices[0] == path.vertices[-1]):
+                        try:
+                            path.vertices = np.append(path.vertices,
+                              [path.vertices[1]], axis=0)
+                        except IndexError:
+                            continue
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
