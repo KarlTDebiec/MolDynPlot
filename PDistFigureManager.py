@@ -134,6 +134,10 @@ class PDistFigureManager(FigureManager):
           xlabel:      "$R_1$"
           xticks:      [0.0,0.5,1.0,1.5,2.0,2.5,3.0]
         draw_dataset:
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                r1: 0.02
           ykey: r1
       r2:
         class: content
@@ -142,6 +146,10 @@ class PDistFigureManager(FigureManager):
           xlabel: "$R_2$"
           xticks: [0,2,4,6,8,10,12,14,16,18,20]
         draw_dataset:
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                r2: 0.3
           ykey: r2
       r2/r1:
         class: content
@@ -150,6 +158,10 @@ class PDistFigureManager(FigureManager):
           xlabel: "$R_2$/$R_1$"
           xticks: [0,2,4,6,8,10,12]
         draw_dataset:
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                "r2/r2": 0.3
           ykey: r2/r1
       hetnoe:
         class: content
@@ -159,6 +171,10 @@ class PDistFigureManager(FigureManager):
           xticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
         draw_dataset:
           ykey: noe
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                noe: 0.03
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE

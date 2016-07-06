@@ -8,9 +8,13 @@ SequenceDataset
 ---------------
 .. autoclass::  moldynplot.Dataset.SequenceDataset
 
-IREDSequenceDataset
-___________________
-.. autoclass::  moldynplot.Dataset.IREDSequenceDataset
+RelaxSequenceDataset
+____________________
+.. autoclass::  moldynplot.Dataset.RelaxSequenceDataset
+
+IREDRelaxDataset
+~~~~~~~~~~~~~~~~
+.. autoclass::  moldynplot.Dataset.IREDRelaxDataset
 
 
 TimeSeriesDataset

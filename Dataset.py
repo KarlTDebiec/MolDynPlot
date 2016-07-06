@@ -167,11 +167,11 @@ class SequenceDataset(Dataset):
             read_csv_kw.append((key, value))
         return (cls, tuple(infiles), use_indexes, tuple(read_csv_kw))
 
-    def __init__(self, calc_pdist=False, outfile=None, interactive=False,
-        **kwargs):
+    def __init__(self, calc_pdist=False, outfile=None,
+        interactive=False, **kwargs):
         """
         Arguments:
-          infile[s] (list): Path(s) to input file(s); may contain
+          infile{s} (list): Path(s) to input file(s); may contain
             environment variables and wildcards
           use_indexes (list): Residue indexes to select from DataFrame,
             once DataFrame has already been loaded
@@ -270,13 +270,45 @@ class SequenceDataset(Dataset):
         Calculates probability distribution across sequence.
 
         Arguments:
+          df (DataFrame): DataFrame; probability distribution will be
+            calculated for each column using rows as data points
           pdist_kw (dict): Keyword arguments used to configure
             probability distribution calculation
+          pdist_kw[columns] (list): Columns for which to calculate
+            probability distribution
+          pdist_kw[mode] (ndarray, dict): Method of calculating
+            probability distribution; eventually will support 'hist' for
+            histogram and 'kde' for kernel density estimate, though
+            presently only kde is implremented
+          pdist_kw[grid] (ndarray, dict, optional): Grid on which to
+            calculate kernel density estimate; may be a single ndarray
+            that will be applied to all columns or a dictionary whose
+            keys are column names and values are ndarrays corresponding
+            to the grid for each column; for any column for which *grid*
+            is not specified, a grid of 1000 points between the minimum
+            value minus three times the standard deviation and the
+            maximum value plots three times the standard deviation will
+            be used
+          pdist_kw[bandwidth] (float, dict, str, optional): Bandwidth to
+            use for kernel density estimates; may be a single float that
+            will be applied to all columns or a dictionary whose keys
+            are column names and values are floats corresponding to the
+            bandwidth for each column; for any column for which
+            *bandwidth* is not specified, the standard deviation will be
+            used; alternatively may be 'se', in which case the standard
+            error of each value will be used
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
+
+        Returns:
+          dict: Dictionary whose keys are columns in *df* and values are
+          DataFrames whose indexes are the *grid* for that column and
+          contain a single column 'probability' containing the
+          normalized probability at each grid point
         """
         from collections import OrderedDict
         from scipy.stats import norm
+        import six
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
@@ -286,13 +318,15 @@ class SequenceDataset(Dataset):
                 df = self.sequence_df
             else:
                 raise()
-
         pdist_kw = kwargs.get("pdist_kw", {})
-        pdist_cols = [a for a in df.columns.values
-                      if not a.endswith(" se")
-                      and str(df[a].dtype).startswith("float")
-                      and a + " se" in df.columns.values]
-        mode = "kde"
+        columns = pdist_kw.get("columns",
+          [a for a in df.columns.values
+           if not a.endswith(" se")
+           and str(df[a].dtype).startswith("float")])
+        if isinstance(columns, six.string_types):
+            columns = [columns]
+        mode = pdist_kw.get("mode", kde)
+
         if mode == "kde":
 
             # Prepare grids
@@ -312,32 +346,55 @@ class SequenceDataset(Dataset):
                 elif all_grid is not None:
                     grid[column] = all_grid
                 else:
-                    grid[column] = np.linspace(series.min() - series.std(),
-                                      series.max() + series.std(), 100)
-            scale = {"r1":0.02, "r2":0.3, "noe":0.03, "r2/r1": 0.3, "s2": 0.05}
+                    grid[column] = np.linspace(
+                      series.min() - 3 * series.std(),
+                      series.max() + 3 * series.std(), 1000)
+
+            # Prepare bandwidths:
+            bandwidth = pdist_kw.pop("bandwidth", None)
+            if bandwidth is None:
+                all_bandwidth = None
+                bandwidth = {}
+            elif (isinstance(bandwidth, six.string_types)
+            and   bandwidth.lower() == "se"):
+                all_bandwidth = None
+                bandwidth = "se"
+            elif isintance(bandwidth, float):
+                all_bandwidth = float(bandwidth)
+                bandwidth = {}
+            elif isintance(bandwidth, dict):
+                all_bandwidth = None
+                pass
+            for column, series in df[columns].iteritems():
+                if column in bandwidth:
+                    bandwidth[column] = float(bandwidth[column])
+                elif all_bandwidth is not None:
+                    bandwidth[column] = all_bandwidth
+                else:
+                    bandwidth[column] = series.std()
 
             # Calculate probability distributions
             pdist = OrderedDict()
-            for column in pdist_cols:
-                qwer = df[[column, column + " se"]]
+            for column in columns:
                 if verbose >= 1:
                     print("calculating probability distribution of "
                     "{0} using a kernel density estimate".format(column))
                 g = grid[column]
-                s = scale[column]
+                b = bandwidth[column]
                 pdf = np.zeros_like(g)
-                for residue, b in qwer.iterrows():
-                    if np.any(np.isnan(b.values)):
+                for residue, row in df.iterrows():
+                    if np.isnan(row[column]):
                         continue
 #                    c = norm(loc=b[column], scale=b[column+" se"])
-                    c = norm(loc=b[column], scale=s)
-                    d = c.pdf(g)
-                    pdf += c.pdf(g)
+                    pdf += norm(loc=row[column], scale=b).pdf(g)
                 pdf /= pdf.sum()
-                series_pdist = pd.DataFrame(pdf, index=grid[column],
+                series_pdist = pd.DataFrame(pdf, index=g,
                   columns=["probability"])
                 series_pdist.index.name = column
                 pdist[column] = series_pdist
+        else:
+            raise Exception("only kde is currently supported")
+        
 
             return pdist
 
@@ -879,7 +936,7 @@ class RelaxSequenceDataset(SequenceDataset):
         **kwargs):
         """
         Arguments:
-          infile[s] (list): Path(s) to input file(s); may contain
+          infile{s} (list): Path(s) to input file(s); may contain
             environment variables and wildcards
           use_indexes (list): Residue indexes to select from DataFrame,
             once DataFrame has already been loaded
@@ -958,13 +1015,13 @@ class RelaxSequenceDataset(SequenceDataset):
                 with open(outfile + "noe", "w") as noe_file:
                     for _, row in df.iterrows():
                         r1_file.write("{0}\t{1}\t{2}\t{3}\n".format(
-                          row["index"],row["code"],row["r1"],row["r1 se"]))
+                          row["code"],row["index"],row["r1"],row["r1 se"]))
                         r2_file.write("{0}\t{1}\t{2}\t{3}\n".format(
-                          row["index"],row["code"],row["r2"],row["r2 se"]))
+                          row["code"],row["index"],row["r2"],row["r2 se"]))
                         noe_file.write("{0}\t{1}\t{2}\t{3}\n".format(
-                          row["index"],row["code"],row["noe"],row["noe se"]))
+                          row["code"],row["index"],row["noe"],row["noe se"]))
 
-class IREDSequenceDataset(RelaxSequenceDataset):
+class IREDRelaxDataset(RelaxSequenceDataset):
     """
     Represents iRED NMR relaxation data as a function of residue number.
     """
@@ -1001,11 +1058,11 @@ class IREDSequenceDataset(RelaxSequenceDataset):
               description = help_message)
 
         # Locked defaults
-        parser.set_defaults(cls=IREDSequenceDataset)
+        parser.set_defaults(cls=IREDRelaxDataset)
         input_group  = parser.add_argument_group("input")
 
         # Arguments from superclass
-        super(IREDSequenceDataset, IREDSequenceDataset).add_shared_args(parser)
+        super(IREDRelaxDataset, IREDRelaxDataset).add_shared_args(parser)
 
         # Input arguments
         input_group = parser.add_argument_group("input")
@@ -1172,7 +1229,7 @@ class IREDSequenceDataset(RelaxSequenceDataset):
         # Process arguments
         verbose = kwargs.get("verbose", 1)
         infile = expandvars(infile)
-        kind = IREDSequenceDataset._identify_infile(infile)
+        kind = IREDRelaxDataset._identify_infile(infile)
 
         if kind == "ired_relax":                    # Parse relaxation
             if verbose >= 1:
@@ -1189,7 +1246,7 @@ class IREDSequenceDataset(RelaxSequenceDataset):
             df = pd.read_csv(infile, delim_whitespace=True, header=0,
               index_col=0, names=["s2"])
         else:                                       # Parse other
-            df = super(IREDSequenceDataset, self)._read_text(infile, **kwargs)
+            df = super(IREDRelaxDataset, self)._read_text(infile, **kwargs)
         df = self._read_index(df, **kwargs)
 
         return df
@@ -1211,7 +1268,7 @@ class IREDSequenceDataset(RelaxSequenceDataset):
         from files that do not specify residue names.
 
         Arguments:
-          infile[s] (list): Path(s) to input file(s); may contain
+          infile{s} (list): Path(s) to input file(s); may contain
             environment variables and wildcards
           dataframe_kw (dict): Keyword arguments passed to
             :class:`DataFrame<pandas.DataFrame>` (hdf5 only)
@@ -1262,7 +1319,7 @@ class IREDSequenceDataset(RelaxSequenceDataset):
 
         return df
 
-class IREDTimeSeriesDataset(TimeSeriesDataset, IREDSequenceDataset):
+class IREDTimeSeriesDataset(TimeSeriesDataset, IREDRelaxDataset):
     """
     Represents iRED NMR relaxation data as a function of time and
     residue number.
@@ -1553,11 +1610,11 @@ class ErrorSequenceDataset(SequenceDataset):
               description = help_message)
 
         # Locked defaults
-        parser.set_defaults(cls=IREDSequenceDataset)
+        parser.set_defaults(cls=IREDRelaxDataset)
         input_group  = parser.add_argument_group("input")
 
         # Arguments from superclass
-        super(IREDSequenceDataset, IREDSequenceDataset).add_shared_args(parser)
+        super(IREDRelaxDataset, IREDRelaxDataset).add_shared_args(parser)
 
         # Input arguments
         input_group = parser.add_argument_group("input")
@@ -1939,7 +1996,7 @@ if __name__ == "__main__":
     SequenceDataset.construct_argparser(subparsers)
     TimeSeriesDataset.construct_argparser(subparsers)
     RelaxSequenceDataset.construct_argparser(subparsers)
-    IREDSequenceDataset.construct_argparser(subparsers)
+    IREDRelaxDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
     kwargs  = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
