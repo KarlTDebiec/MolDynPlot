@@ -517,7 +517,7 @@ class TimeSeriesDataset(Dataset):
         # Output to screen
         if verbose >= 2:
             print("Processed timeseries DataFrame:")
-            print(self.sequence_df)
+            print(self.timeseries_df)
 
         # Write data
         if outfile is not None:
@@ -866,6 +866,123 @@ class CorrDataset(Dataset):
           [a[0] for a in overlap_cols if a[1] == "y"]].loc[overlap_idx].values
 
         self.dataframe = corr
+
+class HSQCDataset(Dataset):
+    """
+    Represents NMR HSQC data.
+
+    Attributes:
+      hsqc_df (DataFrame): DataFrame whose two-dimensional index corresponds to
+        hydrogen and nitrogen chemical shift in ppm and whose columns
+        correspond to intensity
+    """
+
+    def __init__(self, downsample=None, calc_pdist=False, outfile=None,
+        interactive=False, **kwargs):
+        """
+        Arguments:
+          infile (str): Path to input file, may contain environment
+            variables
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        # Load
+        self.hsqc_df = self.read(**kwargs)
+
+        # Offset H
+        # Offset N
+        # Peaks?
+
+        # Output to screen
+        if verbose >= 2:
+            print("Processed HSQC DataFrame:")
+            print(self.hsqc_df)
+
+        # Write data
+        if outfile is not None:
+            self.write(df=self.hsqc_df, outfile=outfile, **kwargs)
+
+        # Interactive prompt
+        if interactive:
+            embed()
+
+    def _read_nmr(self, infile, **kwargs):
+        """
+        Reads DataFrame from NMR formats supported by nmrglue.
+
+        Arguments:
+          infile (str): Path to input file; may contain environment
+            variables
+          read_csv_kw (dict): Keyword arguments passed to
+            :func:`read_csv<pandas.read_csv>`
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          DataFrame: DataFrame
+        """
+        import nmrglue
+        from os.path import expandvars
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        infile = expandvars(infile)
+
+        # Read DataFrame
+        if verbose >= 1:
+            wiprint("""Reading DataFrame from '{0}' """.format(infile))
+        parameters, intensity = nmrglue.pipe.read(infile)
+        hydrogen  = nmrglue.pipe.make_uc(parameters, intensity,
+                       dim=1).ppm_scale()
+        nitrogen  = nmrglue.pipe.make_uc(parameters, intensity,
+                        dim=0).ppm_scale()
+
+#        index = pd.MultiIndex.from_product([hydrogen, nitrogen],
+#          names=["1H", "15N"])
+        index = pd.MultiIndex.from_product([nitrogen, hydrogen],
+          names=["15N", "1H"])
+        df = pd.DataFrame(data=intensity.flatten(), index=index,
+          columns=["intensity"])
+        df = df.swaplevel(0, 1)
+        df = df.sortlevel()
+
+        return df
+
+    def read(self, **kwargs):
+        """
+        Reads HSQC from one or more *infiles* into a DataFrame.
+        """
+        import re
+        from .myplotspec import multi_pop_merged
+
+        # Process arguments
+        infile_args = multi_pop_merged(["infile", "infiles"], kwargs)
+        infiles = self.infiles = self.process_infiles(infiles=infile_args)
+        if len(infiles) == 0:
+            raise Exception(sformat("""No infiles found matching
+            '{0}'""".format(infile_args)))
+        re_h5 = re.compile(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          flags=re.UNICODE)
+
+        # Load Data
+        dfs = []
+        for infile in infiles:
+            if infile.endswith(".ft"):
+                df = self._read_nmr(infile, **kwargs)
+            elif re_h5.match(infile):
+                df = self._read_hdf5(infile, **kwargs)
+            else:
+                df = self._read_text(infile, **kwargs)
+            dfs.append(df)
+        df = dfs.pop(0)
+        # Stack properly
+
+        return df
 
 class RelaxSequenceDataset(SequenceDataset):
     """

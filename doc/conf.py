@@ -23,15 +23,16 @@ source_suffix = ".rst"
 source_encoding = "utf-8"
 napoleon_use_rtype = False
 intersphinx_mapping = {
-  "h5py":       ("http://docs.h5py.org/en/latest", None),
-  "myplotspec": ("http://karltdebiec.github.io/myplotspec", None),
+  "h5py":       ("http://docs.h5py.org/en/latest",              None),
+  "myplotspec": ("http://karltdebiec.github.io/myplotspec",     None),
+  "nmrglue":    ("http://nmrglue.readthedocs.io/en/latest",     None),
   "pandas":     ("http://pandas.pydata.org/pandas-docs/stable", None)}
 master_doc = "index"
-project   = "moldynplot"
-copyright = "2015-2016, Karl T Debiec"
-author    = "Karl T Debiec"
-version   = "0.1.0"
-release   = "16-06-29"
+project    = "moldynplot"
+copyright  = "2015-2016, Karl T Debiec"
+author     = "Karl T Debiec"
+version    = "0.1.0"
+release    = "16-06-29"
 
 exclude_patterns  = ["_build"]
 pygments_style    = "sphinx"

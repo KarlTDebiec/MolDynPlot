@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   myplotspec_nmr.HSQCFigureManager.py
+#   moldynplot.HSQCFigureManager.py
 #
 #   Copyright (C) 2015 Karl T Debiec
 #   All rights reserved.
@@ -14,16 +14,16 @@ file.
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
 if __name__ == "__main__":
-    __package__ = str("myplotspec_nmr")
-    import myplotspec_nmr
+    __package__ = str("moldynplot")
+    import moldynplot
 from .myplotspec.FigureManager import FigureManager
+from .myplotspec.manage_defaults_presets import manage_defaults_presets
+from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
 class HSQCFigureManager(FigureManager):
     """
     Manages the generation of HSQC figures.
     """
-    from .myplotspec.manage_defaults_presets import manage_defaults_presets
-    from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
         draw_figure:
@@ -54,6 +54,8 @@ class HSQCFigureManager(FigureManager):
           title_kw:
             verticalalignment: bottom
         draw_dataset:
+          dataset_kw:
+            cls: moldynplot.Dataset.HSQCDataset
           cutoff: 0.970
           plot_kw:
             zorder: 10
@@ -116,31 +118,64 @@ class HSQCFigureManager(FigureManager):
             linewidths: 1
     """
 
+    @staticmethod
+    def get_slice(collection, lower_bound, upper_bound):
+        import numpy as np
+
+        try:
+            min_index = np.where(collection < lower_bound)[0][0] + 1
+        except IndexError:
+            min_index = collection.size
+        try:
+            max_index = max(np.where(collection > upper_bound)[0][-1],0)
+        except IndexError:
+            max_index = 0
+        return slice(max_index, min_index, 1)
+
+    def get_contour_levels(self, I, cutoff=0.9875, n_levels=10, min_level=None,
+        max_level=None, **kwargs):
+        """
+        Generates contour levels.
+
+        Arguments:
+          I (ndarray): Intensity
+          cutoff (float): Proportion of Intensity below minimum level
+          n_levels (int): Number of contour levels
+          min_level (float): Minimum contour level
+          max_level (float): Maximum contour level; default = max(I)
+
+        Returns:
+          (ndarray): levels
+
+        .. todo::
+            - Support negative contour levels
+            - Write partner function to analyze amino acid sequence,
+              estimate number of peaks, and choose appropriate cutoff
+        """
+        import numpy as np
+
+        I_flat    = np.sort(I.flatten())
+        if min_level is None:
+            min_level = I_flat[int(I_flat.size * cutoff)]
+        if max_level is None:
+            max_level = I_flat[-1]
+        exp_int = ((max_level ** (1 / (n_levels - 1))) /
+                   (min_level ** (1 / (n_levels - 1))))
+        levels = np.array([min_level * exp_int ** a
+                      for a in range(0, n_levels, 1)][:-1], dtype = np.int)
+        return levels
+
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, infile, peaklist=None, sequence=None,
+    def draw_dataset(self, subplot, draw_contour=True,
+        peaklist=None, sequence=None,
         label=None, handles=None, xoffset=0, yoffset=0, **kwargs):
         """
         Draws a dataset.
-
-        Arguments:
-          subplot (Axes): Axes on which to draw
-          infile (str): Path to input file; NMRPipe format
-          label (str, optional): Dataset label
-            handles: Nascent list of dataset handles on subplot
-          color (str, list, ndarray, float, optional): Dataset color
-          xoffset (float, optional): Offset added to x coordinates
-          yoffset (float, optional): Offset added to y coordinates
-          plot_kw (dict, optional): Additional keyword arguments passed
-            to subplot.plot()
-          handles (OrderedDict, optional): Nascent OrderedDict of
-            [labels]: handles on subplot
-          kwargs (dict): Additional keyword arguments
         """
         import numpy as np
-        from . import get_cmap, get_contour_levels
-        from .myplotspec import get_color, multi_get_copy
-        import nmrglue
+#        from . import get_cmap
+        from .myplotspec import get_colors, multi_get_copy
 
         # Cheap way to invert axes without overriding draw_subplot
         if not subplot.xaxis_inverted():
@@ -148,96 +183,45 @@ class HSQCFigureManager(FigureManager):
         if not subplot.yaxis_inverted():
             subplot.invert_yaxis()
 
-        def get_slice(collection, lower_bound, upper_bound):
-            try:
-                min_index = np.where(collection < lower_bound)[0][0] + 1
-            except IndexError:
-                min_index = collection.size
-            try:
-                max_index = max(np.where(collection > upper_bound)[0][-1],0)
-            except IndexError:
-                max_index = 0
-            return slice(max_index, min_index, 1)
-
-        # Load HSQC data
-        parameters, intensity = nmrglue.pipe.read(infile)
-        hydrogen  = nmrglue.pipe.make_uc(parameters, intensity,
-                       dim=1).ppm_scale()
-        nitrogen  = nmrglue.pipe.make_uc(parameters, intensity,
-                        dim=0).ppm_scale()
-
-        hydrogen += xoffset
-        nitrogen += yoffset
-
-
-#        # Load peak list
-#        if peaklist is not None:
-#            from . import parse_ccpnmr_peaks
-#            peaklist = parse_ccpnmr_peaks(peaklist)
-
-#        # Load sequence
-#        if sequence is not None:
-#            import re
-#
-#            sequence_dict = {}
-#            with open(sequence, "r") as sequence_infile:
-#                lines = sequence_infile.readlines()
-#            index = 1
-#            for line in lines:
-#                if line.startswith(">"):
-#                    index = int(line.split()[2])
-#                else:
-#                    for char in re.sub("[^A-Z]","", line):
-#                        sequence_dict[index] = char
-#                        index += 1
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
+        if "infile" in kwargs:
+            dataset_kw["infile"] = kwargs["infile"]
+        dataset = self.load_dataset(**dataset_kw)
+        if dataset is not None and hasattr(dataset, "hsqc_df"):
+            hsqc = dataset.hsqc_df
+        else:
+            hsqc = None
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
-        if "levels" not in plot_kw:
-            plot_kw["levels"] = get_contour_levels(intensity, **kwargs)
-        if "cmap" not in plot_kw:
-            if "color" in plot_kw:
-                plot_kw["color"] = get_color(plot_kw.pop("color"))
-            elif "color" in kwargs:
-                plot_kw["color"] = get_color(kwargs.pop("color"))
-            plot_kw["cmap"] = get_cmap(plot_kw["color"])
-        if label is not None:
-            plot_kw["label"] = label
+        get_colors(plot_kw, kwargs)
 
-        # Cut data that lies outside boundaries
-#        H_slice = get_slice(hydrogen, *subplot.get_xbound())
-#        N_slice = get_slice(nitrogen, *subplot.get_ybound())
+        # Load HSQC data
 
-        # Plot
-        subplot.contour(hydrogen, nitrogen, intensity, **plot_kw)
-#        subplot.contour(hydrogen[H_slice], nitrogen[N_slice],
-#          intensity[N_slice, H_slice], **plot_kw)
-        if handles is not None and label is not None:
-            handle_kw = multi_get_copy("handle_kw", kwargs, {})
-            handle_kw["mfc"] = plot_kw.get("color")
-            handles[label] = subplot.plot([0,0], [0,0], **handle_kw)[0]
-#
-#        # Draw peak labels
-#        if peaklist is not None:
-#            from .myplotspec.text import set_text
-#            from . import three_one
-#            for peak in peaklist.iterrows():
-#                peak_x = peak[1].loc[2]
-#                peak_y = peak[1].loc[3]
-#                assign = peak[1].loc[5].strip()
-#                if not assign.startswith("B"):
-#                    continue
-#                try:
-#                    float(peak_x)
-#                except:
-#                    continue
-#                label = "{0}{1}".format(three_one(assign[-4:-1]), assign[1:-4])
-#                print(peak_x, peak_y, assign, label)
-##                if sequence is not None and peak_index in sequence_dict:
-##                    peak_label = "{0}{1}".format(sequence_dict[peak_index],
-##                      peak_index)
-#                set_text(subplot, s=label, x=peak_x, y=peak_y, fp="6r",
-#                  text_kw=dict(ha="center", va="center"))
+        # Configure plot settings
+#        if "cmap" not in plot_kw:
+#            if "color" in plot_kw:
+#                plot_kw["color"] = get_color(plot_kw.pop("color"))
+#            elif "color" in kwargs:
+#                plot_kw["color"] = get_color(kwargs.pop("color"))
+#            plot_kw["cmap"] = get_cmap(plot_kw["color"])
+
+        # Plot contours
+        if draw_contour:
+            contour_kw = plot_kw.copy()
+            contour_kw.update(kwargs.get("contour_kw", {}))
+            get_colors(contour_kw)
+            hsqc.index.levels[0].size
+            ct_H = hsqc.index.levels[0]
+            ct_N = hsqc.index.levels[1]
+            ct_I = hsqc.values.reshape((hsqc.index.levels[0].size,
+                     hsqc.index.levels[1].size)).T
+            if "levels" not in contour_kw:
+                contour_kw["levels"] = self.get_contour_levels(ct_I, **kwargs)
+
+            subplot.contour(ct_H, ct_N, ct_I, **contour_kw)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
