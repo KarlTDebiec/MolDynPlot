@@ -488,7 +488,6 @@ class TimeSeriesDataset(Dataset):
         verbose = kwargs.get("verbose", 1)
 
         # Load
-#        super(TimeSeriesDataset, self).__init__( **kwargs)
         self.timeseries_df = self.read(**kwargs)
 
 #        if "usecols" in kwargs:
@@ -893,9 +892,16 @@ class HSQCDataset(Dataset):
         # Load
         self.hsqc_df = self.read(**kwargs)
 
-        # Offset H
-        # Offset N
-        # Peaks?
+        # Offset 1H and 15N
+        if "hoffset" in kwargs or "noffset" in kwargs:
+            hydrogen = np.array(self.hsqc_df.index.levels[0].values)
+            nitrogen = np.array(self.hsqc_df.index.levels[1].values)
+            if "hoffset" in kwargs:
+                hydrogen += float(kwargs.pop("hoffset"))
+            if "noffset" in kwargs:
+                nitrogen += float(kwargs.pop("noffset"))
+            self.hsqc_df.index = pd.MultiIndex.from_product(
+              [hydrogen, nitrogen], names=["1H", "15N"])
 
         # Output to screen
         if verbose >= 2:
@@ -941,8 +947,6 @@ class HSQCDataset(Dataset):
         nitrogen  = nmrglue.pipe.make_uc(parameters, intensity,
                         dim=0).ppm_scale()
 
-#        index = pd.MultiIndex.from_product([hydrogen, nitrogen],
-#          names=["1H", "15N"])
         index = pd.MultiIndex.from_product([nitrogen, hydrogen],
           names=["15N", "1H"])
         df = pd.DataFrame(data=intensity.flatten(), index=index,

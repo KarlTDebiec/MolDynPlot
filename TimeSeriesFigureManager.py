@@ -313,7 +313,7 @@ class TimeSeriesFigureManager(FigureManager):
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataset = self.load_dataset(**dataset_kw)
+        dataset = self.load_dataset(verbose=verbose, **dataset_kw)
         if dataset is not None and hasattr(dataset, "timeseries_df"):
             timeseries = dataset.timeseries_df
         else:

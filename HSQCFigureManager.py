@@ -171,9 +171,7 @@ class HSQCFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, draw_contour=True,
-        peaklist=None, sequence=None,
-        label=None, handles=None, xoffset=0, yoffset=0, **kwargs):
+    def draw_dataset(self, subplot, draw_contour=True, **kwargs):
         """
         Draws a dataset.
         """
@@ -192,7 +190,7 @@ class HSQCFigureManager(FigureManager):
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataset = self.load_dataset(**dataset_kw)
+        dataset = self.load_dataset(verbose=verbose, **dataset_kw)
         if dataset is not None and hasattr(dataset, "hsqc_df"):
             hsqc = dataset.hsqc_df
         else:
