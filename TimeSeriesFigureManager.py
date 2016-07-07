@@ -111,7 +111,7 @@ class TimeSeriesFigureManager(FigureManager):
           yticks:      [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
           yticklabels: [0,10,20,30,40,50,60,70,80,90,100]
         draw_dataset:
-          ykey: percent_native_contacts
+          column: percent_native_contacts
           dataset_kw:
             cls: moldynplot.Dataset.NatConTimeSeriesDataset
             downsample_mode: mean
@@ -126,7 +126,7 @@ class TimeSeriesFigureManager(FigureManager):
           ylabel: RMSD (Å)
           yticks: [0,2,4,6,8,10]
         draw_dataset:
-          ykey: rmsd
+          column: rmsd
           partner_kw:
             yticks: [0,2,4,6,8,10]
           dataset_kw:
@@ -145,16 +145,19 @@ class TimeSeriesFigureManager(FigureManager):
           ylabel: $R_g$ (Å)
           yticks: [0,5,10,15,20,25,30]
         draw_dataset:
-          ykey: rg
+          column: rg
           partner_kw:
             yticks: [0,5,10,15,20,25,30]
           dataset_kw:
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
+            pdist_kw:
+              bandwidth: 0.1
+              grid: !!python/object/apply:numpy.linspace [0,30,1000]
             read_csv_kw:
-              delim_whitespace: True
               header: 0
-              index_col: 0
+              delim_whitespace: True
+              engine: c
               names: [frame, rg, rgmax]
       rotdif:
         class: content
@@ -165,7 +168,7 @@ class TimeSeriesFigureManager(FigureManager):
           ylabel: $τ_c$ (ns)
           yticks: [0,5,10,15]
         draw_dataset:
-          ykey: rotdif
+          column: rotdif
           partner_kw:
             yticks: [0,5,10,15]
           dataset_kw:
@@ -308,7 +311,7 @@ class TimeSeriesFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, label=None, ykey=None, handles=None,
+    def draw_dataset(self, subplot, label=None, column=None, handles=None,
         draw_pdist=False, draw_fill_between=False, draw_plot=True, **kwargs):
         """
         """
@@ -376,7 +379,7 @@ class TimeSeriesFigureManager(FigureManager):
                 warn("'draw_pdist' is enabled but dataset does not have the "
                      "necessary attribute 'pdist_df', skipping.")
             else:
-                pdist = dataset.pdist_df[ykey]
+                pdist = dataset.pdist_df[column]
                 pdist_kw = plot_kw.copy()
                 pdist_kw.update(kwargs.get("pdist_kw", {}))
 
@@ -399,11 +402,11 @@ class TimeSeriesFigureManager(FigureManager):
         # Plot series
         if draw_plot:
             if verbose >= 2:
-                print("mean  {0}: {1:6.3f}".format(ykey,
-                  timeseries[ykey].mean()))
-                print("stdev {0}: {1:6.3f}".format(ykey,
-                  timeseries[ykey].std()))
-            plot = subplot.plot(timeseries.index.values, timeseries[ykey],
+                print("mean  {0}: {1:6.3f}".format(column,
+                  timeseries[column].mean()))
+                print("stdev {0}: {1:6.3f}".format(column,
+                  timeseries[column].std()))
+            plot = subplot.plot(timeseries.index.values, timeseries[column],
                      **plot_kw)[0]
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
             handle_kw["mfc"] = plot.get_color()
