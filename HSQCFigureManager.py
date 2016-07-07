@@ -30,6 +30,11 @@ class HSQCFigureManager(FigureManager):
           subplot_kw:
             autoscale_on: False
             axisbg: none
+          multi_tick_params:
+            left: on
+            right: off
+            bottom: on
+            top: off
         draw_subplot:
           xlabel: $^{1}H$ (ppm)
           ylabel: $^{15}N$ (ppm)

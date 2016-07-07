@@ -29,6 +29,7 @@ class TimeSeriesFigureManager(FigureManager):
         draw_figure:
           subplot_kw:
             autoscale_on: False
+            axisbg: none
           multi_tick_params:
             left: on
             right: off
