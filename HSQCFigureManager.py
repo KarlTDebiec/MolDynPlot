@@ -35,29 +35,44 @@ class HSQCFigureManager(FigureManager):
             right: off
             bottom: on
             top: off
+          shared_legend_kw:
+            spines: False
+            handle_kw:
+              ls: none
+              marker: s
+              mec: black
+            legend_kw:
+              frameon: False
+              loc: 9
+              numpoints: 1
+              handletextpad: 0
         draw_subplot:
+          title_kw:
+            verticalalignment: bottom
           xlabel: $^{1}H$ (ppm)
           ylabel: $^{15}N$ (ppm)
           xticks: [5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5]
           yticks: [100,105,110,115,120,125,130,135]
+          tick_params:
+            direction: out
+            bottom: on
+            top: off
+            right: off
+            left: on
           grid: True
           grid_kw:
             b: True
-            linestyle: '-'
             color: [0.8,0.8,0.8]
+            linestyle: '-'
+          label_kw:
+            zorder: 10
+            horizontalalignment: left
+            verticalalignment: top
           legend_kw:
             loc: 2
             handletextpad: 0.0
             numpoints: 1
             frameon: True
-          tick_params:
-            bottom: on
-            top: off
-            right: off
-            left: on
-            direction: out
-          title_kw:
-            verticalalignment: bottom
         draw_dataset:
           dataset_kw:
             cls: moldynplot.Dataset.HSQCDataset
@@ -65,9 +80,9 @@ class HSQCFigureManager(FigureManager):
           plot_kw:
             zorder: 10
           handle_kw:
-            marker: o
             ls: none
-            mew: 0
+            marker: s
+            mec: black
     """
     available_presets = """
       letter:
@@ -82,7 +97,7 @@ class HSQCFigureManager(FigureManager):
           xticklabels: [5.0,'',6.0,'',7.0,'',8.0,'',9.0,'',10.0,'',11.0]
           legend: True
         draw_dataset:
-          plot_kw:
+          contour_kw:
             linewidths: 0.75
           handle_kw:
             ms: 8
@@ -99,7 +114,7 @@ class HSQCFigureManager(FigureManager):
         draw_subplot:
           xticklabels: [5.0,'',6.0,'',7.0,'',8.0,'',9.0,'',10.0,'',11.0]
         draw_dataset:
-          plot_kw:
+          contour_kw:
             linewidths: 0.5
           handle_kw:
             ms: 5
@@ -171,7 +186,8 @@ class HSQCFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, draw_contour=True, **kwargs):
+    def draw_dataset(self, subplot, draw_contour=True, label=None,
+        handles=None, **kwargs):
         """
         Draws a dataset.
         """
@@ -200,17 +216,7 @@ class HSQCFigureManager(FigureManager):
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
         get_colors(plot_kw, kwargs)
 
-        # Load HSQC data
-
-        # Configure plot settings
-#        if "cmap" not in plot_kw:
-#            if "color" in plot_kw:
-#                plot_kw["color"] = get_color(plot_kw.pop("color"))
-#            elif "color" in kwargs:
-#                plot_kw["color"] = get_color(kwargs.pop("color"))
-#            plot_kw["cmap"] = get_cmap(plot_kw["color"])
-
-        # Plot contours
+        # Plot contour
         if draw_contour:
             contour_kw = plot_kw.copy()
             contour_kw.update(kwargs.get("contour_kw", {}))
@@ -241,6 +247,12 @@ class HSQCFigureManager(FigureManager):
                                   [path.vertices[1]], axis=0)
                             except IndexError:
                                 continue
+
+        # Draw handle
+        if handles is not None and label is not None:
+            handle_kw = plot_kw.copy()
+            handle_kw.update(kwargs.get("handle_kw", {}))
+            handles[label] = subplot.plot([0,0], [0,0], **handle_kw)[0]
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
