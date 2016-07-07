@@ -50,7 +50,13 @@ class HSQCFigureManager(FigureManager):
           title_kw:
             verticalalignment: bottom
           xlabel: $^{1}H$ (ppm)
+          xlabel_kw:
+            horizontalalignment: center
+            verticalalignment: center
           ylabel: $^{15}N$ (ppm)
+          ylabel_kw:
+            horizontalalignment: center
+            verticalalignment: center
           xticks: [5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5]
           yticks: [100,105,110,115,120,125,130,135]
           tick_params:
@@ -113,6 +119,10 @@ class HSQCFigureManager(FigureManager):
           top:        0.20
         draw_subplot:
           xticklabels: [5.0,'',6.0,'',7.0,'',8.0,'',9.0,'',10.0,'',11.0]
+          xlabel_kw:
+            labelpad: 10
+          ylabel_kw:
+            labelpad: 10
         draw_dataset:
           contour_kw:
             linewidths: 0.5
