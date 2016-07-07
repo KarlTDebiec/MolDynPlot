@@ -324,7 +324,7 @@ class SequenceDataset(Dataset):
            and str(df[a].dtype).startswith("float")])
         if isinstance(columns, six.string_types):
             columns = [columns]
-        mode = pdist_kw.get("mode", kde)
+        mode = pdist_kw.get("mode", "kde")
 
         if mode == "kde":
 
@@ -339,7 +339,7 @@ class SequenceDataset(Dataset):
             elif isinstance(grid, dict):
                 all_grid = None
                 pass
-            for column, series in df[pdist_cols].iteritems():
+            for column, series in df[columns].iteritems():
                 if column in grid:
                     grid[column] = np.array(grid[column])
                 elif all_grid is not None:
@@ -358,10 +358,10 @@ class SequenceDataset(Dataset):
             and   bandwidth.lower() == "se"):
                 all_bandwidth = None
                 bandwidth = "se"
-            elif isintance(bandwidth, float):
+            elif isinstance(bandwidth, float):
                 all_bandwidth = float(bandwidth)
                 bandwidth = {}
-            elif isintance(bandwidth, dict):
+            elif isinstance(bandwidth, dict):
                 all_bandwidth = None
                 pass
             for column, series in df[columns].iteritems():
@@ -395,7 +395,7 @@ class SequenceDataset(Dataset):
             raise Exception("only kde is currently supported")
         
 
-            return pdist
+        return pdist
 
 class TimeSeriesDataset(Dataset):
     """

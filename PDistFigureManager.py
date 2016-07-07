@@ -156,7 +156,7 @@ class PDistFigureManager(FigureManager):
         help: Format subplot for R2/R1 relaxation
         draw_subplot:
           xlabel: "$R_2$/$R_1$"
-          xticks: [0,2,4,6,8,10,12]
+          xticks: [3,4,5,6,7,8,9,10,11]
         draw_dataset:
           dataset_kw:
             pdist_kw:
@@ -175,6 +175,18 @@ class PDistFigureManager(FigureManager):
             pdist_kw:
               bandwidth:
                 noe: 0.03
+      rotdif:
+        class: content
+        help: Format subplot for rotational diffusion
+        draw_subplot:
+          xlabel: "$τ_c$ (ns)"
+          xticks: [4,5,6,7,8,9,10,11,12,13,14,15]
+        draw_dataset:
+          ykey: rotdif
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                rotdif: 0.1
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -182,14 +194,15 @@ class PDistFigureManager(FigureManager):
           nrows: 3
           shared_ylabel: "Prbability Distribution"
           subplots:
-            all:
-              ylabel: null
             0:
               preset: r1
+              ylabel: null
             1:
               preset: r2
+              ylabel: null
             2:
               preset: hetnoe
+              ylabel: null
       relaxation_4:
         class: content
         help: Four stacked plots including R1, R2, R2/R1, and HetNOE
@@ -197,16 +210,31 @@ class PDistFigureManager(FigureManager):
           nrows: 4
           shared_ylabel: "Prbability Distribution"
           subplots:
-            all:
-              ylabel: null
             0:
               preset: r1
+              ylabel: null
             1:
               preset: r2
+              ylabel: null
             2:
               preset: r2/r1
+              ylabel: null
             3:
               preset: hetnoe
+              ylabel: null
+      rotdif_2:
+        class: content
+        help: Two stacked plots including R2/R1 rotdif
+        draw_figure:
+          nrows: 2
+          shared_ylabel: "Prbability Distribution"
+          subplots:
+            0:
+              preset: r2/r1
+              ylabel: null
+            1:
+              preset: rotdif
+              ylabel: null
       manuscript:
         class: target
         inherits: manuscript
@@ -291,11 +319,12 @@ class PDistFigureManager(FigureManager):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
-        # Load data
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataset = self.load_dataset(**dataset_kw)
+        dataset = self.load_dataset(verbose=verbose, **dataset_kw)
         if dataset is not None and hasattr(dataset, "pdist_df"):
             pdist_df = dataset.pdist_df
         else:
