@@ -81,19 +81,18 @@ class HSQCFigureManager(FigureManager):
             linewidths: 0.75
           handle_kw:
             ms: 8
-      notebook:
+      manuscript:
         class: target
-        inherits: notebook
+        inherits: manuscript
         draw_figure:
-          left:       0.7
-          sub_width:  5.5
-          right:      0.3
-          bottom:     0.6
-          sub_height: 3.8
-          top:        0.3
+          left:       0.50
+          sub_width:  3.80
+          right:      0.20
+          bottom:     0.45
+          sub_height: 2.65
+          top:        0.20
         draw_subplot:
           xticklabels: [5.0,'',6.0,'',7.0,'',8.0,'',9.0,'',10.0,'',11.0]
-          legend: True
         draw_dataset:
           plot_kw:
             linewidths: 0.5
@@ -219,20 +218,26 @@ class HSQCFigureManager(FigureManager):
             ct_I = hsqc.values.reshape((hsqc.index.levels[0].size,
                      hsqc.index.levels[1].size)).T
             if "levels" not in contour_kw:
-                contour_kw["levels"] = self.get_contour_levels(ct_I, **kwargs)
+                contour_kw["levels"] = self.get_contour_levels(ct_I,
+                  **kwargs)
             if "cmap" not in contour_kw:
                 if "color"in contour_kw:
                     contour_kw["cmap"] = get_cmap(contour_kw.pop("color"))
-            contour = subplot.contour(ct_H, ct_N, ct_I, **contour_kw)
-            # Close bottom of contours
-            for collection in contour.collections:
-                for path in collection.get_paths():
-                    if np.all(path.vertices[0] == path.vertices[-1]):
-                        try:
-                            path.vertices = np.append(path.vertices,
-                              [path.vertices[1]], axis=0)
-                        except IndexError:
-                            continue
+            draw_contour_fill = contour_kw.pop("fill", False)
+            if draw_contour_fill:
+                contour = subplot.contourf(ct_H, ct_N, ct_I, **contour_kw)
+            else:
+                contour = subplot.contour(ct_H, ct_N, ct_I, **contour_kw)
+
+                # Close bottom of contours
+                for collection in contour.collections:
+                    for path in collection.get_paths():
+                        if np.all(path.vertices[0] == path.vertices[-1]):
+                            try:
+                                path.vertices = np.append(path.vertices,
+                                  [path.vertices[1]], axis=0)
+                            except IndexError:
+                                continue
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
