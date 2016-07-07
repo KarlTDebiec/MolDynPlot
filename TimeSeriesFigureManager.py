@@ -47,6 +47,7 @@ class TimeSeriesFigureManager(FigureManager):
               loc: 9
               numpoints: 1
               handletextpad: 0
+              borderaxespad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -69,6 +70,9 @@ class TimeSeriesFigureManager(FigureManager):
         draw_dataset:
           partner_kw:
             position: right
+            y2label_kw:
+              rotation: 270
+              verticalalignment: bottom
             tick_params:
               direction: out
               bottom: on
@@ -128,6 +132,9 @@ class TimeSeriesFigureManager(FigureManager):
           dataset_kw:
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
+            pdist_kw:
+              bandwidth: 0.1
+              grid: !!python/object/apply:numpy.linspace [0,10,1000]
             read_csv_kw:
               header: 0
               names: [frame, rmsd]
