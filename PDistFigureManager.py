@@ -95,7 +95,7 @@ class PDistFigureManager(FigureManager):
           xlabel: $R_g$ (Å)
           xticks: [0,5,10,15,20,25,30]
         draw_dataset:
-          ykey: rg
+          column: rg
           dataset_kw:
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
@@ -115,7 +115,7 @@ class PDistFigureManager(FigureManager):
           xlabel: RMSD (Å)
           xticks: [0,1,2,3,4,5]
         draw_dataset:
-          ykey: rmsd
+          column: rmsd
           dataset_kw:
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
@@ -138,7 +138,7 @@ class PDistFigureManager(FigureManager):
             pdist_kw:
               bandwidth:
                 r1: 0.02
-          ykey: r1
+          column: r1
       r2:
         class: content
         help: Format subplot for R2 relaxation
@@ -150,7 +150,7 @@ class PDistFigureManager(FigureManager):
             pdist_kw:
               bandwidth:
                 r2: 0.3
-          ykey: r2
+          column: r2
       r2/r1:
         class: content
         help: Format subplot for R2/R1 relaxation
@@ -162,7 +162,7 @@ class PDistFigureManager(FigureManager):
             pdist_kw:
               bandwidth:
                 "r2/r2": 0.3
-          ykey: r2/r1
+          column: r2/r1
       hetnoe:
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
@@ -170,7 +170,7 @@ class PDistFigureManager(FigureManager):
           xlabel: "Heteronuclear NOE"
           xticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
         draw_dataset:
-          ykey: noe
+          column: noe
           dataset_kw:
             pdist_kw:
               bandwidth:
@@ -182,7 +182,7 @@ class PDistFigureManager(FigureManager):
           xlabel: "$τ_c$ (ns)"
           xticks: [4,5,6,7,8,9,10,11,12,13,14,15]
         draw_dataset:
-          ykey: rotdif
+          column: rotdif
           dataset_kw:
             pdist_kw:
               bandwidth:
@@ -298,7 +298,7 @@ class PDistFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, label=None, ykey=None, handles=None,
+    def draw_dataset(self, subplot, label=None, column=None, handles=None,
         draw_pdist=True, draw_fill_between=False, draw_mean=False, **kwargs):
         """
         Draws a dataset on a subplot.
@@ -309,9 +309,13 @@ class PDistFigureManager(FigureManager):
           draw_fill_between (bool): Fill between specified region for this
             dataset
           draw_mean (bool): Draw point at mean value of this dataset
-          plot_kw (dict): Keyword arguments
-          fill_between_kw (dict): Keyword arguments
-          pdist_kw (dict): Keyword arguments
+          dataset_kw (dict): Keyword arguments used to passed to
+            :meth:`load_dataset`
+          plot_kw (dict): Keyword arguments used to configure plot
+          fill_between_kw (dict): Keyword arguments used to configure
+            fill_between
+          pdist_kw (dict): Keyword arguments using to configure probability
+            distribution
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
         """
@@ -354,7 +358,7 @@ class PDistFigureManager(FigureManager):
                 warn("'draw_pdist' is enabled but dataset does not have the "
                      "necessary attribute 'pdist_df', skipping.")
             else:
-                pdist = pdist_df[ykey]
+                pdist = pdist_df[column]
                 pdist_kw = plot_kw.copy()
                 pdist_kw.update(kwargs.get("pdist_kw", {}))
 

@@ -100,6 +100,11 @@ class TimeSeriesFigureManager(FigureManager):
             ls: none
             marker: s
             mec: black
+          mean_kw:
+            ls: none
+            marker: o
+            mec: black
+            zorder: 11
     """
 
     available_presets = """
@@ -261,6 +266,8 @@ class TimeSeriesFigureManager(FigureManager):
           handle_kw:
             ms: 6
             mew: 1
+          mean_kw:
+            ms: 2
       notebook:
         class: target
         inherits: notebook
@@ -312,10 +319,25 @@ class TimeSeriesFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None, column=None, handles=None,
-        draw_pdist=False, draw_fill_between=False, draw_plot=True, **kwargs):
+        draw_pdist=False, draw_fill_between=False, draw_mean=False,
+        draw_plot=True, **kwargs):
         """
+        Draws a dataset on a subplot.
+
+        Arguments:
+          subplot (Axes): Axes on which to draw
+          draw_pdist (bool): Draw probability distribution for this dataset
+          draw_fill_between (bool): Fill between specified region for this
+            dataset
+          draw_mean (bool): Draw point at mean value of this dataset
+          draw_plot (bool): Draw timeseries
+          dataset_kw (dict): Keyword arguments used to passed to
+            :meth:`load_dataset`
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
         """
         from warnings import warn
+        import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
         # Process arguments
@@ -369,31 +391,44 @@ class TimeSeriesFigureManager(FigureManager):
         # Plot pdist
         if draw_pdist:
 
-            # Add subplot if not already present
-            if not hasattr(subplot, "_mps_partner_subplot"):
-                from .myplotspec.axes import add_partner_subplot
-
-                add_partner_subplot(subplot, **kwargs)
-
             if not hasattr(dataset, "pdist_df"):
                 warn("'draw_pdist' is enabled but dataset does not have the "
                      "necessary attribute 'pdist_df', skipping.")
             else:
+
+                # Add subplot if not already present
+                if not hasattr(subplot, "_mps_partner_subplot"):
+                    from .myplotspec.axes import add_partner_subplot
+
+                    add_partner_subplot(subplot, **kwargs)
+
                 pdist = dataset.pdist_df[column]
                 pdist_kw = plot_kw.copy()
                 pdist_kw.update(kwargs.get("pdist_kw", {}))
 
                 pd_x = pdist.index.values
-                pd_y = pdist.values
+                pd_y = np.squeeze(pdist.values)
 
                 subplot._mps_partner_subplot.plot(pd_y, pd_x, **pdist_kw)
-                pdist_max = pd_y.max()
-                x_max = subplot._mps_partner_subplot.get_xbound()[1]
-                if pdist_max > x_max / 1.25:
-                    subplot._mps_partner_subplot.set_xbound(0, pdist_max*1.25)
-                    xticks = [0, pdist_max*0.25, pdist_max*0.50,
-                      pdist_max*0.75, pdist_max, pdist_max*1.25]
-                    subplot._mps_partner_subplot.set_xticks(xticks)
+                pdist_rescale = True
+                if pdist_rescale:
+                    pdist_max = pd_y.max()
+                    x_max = subplot._mps_partner_subplot.get_xbound()[1]
+                    if (pdist_max > x_max / 1.25
+                    or not hasattr(subplot, "_mps_rescaled")):
+                        subplot._mps_partner_subplot.set_xbound(0,
+                        pdist_max*1.25)
+                        xticks = [0, pdist_max*0.25, pdist_max*0.50,
+                          pdist_max*0.75, pdist_max, pdist_max*1.25]
+                        subplot._mps_partner_subplot.set_xticks(xticks)
+                        subplot._mps_rescaled = True
+                    if draw_mean:
+                        mean_kw = plot_kw.copy()
+                        mean_kw.update(kwargs.get("mean_kw", {}))
+                        mean = np.sum(np.array(pd_x, np.float64)
+                                     *np.array(pd_y, np.float64))
+                        subplot._mps_partner_subplot.plot(
+                          pd_y[np.abs(pd_x - mean).argmin()], mean, **mean_kw)
 
             if draw_fill_between:
                 subplot._mps_partner_subplot.fill_between(fb_x, fb_ylb,
