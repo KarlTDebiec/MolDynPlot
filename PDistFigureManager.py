@@ -100,11 +100,11 @@ class PDistFigureManager(FigureManager):
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
-                bandwidth: 0.1
+              bandwidth: 0.1
+              grid: !!python/object/apply:numpy.linspace [0,30,1000]
             read_csv_kw:
               delim_whitespace: True
               header: 0
-              index_col: 0
               names: [frame, rg, rgmax]
       rmsd:
         class: content
@@ -125,7 +125,6 @@ class PDistFigureManager(FigureManager):
             read_csv_kw:
               delim_whitespace: True
               header: 0
-              index_col: 0
               names: [frame, rmsd]
       r1:
         class: content

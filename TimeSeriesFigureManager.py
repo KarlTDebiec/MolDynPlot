@@ -146,6 +146,8 @@ class TimeSeriesFigureManager(FigureManager):
       rg:
         class: content
         help: Radius of gyration (Rg)
+        draw_figure:
+          multi_yticklabels: [0,5,10,15,20,25,30]
         draw_subplot:
           ylabel: $R_g$ (Å)
           yticks: [0,5,10,15,20,25,30]
@@ -160,9 +162,8 @@ class TimeSeriesFigureManager(FigureManager):
               bandwidth: 0.1
               grid: !!python/object/apply:numpy.linspace [0,30,1000]
             read_csv_kw:
-              header: 0
               delim_whitespace: True
-              engine: c
+              header: 0
               names: [frame, rg, rgmax]
       rotdif:
         class: content
