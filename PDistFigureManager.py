@@ -46,6 +46,7 @@ class PDistFigureManager(FigureManager):
               loc: 9
               numpoints: 1
               handletextpad: 0
+              borderaxespad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -185,7 +186,7 @@ class PDistFigureManager(FigureManager):
           dataset_kw:
             pdist_kw:
               bandwidth:
-                rotdif: 0.1
+                rotdif: 0.2
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE

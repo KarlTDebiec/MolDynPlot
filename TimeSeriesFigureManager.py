@@ -168,8 +168,6 @@ class TimeSeriesFigureManager(FigureManager):
       rotdif:
         class: content
         help: Rotational correlatio time (τc)
-        draw_figure:
-          multi_yticklabels: [0,5,10,15]
         draw_subplot:
           ylabel: $τ_c$ (ns)
           yticks: [0,5,10,15]
@@ -180,6 +178,9 @@ class TimeSeriesFigureManager(FigureManager):
           dataset_kw:
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
+            pdist_kw:
+              bandwidth:
+                rotdif: 0.2
       presentation:
         class: target
         inherits: presentation
