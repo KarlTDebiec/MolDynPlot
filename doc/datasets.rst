@@ -16,6 +16,9 @@ IREDRelaxDataset
 ~~~~~~~~~~~~~~~~
 .. autoclass::  moldynplot.Dataset.IREDRelaxDataset
 
+IREDTimeSeriesDataset
+:::::::::::::::::::::
+See :class:`moldynplot.Dataset.IREDTimeSeriesDataset`.
 
 TimeSeriesDataset
 -----------------
@@ -37,6 +40,11 @@ _____________________
 CorrDataset
 -----------
 .. autoclass::  moldynplot.Dataset.CorrDataset
+
+
+HSQCDataset
+-----------
+.. autoclass::  moldynplot.Dataset.HSQCDataset
 
 
 SAXSDataset

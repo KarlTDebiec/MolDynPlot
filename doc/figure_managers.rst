@@ -8,6 +8,10 @@ CorrFigureManager
 -----------------
 .. automodule:: moldynplot.CorrFigureManager
 
+HSQCFigureManager
+-----------------
+.. automodule:: moldynplot.HSQCFigureManager
+
 MDGXFigureManager
 -----------------
 .. automodule:: moldynplot.MDGXFigureManager
