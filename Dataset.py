@@ -138,7 +138,7 @@ class SequenceDataset(Dataset):
         super(SequenceDataset, SequenceDataset).add_shared_args(parser)
 
     @classmethod
-    def get_cache_key(cls, *args, **kwargs):
+    def get_cache_key(cls, **kwargs):
         """
         Generates key for dataset cache.
 
@@ -176,9 +176,10 @@ class SequenceDataset(Dataset):
           use_indexes (list): Residue indexes to select from DataFrame,
             once DataFrame has already been loaded
           calc_pdist (bool): Calculate probability distribution
-          pdist_kw (dict): Keyword arguments used to configure
-            probability distribution calculation
+            using :meth:`calc_pdist`
           dataset_cache (dict): Cache of previously-loaded Datasets
+          interactive (bool): Provide iPython prompt and reading and
+            processing data
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
         """
@@ -456,10 +457,8 @@ class TimeSeriesDataset(Dataset):
         interactive=False, **kwargs):
         """
         Arguments:
-          infile (str): Path to input file, may contain environment
-            variables
-          usecols (list): Columns to select from DataFrame, once
-            DataFrame has already been loaded
+          infile{s} (list): Path(s) to input file(s); may contain
+            environment variables and wildcards
           dt (float): Time interval between points; units unspecified
           toffset (float): Time offset to be added to all points (i.e.
             time of first point)
@@ -473,13 +472,12 @@ class TimeSeriesDataset(Dataset):
             sklearn.neighbors.KernelDensity; key argument is 'bandwidth'
           grid (ndarray): Grid on which to calculate probability
             distribution
+          interactive (bool): Provide iPython prompt and reading and
+            processing data
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
 
           .. todo:
-            - 'y' argument does not belong here; make sure it is
-              removable
-            - Make pdist a DataFrame rather than explicit x and y
             - Calculate pdist using histogram
             - Verbose pdist
         """
@@ -490,9 +488,6 @@ class TimeSeriesDataset(Dataset):
         # Load
         self.timeseries_df = self.read(**kwargs)
 
-#        if "usecols" in kwargs:
-#            timeseries = timeseries[timeseries.columns[kwargs.pop("usecols")]]
-
         # Convert from frame index to time
         if "dt" in kwargs:
             self.timeseries_df.index *= kwargs.pop("dt")
@@ -500,10 +495,6 @@ class TimeSeriesDataset(Dataset):
         # Offset time
         if "toffset" in kwargs:
             self.timeseries_df.index += kwargs.pop("toffset")
-
-#        # Store y, if applicable
-#        if "y" in kwargs:
-#            self.y = kwargs.pop("y")
 
         # Downsample
         if downsample:
