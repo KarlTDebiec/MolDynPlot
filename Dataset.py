@@ -2000,14 +2000,13 @@ class MDGXDataset(Dataset):
             read_csv_kw.append((key, value))
         return (cls, expandvars(infile), tuple(selections), tuple(read_csv_kw))
 
-    def __init__(self, infile, selections=None, verbose=1, debug=0, **kwargs):
+    def __init__(self, infile, selections=None, **kwargs):
         """
         """
         from os.path import expandvars
 
         # Load
-        super(MDGXDataset, self).__init__(infile=infile,
-          verbose=verbose, debug=debug, **kwargs)
+        super(MDGXDataset, self).__init__(infile=infile, **kwargs)
         dataframe = self.dataframe
         dataframe.index.name = "conformation"
         dataframe["error"] = np.abs(dataframe["qm_energy"]

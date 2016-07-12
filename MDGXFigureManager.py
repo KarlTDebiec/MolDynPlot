@@ -13,11 +13,10 @@ file.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
-import matplotlib
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
-from myplotspec.FigureManager import FigureManager
+from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
@@ -48,6 +47,7 @@ class MDGXFigureManager(FigureManager):
               loc: 9
               numpoints: 1
               title: Backbone torsion class
+              borderaxespad: 0
             handles:
               - ["Neutral",            {color: green}]
               - ["Negatively-charged", {color: red}]
@@ -77,7 +77,7 @@ class MDGXFigureManager(FigureManager):
             read_csv_kw:
               delim_whitespace: True
               names: [topology, restart, qm_energy, mm_energy]
-              header: 0
+              index_col: False
     """
 
     available_presets = """
@@ -143,6 +143,71 @@ class MDGXFigureManager(FigureManager):
             alpha: 1
             zorder: 13
             lw: 1
+      presentation:
+        class: target
+        inherits: presentation
+        draw_figure:
+          left:       1.20
+          sub_width:  8.64
+          right:      0.40
+          bottom:     4.00
+          sub_height: 2.00
+          top:        1.68
+          shared_legend: True
+          shared_legend_kw:
+            left:       1.20
+            sub_width:  8.64
+            bottom:     3.00
+            sub_height: 0.60
+            handle_kw:
+              ms: 10
+              mew: 2
+            legend_kw:
+              legend_fp: 14r
+              ncol: 5
+        draw_subplot:
+          xtick_fp: 11r
+          xlabel_kw:
+            labelpad: 3
+          ylabel_kw:
+            labelpad: 8
+          grid_kw:
+            lw: 1
+        draw_dataset:
+          violin_kw:
+            points: 1000
+            widths: 0.8
+            showmeans: False
+            showextrema: False
+          body_kw:
+            alpha: 1
+            zorder: 10
+          median_kw:
+            color: black
+            lw: 2
+          percentile_kw:
+            color: black
+            lw: 1
+            zorder: 11
+          mae_kw:
+            linestyle: none
+            marker: o
+            ms: 5
+            mfc: white
+            mew: 0
+            zorder: 12
+          rmse_kw:
+            linestyle: none
+            marker: o
+            ms: 5
+            mfc: white
+            mew: 1
+            mec: black
+            zorder: 12
+          edge_kw:
+            alpha: 1
+            zorder: 13
+            lw: 2
         """
 
     @manage_defaults_presets()
