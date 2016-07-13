@@ -41,6 +41,7 @@ class SequenceFigureManager(FigureManager):
               loc: 9
               numpoints: 1
               handletextpad: 0
+              borderaxespad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -290,7 +291,7 @@ class SequenceFigureManager(FigureManager):
         draw_figure:
           left:       1.50
           sub_width:  6.00
-          bottom:     2.30
+          bottom:     2.50
           sub_height: 1.20
           hspace:     0.10
           shared_legend_kw:
@@ -308,13 +309,14 @@ class SequenceFigureManager(FigureManager):
             labelpad: 3
         draw_dataset:
           fill_between_kw:
+            lw: 1
             zorder: 9
           errorbar_kw:
             capsize: 0
             elinewidth: 2
             marker: 'o'
             mew: 0
-            ms: 2
+            ms: 5
           handle_kw:
             ms: 12
             mew: 2
