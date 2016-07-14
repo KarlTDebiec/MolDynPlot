@@ -17,14 +17,13 @@ if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
 from .myplotspec.FigureManager import FigureManager
+from .myplotspec.manage_defaults_presets import manage_defaults_presets
+from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
 class SequenceFigureManager(FigureManager):
     """
     Manages the generation of sequence figures.
     """
-
-    from .myplotspec.manage_defaults_presets import manage_defaults_presets
-    from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
         draw_figure:
@@ -42,6 +41,7 @@ class SequenceFigureManager(FigureManager):
               loc: 9
               numpoints: 1
               handletextpad: 0
+              borderaxespad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -65,8 +65,9 @@ class SequenceFigureManager(FigureManager):
             verticalalignment: top
         draw_dataset:
           dataset_kw:
+            cls: moldynplot.Dataset.SequenceDataset
             read_csv_kw:
-              delim_whitespace: True
+              delimiter: "\\\\s\\\\s+"
               index_col: 0
           fill_between_kw:
             zorder: 9
@@ -83,21 +84,22 @@ class SequenceFigureManager(FigureManager):
         class: content
         help: Plot secondary structure as a function of sequence
         draw_subplot:
-          ylabel: '% α Helix'
+          ylabel: "% α Helix"
           yticks: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
-          yticklabels: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
         draw_dataset:
           kind: ss
-          ykey: Alpha
+          column: Alpha
       r1:
         class: content
         help: Format subplot for R1 relaxation
         draw_subplot:
-          ylabel:      "$R_1$"
-          yticks:      [0,1,2,3,4,5]
+          ylabel: "$R_1$"
+          yticks: [0,1,2,3,4,5]
         draw_dataset:
-          ykey:   r1
-          ysekey: r1_se
+          dataset_kw:
+            cls: moldynplot.Dataset.RelaxSequenceDataset
+          column:    "r1"
+          column_se: "r1 se"
       r2:
         class: content
         help: Format subplot for R2 relaxation
@@ -105,8 +107,22 @@ class SequenceFigureManager(FigureManager):
           ylabel: "$R_2$"
           yticks: [0,2,4,6,8,10,12,14,16,18,20]
         draw_dataset:
-          ykey:   r2
-          ysekey: r2_se
+          dataset_kw:
+            cls: moldynplot.Dataset.RelaxSequenceDataset
+          column:    "r2"
+          column_se: "r2 se"
+      r2/r1:
+        class: content
+        help: Format subplot for R2/R1 relaxation
+        draw_subplot:
+          ylabel: "$\\\\frac{R_2}{R_1}$"
+          ylabel_fp: 12b
+          yticks: [3,4,5,6,7,8,9,10,11]
+        draw_dataset:
+          dataset_kw:
+            cls: moldynplot.Dataset.RelaxSequenceDataset
+          column:    "r2/r1"
+          column_se: "r2/r1 se"
       hetnoe:
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
@@ -114,8 +130,10 @@ class SequenceFigureManager(FigureManager):
           ylabel: "Het\n\nNOE"
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          ykey:   noe
-          ysekey: noe_se
+          dataset_kw:
+            cls: moldynplot.Dataset.RelaxSequenceDataset
+          column:    "noe"
+          column_se: "noe se"
       s2:
         class: content
         help: Format subplot for S2 order parameter
@@ -123,8 +141,10 @@ class SequenceFigureManager(FigureManager):
           ylabel: "$S^2$"
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          ykey:   s2
-          ysekey: s2_se
+          dataset_kw:
+            cls: moldynplot.Dataset.RelaxSequenceDataset
+          column:    "s2"
+          column_se: "s2 se"
       error:
         class: content
         help: Format subplot for normalized error
@@ -148,8 +168,8 @@ class SequenceFigureManager(FigureManager):
             labelpad: 12
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          ykey:   pre
-          ysekey: pre_se
+          column:    "pre"
+          column_se: "pre se"
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -158,26 +178,26 @@ class SequenceFigureManager(FigureManager):
           nrows: 3
           subplots:
             0:
-              preset: r1
+              preset: "r1"
             1:
-              preset: r2
+              preset: "r2"
             2:
-              preset: hetnoe
+              preset: "hetnoe"
       relaxation_4:
         class: content
-        help: Four stacked plots including R1, R2, HetNOE, and S2
+        help: Four stacked plots including R1, R2, R2/R1, and HetNOE
         draw_figure:
           multiplot: True
           nrows: 4
           subplots:
             0:
-              preset: r1
+              preset: "r1"
             1:
-              preset: r2
+              preset: "r2"
             2:
-              preset: hetnoe
+              preset: "r2/r1"
             3:
-              preset: s2
+             preset: "hetnoe"
       manuscript:
         class: target
         inherits: manuscript
@@ -271,7 +291,7 @@ class SequenceFigureManager(FigureManager):
         draw_figure:
           left:       1.50
           sub_width:  6.00
-          bottom:     2.30
+          bottom:     2.50
           sub_height: 1.20
           hspace:     0.10
           shared_legend_kw:
@@ -289,13 +309,14 @@ class SequenceFigureManager(FigureManager):
             labelpad: 3
         draw_dataset:
           fill_between_kw:
+            lw: 1
             zorder: 9
           errorbar_kw:
             capsize: 0
             elinewidth: 2
             marker: 'o'
             mew: 0
-            ms: 2
+            ms: 5
           handle_kw:
             ms: 12
             mew: 2
@@ -304,7 +325,7 @@ class SequenceFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot,
-        ykey=None, ysekey=None, label=None,
+        column=None, column_se=None, label=None,
         handles=None,
         draw_fill_between=False, draw_errorbar=True, draw_plot=False,
         draw_handle=True, draw_label=False,
@@ -316,8 +337,8 @@ class SequenceFigureManager(FigureManager):
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataframe= self.load_dataset(verbose=verbose, debug=debug,
-          **dataset_kw).dataframe
+        dataframe = self.load_dataset(verbose=verbose, debug=debug,
+          **dataset_kw).sequence_df
         x = np.array([filter(lambda x: x in '0123456789.', s)
               for s in dataframe.index.values], np.int)
 
@@ -335,8 +356,8 @@ class SequenceFigureManager(FigureManager):
                 if residue in x:
                     fb_x.extend([residue-0.5, residue+0.5])
                     index = np.argmax(x==residue)
-                    if ysekey is not None:
-                        yse = dataframe[ysekey][index]
+                    if column_se is not None:
+                        yse = dataframe[column_se][index]
                         if yse_min is not None and yse < yse_min:
                             yse = yse_min
                     elif yse_min is not None:
@@ -344,11 +365,11 @@ class SequenceFigureManager(FigureManager):
                     else:
                         yse = 0
                     fb_lb.extend([
-                      dataframe[ykey][index] - yse * 1.96,
-                      dataframe[ykey][index] - yse * 1.96])
+                      dataframe[column][index] - yse * 1.96,
+                      dataframe[column][index] - yse * 1.96])
                     fb_ub.extend([
-                      dataframe[ykey][index] + yse * 1.96,
-                      dataframe[ykey][index] + yse * 1.96])
+                      dataframe[column][index] + yse * 1.96,
+                      dataframe[column][index] + yse * 1.96])
                 else:
                     fb_x.append(None)
                     fb_lb.append(None)
@@ -363,7 +384,8 @@ class SequenceFigureManager(FigureManager):
         if draw_errorbar:
             errorbar_kw = multi_get_copy("errorbar_kw", kwargs, {})
             get_colors(errorbar_kw, plot_kw)
-            subplot.errorbar(x, y=dataframe[ykey], yerr=dataframe[ysekey]*1.96,
+            subplot.errorbar(x, y=dataframe[column],
+              yerr=dataframe[column_se]*1.96,
               **errorbar_kw)
 
         # Plot series
@@ -373,8 +395,8 @@ class SequenceFigureManager(FigureManager):
                 if residue in x:
                     p_x.extend([residue-0.5, residue+0.5])
                     index = np.argmax(x==residue)
-                    p_y.extend([dataframe[ykey][index],
-                                dataframe[ykey][index]])
+                    p_y.extend([dataframe[column][index],
+                                dataframe[column][index]])
                 else:
                     p_x.append(None)
                     p_y.append(None)
@@ -382,7 +404,7 @@ class SequenceFigureManager(FigureManager):
             p_y = np.array(p_y, np.float)
             plot = subplot.plot(p_x, p_y, **plot_kw)[0]
             if verbose >= 2:
-                print(ykey, np.nanmean(p_y))
+                print(column, np.nanmean(p_y))
                 print(p_x)
                 print(p_y)
 

@@ -16,14 +16,13 @@ if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
 from .myplotspec.FigureManager import FigureManager
+from .myplotspec.manage_defaults_presets import manage_defaults_presets
+from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
 class CorrFigureManager(FigureManager):
     """
     Manages the generation of correlation figures.
     """
-
-    from .myplotspec.manage_defaults_presets import manage_defaults_presets
-    from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
         draw_figure:
@@ -61,7 +60,7 @@ class CorrFigureManager(FigureManager):
             linestyle: '-'
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.CorrDataset.CorrDataset
+            cls: moldynplot.Dataset.CorrDataset
             x_kw:
               read_csv_kw:
                 delim_whitespace: True
@@ -241,6 +240,9 @@ class CorrFigureManager(FigureManager):
         draw_corr_line=True, draw_errorbar=True, draw_plot=True,
         draw_handle=False, draw_label=False,
         verbose=1, debug=0, **kwargs):
+        """
+        Draws dataset
+        """
         from os.path import expandvars
         from warnings import warn
         import numpy as np

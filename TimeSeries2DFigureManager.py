@@ -17,14 +17,13 @@ if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
 from .myplotspec.FigureManager import FigureManager
+from .myplotspec.manage_defaults_presets import manage_defaults_presets
+from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
 class TimeSeries2DFigureManager(FigureManager):
     """
     Manages the generation of 2D time series figures.
     """
-
-    from .myplotspec.manage_defaults_presets import manage_defaults_presets
-    from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
         draw_figure:
@@ -361,17 +360,17 @@ class TimeSeries2DFigureManager(FigureManager):
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
-        timeseries = dataset.timeseries
+        timeseries_df = dataset.timeseries_df
 
         # Draw heatmap
         if draw_heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
-            hm_x = timeseries.index.values
+            hm_x = timeseries_df.index.values
             try:
-                hm_y = np.array(timeseries.columns, np.float)
+                hm_y = np.array(timeseries_df.columns, np.float)
             except:
-                hm_y = np.array(range(1, timeseries.shape[1] + 2))
-            hm_z = timeseries.values.T
+                hm_y = np.array(range(1, timeseries_df.shape[1] + 2))
+            hm_z = timeseries_df.values.T
             if logz:
                 hm_z = np.log10(hm_z)
             pcolormesh = subplot.pcolor(hm_x, hm_y, hm_z, **heatmap_kw)
@@ -394,13 +393,13 @@ class TimeSeries2DFigureManager(FigureManager):
             get_colors(contour_kw)
             if "levels" not in contour_kw:
                 contour_kw["levels"] = range(0,
-                  int(np.ceil(np.nanmax(timeseries.values))))
-            ct_x = timeseries.index.values
+                  int(np.ceil(np.nanmax(timeseries_df.values))))
+            ct_x = timeseries_df.index.values
             try:
-                ct_y = np.array(timeseries.columns, np.float)
+                ct_y = np.array(timeseries_df.columns, np.float)
             except:
-                ct_y = np.array(range(1, timeseries.shape[1] + 2))
-            ct_z = timeseries.values.T
+                ct_y = np.array(range(1, timeseries_df.shape[1] + 2))
+            ct_z = timeseries_df.values.T
             if logz:
                 ct_z = np.log10(ct_z)
             contour = subplot.contour(ct_x, ct_y, ct_z, **contour_kw)

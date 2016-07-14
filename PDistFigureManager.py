@@ -17,14 +17,13 @@ if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
 from .myplotspec.FigureManager import FigureManager
+from .myplotspec.manage_defaults_presets import manage_defaults_presets
+from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
 class PDistFigureManager(FigureManager):
     """
     Manages the generation of probability distribution figures.
     """
-
-    from .myplotspec.manage_defaults_presets import manage_defaults_presets
-    from .myplotspec.manage_kwargs import manage_kwargs
 
     defaults = """
         draw_figure:
@@ -47,6 +46,7 @@ class PDistFigureManager(FigureManager):
               loc: 9
               numpoints: 1
               handletextpad: 0
+              borderaxespad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -96,16 +96,16 @@ class PDistFigureManager(FigureManager):
           xlabel: $R_g$ (Å)
           xticks: [0,5,10,15,20,25,30]
         draw_dataset:
-          ykey: rg
+          column: rg
           dataset_kw:
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
-                bandwidth: 0.1
+              bandwidth: 0.1
+              grid: !!python/object/apply:numpy.linspace [0,30,1000]
             read_csv_kw:
               delim_whitespace: True
               header: 0
-              index_col: 0
               names: [frame, rg, rgmax]
       rmsd:
         class: content
@@ -116,7 +116,7 @@ class PDistFigureManager(FigureManager):
           xlabel: RMSD (Å)
           xticks: [0,1,2,3,4,5]
         draw_dataset:
-          ykey: rmsd
+          column: rmsd
           dataset_kw:
             cls: moldynplot.Dataset.TimeSeriesDataset
             calc_pdist: True
@@ -126,7 +126,6 @@ class PDistFigureManager(FigureManager):
             read_csv_kw:
               delim_whitespace: True
               header: 0
-              index_col: 0
               names: [frame, rmsd]
       r1:
         class: content
@@ -134,18 +133,60 @@ class PDistFigureManager(FigureManager):
         draw_subplot:
           xlabel:      "$R_1$"
           xticks:      [0.0,0.5,1.0,1.5,2.0,2.5,3.0]
+        draw_dataset:
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                r1: 0.02
+          column: r1
       r2:
         class: content
         help: Format subplot for R2 relaxation
         draw_subplot:
           xlabel: "$R_2$"
           xticks: [0,2,4,6,8,10,12,14,16,18,20]
+        draw_dataset:
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                r2: 0.3
+          column: r2
+      r2/r1:
+        class: content
+        help: Format subplot for R2/R1 relaxation
+        draw_subplot:
+          xlabel: "$R_2$/$R_1$"
+          xticks: [3,4,5,6,7,8,9,10,11]
+        draw_dataset:
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                "r2/r2": 0.3
+          column: r2/r1
       hetnoe:
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
         draw_subplot:
           xlabel: "Heteronuclear NOE"
           xticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+        draw_dataset:
+          column: noe
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                noe: 0.03
+      rotdif:
+        class: content
+        help: Format subplot for rotational diffusion
+        draw_subplot:
+          xlabel: "$τ_c$ (ns)"
+          xticks: [4,5,6,7,8,9,10,11,12,13,14,15]
+        draw_dataset:
+          column: rotdif
+          dataset_kw:
+            pdist_kw:
+              bandwidth:
+                rotdif: 0.2
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -153,14 +194,47 @@ class PDistFigureManager(FigureManager):
           nrows: 3
           shared_ylabel: "Prbability Distribution"
           subplots:
-            all:
-              ylabel: null
             0:
               preset: r1
+              ylabel: null
             1:
               preset: r2
+              ylabel: null
             2:
               preset: hetnoe
+              ylabel: null
+      relaxation_4:
+        class: content
+        help: Four stacked plots including R1, R2, R2/R1, and HetNOE
+        draw_figure:
+          nrows: 4
+          shared_ylabel: "Prbability Distribution"
+          subplots:
+            0:
+              preset: r1
+              ylabel: null
+            1:
+              preset: r2
+              ylabel: null
+            2:
+              preset: r2/r1
+              ylabel: null
+            3:
+              preset: hetnoe
+              ylabel: null
+      rotdif_2:
+        class: content
+        help: Two stacked plots including R2/R1 rotdif
+        draw_figure:
+          nrows: 2
+          shared_ylabel: "Prbability Distribution"
+          subplots:
+            0:
+              preset: r2/r1
+              ylabel: null
+            1:
+              preset: rotdif
+              ylabel: null
       manuscript:
         class: target
         inherits: manuscript
@@ -224,30 +298,64 @@ class PDistFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, label=None, ykey=None, handles=None,
-        draw_pdist=True, draw_fill_between=False, draw_mean=False,verbose=1,
-        debug=0, **kwargs):
+    def draw_dataset(self, subplot, column=None,
+        draw_pdist=True, draw_fill_between=False, draw_mean=False, **kwargs):
         """
+        Loads a dataset and draws it on a subplot.
+
+        Loaded dataset should have attribute `pdist_df`.
+
+        Arguments:
+          subplot (Axes): :class:`Axes<matplotlib.axes.Axes>` on
+            which to draw
+          dataset_kw (dict): Keyword arguments passed to
+            :meth:`load_dataset
+            <myplotspec.FigureManager.FigureManager.load_dataset>`
+          plot_kw (dict): Keyword arguments passed to methods of
+            :class:`Axes<matplotlib.axes.Axes>`
+          column (str): Column within `pdist_df` to use
+          draw_fill_between (bool): Fill between specified region
+          fill_between_kw (dict): Keyword arguments used to configure
+            call to
+            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
+          fill_between_kw[x] (list, ndarray): x values passed to
+            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
+          fill_between_kw[ylb] (list, ndarray): y lower bound values
+            passed to
+            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
+          fill_between_kw[yub] (list, ndarray): y upper bound values
+            passed to
+            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
+          draw_pdist (bool): Draw probability distribution
+          pdist_kw (dict): Keyword arguments using to configure call to 
+            :meth:`plot<matplotlib.axes.Axes.plot>`
+          draw_mean (bool): Draw point at mean value
+          mean_kw (dict): Keyword arguments used to configure call to 
+            :meth:`plot<matplotlib.axes.Axes.plot>`
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
         """
         from warnings import warn
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
-        # Load data
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
-        if dataset is not None and hasattr(dataset, "pdist"):
-            pdist = dataset.pdist
+        dataset = self.load_dataset(verbose=verbose, **dataset_kw)
+        if dataset is not None and hasattr(dataset, "pdist_df"):
+            pdist_df = dataset.pdist_df
         else:
-            pdist = None
+            pdist_df = None
+
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
         get_colors(plot_kw, kwargs)
 
-        # Plot fill_between
+        # Draw fill_between
         if draw_fill_between:
             fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
             get_colors(fill_between_kw, plot_kw)
@@ -260,13 +368,13 @@ class PDistFigureManager(FigureManager):
                 fb_yub = fill_between_kw.pop("yub")
             subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
 
-        # Plot pdist
+        # Draw pdist
         if draw_pdist:
-            if not hasattr(dataset, "pdist"):
+            if not hasattr(dataset, "pdist_df"):
                 warn("'draw_pdist' is enabled but dataset does not have the "
-                     "necessary attribute 'pdist', skipping.")
+                     "necessary attribute 'pdist_df', skipping.")
             else:
-                pdist = pdist[ykey]
+                pdist = pdist_df[column]
                 pdist_kw = plot_kw.copy()
                 pdist_kw.update(kwargs.get("pdist_kw", {}))
 
