@@ -199,7 +199,23 @@ class HSQCFigureManager(FigureManager):
     def draw_dataset(self, subplot, draw_contour=True, label=None,
         handles=None, **kwargs):
         """
-        Draws a dataset.
+        Draws a dataset on a subplot.
+
+        Arguments:
+          subplot (Axes): Axes on which to draw
+          draw_pdist (bool): Draw contour
+          draw_fill_between (bool): Fill between specified region for this
+            dataset
+          draw_mean (bool): Draw point at mean value of this dataset
+          dataset_kw (dict): Keyword arguments used to passed to
+            :meth:`load_dataset`
+          plot_kw (dict): Keyword arguments used to configure plot
+          fill_between_kw (dict): Keyword arguments used to configure
+            fill_between
+          pdist_kw (dict): Keyword arguments using to configure probability
+            distribution
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
         """
         import numpy as np
 #        from . import get_cmap

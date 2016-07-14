@@ -24,6 +24,7 @@ source_encoding = "utf-8"
 napoleon_use_rtype = False
 intersphinx_mapping = {
   "h5py":       ("http://docs.h5py.org/en/latest",              None),
+  "matplotlib": ("http://matplotlib.org",        None),
   "myplotspec": ("http://karltdebiec.github.io/myplotspec",     None),
   "nmrglue":    ("http://nmrglue.readthedocs.io/en/latest",     None),
   "pandas":     ("http://pandas.pydata.org/pandas-docs/stable", None)}

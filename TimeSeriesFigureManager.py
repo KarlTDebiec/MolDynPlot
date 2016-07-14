@@ -326,15 +326,22 @@ class TimeSeriesFigureManager(FigureManager):
         """
         Draws a dataset on a subplot.
 
+        Loaded dataset should have attribute `timeseries_df`
+
         Arguments:
-          subplot (Axes): Axes on which to draw
-          draw_pdist (bool): Draw probability distribution for this dataset
+          subplot (Axes): :class:`Axes<matplotlib.axes.Axes>` on
+            which to draw
+          dataset_kw (dict): Keyword arguments passed to
+            :meth:`load_dataset
+            <myplotspec.FigureManager.FigureManager.load_dataset>`
+          plot_kw (dict): Keyword arguments passed to methods of
+            :class:`Axes<matplotlib.axes.Axes>`
+          draw_plot (bool): Draw plot
+          draw_pdist (bool): Draw probability distribution
           draw_fill_between (bool): Fill between specified region for this
             dataset
-          draw_mean (bool): Draw point at mean value of this dataset
-          draw_plot (bool): Draw timeseries
-          dataset_kw (dict): Keyword arguments used to passed to
-            :meth:`load_dataset`
+          draw_mean (bool): Draw point at mean value value of
+            probability distribution
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
         """
@@ -357,7 +364,7 @@ class TimeSeriesFigureManager(FigureManager):
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
         get_colors(plot_kw, kwargs)
 
-        # Plot fill_between
+        # Draw fill_between
         if draw_fill_between:
             fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
             get_colors(fill_between_kw, plot_kw)
@@ -390,7 +397,22 @@ class TimeSeriesFigureManager(FigureManager):
                 warn("inappropriate fill_between settings")
             subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
 
-        # Plot pdist
+        # Draw plot
+        if draw_plot:
+            if verbose >= 2:
+                print("mean  {0}: {1:6.3f}".format(column,
+                  timeseries[column].mean()))
+                print("stdev {0}: {1:6.3f}".format(column,
+                  timeseries[column].std()))
+            plot = subplot.plot(timeseries.index.values, timeseries[column],
+                     **plot_kw)[0]
+            handle_kw = multi_get_copy("handle_kw", kwargs, {})
+            handle_kw["mfc"] = plot.get_color()
+            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
+            if handles is not None and label is not None:
+                handles[label] = handle
+
+        # Draw pdist
         if draw_pdist:
 
             if not hasattr(dataset, "pdist_df"):
@@ -435,21 +457,6 @@ class TimeSeriesFigureManager(FigureManager):
             if draw_fill_between:
                 subplot._mps_partner_subplot.fill_between(fb_x, fb_ylb,
                   fb_yub, **fill_between_kw)
-
-        # Plot series
-        if draw_plot:
-            if verbose >= 2:
-                print("mean  {0}: {1:6.3f}".format(column,
-                  timeseries[column].mean()))
-                print("stdev {0}: {1:6.3f}".format(column,
-                  timeseries[column].std()))
-            plot = subplot.plot(timeseries.index.values, timeseries[column],
-                     **plot_kw)[0]
-            handle_kw = multi_get_copy("handle_kw", kwargs, {})
-            handle_kw["mfc"] = plot.get_color()
-            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
-            if handles is not None and label is not None:
-                handles[label] = handle
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

@@ -298,24 +298,40 @@ class PDistFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, label=None, column=None, handles=None,
+    def draw_dataset(self, subplot, column=None,
         draw_pdist=True, draw_fill_between=False, draw_mean=False, **kwargs):
         """
-        Draws a dataset on a subplot.
+        Loads a dataset and draws it on a subplot.
+
+        Loaded dataset should have attribute `pdist_df`.
 
         Arguments:
-          subplot (Axes): Axes on which to draw
-          draw_pdist (bool): Draw probability distribution for this dataset
-          draw_fill_between (bool): Fill between specified region for this
-            dataset
-          draw_mean (bool): Draw point at mean value of this dataset
-          dataset_kw (dict): Keyword arguments used to passed to
-            :meth:`load_dataset`
-          plot_kw (dict): Keyword arguments used to configure plot
+          subplot (Axes): :class:`Axes<matplotlib.axes.Axes>` on
+            which to draw
+          dataset_kw (dict): Keyword arguments passed to
+            :meth:`load_dataset
+            <myplotspec.FigureManager.FigureManager.load_dataset>`
+          plot_kw (dict): Keyword arguments passed to methods of
+            :class:`Axes<matplotlib.axes.Axes>`
+          column (str): Column within `pdist_df` to use
+          draw_fill_between (bool): Fill between specified region
           fill_between_kw (dict): Keyword arguments used to configure
-            fill_between
-          pdist_kw (dict): Keyword arguments using to configure probability
-            distribution
+            call to
+            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
+          fill_between_kw[x] (list, ndarray): x values passed to
+            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
+          fill_between_kw[ylb] (list, ndarray): y lower bound values
+            passed to
+            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
+          fill_between_kw[yub] (list, ndarray): y upper bound values
+            passed to
+            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
+          draw_pdist (bool): Draw probability distribution
+          pdist_kw (dict): Keyword arguments using to configure call to 
+            :meth:`plot<matplotlib.axes.Axes.plot>`
+          draw_mean (bool): Draw point at mean value
+          mean_kw (dict): Keyword arguments used to configure call to 
+            :meth:`plot<matplotlib.axes.Axes.plot>`
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
         """
@@ -339,7 +355,7 @@ class PDistFigureManager(FigureManager):
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
         get_colors(plot_kw, kwargs)
 
-        # Plot fill_between
+        # Draw fill_between
         if draw_fill_between:
             fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
             get_colors(fill_between_kw, plot_kw)
@@ -352,7 +368,7 @@ class PDistFigureManager(FigureManager):
                 fb_yub = fill_between_kw.pop("yub")
             subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
 
-        # Plot pdist
+        # Draw pdist
         if draw_pdist:
             if not hasattr(dataset, "pdist_df"):
                 warn("'draw_pdist' is enabled but dataset does not have the "
