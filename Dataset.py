@@ -13,6 +13,12 @@ specific for molecular dynamics simulation data.
 
 .. todo:
   - Fix ordering of argument groups: input, action, output
+  - Move relaxation error to a Dataset subclass
+  - Move relaxation r1/r2 to a Dataset subclass
+  - Move relaxation heteronuclear noe to a Dataset subclass
+  - Move relaxation pre to a Dataset subclass
+  - Move SAXS to a Dataset subclass
+  - Move cpptraj parsing to a Dataset subclass and test robustness
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
