@@ -60,14 +60,17 @@ class SequenceDataset(Dataset):
       scaleoffset = 5)
 
     @staticmethod
-    def construct_argparser(subparsers=None, **kwargs):
+    def construct_argparser(parser_or_subparsers=None, **kwargs):
         """
-        Constructs argument parser, either new or as a subparser.
+        Adds arguments to an existing argument parser, constructs a
+        subparser, or constructs a new parser
 
         Arguments:
-          subparsers (_SubParsersAction, optional): Nascent collection
-            of subparsers to which to add; if omitted, a new parser will
-            be generated
+          parser_or_subparsers (ArgumentParser, _SubParsersAction,
+            optional): If ArgumentParser, existing parser to which
+            arguments will be added; if _SubParsersAction, collection of
+            subparsers to which a new argument parser will be added; if
+            None, a new argument parser will be generated
           kwargs (dict): Additional keyword arguments
 
         Returns:
@@ -78,70 +81,43 @@ class SequenceDataset(Dataset):
         # Process arguments
         help_message = """Process data that is a function of amino acid
           sequence"""
-        if subparsers is not None:
-            parser = subparsers.add_parser(
+        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
+            parser = parser_or_subparsers
+        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
+            parser = parser_or_subparsers.add_parser(
               name        = "sequence",
               description = help_message,
               help        = help_message)
-        else:
+        elif parser is None:
             parser = argparse.ArgumentParser(
               description = help_message)
 
-        # Locked defaults
-        parser.set_defaults(cls=SequenceDataset)
-        input_group  = parser.add_argument_group("input")
+        # Defaults
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=SequenceDataset)
 
-        # Arguments from superclass
-        super(SequenceDataset, SequenceDataset).add_shared_args(parser)
-
-        # Input arguments
-        input_group = parser.add_argument_group("input")
-        input_group.add_argument(
-          "-infiles",
-          required = True,
-          dest     = "infiles",
-          metavar  = "INFILE",
-          nargs    = "+",
-          type     = str,
-          help     = """File(s) from which to load data; may be text or hdf5 ;
-                     may contain environment variables and wildcards""")
-        input_group.add_argument(
-          "-indexfile",
-          required = False,
-          type     = str,
-          help     = """text file from which to load residue names; should list
-                    amino acids in the form 'XAA:#' separated by whitespace; if
-                    omitted will be taken from rows of first infile; may
-                    contain environment variables""")
-
-        return parser
-
-    @staticmethod
-    def add_shared_args(parser, **kwargs):
-        """
-        Adds command line arguments shared by all subclasses.
-
-        Arguments:
-          parser (ArgumentParser): Nascent argument parser to which to
-            add arguments
-          kwargs (dict): Additional keyword arguments
-        """
-
-        # Process arguments
+        # Arguments unique to this class
         arg_groups = {ag.title: ag for ag in parser._action_groups}
 
-        # Output arguments
-        output_group = arg_groups.get("output", 
-          parser.add_argument_group("output"))
-        output_group.add_argument(
-          "-outfile",
-          required = False,
-          type     = str,
-          help     = """text or hdf5 file to which processed results will be
-                     output; may contain environment variables""")
+        # Input arguments
+        input_group  = arg_groups.get("input",
+          parser.add_argument_group("input"))
+        try:
+            input_group.add_argument(
+              "-indexfile",
+              required = False,
+              type     = str,
+              help     = """text file from which to load residue names; should
+                         list amino acids in the form 'XAA:#' separated by
+                         whitespace; if omitted will be taken from rows of
+                         first infile; may contain environment variables""")
+        except argparse.ArgumentError:
+            pass
 
-        # Arguments from superclass
-        super(SequenceDataset, SequenceDataset).add_shared_args(parser)
+        # Arguments inherited from superclass
+        Dataset.construct_argparser(parser)
+
+        return parser
 
     @classmethod
     def get_cache_key(cls, **kwargs):
@@ -247,7 +223,7 @@ class SequenceDataset(Dataset):
                         """.format(indexfile))
             res_index = np.loadtxt(indexfile, dtype=np.str).flatten()
             df.set_index(res_index, inplace=True)
-            df.index.name = "residue" 
+            df.index.name = "residue"
         elif (sum([1 for a in [re_res.match(str(b)) for b in df.index.values]
               if a is not None]) == len(df.index.values)):
             df.index.name = "residue"
@@ -400,7 +376,7 @@ class SequenceDataset(Dataset):
                 pdist[column] = series_pdist
         else:
             raise Exception("only kde is currently supported")
-        
+
 
         return pdist
 
@@ -411,18 +387,21 @@ class TimeSeriesDataset(Dataset):
     Attributes:
       timeseries_df (DataFrame): DataFrame whose index corresponds to
         time as represented by frame number or chemical time and whose
-        columns are a series of quantities as a function of time. 
+        columns are a series of quantities as a function of time.
     """
 
     @staticmethod
-    def construct_argparser(subparsers=None, **kwargs):
+    def construct_argparser(parser_or_subparsers=None, **kwargs):
         """
-        Constructs argument parser, either new or as a subparser.
+        Adds arguments to an existing argument parser, constructs a
+        subparser, or constructs a new parser
 
         Arguments:
-          subparsers (_SubParsersAction, optional): Nascent collection
-            of subparsers to which to add; if omitted, a new parser will
-            be generated
+          parser_or_subparsers (ArgumentParser, _SubParsersAction,
+            optional): If ArgumentParser, existing parser to which
+            arguments will be added; if _SubParsersAction, collection of
+            subparsers to which a new argument parser will be added; if
+            None, a new argument parser will be generated
           kwargs (dict): Additional keyword arguments
 
         Returns:
@@ -432,32 +411,27 @@ class TimeSeriesDataset(Dataset):
 
         # Process arguments
         help_message = """Process data that is a function of time"""
-        if subparsers is not None:
-            parser = subparsers.add_parser(
+        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
+            parser = parser_or_subparsers
+        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
+            parser = parser_or_subparsers.add_parser(
               name        = "timeseries",
               description = help_message,
               help        = help_message)
-        else:
+        elif parser is None:
             parser = argparse.ArgumentParser(
               description = help_message)
 
-        # Locked defaults
-        parser.set_defaults(cls=TimeSeriesDataset)
+        # Defaults
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=TimeSeriesDataset)
 
-        # Arguments from superclass
-        super(TimeSeriesDataset, TimeSeriesDataset).add_shared_args(parser)
+        # Arguments unique to this class
 
-        # Input arguments
-        input_group  = parser.add_argument_group("input")
-        input_group.add_argument(
-          "-infiles",
-          required = True,
-          dest     = "infiles",
-          metavar  = "INFILE",
-          nargs    = "+",
-          type     = str,
-          help     = """File(s) from which to load data; may be text or hdf5 ;
-                     may contain environment variables and wildcards""")
+        # Arguments inherited from superclass
+        Dataset.construct_argparser(parser)
+
+        return parser
 
     def __init__(self, downsample=None, calc_pdist=False, outfile=None,
         interactive=False, **kwargs):
@@ -716,7 +690,7 @@ class SAXSDataset(Dataset):
         verbose = kwargs.get("verbose", 1)
 
         # Scale by constant
-        if (isinstance(scale, float) 
+        if (isinstance(scale, float)
         or (isinstance(scale, int) and not isinstance(scale, bool))):
             scale = float(scale)
         # Scale to match target
@@ -991,14 +965,17 @@ class RelaxSequenceDataset(SequenceDataset):
     """
 
     @staticmethod
-    def construct_argparser(subparsers=None, **kwargs):
+    def construct_argparser(parser_or_subparsers=None, **kwargs):
         """
-        Constructs argument parser, either new or as a subparser.
+        Adds arguments to an existing argument parser, constructs a
+        subparser, or constructs a new parser
 
         Arguments:
-          subparsers (_SubParsersAction, optional): Nascent collection
-            of subparsers to which to add; if omitted, a new parser will
-            be generated
+          parser_or_subparsers (ArgumentParser, _SubParsersAction,
+            optional): If ArgumentParser, existing parser to which
+            arguments will be added; if _SubParsersAction, collection of
+            subparsers to which a new argument parser will be added; if
+            None, a new argument parser will be generated
           kwargs (dict): Additional keyword arguments
 
         Returns:
@@ -1008,42 +985,25 @@ class RelaxSequenceDataset(SequenceDataset):
 
         # Process arguments
         help_message = """Process relaxation data"""
-        if subparsers is not None:
-            parser = subparsers.add_parser(
+        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
+            parser = parser_or_subparsers
+        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
+            parser = parser_or_subparsers.add_parser(
               name        = "relax",
               description = help_message,
               help        = help_message)
-        else:
+        elif parser is None:
             parser = argparse.ArgumentParser(
               description = help_message)
 
-        # Locked defaults
-        parser.set_defaults(cls=RelaxSequenceDataset)
-        input_group  = parser.add_argument_group("input")
+        # Defaults
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=RelaxSequenceDataset)
 
-        # Arguments from superclass
-        super(RelaxSequenceDataset,
-          RelaxSequenceDataset).add_shared_args(parser)
+        # Arguments unique to this class
 
-        # Input arguments
-        input_group = parser.add_argument_group("input")
-        input_group.add_argument(
-          "-infiles",
-          required = True,
-          dest     = "infiles",
-          metavar  = "INFILE",
-          nargs    = "+",
-          type     = str,
-          help     = """File(s) from which to load data; may be text or hdf5 ;
-                     may contain environment variables and wildcards""")
-        input_group.add_argument(
-          "-indexfile",
-          required = False,
-          type     = str,
-          help     = """text file from which to load residue names; should list
-                    amino acids in the form 'XAA:#' separated by whitespace; if
-                    omitted will be taken from rows of first infile; may
-                    contain environment variables""")
+        # Arguments inherited from superclass
+        SequenceDataset.construct_argparser(parser)
 
         return parser
 
@@ -1109,7 +1069,6 @@ class RelaxSequenceDataset(SequenceDataset):
         from . import three_one
 
         # Process arguments
-        verbose = kwargs.get("verbose", 1)
         df      = kwargs.get("df")
         if df is None:
             if hasattr(self, "sequence_df"):
@@ -1117,10 +1076,10 @@ class RelaxSequenceDataset(SequenceDataset):
             else:
                 raise()
         outfile = expandvars(outfile)
-        res_index = np.array([int(i.split(":")[1]) for i in df.index.values])
-        print(res_index)
-        res_code = np.array([three_one(i.split(":")[0]) for i in df.index.values])
-        print(res_code)
+        res_index = np.array([int(i.split(":")[1])
+          for i in df.index.values])
+        res_code = np.array([three_one(i.split(":")[0])
+          for i in df.index.values])
 
         df["index"] = res_index
         df["code"] = res_code
@@ -1142,14 +1101,17 @@ class IREDRelaxDataset(RelaxSequenceDataset):
     """
 
     @staticmethod
-    def construct_argparser(subparsers=None, **kwargs):
+    def construct_argparser(parser_or_subparsers=None, **kwargs):
         """
-        Constructs argument parser, either new or as a subparser.
+        Adds arguments to an existing argument parser, constructs a
+        subparser, or constructs a new parser
 
         Arguments:
-          subparsers (_SubParsersAction, optional): Nascent collection
-            of subparsers to which to add; if omitted, a new parser will
-            be generated
+          parser_or_subparsers (ArgumentParser, _SubParsersAction,
+            optional): If ArgumentParser, existing parser to which
+            arguments will be added; if _SubParsersAction, collection of
+            subparsers to which a new argument parser will be added; if
+            None, a new argument parser will be generated
           kwargs (dict): Additional keyword arguments
 
         Returns:
@@ -1163,41 +1125,43 @@ class IREDRelaxDataset(RelaxSequenceDataset):
             independent simulations; processed results are the average across
             the simulations, including standard errors calculated using
             standard deviation"""
-        if subparsers is not None:
-            parser = subparsers.add_parser(
+        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
+            parser = parser_or_subparsers
+        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
+            parser = parser_or_subparsers.add_parser(
               name        = "ired",
               description = help_message,
               help        = help_message)
-        else:
+        elif parser is None:
             parser = argparse.ArgumentParser(
               description = help_message)
 
-        # Locked defaults
-        parser.set_defaults(cls=IREDRelaxDataset)
-        input_group  = parser.add_argument_group("input")
+        # Defaults
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=IREDRelaxDataset)
 
-        # Arguments from superclass
-        super(IREDRelaxDataset, IREDRelaxDataset).add_shared_args(parser)
+        # Arguments unique to this class
+        arg_groups = {ag.title: ag for ag in parser._action_groups}
 
         # Input arguments
-        input_group = parser.add_argument_group("input")
-        input_group.add_argument(
-          "-infiles",
-          required = True,
-          dest     = "infiles",
-          metavar  = "INFILE",
-          nargs    = "+",
-          type     = str,
-          help     = """File(s) from which to load data; may be text or hdf5 ;
-                     may contain environment variables and wildcards""")
-        input_group.add_argument(
-          "-indexfile",
-          required = False,
-          type     = str,
-          help     = """text file from which to load residue names; should list
-                    amino acids in the form 'XAA:#' separated by whitespace; if
-                    omitted will be taken from rows of first infile; may
-                    contain environment variables""")
+        input_group  = arg_groups.get("input",
+          parser.add_argument_group("input"))
+        try:
+            input_group.add_argument(
+              "-infiles",
+              required = True,
+              dest     = "infiles",
+              metavar  = "INFILE",
+              nargs    = "+",
+              type     = str,
+              help     = """File(s) from which to load data; may be text or
+                         hdf5; if text, may be pandas-formatted DataFrames, or
+                         may be cpptraj-formatted iRED output; may contain
+                         environment variables and wildcards""")
+        except argparse.ArgumentError:
+            pass
+        # Arguments inherited from superclass
+        RelaxSequenceDataset.construct_argparser(parser)
 
         return parser
 
@@ -1441,14 +1405,17 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDRelaxDataset):
     """
 
     @staticmethod
-    def construct_argparser(subparsers=None, **kwargs):
+    def construct_argparser(parser_or_subparsers=None, **kwargs):
         """
-        Constructs argument parser, either new or as a subparser.
+        Adds arguments to an existing argument parser, constructs a
+        subparser, or constructs a new parser
 
         Arguments:
-          subparsers (_SubParsersAction, optional): Nascent collection
-            of subparsers to which to add; if omitted, a new parser will
-            be generated
+          parser_or_subparsers (ArgumentParser, _SubParsersAction,
+            optional): If ArgumentParser, existing parser to which
+            arguments will be added; if _SubParsersAction, collection of
+            subparsers to which a new argument parser will be added; if
+            None, a new argument parser will be generated
           kwargs (dict): Additional keyword arguments
 
         Returns:
@@ -1463,42 +1430,26 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDRelaxDataset):
           excerpts of a longer simulation; processed results are a
           timeseries and the average across the timeseries, including
           standard errors calculated using block averaging"""
-        if subparsers is not None:
-            parser = subparsers.add_parser(
-              name = "ired_timeseries",
+        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
+            parser = parser_or_subparsers
+        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
+            parser = parser_or_subparsers.add_parser(
+              name        = "ired_timeseries",
               description = help_message,
               help        = help_message)
-        else:
+        elif parser is None:
             parser = argparse.ArgumentParser(
               description = help_message)
 
-        # Locked defaults
-        parser.set_defaults(cls=IREDTimeSeriesDataset)
+        # Defaults
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=IREDTimeSeriesDataset)
 
-        # Arguments from superclass
-        super(IREDTimeSeriesDataset, IREDTimeSeriesDataset).add_shared_args(
-          parser)
+        # Arguments unique to this class
 
-        # Input arguments
-        input_group  = parser.add_argument_group("input")
-        input_group.add_argument(
-          "-infiles",
-          required = True,
-          dest     = "infiles",
-          metavar  = "INFILE",
-          nargs    = "+",
-          type     = str,
-          help     = """cpptraj iRED output file(s) from which to load
-                     datasets; may be plain text or compressed, and may
-                     contain environment variables and wildcards""")
-        input_group.add_argument(
-          "-indexfile",
-          required = False,
-          type     = str,
-          help     = """text file from which to load residue names; should list
-                     amino acids in the form 'XAA:#' separated by whitespace;
-                     if omitted will be taken from rows of first infile; may
-                     contain environment variables""")
+        # Arguments inherited from superclass
+        IREDRelaxDataset.construct_argparser(parser)
+        TimeSeriesDataset.construct_argparser(parser)
 
         return parser
 
@@ -1593,7 +1544,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDRelaxDataset):
         self.sequence_df = c
         c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
         sequence_df = c
-        
+
         return sequence_df
 
     def __init__(self, outfile=None, interactive=False, **kwargs):
@@ -1675,96 +1626,6 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDRelaxDataset):
         df = self.concatenate_timeseries(timeseries_dfs, relax_dfs, order_dfs)
         df.index.name = "frame"
         return df
-
-class ErrorSequenceDataset(SequenceDataset):
-    """
-    Represents error in simulated relaxation data relative to experiment
-    as a function of residue number.
-    """
-
-    @staticmethod
-    def construct_argparser(subparsers=None, **kwargs):
-        """
-        Constructs argument parser, either new or as a subparser.
-
-        Arguments:
-          subparsers (_SubParsersAction, optional): Nascent collection
-            of subparsers to which to add; if omitted, a new parser will
-            be generated
-          kwargs (dict): Additional keyword arguments
-
-        Returns:
-          ArgumentParser: Argument parser or subparser
-        """
-        import argparse
-
-        # Process arguments
-        help_message = """Calculate error of simulated relaxation
-          relative to experiment."""
-        desc_message = help_message + """ The intended use case is to break
-          down errors relative to experimental data collected at multiple
-          magnetic fields or by multiple groups, error(residue, measurement,
-          magnet/group), into a form that is easier to visualize and
-          communicate, error(residue, measurement). Reads in a series of input
-          files containing simulated data and a series of files containing
-          corresponding experimental data. These files are treated in pairs and
-          the error between all data points present in both (e.g. row 'GLN:2',
-          column 'r1') calculated. Columns ending in ' se' are treated as
-          uncertainties, and are propogated into uncertainties in the resulting
-          errors. Take caution when processing datasets that omit uncertainties
-          alongside those that do (experimental uncertainties are not always
-          reported), as the resulting uncertainties in the residuals will be
-          incorrect."""
-        if subparsers is not None:
-            parser = subparsers.add_parser(
-              name        = "error",
-              description = desc_message,
-              help        = help_message)
-        else:
-            parser = argparse.ArgumentParser(
-              description = help_message)
-
-        # Locked defaults
-        parser.set_defaults(cls=IREDRelaxDataset)
-        input_group  = parser.add_argument_group("input")
-
-        # Arguments from superclass
-        super(IREDRelaxDataset, IREDRelaxDataset).add_shared_args(parser)
-
-        # Input arguments
-        input_group = parser.add_argument_group("input")
-        input_group.add_argument(
-          "-sim-infiles",
-          required = True,
-          dest     = "sim_infiles",
-          metavar  = "SIM_INFILE",
-          nargs    = "+",
-          type     = str,
-          help     = """Input file(s) from which to load simulation datasets;
-                     may be plain text or compressed, and may contain
-                     environment variables and wildcards""")
-        input_group.add_argument(
-          "-exp-infiles",
-          required = True,
-          dest     = "exp_infiles",
-          metavar  = "EXP_INFILE",
-          nargs    = "+",
-          type     = str,
-          help     = """Input file(s) from which to load experimental datasets;
-                     may be plain text or compressed, and may contain
-                     environment variables and wildcards""")
-
-        return parser
-
-    def __init__(self, calc_pdist=False, **kwargs):
-        """
-        """
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-
-        # Load
-        super(SequenceDataset, self).__init__( **kwargs)
 
 class NatConTimeSeriesDataset(TimeSeriesDataset):
     """
@@ -2109,10 +1970,12 @@ if __name__ == "__main__":
       dest        = "mode",
       description = "")
 
+    Dataset.construct_argparser(subparsers)
     SequenceDataset.construct_argparser(subparsers)
     TimeSeriesDataset.construct_argparser(subparsers)
     RelaxSequenceDataset.construct_argparser(subparsers)
     IREDRelaxDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
+
     kwargs  = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
