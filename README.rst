@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/KarlTDebiec/moldynplot.svg?branch=master
+    :target: https://travis-ci.org/KarlTDebiec/moldynplot
+
 Introduction
 ============
 
