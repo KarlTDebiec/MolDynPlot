@@ -5,6 +5,7 @@ addons:
     apt:
         packages:
             - libhdf5-serial-dev
+            - liblapack-dev
 before_install:
     - pip install coveralls
     - pip install pytest
