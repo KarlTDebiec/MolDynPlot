@@ -7,8 +7,12 @@ addons:
             - libhdf5-serial-dev
 before_install:
     - pip install coveralls
-    - pip install pytest pytest-cov
-    - pip install -r requirements.txt
+    - pip install pytest
+    - pip install pytest-cov
+    - pip install h5py
+    - pip install ipython
+    - pip install matplotlib
+    - pip install pandas
 install:
     - python setup.py install
 script:
