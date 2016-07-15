@@ -3,4 +3,5 @@
 *.swo
 .DS_Store
 .cache
+build
 doc/_build
