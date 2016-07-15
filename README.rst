@@ -1,8 +1,8 @@
-.. image:: https://travis-ci.org/KarlTDebiec/moldynplot.svg?branch=master
-    :target: https://travis-ci.org/KarlTDebiec/moldynplot
+.. image:: https://travis-ci.org/KarlTDebiec/MolDynPlot.svg?branch=master
+    :target: https://travis-ci.org/KarlTDebiec/MolDynPlot
 
-.. image:: https://coveralls.io/repos/github/KarlTDebiec/moldynplot/badge.svg?branch=master
-    :target: https://coveralls.io/github/KarlTDebiec/moldynplot?branch=master
+.. image:: https://coveralls.io/repos/github/KarlTDebiec/MolDynPlot/badge.svg?branch=master
+    :target: https://coveralls.io/github/KarlTDebiec/MolDynPlot?branch=master
 
 Introduction
 ============
