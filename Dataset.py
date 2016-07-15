@@ -427,14 +427,46 @@ class TimeSeriesDataset(Dataset):
             parser.set_defaults(cls=TimeSeriesDataset)
 
         # Arguments unique to this class
+        arg_groups = {ag.title: ag for ag in parser._action_groups}
+        input_group = arg_groups.get("input",
+          parser.add_argument_group("input"))
+        action_group = arg_groups.get("action",
+          parser.add_argument_group("action"))
+        output_group = arg_groups.get("output",
+          parser.add_argument_group("output"))
 
+        # Action arguments
+        try:
+            action_group.add_argument(
+              "-dt",
+              required = False,
+              type     = float,
+              help     = """Time between frames""")
+        except argparse.ArgumentError:
+            pass
+        try:
+            action_group.add_argument(
+              "-toffset",
+              required = False,
+              type     = float,
+              help     = """Offset to add to index (time or frame number)""")
+        except argparse.ArgumentError:
+            pass
+        try:
+            action_group.add_argument(
+              "-downsample",
+              required = False,
+              type     = int,
+              help     = """Factor by which to downsample data""")
+        except argparse.ArgumentError:
+            pass
         # Arguments inherited from superclass
         Dataset.construct_argparser(parser)
 
         return parser
 
-    def __init__(self, downsample=None, calc_pdist=False, outfile=None,
-        interactive=False, **kwargs):
+    def __init__(self, dt=None, toffset=None, downsample=None,
+        calc_pdist=False, outfile=None, interactive=False, **kwargs):
         """
         Arguments:
           infile{s} (list): Path(s) to input file(s); may contain
@@ -469,12 +501,17 @@ class TimeSeriesDataset(Dataset):
         self.timeseries_df = self.read(**kwargs)
 
         # Convert from frame index to time
-        if "dt" in kwargs:
-            self.timeseries_df.index *= kwargs.pop("dt")
+        if dt is not None:
+            self.timeseries_df.set_index(self.timeseries_df.index.values *
+              float(dt), inplace=True)
+            self.timeseries_df.index.name = "time"
 
         # Offset time
-        if "toffset" in kwargs:
-            self.timeseries_df.index += kwargs.pop("toffset")
+        if toffset is not None:
+            index_name = self.timeseries_df.index.name
+            self.timeseries_df.set_index(self.timeseries_df.index.values +
+              float(toffset), inplace=True)
+            self.timeseries_df.index.name = index_name
 
         # Downsample
         if downsample:
@@ -496,6 +533,7 @@ class TimeSeriesDataset(Dataset):
         # Interactive prompt
         if interactive:
             embed()
+
     def downsample(self, downsample, downsample_mode="mean", **kwargs):
         """
         Downsamples time series.
@@ -530,12 +568,12 @@ class TimeSeriesDataset(Dataset):
         # Downsample
         if downsample_mode == "mean":
             if verbose >= 1:
-                print("downsampling by factor of {0} using mean".format(
+                wiprint("downsampling by factor of {0} using mean".format(
                   downsample))
             reduced = np.squeeze(reduced.mean(axis=1))
         elif downsample_mode == "mode":
             if verbose >= 1:
-                print("downsampling by factor of {0} using mode".format(
+                wiprint("downsampling by factor of {0} using mode".format(
                   downsample))
             reduced = np.squeeze(mode(reduced, axis=1)[0])
 
@@ -649,7 +687,7 @@ class TimeSeriesDataset(Dataset):
             pdist = OrderedDict()
             for column, series in df.iteritems():
                 if verbose >= 1:
-                    print("calculating probability distribution of "
+                   wiprint("calculating probability distribution of "
                     "{0} using a kernel density estimate".format(column))
                 kde = KernelDensity(bandwidth=bandwidth[column], **kde_kw)
                 kde.fit(series[:, np.newaxis])
@@ -697,7 +735,7 @@ class SAXSDataset(Dataset):
         elif isinstance(scale, six.string_types):
             if not isfile(expandvars(scale)):
                 if verbose >= 1:
-                    print("scale target '{0}' ".format(scale) +
+                   wiprint("scale target '{0}' ".format(scale) +
                           "not found, not scaling.")
                 return
 
@@ -740,12 +778,12 @@ class SAXSDataset(Dataset):
         # 'scale' argument not understood
         else:
             if verbose >= 1:
-                print("scale target '{0}' ".format(scale) +
+                wiprint("scale target '{0}' ".format(scale) +
                       "not understood, not scaling.")
             return
 
         if verbose >= 1:
-            print("scaling by factor of {0}".format(scale))
+            wiprint("scaling by factor of {0}".format(scale))
         self.dataframe["intensity"] *= scale
         if "intensity_se" in self.dataframe.columns.values:
             self.dataframe["intensity_se"] *= scale
@@ -1142,10 +1180,14 @@ class IREDRelaxDataset(RelaxSequenceDataset):
 
         # Arguments unique to this class
         arg_groups = {ag.title: ag for ag in parser._action_groups}
+        input_group = arg_groups.get("input",
+          parser.add_argument_group("input"))
+        action_group = arg_groups.get("action",
+          parser.add_argument_group("action"))
+        output_group = arg_groups.get("output",
+          parser.add_argument_group("output"))
 
         # Input arguments
-        input_group  = arg_groups.get("input",
-          parser.add_argument_group("input"))
         try:
             input_group.add_argument(
               "-infiles",
@@ -1160,6 +1202,7 @@ class IREDRelaxDataset(RelaxSequenceDataset):
                          environment variables and wildcards""")
         except argparse.ArgumentError:
             pass
+
         # Arguments inherited from superclass
         RelaxSequenceDataset.construct_argparser(parser)
 
