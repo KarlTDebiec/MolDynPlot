@@ -10,6 +10,8 @@
 def test_TimeSeriesDataset():
     from moldynplot.Dataset import TimeSeriesDataset
 
+    # Read cpptraj
+
     # Read text
     text_df = TimeSeriesDataset(infile="test/data/p53/rmsd.dat").timeseries_df
     assert hash(text_df.to_string()) == 8096571869640597227
@@ -17,3 +19,7 @@ def test_TimeSeriesDataset():
     # Read hdf5
     hdf5_df = TimeSeriesDataset(infile="test/data/p53/rmsd.h5").timeseries_df
     assert hash(hdf5_df.to_string()) == 8096571869640597227
+
+    # Write text
+
+    # Write hdf5
