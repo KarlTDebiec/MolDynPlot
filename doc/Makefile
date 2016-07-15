@@ -42,7 +42,6 @@ gh-pages:
 	cd .. && \
     rm -vr _sources _static && \
     mv doc/_build/html/* . && \
-    rm -vr doc *.pyc && \
     git add -A && \
     git commit -m "Updated documentation for `git log master -1 --pretty=short --abbrev-commit`" && \
     git push && \
