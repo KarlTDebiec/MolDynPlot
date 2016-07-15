@@ -5,6 +5,7 @@ python:
 addons:
     apt:
         packages:
+            - gfortran
             - libhdf5-serial-dev
             - liblapack-dev
 before_install:
