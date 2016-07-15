@@ -1,0 +1,1059 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Datasets &mdash; MolDynPlot 16-06-29 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="MolDynPlot 16-06-29 documentation" href="index.html"/>
+        <link rel="next" title="Functions" href="functions.html"/>
+        <link rel="prev" title="Figure Managers" href="figure_managers.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MolDynPlot
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="figure_managers.html">Figure Managers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sequencedataset">SequenceDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#relaxsequencedataset">RelaxSequenceDataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#iredrelaxdataset">IREDRelaxDataset</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#timeseriesdataset">TimeSeriesDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">IREDTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#natcontimeseriesdataset">NatConTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#saxstimeseriesdataset">SAXSTimeSeriesDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#corrdataset">CorrDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hsqcdataset">HSQCDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#saxsdataset">SAXSDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#saxsexperimentdataset">SAXSExperimentDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">SAXSTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#saxsdiffdataset">SAXSDiffDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mdgxdataset">MDGXDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#h5dataset">H5Dataset</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">MolDynPlot</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Datasets</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/datasets.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="datasets">
+<h1>Datasets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h1>
+<p>Moldynplot includes several dataset classes that build on
+<a class="reference external" href="http://karltdebiec.github.io/myplotspec/dataset.html#myplotspec.Dataset.Dataset" title="(in myplotspec v0.1)"><code class="xref py py-class docutils literal"><span class="pre">Dataset</span></code></a> will additions
+specific for molecular dynamics simulation data.</p>
+<div class="section" id="sequencedataset">
+<h2>SequenceDataset<a class="headerlink" href="#sequencedataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.SequenceDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SequenceDataset</code><span class="sig-paren">(</span><em>calc_pdist=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SequenceDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.Dataset.Dataset</span></code></p>
+<p>Represents data that is a function of amino acid sequence.</p>
+<dl class="attribute">
+<dt id="SequenceDataset.sequence_df">
+<code class="descname">sequence_df</code><a class="headerlink" href="#SequenceDataset.sequence_df" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>DataFrame</em></p>
+<p>DataFrame whose index corresponds to
+amino acid residue number in the form <code class="docutils literal"><span class="pre">XAA:#</span></code> and whose
+columns are a series of quantities specific to each residue.
+Standard errors of these quantities may be represented by
+adjacent columns with &#8216; se&#8217; appended to their names.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>               r1     r1 se        r2     r2 se  ...
+residue
+GLN:2    2.451434  0.003734  5.041334  0.024776  ...
+TYR:3    2.443613  0.004040  5.138383  0.025376  ...
+LYS:4    2.511626  0.004341  5.589428  0.026236  ...
+...      ...       ...       ...       ...       ...
+</pre></div>
+</div>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile{s}</strong> (<em>list</em>) &#8211; Path(s) to input file(s); may contain
+environment variables and wildcards</li>
+<li><strong>use_indexes</strong> (<em>list</em>) &#8211; Residue indexes to select from DataFrame,
+once DataFrame has already been loaded</li>
+<li><strong>calc_pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution
+using <code class="xref py py-meth docutils literal"><span class="pre">calc_pdist()</span></code></li>
+<li><strong>dataset_cache</strong> (<em>dict</em>) &#8211; Cache of previously-loaded Datasets</li>
+<li><strong>interactive</strong> (<em>bool</em>) &#8211; Provide iPython prompt and reading and
+processing data</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.SequenceDataset.construct_argparser">
+<em class="property">static </em><code class="descname">construct_argparser</code><span class="sig-paren">(</span><em>parser_or_subparsers=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SequenceDataset.construct_argparser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds arguments to an existing argument parser, constructs a
+subparser, or constructs a new parser</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>(ArgumentParser, _SubParsersAction,</strong> (<em>parser_or_subparsers</em>) &#8211; optional): If ArgumentParser, existing parser to which
+arguments will be added; if _SubParsersAction, collection of
+subparsers to which a new argument parser will be added; if
+None, a new argument parser will be generated</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
+Argument parser or subparser</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="moldynplot.Dataset.SequenceDataset.get_cache_key">
+<em class="property">classmethod </em><code class="descname">get_cache_key</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SequenceDataset.get_cache_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates key for dataset cache.</p>
+<p>See <a class="reference internal" href="#moldynplot.Dataset.SequenceDataset" title="moldynplot.Dataset.SequenceDataset"><code class="xref py py-class docutils literal"><span class="pre">SequenceDataset</span></code></a>
+for argument details.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>tuple</em> &#8211;
+Cache key; contains arguments sufficient to reconstruct
+dataset</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.SequenceDataset.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SequenceDataset.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads sequence from one or more <em>infiles</em> into a DataFrame.</p>
+<p>Extends <a class="reference external" href="http://karltdebiec.github.io/myplotspec/dataset.html#myplotspec.Dataset.Dataset" title="(in myplotspec v0.1)"><code class="xref py py-class docutils literal"><span class="pre">Dataset</span></code></a> with
+option to read in residue indexes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.SequenceDataset.calc_pdist">
+<code class="descname">calc_pdist</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SequenceDataset.calc_pdist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates probability distribution across sequence.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>df</strong> (<em>DataFrame</em>) &#8211; DataFrame; probability distribution will be
+calculated for each column using rows as data points</li>
+<li><strong>pdist_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure
+probability distribution calculation</li>
+<li><strong>pdist_kw[columns]</strong> (<em>list</em>) &#8211; Columns for which to calculate
+probability distribution</li>
+<li><strong>pdist_kw[mode]</strong> (<em>ndarray, dict</em>) &#8211; Method of calculating
+probability distribution; eventually will support &#8216;hist&#8217; for
+histogram and &#8216;kde&#8217; for kernel density estimate, though
+presently only kde is implremented</li>
+<li><strong>pdist_kw[grid]</strong> (<em>ndarray, dict, optional</em>) &#8211; Grid on which to
+calculate kernel density estimate; may be a single ndarray
+that will be applied to all columns or a dictionary whose
+keys are column names and values are ndarrays corresponding
+to the grid for each column; for any column for which <em>grid</em>
+is not specified, a grid of 1000 points between the minimum
+value minus three times the standard deviation and the
+maximum value plots three times the standard deviation will
+be used</li>
+<li><strong>pdist_kw[bandwidth]</strong> (<em>float, dict, str, optional</em>) &#8211; Bandwidth to
+use for kernel density estimates; may be a single float that
+will be applied to all columns or a dictionary whose keys
+are column names and values are floats corresponding to the
+bandwidth for each column; for any column for which
+<em>bandwidth</em> is not specified, the standard deviation will be
+used; alternatively may be &#8216;se&#8217;, in which case the standard
+error of each value will be used</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>dict</em> &#8211;
+Dictionary whose keys are columns in <em>df</em> and values are
+DataFrames whose indexes are the <em>grid</em> for that column and
+contain a single column &#8216;probability&#8217; containing the
+normalized probability at each grid point</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="relaxsequencedataset">
+<h3>RelaxSequenceDataset<a class="headerlink" href="#relaxsequencedataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.RelaxSequenceDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">RelaxSequenceDataset</code><span class="sig-paren">(</span><em>calc_pdist=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.RelaxSequenceDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.SequenceDataset" title="moldynplot.Dataset.SequenceDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.SequenceDataset</span></code></a></p>
+<p>Represents NMR relaxation data as a function of residue number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile{s}</strong> (<em>list</em>) &#8211; Path(s) to input file(s); may contain
+environment variables and wildcards</li>
+<li><strong>use_indexes</strong> (<em>list</em>) &#8211; Residue indexes to select from DataFrame,
+once DataFrame has already been loaded</li>
+<li><strong>calc_pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution</li>
+<li><strong>pdist_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure
+probability distribution calculation</li>
+<li><strong>dataset_cache</strong> (<em>dict</em>) &#8211; Cache of previously-loaded Datasets</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.RelaxSequenceDataset.construct_argparser">
+<em class="property">static </em><code class="descname">construct_argparser</code><span class="sig-paren">(</span><em>parser_or_subparsers=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.RelaxSequenceDataset.construct_argparser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds arguments to an existing argument parser, constructs a
+subparser, or constructs a new parser</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>(ArgumentParser, _SubParsersAction,</strong> (<em>parser_or_subparsers</em>) &#8211; optional): If ArgumentParser, existing parser to which
+arguments will be added; if _SubParsersAction, collection of
+subparsers to which a new argument parser will be added; if
+None, a new argument parser will be generated</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
+Argument parser or subparser</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.RelaxSequenceDataset.write_for_relax">
+<code class="descname">write_for_relax</code><span class="sig-paren">(</span><em>outfile</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.RelaxSequenceDataset.write_for_relax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes sequence DataFrame in format readable by relax.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="iredrelaxdataset">
+<h4>IREDRelaxDataset<a class="headerlink" href="#iredrelaxdataset" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="moldynplot.Dataset.IREDRelaxDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">IREDRelaxDataset</code><span class="sig-paren">(</span><em>calc_pdist=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDRelaxDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.RelaxSequenceDataset" title="moldynplot.Dataset.RelaxSequenceDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.RelaxSequenceDataset</span></code></a></p>
+<p>Represents iRED NMR relaxation data as a function of residue number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile{s}</strong> (<em>list</em>) &#8211; Path(s) to input file(s); may contain
+environment variables and wildcards</li>
+<li><strong>use_indexes</strong> (<em>list</em>) &#8211; Residue indexes to select from DataFrame,
+once DataFrame has already been loaded</li>
+<li><strong>calc_pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution</li>
+<li><strong>pdist_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure
+probability distribution calculation</li>
+<li><strong>dataset_cache</strong> (<em>dict</em>) &#8211; Cache of previously-loaded Datasets</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.IREDRelaxDataset.construct_argparser">
+<em class="property">static </em><code class="descname">construct_argparser</code><span class="sig-paren">(</span><em>parser_or_subparsers=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDRelaxDataset.construct_argparser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds arguments to an existing argument parser, constructs a
+subparser, or constructs a new parser</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>(ArgumentParser, _SubParsersAction,</strong> (<em>parser_or_subparsers</em>) &#8211; optional): If ArgumentParser, existing parser to which
+arguments will be added; if _SubParsersAction, collection of
+subparsers to which a new argument parser will be added; if
+None, a new argument parser will be generated</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
+Argument parser or subparser</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.IREDRelaxDataset.average_independent">
+<em class="property">static </em><code class="descname">average_independent</code><span class="sig-paren">(</span><em>relax_dfs=None</em>, <em>order_dfs=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDRelaxDataset.average_independent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the average and standard error of a set of independent
+iRED datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>relax_dfs</strong> (<em>list</em>) &#8211; DataFrames containing data from relax infiles</li>
+<li><strong>order_dfs</strong> (<em>list</em>) &#8211; DataFrames containing data from order infiles</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>df</strong> (<em>DataFrame</em>) &#8211;
+Averaged DataFrame including relax and order</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.IREDRelaxDataset.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDRelaxDataset.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads iRED sequence data from one or more <em>infiles</em> into a
+DataFrame.</p>
+<p><em>infiles</em> may contain relaxation data, order parameters, or
+both. If more than one <em>infile</em> is provided, the resulting
+DataFrame will contain their average, and the standard error
+will be calculated assuming the <em>infiles</em> represent independent
+samples.</p>
+<p>After generating the DataFrame from <em>infiles</em>, the index may be
+set by loading a list of residue names and numbers in the form
+<code class="docutils literal"><span class="pre">XAA:#</span></code> from <em>indexfile</em>. This is useful when loading data
+from files that do not specify residue names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>infile{s}</strong> (<em>list</em>) &#8211; Path(s) to input file(s); may contain
+environment variables and wildcards</li>
+<li><strong>dataframe_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.18.1)"><code class="xref py py-class docutils literal"><span class="pre">DataFrame</span></code></a> (hdf5 only)</li>
+<li><strong>read_csv_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_csv.html#pandas.read_csv" title="(in pandas v0.18.1)"><code class="xref py py-func docutils literal"><span class="pre">read_csv</span></code></a> (text only)</li>
+<li><strong>indexfile</strong> (<em>str</em>) &#8211; Path to index file; may contain environment
+variables</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>df</strong> (<em>DataFrame</em>) &#8211;
+iRED sequence DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="iredtimeseriesdataset">
+<h5>IREDTimeSeriesDataset<a class="headerlink" href="#iredtimeseriesdataset" title="Permalink to this headline">¶</a></h5>
+<p>See <a class="reference internal" href="#moldynplot.Dataset.IREDTimeSeriesDataset" title="moldynplot.Dataset.IREDTimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.IREDTimeSeriesDataset</span></code></a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="timeseriesdataset">
+<h2>TimeSeriesDataset<a class="headerlink" href="#timeseriesdataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.TimeSeriesDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">TimeSeriesDataset</code><span class="sig-paren">(</span><em>dt=None</em>, <em>toffset=None</em>, <em>downsample=None</em>, <em>calc_pdist=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.TimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.Dataset.Dataset</span></code></p>
+<p>Represents data as a function of time.</p>
+<dl class="attribute">
+<dt id="TimeSeriesDataset.timeseries_df">
+<code class="descname">timeseries_df</code><a class="headerlink" href="#TimeSeriesDataset.timeseries_df" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>DataFrame</em></p>
+<p>DataFrame whose index corresponds to
+time as represented by frame number or chemical time and whose
+columns are a series of quantities as a function of time.</p>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile{s}</strong> (<em>list</em>) &#8211; Path(s) to input file(s); may contain
+environment variables and wildcards</li>
+<li><strong>dt</strong> (<em>float</em>) &#8211; Time interval between points; units unspecified</li>
+<li><strong>toffset</strong> (<em>float</em>) &#8211; Time offset to be added to all points (i.e.
+time of first point)</li>
+<li><strong>downsample</strong> (<em>int</em>) &#8211; Interval by which to downsample points</li>
+<li><strong>downsample_mode</strong> (<em>str</em>) &#8211; Method of downsampling; may be &#8216;mean&#8217;
+or &#8216;mode&#8217;</li>
+<li><strong>pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution</li>
+<li><strong>pdist_key</strong> (<em>str</em>) &#8211; Column of which to calculate probability
+distribution</li>
+<li><strong>kde_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+sklearn.neighbors.KernelDensity; key argument is &#8216;bandwidth&#8217;</li>
+<li><strong>grid</strong> (<em>ndarray</em>) &#8211; Grid on which to calculate probability
+distribution</li>
+<li><strong>interactive</strong> (<em>bool</em>) &#8211; Provide iPython prompt and reading and
+processing data</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+<li><strong>todo</strong> (<em>.</em>) &#8211; <ul>
+<li>Calculate pdist using histogram</li>
+<li>Verbose pdist</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.TimeSeriesDataset.construct_argparser">
+<em class="property">static </em><code class="descname">construct_argparser</code><span class="sig-paren">(</span><em>parser_or_subparsers=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.TimeSeriesDataset.construct_argparser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds arguments to an existing argument parser, constructs a
+subparser, or constructs a new parser</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>(ArgumentParser, _SubParsersAction,</strong> (<em>parser_or_subparsers</em>) &#8211; optional): If ArgumentParser, existing parser to which
+arguments will be added; if _SubParsersAction, collection of
+subparsers to which a new argument parser will be added; if
+None, a new argument parser will be generated</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
+Argument parser or subparser</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.TimeSeriesDataset.downsample">
+<code class="descname">downsample</code><span class="sig-paren">(</span><em>downsample</em>, <em>downsample_mode=u'mean'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.TimeSeriesDataset.downsample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downsamples time series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>downsample</strong> (<em>int</em>) &#8211; Interval by which to downsample points</li>
+<li><strong>downsample_mode</strong> (<em>str</em>) &#8211; Method of downsampling; may be &#8216;mean&#8217;
+or &#8216;mode&#8217;</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.TimeSeriesDataset.calc_pdist">
+<code class="descname">calc_pdist</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.TimeSeriesDataset.calc_pdist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calcualtes probability distribution of time series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pdist_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure
+probability distribution calculation</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="id1">
+<h3>IREDTimeSeriesDataset<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.IREDTimeSeriesDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">IREDTimeSeriesDataset</code><span class="sig-paren">(</span><em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDTimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.TimeSeriesDataset" title="moldynplot.Dataset.TimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.TimeSeriesDataset</span></code></a>, <a class="reference internal" href="#moldynplot.Dataset.IREDRelaxDataset" title="moldynplot.Dataset.IREDRelaxDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.IREDRelaxDataset</span></code></a></p>
+<p>Represents iRED NMR relaxation data as a function of time and
+residue number.</p>
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.IREDTimeSeriesDataset.construct_argparser">
+<em class="property">static </em><code class="descname">construct_argparser</code><span class="sig-paren">(</span><em>parser_or_subparsers=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDTimeSeriesDataset.construct_argparser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds arguments to an existing argument parser, constructs a
+subparser, or constructs a new parser</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>(ArgumentParser, _SubParsersAction,</strong> (<em>parser_or_subparsers</em>) &#8211; optional): If ArgumentParser, existing parser to which
+arguments will be added; if _SubParsersAction, collection of
+subparsers to which a new argument parser will be added; if
+None, a new argument parser will be generated</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
+Argument parser or subparser</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.IREDTimeSeriesDataset.concatenate_timeseries">
+<em class="property">static </em><code class="descname">concatenate_timeseries</code><span class="sig-paren">(</span><em>timeseries_dfs=None</em>, <em>relax_dfs=None</em>, <em>order_dfs=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDTimeSeriesDataset.concatenate_timeseries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenates a series of iRED datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>relax_dfs</strong> (<em>list</em>) &#8211; DataFrames containing data from relax infiles</li>
+<li><strong>order_dfs</strong> (<em>list</em>) &#8211; DataFrames containing data from order infiles</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>df</strong> (<em>DataFrame</em>) &#8211;
+Averaged DataFrame including relax and order</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.IREDTimeSeriesDataset.timeseries_to_sequence">
+<code class="descname">timeseries_to_sequence</code><span class="sig-paren">(</span><em>timeseries_df</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDTimeSeriesDataset.timeseries_to_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the average and standard error of relaxation, prepares
+sequence DataFrame.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.Dataset.IREDTimeSeriesDataset.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDTimeSeriesDataset.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads iRED time series data from one or more <em>infiles</em> into a
+DataFrame.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="natcontimeseriesdataset">
+<h3>NatConTimeSeriesDataset<a class="headerlink" href="#natcontimeseriesdataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.NatConTimeSeriesDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">NatConTimeSeriesDataset</code><span class="sig-paren">(</span><em>downsample=None</em>, <em>calc_pdist=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.NatConTimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.TimeSeriesDataset" title="moldynplot.Dataset.TimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.TimeSeriesDataset</span></code></a></p>
+<p>Manages native contact datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile</strong> (<em>str</em>) &#8211; Path to input file, may contain environment
+variables</li>
+<li><strong>usecols</strong> (<em>list</em>) &#8211; Columns to select from DataFrame, once
+dataframe has already been loaded</li>
+<li><strong>dt</strong> (<em>float</em>) &#8211; Time interval between points; units unspecified</li>
+<li><strong>toffset</strong> (<em>float</em>) &#8211; Time offset to be added to all points (i.e.
+time of first point)</li>
+<li><strong>cutoff</strong> (<em>float</em>) &#8211; Minimum distance within which a contact is
+considered to be formed</li>
+<li><strong>downsample</strong> (<em>int</em>) &#8211; Interval by which to downsample points using
+mode</li>
+<li><strong>pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="saxstimeseriesdataset">
+<h3>SAXSTimeSeriesDataset<a class="headerlink" href="#saxstimeseriesdataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.SAXSTimeSeriesDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SAXSTimeSeriesDataset</code><span class="sig-paren">(</span><em>infile</em>, <em>address=u'saxs'</em>, <em>downsample=None</em>, <em>calc_mean=False</em>, <em>calc_error=True</em>, <em>error_method=u'std'</em>, <em>scale=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSTimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.TimeSeriesDataset" title="moldynplot.Dataset.TimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.TimeSeriesDataset</span></code></a>, <a class="reference internal" href="#moldynplot.Dataset.SAXSDataset" title="moldynplot.Dataset.SAXSDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.SAXSDataset</span></code></a></p>
+<p>Manages Small Angle X-ray Scattering time series datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile</strong> (<em>str</em>) &#8211; Path to input file, may contain environment
+variables</li>
+<li><strong>usecols</strong> (<em>list</em>) &#8211; Columns to select from DataFrame, once
+dataframe has already been loaded</li>
+<li><strong>dt</strong> (<em>float</em>) &#8211; Time interval between points; units unspecified</li>
+<li><strong>toffset</strong> (<em>float</em>) &#8211; Time offset to be added to all points (i.e.
+time of first point)</li>
+<li><strong>downsample</strong> (<em>int</em>) &#8211; Interval by which to downsample points</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="corrdataset">
+<h2>CorrDataset<a class="headerlink" href="#corrdataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.CorrDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">CorrDataset</code><span class="sig-paren">(</span><em>verbose=1</em>, <em>debug=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.CorrDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.Dataset.Dataset</span></code></p>
+<p>Represents correlations between different datasets.</p>
+<dl class="classmethod">
+<dt id="moldynplot.Dataset.CorrDataset.get_cache_key">
+<em class="property">classmethod </em><code class="descname">get_cache_key</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.CorrDataset.get_cache_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates tuple of arguments to be used as key for dataset
+cache.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.CorrDataset.get_cache_message">
+<em class="property">static </em><code class="descname">get_cache_message</code><span class="sig-paren">(</span><em>cache_key</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.CorrDataset.get_cache_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates message to be used when reloading previously-loaded
+dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cache_key</strong> (<em>tuple</em>) &#8211; key with which dataset object is stored in
+dataset cache</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> &#8211;
+message to be used when reloading previously-loaded
+dataset</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="hsqcdataset">
+<h2>HSQCDataset<a class="headerlink" href="#hsqcdataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.HSQCDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">HSQCDataset</code><span class="sig-paren">(</span><em>downsample=None</em>, <em>calc_pdist=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.HSQCDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.Dataset.Dataset</span></code></p>
+<p>Represents NMR HSQC data.</p>
+<dl class="attribute">
+<dt id="HSQCDataset.hsqc_df">
+<code class="descname">hsqc_df</code><a class="headerlink" href="#HSQCDataset.hsqc_df" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>DataFrame</em></p>
+<p>DataFrame whose two-dimensional index corresponds to
+hydrogen and nitrogen chemical shift in ppm and whose columns
+correspond to intensity</p>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile</strong> (<em>str</em>) &#8211; Path to input file, may contain environment
+variables</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldynplot.Dataset.HSQCDataset.read">
+<code class="descname">read</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.HSQCDataset.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads HSQC from one or more <em>infiles</em> into a DataFrame.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="saxsdataset">
+<h2>SAXSDataset<a class="headerlink" href="#saxsdataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.SAXSDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SAXSDataset</code><span class="sig-paren">(</span><em>infile</em>, <em>address=None</em>, <em>dataset_cache=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.Dataset.Dataset</span></code></p>
+<p>Represents Small-Angle X-ray Scattering Data.</p>
+<p>Initializes dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile</strong> (<em>str</em>) &#8211; Path to input file, may contain environment
+variables</li>
+<li><strong>address</strong> (<em>str</em>) &#8211; Address within hdf5 file from which to load
+dataset (hdf5 only)</li>
+<li><strong>slice</strong> (<em>slice</em>) &#8211; Slice to load from hdf5 dataset (hdf5 only)</li>
+<li><strong>dataframe_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+pandas.DataFrame(...) (hdf5 only)</li>
+<li><strong>read_csv_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+pandas.read_csv(...) (text only)</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>debug</strong> (<em>int</em>) &#8211; Level of debug output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldynplot.Dataset.SAXSDataset.scale">
+<code class="descname">scale</code><span class="sig-paren">(</span><em>scale</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSDataset.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scales SAXS intensity, either by a constant or to match the
+intensity of a target dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>scale</strong> (<em>float, str</em>) &#8211; If float, proportion by which to scale
+intensity; if str, path to input file to which intensity
+will be scaled, may contain environment variables</li>
+<li><strong>curve_fit_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+scipy.optimize.curve_fit (scale to match target dataset
+only)</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="saxsexperimentdataset">
+<h3>SAXSExperimentDataset<a class="headerlink" href="#saxsexperimentdataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.SAXSExperimentDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SAXSExperimentDataset</code><span class="sig-paren">(</span><em>scale=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSExperimentDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.SAXSDataset" title="moldynplot.Dataset.SAXSDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.SAXSDataset</span></code></a></p>
+<p>Manages Small Angle X-ray Scattering experimental datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile</strong> (<em>str</em>) &#8211; Path to input file, may contain environment
+variables</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>SAXSTimeSeriesDataset<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>See <a class="reference internal" href="#moldynplot.Dataset.SAXSTimeSeriesDataset" title="moldynplot.Dataset.SAXSTimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.SAXSTimeSeriesDataset</span></code></a>.</p>
+</div>
+<div class="section" id="saxsdiffdataset">
+<h3>SAXSDiffDataset<a class="headerlink" href="#saxsdiffdataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.SAXSDiffDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">SAXSDiffDataset</code><span class="sig-paren">(</span><em>dataset_cache=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.SAXSDiffDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.SAXSDataset" title="moldynplot.Dataset.SAXSDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.SAXSDataset</span></code></a></p>
+<p>Manages Small Angle X-ray Scattering difference datasets.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="mdgxdataset">
+<h2>MDGXDataset<a class="headerlink" href="#mdgxdataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.MDGXDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">MDGXDataset</code><span class="sig-paren">(</span><em>infile</em>, <em>selections=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.MDGXDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.Dataset.Dataset</span></code></p>
+<p>Represents MDGX force field parameterization data.</p>
+<dl class="classmethod">
+<dt id="moldynplot.Dataset.MDGXDataset.get_cache_key">
+<em class="property">classmethod </em><code class="descname">get_cache_key</code><span class="sig-paren">(</span><em>infile</em>, <em>selections=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.MDGXDataset.get_cache_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates tuple of arguments to be used as key for dataset
+cache.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="h5dataset">
+<h2>H5Dataset<a class="headerlink" href="#h5dataset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldynplot.Dataset.H5Dataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">H5Dataset</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.H5Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class for managing hdf5 datasets</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Will be reimplemented or removed eventually</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infiles</strong> (<em>list</em>) &#8211; List of infiles</li>
+<li><strong>infile</strong> (<em>str</em>) &#8211; Alternatively, single infile</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldynplot.Dataset.H5Dataset.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>infiles</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.H5Dataset.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads data from h5 files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>infiles</strong> (<em>list</em>) &#8211; infiles</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="functions.html" class="btn btn-neutral float-right" title="Functions" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="figure_managers.html" class="btn btn-neutral" title="Figure Managers" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015-2016, Karl T Debiec.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'16-06-29',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

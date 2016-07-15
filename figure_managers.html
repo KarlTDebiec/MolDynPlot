@@ -1,0 +1,634 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Figure Managers &mdash; MolDynPlot 16-06-29 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="MolDynPlot 16-06-29 documentation" href="index.html"/>
+        <link rel="next" title="Datasets" href="datasets.html"/>
+        <link rel="prev" title="MolDynPlot" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MolDynPlot
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Figure Managers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.CorrFigureManager">CorrFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.HSQCFigureManager">HSQCFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.MDGXFigureManager">MDGXFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.PDistFigureManager">PDistFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.SAXSFigureManager">SAXSFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.SequenceFigureManager">SequenceFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.StateProbFigureManager">StateProbFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.TimeSeriesFigureManager">TimeSeriesFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.TimeSeries2DFigureManager">TimeSeries2DFigureManager</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">MolDynPlot</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Figure Managers</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/figure_managers.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="figure-managers">
+<h1>Figure Managers<a class="headerlink" href="#figure-managers" title="Permalink to this headline">¶</a></h1>
+<p>Moldynplot includes several figure managers that build on
+<a class="reference external" href="http://karltdebiec.github.io/myplotspec/figure_manager.html#myplotspec.FigureManager.FigureManager" title="(in myplotspec v0.1)"><code class="xref py py-class docutils literal"><span class="pre">FigureManager</span></code></a>
+will additions specific for molecular dynamics simulation data.</p>
+<div class="section" id="module-moldynplot.CorrFigureManager">
+<span id="corrfiguremanager"></span><h2>CorrFigureManager<a class="headerlink" href="#module-moldynplot.CorrFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more correlation figures to specifications in a YAML file.</p>
+<dl class="class">
+<dt id="moldynplot.CorrFigureManager.CorrFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.CorrFigureManager.</code><code class="descname">CorrFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.CorrFigureManager.CorrFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
+<p>Manages the generation of correlation figures.</p>
+<p>Initializes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>defaults</strong> (<em>string, dict, optional</em>) &#8211; Default arguments; may be a
+yaml string, path to a yaml file, or a dictionary; if not
+provided pulled from self.defaults</li>
+<li><strong>args</strong> (<em>tuple</em>) &#8211; Additional positional arguments</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldynplot.CorrFigureManager.CorrFigureManager.draw_dataset">
+<code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.CorrFigureManager.CorrFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws dataset</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.HSQCFigureManager">
+<span id="hsqcfiguremanager"></span><h2>HSQCFigureManager<a class="headerlink" href="#module-moldynplot.HSQCFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more HSQC figures to specifications provided in a YAML
+file.</p>
+<dl class="class">
+<dt id="moldynplot.HSQCFigureManager.HSQCFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.HSQCFigureManager.</code><code class="descname">HSQCFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.HSQCFigureManager.HSQCFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
+<p>Manages the generation of HSQC figures.</p>
+<p>Initializes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>defaults</strong> (<em>string, dict, optional</em>) &#8211; Default arguments; may be a
+yaml string, path to a yaml file, or a dictionary; if not
+provided pulled from self.defaults</li>
+<li><strong>args</strong> (<em>tuple</em>) &#8211; Additional positional arguments</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldynplot.HSQCFigureManager.HSQCFigureManager.get_contour_levels">
+<code class="descname">get_contour_levels</code><span class="sig-paren">(</span><em>I</em>, <em>cutoff=0.9875</em>, <em>n_levels=10</em>, <em>min_level=None</em>, <em>max_level=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.HSQCFigureManager.HSQCFigureManager.get_contour_levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates contour levels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>I</strong> (<em>ndarray</em>) &#8211; Intensity</li>
+<li><strong>cutoff</strong> (<em>float</em>) &#8211; Proportion of Intensity below minimum level</li>
+<li><strong>n_levels</strong> (<em>int</em>) &#8211; Number of contour levels</li>
+<li><strong>min_level</strong> (<em>float</em>) &#8211; Minimum contour level</li>
+<li><strong>max_level</strong> (<em>float</em>) &#8211; Maximum contour level; default = max(I)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>(ndarray)</em> &#8211;
+levels</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldynplot.HSQCFigureManager.HSQCFigureManager.draw_dataset">
+<code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.HSQCFigureManager.HSQCFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws a dataset on a subplot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>subplot</strong> (<em>Axes</em>) &#8211; Axes on which to draw</li>
+<li><strong>draw_pdist</strong> (<em>bool</em>) &#8211; Draw contour</li>
+<li><strong>draw_fill_between</strong> (<em>bool</em>) &#8211; Fill between specified region for this
+dataset</li>
+<li><strong>draw_mean</strong> (<em>bool</em>) &#8211; Draw point at mean value of this dataset</li>
+<li><strong>dataset_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to passed to
+<code class="xref py py-meth docutils literal"><span class="pre">load_dataset()</span></code></li>
+<li><strong>plot_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure plot</li>
+<li><strong>fill_between_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure
+fill_between</li>
+<li><strong>pdist_kw</strong> (<em>dict</em>) &#8211; Keyword arguments using to configure probability
+distribution</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.MDGXFigureManager">
+<span id="mdgxfiguremanager"></span><h2>MDGXFigureManager<a class="headerlink" href="#module-moldynplot.MDGXFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more MDGX figures to specifications provided in a YAML
+file.</p>
+<dl class="class">
+<dt id="moldynplot.MDGXFigureManager.MDGXFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.MDGXFigureManager.</code><code class="descname">MDGXFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.MDGXFigureManager.MDGXFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
+<p>Manages the generation of MDGX figures.</p>
+<p>Initializes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>defaults</strong> (<em>string, dict, optional</em>) &#8211; Default arguments; may be a
+yaml string, path to a yaml file, or a dictionary; if not
+provided pulled from self.defaults</li>
+<li><strong>args</strong> (<em>tuple</em>) &#8211; Additional positional arguments</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldynplot.MDGXFigureManager.MDGXFigureManager.draw_dataset">
+<code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.MDGXFigureManager.MDGXFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.PDistFigureManager">
+<span id="pdistfiguremanager"></span><h2>PDistFigureManager<a class="headerlink" href="#module-moldynplot.PDistFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more probability distribution figures to specifications
+in a YAML file.</p>
+<dl class="class">
+<dt id="moldynplot.PDistFigureManager.PDistFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.PDistFigureManager.</code><code class="descname">PDistFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.PDistFigureManager.PDistFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
+<p>Manages the generation of probability distribution figures.</p>
+<p>Initializes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>defaults</strong> (<em>string, dict, optional</em>) &#8211; Default arguments; may be a
+yaml string, path to a yaml file, or a dictionary; if not
+provided pulled from self.defaults</li>
+<li><strong>args</strong> (<em>tuple</em>) &#8211; Additional positional arguments</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldynplot.PDistFigureManager.PDistFigureManager.draw_dataset">
+<code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.PDistFigureManager.PDistFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a dataset and draws it on a subplot.</p>
+<p>Loaded dataset should have attribute <cite>pdist_df</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>subplot</strong> (<em>Axes</em>) &#8211; <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">Axes</span></code></a> on
+which to draw</li>
+<li><strong>dataset_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+<a class="reference external" href="http://karltdebiec.github.io/myplotspec/figure_manager.html#myplotspec.FigureManager.FigureManager.load_dataset" title="(in myplotspec v0.1)"><code class="xref py py-meth docutils literal"><span class="pre">load_dataset</span></code></a></li>
+<li><strong>plot_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to methods of
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">Axes</span></code></a></li>
+<li><strong>column</strong> (<em>str</em>) &#8211; Column within <cite>pdist_df</cite> to use</li>
+<li><strong>draw_fill_between</strong> (<em>bool</em>) &#8211; Fill between specified region</li>
+<li><strong>fill_between_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure
+call to
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.fill_between" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">fill_between</span></code></a></li>
+<li><strong>fill_between_kw[x]</strong> (<em>list, ndarray</em>) &#8211; x values passed to
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.fill_between" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">fill_between</span></code></a></li>
+<li><strong>fill_between_kw[ylb]</strong> (<em>list, ndarray</em>) &#8211; y lower bound values
+passed to
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.fill_between" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">fill_between</span></code></a></li>
+<li><strong>fill_between_kw[yub]</strong> (<em>list, ndarray</em>) &#8211; y upper bound values
+passed to
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.fill_between" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">fill_between</span></code></a></li>
+<li><strong>draw_pdist</strong> (<em>bool</em>) &#8211; Draw probability distribution</li>
+<li><strong>pdist_kw</strong> (<em>dict</em>) &#8211; Keyword arguments using to configure call to
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.plot" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">plot</span></code></a></li>
+<li><strong>draw_mean</strong> (<em>bool</em>) &#8211; Draw point at mean value</li>
+<li><strong>mean_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure call to
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.plot" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">plot</span></code></a></li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.SAXSFigureManager">
+<span id="saxsfiguremanager"></span><h2>SAXSFigureManager<a class="headerlink" href="#module-moldynplot.SAXSFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more time series figures to specifications in a YAML
+file.</p>
+<dl class="class">
+<dt id="moldynplot.SAXSFigureManager.SAXSFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.SAXSFigureManager.</code><code class="descname">SAXSFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.SAXSFigureManager.SAXSFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
+<p>Manages the generation of time series figures</p>
+<p>Initializes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>defaults</strong> (<em>string, dict, optional</em>) &#8211; Default arguments; may be a
+yaml string, path to a yaml file, or a dictionary; if not
+provided pulled from self.defaults</li>
+<li><strong>args</strong> (<em>tuple</em>) &#8211; Additional positional arguments</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.SequenceFigureManager">
+<span id="sequencefiguremanager"></span><h2>SequenceFigureManager<a class="headerlink" href="#module-moldynplot.SequenceFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more sequence figures to specifications in a YAML file.</p>
+<dl class="class">
+<dt id="moldynplot.SequenceFigureManager.SequenceFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.SequenceFigureManager.</code><code class="descname">SequenceFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.SequenceFigureManager.SequenceFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
+<p>Manages the generation of sequence figures.</p>
+<p>Initializes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>defaults</strong> (<em>string, dict, optional</em>) &#8211; Default arguments; may be a
+yaml string, path to a yaml file, or a dictionary; if not
+provided pulled from self.defaults</li>
+<li><strong>args</strong> (<em>tuple</em>) &#8211; Additional positional arguments</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.StateProbFigureManager">
+<span id="stateprobfiguremanager"></span><h2>StateProbFigureManager<a class="headerlink" href="#module-moldynplot.StateProbFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more state probability figures to specifications in a
+YAML file.</p>
+<dl class="class">
+<dt id="moldynplot.StateProbFigureManager.StateProbFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.StateProbFigureManager.</code><code class="descname">StateProbFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.StateProbFigureManager.StateProbFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
+<p>Class to manage the generation of probability distribution figures</p>
+<p>Initializes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>defaults</strong> (<em>string, dict, optional</em>) &#8211; Default arguments; may be a
+yaml string, path to a yaml file, or a dictionary; if not
+provided pulled from self.defaults</li>
+<li><strong>args</strong> (<em>tuple</em>) &#8211; Additional positional arguments</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldynplot.StateProbFigureManager.StateProbFigureManager.draw_dataset">
+<code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.StateProbFigureManager.StateProbFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws a dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>subplot</strong> (<em>Axes</em>) &#8211; Axes on which to draw</li>
+<li><strong>x</strong> (<em>float</em>) &#8211; X coordinate of bar</li>
+<li><strong>label</strong> (<em>str, optional</em>) &#8211; Dataset label</li>
+<li><strong>color</strong> (<em>str, list, ndarray, float, optional</em>) &#8211; Dataset color</li>
+<li><strong>bar_kw</strong> (<em>dict, optional</em>) &#8211; Additional keyword arguments passed
+to subplot.plot()</li>
+<li><strong>handles</strong> (<em>OrderedDict, optional</em>) &#8211; Nascent OrderedDict of
+[labels]: handles on subplot</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.TimeSeriesFigureManager">
+<span id="timeseriesfiguremanager"></span><h2>TimeSeriesFigureManager<a class="headerlink" href="#module-moldynplot.TimeSeriesFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more time series figures to specifications in a YAML
+file.</p>
+<dl class="class">
+<dt id="moldynplot.TimeSeriesFigureManager.TimeSeriesFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.TimeSeriesFigureManager.</code><code class="descname">TimeSeriesFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.TimeSeriesFigureManager.TimeSeriesFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
+<p>Manages the generation of time series figures</p>
+<p>Initializes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>defaults</strong> (<em>string, dict, optional</em>) &#8211; Default arguments; may be a
+yaml string, path to a yaml file, or a dictionary; if not
+provided pulled from self.defaults</li>
+<li><strong>args</strong> (<em>tuple</em>) &#8211; Additional positional arguments</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldynplot.TimeSeriesFigureManager.TimeSeriesFigureManager.draw_dataset">
+<code class="descname">draw_dataset</code><span class="sig-paren">(</span><em>*in_args</em>, <em>**in_kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.TimeSeriesFigureManager.TimeSeriesFigureManager.draw_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws a dataset on a subplot.</p>
+<p>Loaded dataset should have attribute <cite>timeseries_df</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>subplot</strong> (<em>Axes</em>) &#8211; <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">Axes</span></code></a> on
+which to draw</li>
+<li><strong>dataset_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+<a class="reference external" href="http://karltdebiec.github.io/myplotspec/figure_manager.html#myplotspec.FigureManager.FigureManager.load_dataset" title="(in myplotspec v0.1)"><code class="xref py py-meth docutils literal"><span class="pre">load_dataset</span></code></a></li>
+<li><strong>plot_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to methods of
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">Axes</span></code></a></li>
+<li><strong>draw_plot</strong> (<em>bool</em>) &#8211; Draw plot</li>
+<li><strong>draw_pdist</strong> (<em>bool</em>) &#8211; Draw probability distribution</li>
+<li><strong>draw_fill_between</strong> (<em>bool</em>) &#8211; Fill between specified region for this
+dataset</li>
+<li><strong>draw_mean</strong> (<em>bool</em>) &#8211; Draw point at mean value value of
+probability distribution</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldynplot.TimeSeries2DFigureManager">
+<span id="timeseries2dfiguremanager"></span><h2>TimeSeries2DFigureManager<a class="headerlink" href="#module-moldynplot.TimeSeries2DFigureManager" title="Permalink to this headline">¶</a></h2>
+<p>Generates one or more 2D time series figures to specifications in a YAML
+file.</p>
+<dl class="class">
+<dt id="moldynplot.TimeSeries2DFigureManager.TimeSeries2DFigureManager">
+<em class="property">class </em><code class="descclassname">moldynplot.TimeSeries2DFigureManager.</code><code class="descname">TimeSeries2DFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.TimeSeries2DFigureManager.TimeSeries2DFigureManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
+<p>Manages the generation of 2D time series figures.</p>
+<p>Initializes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>defaults</strong> (<em>string, dict, optional</em>) &#8211; Default arguments; may be a
+yaml string, path to a yaml file, or a dictionary; if not
+provided pulled from self.defaults</li>
+<li><strong>args</strong> (<em>tuple</em>) &#8211; Additional positional arguments</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="datasets.html" class="btn btn-neutral float-right" title="Datasets" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="MolDynPlot" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015-2016, Karl T Debiec.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'16-06-29',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

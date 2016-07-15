@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldynplot &mdash; moldynplot 0.1 documentation</title>
+  <title>MolDynPlot &mdash; MolDynPlot 16-06-29 documentation</title>
   
 
   
@@ -30,8 +30,8 @@
   
 
   
-    <link rel="top" title="moldynplot 0.1 documentation" href="#"/>
-        <link rel="next" title="Figure Managers" href="code.html"/> 
+    <link rel="top" title="MolDynPlot 16-06-29 documentation" href="#"/>
+        <link rel="next" title="Figure Managers" href="figure_managers.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -49,7 +49,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> moldynplot
+            <a href="#" class="icon icon-home"> MolDynPlot
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.1
+                0.1.0
               </div>
             
           
@@ -81,8 +81,9 @@
             
             
                 <ul>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Figure Managers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#module-moldynplot.Dataset">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="figure_managers.html">Figure Managers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Functions</a></li>
 </ul>
 
             
@@ -96,7 +97,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="#">moldynplot</a>
+        <a href="#">MolDynPlot</a>
       </nav>
 
 
@@ -113,7 +114,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="#">Docs</a> &raquo;</li>
       
-    <li>moldynplot</li>
+    <li>MolDynPlot</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -128,23 +129,28 @@
            <div itemprop="articleBody">
             
   <div class="section" id="moldynplot">
-<h1>moldynplot<a class="headerlink" href="#moldynplot" title="Permalink to this headline">¶</a></h1>
+<h1>MolDynPlot<a class="headerlink" href="#moldynplot" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://travis-ci.org/KarlTDebiec/MolDynPlot"><img alt="https://travis-ci.org/KarlTDebiec/MolDynPlot.svg?branch=master" src="https://travis-ci.org/KarlTDebiec/MolDynPlot.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://coveralls.io/github/KarlTDebiec/MolDynPlot?branch=master"><img alt="https://coveralls.io/repos/github/KarlTDebiec/MolDynPlot/badge.svg?branch=master" src="https://coveralls.io/repos/github/KarlTDebiec/MolDynPlot/badge.svg?branch=master" /></a>
 </div>
 <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>Moldynplot is a Python package used to design matplotlib-based figures of
+<p>MolDynPlot is a Python package used to design matplotlib-based figures of
 Molecular Dynamics (MD) simulation data using the simple text format YAML.</p>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<p>Moldynplot supports Python 2.7 and 3.4, and requires the following
+<p>MolDynPlot supports Python 2.7 and 3.4, and requires the following
 packages:</p>
 <ul class="simple">
+<li>h5py</li>
+<li>ipython</li>
 <li>matplotlib</li>
-<li>numpy</li>
-<li>six</li>
-<li>yaml</li>
+<li>pandas</li>
+<li>pyyaml</li>
+<li>scikit-learn</li>
+<li>scipy</li>
 </ul>
-<p>Moldynplot has been tested with Anaconda python 2.1.0 on Arch Linux, OSX
+<p>MolDynPlot has been tested with Anaconda python 2.1.0 on Arch Linux, OSX
 Yosemite, and Windows 8.1.</p>
 </div>
 <div class="section" id="installation">
@@ -153,11 +159,11 @@ Yosemite, and Windows 8.1.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span>export PYTHONPATH=/path/to/my/python/modules:$PYTHONPATH
 </pre></div>
 </div>
-<p>where <code class="docutils literal"><span class="pre">/path/to/my/python/modules</span></code> contains <code class="docutils literal"><span class="pre">myplotspec_nmr</span></code>.</p>
+<p>where <code class="docutils literal"><span class="pre">/path/to/my/python/modules</span></code> contains <code class="docutils literal"><span class="pre">moldynplot</span></code>.</p>
 </div>
 <div class="section" id="authorship">
 <h2>Authorship<a class="headerlink" href="#authorship" title="Permalink to this headline">¶</a></h2>
-<p>Moldynplot is developed by Karl T. Debiec, a graduate student at the
+<p>MolDynPlot is developed by Karl T. Debiec, a graduate student at the
 University of Pittsburgh advised by Professors Lillian T. Chong and Angela M.
 Gronenborn.</p>
 </div>
@@ -175,7 +181,7 @@ list of conditions and the following disclaimer.</li>
 <li>Redistributions in binary form must reproduce the above copyright notice,
 this list of conditions and the following disclaimer in the documentation
 and/or other materials provided with the distribution.</li>
-<li>Neither the name Moldynplot nor the names of its contributors may be
+<li>Neither the name MolDynPlot nor the names of its contributors may be
 used to endorse or promote products derived from this software without
 specific prior written permission.</li>
 </ul>
@@ -191,37 +197,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
 </div>
 </div>
-<div class="section" id="code">
-<h1>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="contents">
+<h1>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Figure Managers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.CorrFigureManager">CorrFigureManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.MDGXFigureManager">MDGXFigureManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.PDistFigureManager">PDistFigureManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.SAXSFigureManager">SAXSFigureManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.SequenceFigureManager">SequenceFigureManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.StateProbFigureManager">StateProbFigureManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.TimeSeriesFigureManager">TimeSeriesFigureManager</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#module-moldynplot.TimeSeries2DFigureManager">TimeSeries2DFigureManager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="figure_managers.html">Figure Managers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="figure_managers.html#module-moldynplot.CorrFigureManager">CorrFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figure_managers.html#module-moldynplot.HSQCFigureManager">HSQCFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figure_managers.html#module-moldynplot.MDGXFigureManager">MDGXFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figure_managers.html#module-moldynplot.PDistFigureManager">PDistFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figure_managers.html#module-moldynplot.SAXSFigureManager">SAXSFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figure_managers.html#module-moldynplot.SequenceFigureManager">SequenceFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figure_managers.html#module-moldynplot.StateProbFigureManager">StateProbFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figure_managers.html#module-moldynplot.TimeSeriesFigureManager">TimeSeriesFigureManager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figure_managers.html#module-moldynplot.TimeSeries2DFigureManager">TimeSeries2DFigureManager</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="code.html#module-moldynplot.Dataset">Datasets</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="code.html#sequencedataset">SequenceDataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#timeseriesdataset">TimeSeriesDataset</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code.html#natcondataset">NatConDataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code.html#saxstimeseriesdataset">SAXSTimeSeriesDataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#sequencedataset">SequenceDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="datasets.html#relaxsequencedataset">RelaxSequenceDataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="datasets.html#iredrelaxdataset">IREDRelaxDataset</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#saxsdataset">SAXSDataset</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="code.html#saxsexperimentdataset">SAXSExperimentDataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code.html#id1">SAXSTimeSeriesDataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code.html#saxsdiffdataset">SAXSDiffDataset</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="code.html#h5dataset">H5Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#timeseriesdataset">TimeSeriesDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="datasets.html#id1">IREDTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datasets.html#natcontimeseriesdataset">NatConTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datasets.html#saxstimeseriesdataset">SAXSTimeSeriesDataset</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#corrdataset">CorrDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#hsqcdataset">HSQCDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#saxsdataset">SAXSDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="datasets.html#saxsexperimentdataset">SAXSExperimentDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datasets.html#id2">SAXSTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="datasets.html#saxsdiffdataset">SAXSDiffDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#mdgxdataset">MDGXDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets.html#h5dataset">H5Dataset</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Functions</a></li>
 </ul>
 </div>
 </div>
@@ -237,7 +255,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="code.html" class="btn btn-neutral float-right" title="Figure Managers" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="figure_managers.html" class="btn btn-neutral float-right" title="Figure Managers" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
@@ -269,7 +287,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1',
+            VERSION:'16-06-29',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
