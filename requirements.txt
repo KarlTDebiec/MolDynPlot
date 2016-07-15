@@ -2,3 +2,5 @@ h5py
 ipython
 matplotlib
 pandas
+pyyaml
+scikit-learn
