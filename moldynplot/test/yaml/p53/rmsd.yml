@@ -1,0 +1,17 @@
+preset: [rmsd, manuscript, pdist]
+figures:
+    0:
+        outfile: "rmsd.png"
+        savefig_kw:
+            dpi: 300
+        right:   1.1
+        subplots:
+            0:
+                xticks: [0,100,200,300,400,500,600,700,800,900,1000]
+                xlabel: "Time (ns)"
+                ylabel: "Backbone RMSD (Å)"
+                datasets:
+                    0:
+                        label:  "p53"
+                        infile: data/p53/rmsd.h5
+                        color:  blue

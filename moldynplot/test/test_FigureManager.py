@@ -9,28 +9,12 @@
 #   BSD license. See the LICENSE file for details.
 
 def test_TimeSeriesFigureManager():
-    from pandas.util.testing import assert_frame_equal
-    from moldynplot.Dataset import TimeSeriesDataset
+    from matplotlib.testing.compare import compare_images
+    from moldynplot.TimeSeriesFigureManager import TimeSeriesFigureManager
 
-    # Read cpptraj
-    cpptraj_df = TimeSeriesDataset(
-      infile="data/p53/rmsd.cpptraj",
-      dt=0.1,
-      toffset=-0.1).timeseries_df
+    tsfm = TimeSeriesFigureManager()
+    tsfm.draw_report(yaml_spec="yaml/p53/rmsd.yml")
+    compare_images("rmsd.png", "figure/p53/rmsd.png", tol=0)
 
-    # Read text
-    text_df = TimeSeriesDataset(
-      infile="data/p53/rmsd.dat").timeseries_df
-
-    # Read hdf5
-    hdf5_df = TimeSeriesDataset(
-      infile="data/p53/rmsd.h5").timeseries_df
-
-    # Compare
-    assert_frame_equal(cpptraj_df, hdf5_df)
-    assert_frame_equal(cpptraj_df, text_df)
-    assert_frame_equal(text_df, hdf5_df)
-
-    # Write text
-
-    # Write hdf5
+if __name__ == "__main__":
+    test_TimeSeriesFigureManager()
