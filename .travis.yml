@@ -23,6 +23,6 @@ install:
     - python setup.py install
 script:
     - cd moldynplot/test/
-    - py.test --cov ../
+    - py.test --cov .. --cov-report=term-missing
 after_success:
-    - coveralls
+    - coveralls --data_file .coverage
