@@ -13,17 +13,17 @@ def test_TimeSeriesDataset():
 
     # Read cpptraj
     cpptraj_df = TimeSeriesDataset(
-      infile="test/data/p53/rmsd.cpptraj",
+      infile="data/p53/rmsd.cpptraj",
       dt=0.1,
       toffset=-0.1).timeseries_df
 
     # Read text
     text_df = TimeSeriesDataset(
-      infile="test/data/p53/rmsd.dat").timeseries_df
+      infile="data/p53/rmsd.dat").timeseries_df
 
     # Read hdf5
     hdf5_df = TimeSeriesDataset(
-      infile="test/data/p53/rmsd.h5").timeseries_df
+      infile="data/p53/rmsd.h5").timeseries_df
 
     # Compare
     assert_frame_equal(cpptraj_df, hdf5_df)
