@@ -3,4 +3,5 @@ ipython
 matplotlib
 pandas
 pyyaml
+scipy
 scikit-learn
