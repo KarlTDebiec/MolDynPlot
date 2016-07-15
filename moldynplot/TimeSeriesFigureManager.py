@@ -22,7 +22,9 @@ from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
 class TimeSeriesFigureManager(FigureManager):
     """
-    Manages the generation of time series figures
+    Manages the generation of time series figures.
+
+    .. image:: ../moldynplot/test/figure/p53/rmsd.png
     """
 
     defaults = """
