@@ -8,21 +8,27 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 def test_TimeSeriesDataset():
+    from pandas.util.testing import assert_frame_equal
     from moldynplot.Dataset import TimeSeriesDataset
 
     # Read cpptraj
+    cpptraj_df = TimeSeriesDataset(
+      infile="test/data/p53/rmsd.cpptraj",
+      dt=0.1,
+      toffset=-0.1).timeseries_df
 
     # Read text
     text_df = TimeSeriesDataset(
-      infile="data/p53/rmsd.dat").timeseries_df
-    assert hash(text_df.to_string()) == 8096571869640597227
+      infile="test/data/p53/rmsd.dat").timeseries_df
 
     # Read hdf5
     hdf5_df = TimeSeriesDataset(
-      infile="data/p53/rmsd.h5").timeseries_df
-    assert hash(hdf5_df.to_string()) == 8096571869640597227
+      infile="test/data/p53/rmsd.h5").timeseries_df
 
-    # Read legacy hdf5
+    # Compare
+    assert_frame_equal(cpptraj_df, hdf5_df)
+    assert_frame_equal(cpptraj_df, text_df)
+    assert_frame_equal(text_df, hdf5_df)
 
     # Write text
 
