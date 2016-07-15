@@ -1,4 +1,4 @@
-moldynplot
+MolDynPlot
 ==========
 .. include:: ../README.rst
 .. include:: ../LICENSE

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot/doc/conf.py
+#   MolDynPlot/doc/conf.py
 #
 #   Copyright (C) 2015-2016 Karl T Debiec
 #   All rights reserved.
@@ -29,7 +29,7 @@ intersphinx_mapping = {
   "nmrglue":    ("http://nmrglue.readthedocs.io/en/latest",     None),
   "pandas":     ("http://pandas.pydata.org/pandas-docs/stable", None)}
 master_doc = "index"
-project   = "moldynplot"
+project   = "MolDynPlot"
 copyright = "2015-2016, Karl T Debiec"
 author    = "Karl T Debiec"
 version   = "0.1.0"
@@ -40,7 +40,7 @@ pygments_style    = "sphinx"
 html_theme        = "sphinx_rtd_theme"
 html_theme_path   = sphinx_rtd_theme.get_html_theme_path()
 html_static_path  = ["_static"]
-htmlhelp_basename = "moldynplotdoc"
+htmlhelp_basename = "MolDynPlotdoc"
 
 autoclass_content     = "both"
 autodoc_member_order  = "bysource"
