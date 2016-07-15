@@ -5,10 +5,14 @@ addons:
     apt:
         packages:
             - libhdf5-serial-dev
-install:
+before_install:
+    - pip install coveralls
     - pip install pytest pytest-cov
+install:
     - pip install -r requirements.txt
 before_script:
     - export PYTHONPATH=$PYTHONPATH:$(pwd)/..
 script:
     - py.test
+after_success:
+    - coveralls

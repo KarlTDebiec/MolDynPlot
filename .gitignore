@@ -2,4 +2,5 @@
 *.swp
 *.swo
 .DS_Store
+.cache
 doc/_build
