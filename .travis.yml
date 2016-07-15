@@ -25,4 +25,4 @@ script:
     - cd moldynplot/test/
     - py.test --cov .. --cov-report=term-missing
 after_success:
-    - coveralls --data_file .coverage --coveralls_url https://coveralls.io/github/KarlTDebiec/moldynplo
+    - coveralls --data_file .coverage -u https://coveralls.io/github/KarlTDebiec/moldynplot
