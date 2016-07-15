@@ -22,6 +22,8 @@ def test_TimeSeriesDataset():
       infile="data/p53/rmsd.h5").timeseries_df
     assert hash(hdf5_df.to_string()) == 8096571869640597227
 
+    # Read legacy hdf5
+
     # Write text
 
     # Write hdf5
