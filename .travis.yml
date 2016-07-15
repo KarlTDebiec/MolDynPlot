@@ -4,7 +4,7 @@ python:
 addons:
     apt:
         packages:
-            - libhdf5
+            - libhdf5-serial-dev
 install:
     - pip install pytest pytest-cov
     - pip install -r requirements.txt
