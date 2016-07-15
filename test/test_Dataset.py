@@ -12,4 +12,6 @@ def test_TimeSeriesDataset():
     from moldynplot.Dataset import TimeSeriesDataset
     text_df = TimeSeriesDataset(infile="test/data/p53/rmsd.dat").timeseries_df
     hdf5_df = TimeSeriesDataset(infile="test/data/p53/rmsd.h5").timeseries_df
+    assert hash(text_df.to_string()) == 8096571869640597227
+    assert hash(hdf5_df.to_string()) == 8096571869640597227
     assert_frame_equal(text_df, hdf5_df)
