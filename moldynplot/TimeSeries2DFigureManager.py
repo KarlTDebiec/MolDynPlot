@@ -23,6 +23,8 @@ from .myplotspec.manage_kwargs import manage_kwargs
 class TimeSeries2DFigureManager(FigureManager):
     """
     Manages the generation of 2D time series figures.
+
+    .. image:: ../moldynplot/test/figure/p53/perresrmsd.png
     """
 
     defaults = """

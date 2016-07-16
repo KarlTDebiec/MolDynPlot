@@ -4,6 +4,7 @@ figures:
         outfile: "perresrmsd.png"
         savefig_kw:
             dpi: 300
+        left: 0.70
         subplots:
             0:
                 title:  "p53"
@@ -23,6 +24,6 @@ figures:
                 datasets:
                     0:
                         dataset_kw:
+                            infile:  data/p53/perresrmsd.h5
                             usecols: !!python/object/apply:range        [1,14,1]
                             y:       !!python/object/apply:numpy.arange [2,16,1]
-                            infile:  data/p53/perresrmsd.h5
