@@ -34,24 +34,24 @@ def test_rmsd():
 
     # Write hdf5
 
-def test_rmsd_perres():
+def test_perresrmsd():
     # Read cpptraj
     cpptraj_df = TimeSeriesDataset(
-      infile="data/p53/rmsd_perres.cpptraj",
+      infile="data/p53/perresrmsd.cpptraj",
       dt=0.1,
       toffset=-0.1).timeseries_df
 
     # Read text
     text_df = TimeSeriesDataset(
-      infile="data/p53/rmsd_perres.dat").timeseries_df
+      infile="data/p53/perresrmsd.dat").timeseries_df
 
     # Read hdf5
     hdf5_df = TimeSeriesDataset(
-      infile="data/p53/rmsd_perres.h5").timeseries_df
+      infile="data/p53/perresrmsd.h5").timeseries_df
 
     # Read legacy hdf5
     lgcy_df = TimeSeriesDataset(
-      infile="data/p53/rmsd_perres_legacy.h5",
+      infile="data/p53/perresrmsd_legacy.h5",
       dt=0.1).timeseries_df
 
     # Compare
@@ -65,4 +65,4 @@ def test_rmsd_perres():
 
 if __name__ == "__main__":
     test_rmsd()
-    test_rmsd_perres()
+    test_perresrmsd()

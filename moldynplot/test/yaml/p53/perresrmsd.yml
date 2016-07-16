@@ -1,0 +1,28 @@
+preset: [perresrmsd, manuscript]
+figures:
+    0:
+        outfile: "perresrmsd.png"
+        savefig_kw:
+            dpi: 300
+        subplots:
+            0:
+                title:  "p53"
+                xlabel: "Time (ns)"
+                xticks: [0,100,200,300,400,500,600,700,800,900,1000]
+                ybound:      [1, 16]
+                yticks:      [ 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5,
+                              10.5,11.5,12.5,13.5,14.5,15.5]
+                yticklabels: ["Ace 16", "Glu 17", "Thr 18", "Phe 19", "Ser 20",
+                              "Asp 21", "Leu 22", "Trp 23", "Lys 24", "Leu 25",
+                              "Leu 26", "Pro 27", "Glu 28", "Asn 29", "Nhe 30"]
+                grid_kw:
+                    axis: "x"
+                draw_hline: True
+                hline_kw:
+                    y: [4, 11]
+                datasets:
+                    0:
+                        dataset_kw:
+                            usecols: !!python/object/apply:range        [1,14,1]
+                            y:       !!python/object/apply:numpy.arange [2,16,1]
+                            infile:  data/p53/perresrmsd.h5

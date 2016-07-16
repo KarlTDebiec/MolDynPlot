@@ -6,3 +6,4 @@
 .DS_Store
 build
 doc/_build
+moldynplot/test/*.png

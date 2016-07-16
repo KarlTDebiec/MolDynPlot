@@ -7,11 +7,12 @@ figures:
         right:   1.1
         subplots:
             0:
-                xticks: [0,100,200,300,400,500,600,700,800,900,1000]
                 xlabel: "Time (ns)"
+                xticks: [0,100,200,300,400,500,600,700,800,900,1000]
                 ylabel: "Backbone RMSD (Å)"
                 datasets:
                     0:
                         label:  "p53"
-                        infile: data/p53/rmsd.h5
+                        dataset_kw:
+                            infile: data/p53/rmsd.h5
                         color:  blue
