@@ -24,9 +24,6 @@ packages:
 - scikit-learn
 - scipy
 
-MolDynPlot has been tested with Anaconda python 2.1.0 on Arch Linux, OSX
-Yosemite, and Windows 8.1.
-
 Installation
 ------------
 
