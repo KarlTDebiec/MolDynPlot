@@ -24,8 +24,8 @@ class TimeSeries2DFigureManager(FigureManager):
     """
     Manages the generation of 2D time series figures.
 
-    .. image:: ../moldynplot/test/figure/p53/perresrmsd.png
-    .. image:: ../moldynplot/test/figure/p53/dssp.png
+    .. image:: _static/p53/perresrmsd.png
+    .. image:: _static/p53/dssp.png
     """
 
     defaults = """

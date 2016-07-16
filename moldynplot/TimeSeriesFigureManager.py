@@ -24,7 +24,7 @@ class TimeSeriesFigureManager(FigureManager):
     """
     Manages the generation of time series figures.
 
-    .. image:: ../moldynplot/test/figure/p53/rmsd.png
+    .. image:: _static/p53/rmsd.png
     """
 
     defaults = """
