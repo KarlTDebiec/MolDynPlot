@@ -1,7 +1,7 @@
-preset: [perresrmsd, manuscript]
+preset: [dssp, manuscript]
 figures:
     0:
-        outfile: "perresrmsd.png"
+        outfile: "dssp.png"
         savefig_kw:
             dpi: 300
         left: 0.70
@@ -24,6 +24,6 @@ figures:
                 datasets:
                     0:
                         dataset_kw:
-                            infile:  data/p53/perresrmsd.h5
+                            infile:  data/p53/dssp.h5
                             usecols: !!python/object/apply:range        [1,14,1]
                             y:       !!python/object/apply:numpy.arange [2,16,1]

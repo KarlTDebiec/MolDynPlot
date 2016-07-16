@@ -22,6 +22,12 @@ def test_perresrmsd():
     tsfm.draw_report(yaml_spec="yaml/p53/perresrmsd.yml")
     compare_images("perresrmsd.png", "figure/p53/perresrmsd.png", tol=0)
 
+def test_dssp():
+    tsfm = TimeSeries2DFigureManager()
+    tsfm.draw_report(yaml_spec="yaml/p53/dssp.yml")
+    compare_images("dssp.png", "figure/p53/dssp.png", tol=0)
+
 if __name__ == "__main__":
     test_rmsd()
     test_perresrmsd()
+    test_dssp()

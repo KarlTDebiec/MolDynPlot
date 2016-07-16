@@ -26,4 +26,5 @@ script:
     - py.test --cov=moldynplot --cov-report=term-missing
 after_success:
     - pwd
+    - ls -al
     - coveralls
