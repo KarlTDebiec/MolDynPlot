@@ -27,11 +27,9 @@ packages:
 Installation
 ------------
 
-Put in your ``$PYTHONPATH``::
+Change to the ``MolDynPlot`` directory and run::
 
-    export PYTHONPATH=/path/to/my/python/modules:$PYTHONPATH
-
-where ``/path/to/my/python/modules`` contains ``moldynplot``.
+    python setup.py install
 
 Authorship
 ----------
