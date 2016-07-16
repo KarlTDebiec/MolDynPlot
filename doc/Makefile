@@ -40,7 +40,7 @@ gh-pages:
 	make html
 	git checkout gh-pages
 	cd .. && \
-    rm -vr _sources _static && \
+    rm -vr _sources _static _images && \
     mv doc/_build/html/* . && \
     git add -A && \
     git commit -m "Updated documentation for `git log master -1 --pretty=short --abbrev-commit`" && \
