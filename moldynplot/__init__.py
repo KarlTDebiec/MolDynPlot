@@ -11,7 +11,7 @@ General functions.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
-################################### CLASSES ###################################
+################################## FUNCTIONS ##################################
 def dssp_cmap(z=None, vmin=None, vmax=None):
     """
     Generates colormap for Dictionary of Secondary Structure Prediction
