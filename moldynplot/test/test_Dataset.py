@@ -63,6 +63,36 @@ def test_perresrmsd():
 
     # Write hdf5
 
+def test_dssp():
+    # Read cpptraj
+    cpptraj_df = TimeSeriesDataset(
+      infile="data/p53/dssp.cpptraj",
+      dt=0.1,
+      toffset=-0.1).timeseries_df
+
+    # Read text
+    text_df = TimeSeriesDataset(
+      infile="data/p53/dssp.dat").timeseries_df
+
+    # Read hdf5
+    hdf5_df = TimeSeriesDataset(
+      infile="data/p53/dssp.h5").timeseries_df
+
+    # Read legacy hdf5
+    lgcy_df = TimeSeriesDataset(
+      infile="data/p53/dssp_legacy.h5",
+      dt=0.1).timeseries_df
+
+    # Compare
+    assert_frame_equal(cpptraj_df, hdf5_df)
+    assert_frame_equal(cpptraj_df, text_df)
+    assert_frame_equal(cpptraj_df, lgcy_df)
+
+    # Write text
+
+    # Write hdf5
+
 if __name__ == "__main__":
     test_rmsd()
     test_perresrmsd()
+    test_dssp()
