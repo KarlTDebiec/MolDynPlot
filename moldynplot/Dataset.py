@@ -246,6 +246,13 @@ class SequenceDataset(Dataset):
         # Load index, if applicable
         df = self._read_index(df, **kwargs)
 
+        # Sort
+        if df.index.name == "residue":
+            df = df.loc[sorted(df.index.values,
+                   key=lambda x: int(x.split(":")[1]))]
+        else:
+            df = df.loc[sorted(df.index.values)]
+
         return df
 
     def calc_pdist(self, **kwargs):
