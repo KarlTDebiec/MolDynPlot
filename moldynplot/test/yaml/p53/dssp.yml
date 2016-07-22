@@ -4,10 +4,13 @@ figures:
         outfile: "dssp.png"
         savefig_kw:
             dpi: 300
-        left: 0.70
+        left:       0.70
+        sub_height: 1.50
+        shared_legend_kw:
+            left:   0.70
         subplots:
             0:
-                title: "p53"
+                title: "p53 Peptide"
                 xlabel: "Time (ns)"
                 xticks: [0,100,200,300,400,500,600,700,800,900,1000]
                 ybound:      [1, 16]

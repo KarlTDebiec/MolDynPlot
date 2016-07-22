@@ -7,3 +7,4 @@
 build
 doc/_build
 moldynplot/test/*.png
+moldynplot/test/figure/*/*-failed-diff.png

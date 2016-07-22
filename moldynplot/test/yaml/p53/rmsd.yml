@@ -1,13 +1,13 @@
 preset: [rmsd, manuscript, pdist]
 figures:
     0:
-        title: "p53"
         outfile: "rmsd.png"
         savefig_kw:
             dpi: 300
         right: 1.1
         subplots:
             0:
+                title: "p53 Peptide"
                 xlabel: "Time (ns)"
                 xticks: [0,100,200,300,400,500,600,700,800,900,1000]
                 ylabel: "Backbone RMSD (Å)"
@@ -16,4 +16,5 @@ figures:
                         label: "p53"
                         dataset_kw:
                             infile: data/p53/rmsd.h5
-                        color: blue
+                        plot_kw:
+                            color: blue
