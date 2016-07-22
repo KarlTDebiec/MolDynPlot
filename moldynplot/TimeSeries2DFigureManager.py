@@ -26,7 +26,7 @@ class TimeSeries2DFigureManager(FigureManager):
 
     **Supported Presets:**
 
-    Per-residue Root-mean standard deviation (``perresrmsd``):
+    Per-residue root-mean standard deviation (``perresrmsd``):
 
     .. image:: _static/p53/perresrmsd.png
 
