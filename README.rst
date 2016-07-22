@@ -18,7 +18,13 @@ TimeSeriesFigureManager.py
 
 Root-mean standard deviation:
 
-.. image:: doc/_static/p53/rmsd.png
+.. only:: not html
+
+    .. image:: doc/_static/p53/rmsd.png
+
+.. only:: html
+
+    .. image:: _static/p53/rmsd.png
 
 Radius of gyration:
 
