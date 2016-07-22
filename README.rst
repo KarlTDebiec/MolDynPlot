@@ -18,35 +18,22 @@ TimeSeriesFigureManager.py
 
 Root-mean standard deviation:
 
-.. only:: github
-
-    .. image:: _static/p53/rmsd.png
-
-
-.. only:: html
-
-    .. image:: doc/_static/p53/rmsd.png
+.. image:: doc/_static/p53/rmsd.png
 
 Radius of gyration:
 
-.. only:: html
-
-    .. image:: doc/_static/p53/radgyr.png
+.. image:: doc/_static/p53/radgyr.png
 
 TimeSeries2DFigureManager.py
 ----------------------------
 
 Per-residue Root-mean standard deviation:
 
-.. only:: html
-
-    .. image:: doc/_static/p53/perresrmsd.png
+.. image:: doc/_static/p53/perresrmsd.png
 
 Dictionary of secondary structure prediction:
 
-.. only:: html
-
-    .. image:: doc/_static/p53/dssp.png
+.. image:: doc/_static/p53/dssp.png
 
 Dependencies
 ------------

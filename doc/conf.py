@@ -40,7 +40,7 @@ pygments_style    = "sphinx"
 html_theme        = "sphinx_rtd_theme"
 html_theme_path   = sphinx_rtd_theme.get_html_theme_path()
 html_static_path  = ["_static"]
-htmlhelp_basename = "MolDynPlotdoc"
+htmlhelp_basename = "MolDynPlot"
 
 autoclass_content     = "both"
 autodoc_member_order  = "bysource"
