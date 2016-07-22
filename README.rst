@@ -21,10 +21,14 @@ TimeSeriesFigureManager.py
 Root-mean standard deviation:
 
 .. image:: doc/_static/p53/rmsd.png
+    :scale: 35
+    :align: center
 
 Radius of gyration:
 
 .. image:: doc/_static/p53/radgyr.png
+    :scale: 35
+    :align: center
 
 TimeSeries2DFigureManager.py
 ----------------------------
@@ -32,10 +36,14 @@ TimeSeries2DFigureManager.py
 Per-residue Root-mean standard deviation:
 
 .. image:: doc/_static/p53/perresrmsd.png
+    :scale: 35
+    :align: center
 
 Dictionary of secondary structure prediction:
 
 .. image:: doc/_static/p53/dssp.png
+    :scale: 35
+    :align: center
 
 .. github_end
 
@@ -47,10 +55,14 @@ Dictionary of secondary structure prediction:
     Root-mean standard deviation:
 
     .. image:: _static/p53/rmsd.png
+        :scale: 35
+        :align: center
 
     Radius of gyration:
 
     .. image:: _static/p53/radgyr.png
+        :scale: 35
+        :align: center
 
     TimeSeries2DFigureManager.py
     ----------------------------
@@ -58,10 +70,14 @@ Dictionary of secondary structure prediction:
     Per-residue Root-mean standard deviation:
 
     .. image:: _static/p53/perresrmsd.png
+        :scale: 35
+        :align: center
 
     Dictionary of secondary structure prediction:
 
     .. image:: _static/p53/dssp.png
+        :scale: 35
+        :align: center
 
 Dependencies
 ------------
