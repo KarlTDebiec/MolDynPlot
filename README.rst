@@ -15,26 +15,11 @@ Example Outputs
 
 .. github_start
 
-TimeSeriesFigureManager.py
---------------------------
-
-Root-mean standard deviation:
+Time Series
 
 .. image:: doc/_static/p53/rmsd.png
-    :width: 100
 
-Radius of gyration:
-
-.. image:: doc/_static/p53/radgyr.png
-
-TimeSeries2DFigureManager.py
-----------------------------
-
-Per-residue Root-mean standard deviation:
-
-.. image:: doc/_static/p53/perresrmsd.png
-
-Dictionary of secondary structure prediction:
+2D Time Series
 
 .. image:: doc/_static/p53/dssp.png
 
@@ -42,31 +27,13 @@ Dictionary of secondary structure prediction:
 
 .. only:: html
 
-    TimeSeriesFigureManager.py
-    --------------------------
-
-    Root-mean standard deviation:
+    Time Series
 
     .. image:: _static/p53/rmsd.png
         :scale: 35
         :align: center
 
-    Radius of gyration:
-
-    .. image:: _static/p53/radgyr.png
-        :scale: 35
-        :align: center
-
-    TimeSeries2DFigureManager.py
-    ----------------------------
-
-    Per-residue Root-mean standard deviation:
-
-    .. image:: _static/p53/perresrmsd.png
-        :scale: 35
-        :align: center
-
-    Dictionary of secondary structure prediction:
+    2D Time Series
 
     .. image:: _static/p53/dssp.png
         :scale: 35
