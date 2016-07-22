@@ -1,0 +1,28 @@
+preset: [s2, manuscript_tight]
+figures:
+    0:
+        outfile: "s2.png"
+        savefig_kw:
+            dpi: 300
+        multi_xticklabels: [1,10,20,30,40,50,56]
+        top:  0.25
+        left: 0.60
+        shared_legend_kw:
+            left: 0.60
+        subplots:
+            0:
+                title:  "GB3"
+                xbound: [0.5,56.5]
+                xticks: [1,10,20,30,40,50,56]
+                yticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
+                yticklabels: [0.0,0.2,0.4,0.6,0.8]
+                ylabel_kw:   {labelpad: 13}
+                datasets:
+                    0:
+                        label: "Hall et al. JACS. 2006. 128. 7855-7870"
+                        dataset_kw:
+                            infile: data/gb3/relax_s2.h5
+                        plot_kw:
+                            color: blue
+                        draw_fill_between: True
+                        draw_errorbar: False
