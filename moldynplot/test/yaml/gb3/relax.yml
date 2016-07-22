@@ -1,0 +1,41 @@
+preset: [relax_4_s2, manuscript_tight]
+figures:
+    0:
+        outfile: "relax.png"
+        savefig_kw:
+            dpi: 300
+        multi_xticklabels: [1,10,20,30,40,50,56]
+        top:  0.25
+        left: 0.60
+        shared_legend_kw:
+            left: 0.60
+        subplots:
+            all:
+                xbound: [0.5,56.5]
+                xticks: [1,10,20,30,40,50,56]
+                datasets:
+                    0:
+                        label: "Hall et al. JACS. 2006. 128. 7855-7870"
+                        dataset_kw:
+                            infile: data/gb3/relax_s2.h5
+                        plot_kw:
+                            color: blue
+                        draw_fill_between: True
+                        draw_errorbar: False
+            0:
+                title:       "GB3"
+                yticks:      [ 0.5,  1.0,  1.5,  2.0,  2.5,  3.0]
+                yticklabels: ["0.5","1.0","1.5","2.0","2.5","3.0"]
+                ylabel_kw:   {labelpad: 12}
+            1:
+                yticks:      [ 2.0,  3.0,  4.0,  5.0,  6.0, 7.0]
+                yticklabels: ["2.0","3.0","4.0","5.0","6.0"]
+                ylabel_kw:   {labelpad: 12}
+            2:
+                yticks:      [ 0.0,  0.2,  0.4,  0.6,  0.8,  1.0]
+                yticklabels: ["0.0","0.2","0.4","0.6","0.8"]
+                ylabel_kw:   {labelpad: 13}
+            3:
+                yticks:      [0.0,0.2,0.4,0.6,0.8,1.0]
+                yticklabels: [0.0,0.2,0.4,0.6,0.8]
+                ylabel_kw:   {labelpad: 13}

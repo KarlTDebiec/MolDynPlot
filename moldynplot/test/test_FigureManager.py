@@ -9,9 +9,15 @@
 #   BSD license. See the LICENSE file for details.
 ################################### MODULES ###################################
 from matplotlib.testing.compare import compare_images
+from moldynplot.SequenceFigureManager import SequenceFigureManager
 from moldynplot.TimeSeriesFigureManager import TimeSeriesFigureManager
 from moldynplot.TimeSeries2DFigureManager import TimeSeries2DFigureManager
 ################################## FUNCTIONS ##################################
+def test_relax():
+    sfm = SequenceFigureManager()
+    sfm.draw_report(yaml_spec="yaml/gb3/relax.yml")
+    compare_images("relax.png", "figure/gb3/relax.png", tol=0)
+
 def test_rmsd():
     tsfm = TimeSeriesFigureManager()
     tsfm.draw_report(yaml_spec="yaml/p53/rmsd.yml")
@@ -33,6 +39,7 @@ def test_dssp():
     compare_images("dssp.png", "figure/p53/dssp.png", tol=0)
 
 if __name__ == "__main__":
+    test_relax()
     test_rmsd()
     test_radgyr()
     test_perresrmsd()

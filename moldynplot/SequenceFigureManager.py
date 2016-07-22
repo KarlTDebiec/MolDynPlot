@@ -170,7 +170,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           column:    "pre"
           column_se: "pre se"
-      relaxation_3:
+      relax_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
         draw_figure:
@@ -183,7 +183,7 @@ class SequenceFigureManager(FigureManager):
               preset: "r2"
             2:
               preset: "hetnoe"
-      relaxation_4:
+      relax_4:
         class: content
         help: Four stacked plots including R1, R2, R2/R1, and HetNOE
         draw_figure:
@@ -198,6 +198,21 @@ class SequenceFigureManager(FigureManager):
               preset: "r2/r1"
             3:
              preset: "hetnoe"
+      relax_4_s2:
+        class: content
+        help: Four stacked plots including R1, R2, HetNOE, and S2
+        draw_figure:
+          multiplot: True
+          nrows: 4
+          subplots:
+            0:
+              preset: "r1"
+            1:
+              preset: "r2"
+            2:
+             preset: "hetnoe"
+            3:
+             preset: "s2"
       manuscript:
         class: target
         inherits: manuscript
