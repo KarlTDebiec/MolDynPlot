@@ -10,8 +10,8 @@ Introduction
 MolDynPlot is a Python package used to design matplotlib-based figures of
 Molecular Dynamics (MD) simulation data using the simple text format YAML.
 
-Example Outputs
-===============
+Example Output
+==============
 
 .. github_start
 
