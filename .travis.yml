@@ -9,22 +9,36 @@ addons:
             - libhdf5-serial-dev
             - liblapack-dev
 before_install:
-    - pip install coveralls
-    - pip install pytest
-    - pip install pytest-cov
-    - pip install h5py
-    - pip install ipython
-    - pip install matplotlib
-    - pip install pandas
-    - pip install pyyaml
-    - pip install scipy
-    - pip install scikit-learn
+  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update  --yes conda
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION coveralls
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION pytest
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION pytest-cov
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION h5py
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION ipython
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION pandas
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION pyyaml
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION scikit-learn
+#before_install:
+#    - pip install coveralls
+#    - pip install pytest
+#    - pip install pytest-cov
+#    - pip install h5py
+#    - pip install ipython
+#    - pip install matplotlib
+#    - pip install pandas
+#    - pip install pyyaml
+#    - pip install scipy
+#    - pip install scikit-learn
 install:
-    - python setup.py install
+  - python setup.py install
 script:
     - cd moldynplot/test
     - py.test --cov=moldynplot --cov-report=term-missing
 after_success:
-    - pwd
-    - ls -al
     - coveralls
