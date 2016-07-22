@@ -15,11 +15,11 @@ Example Outputs
 
 .. github_start
 
-Time Series
+Time Series:
 
 .. image:: doc/_static/p53/rmsd.png
 
-2D Time Series
+2D Time Series:
 
 .. image:: doc/_static/p53/dssp.png
 
@@ -27,13 +27,13 @@ Time Series
 
 .. only:: html
 
-    Time Series
+    Time Series:
 
     .. image:: _static/p53/rmsd.png
         :scale: 35
         :align: center
 
-    2D Time Series
+    2D Time Series:
 
     .. image:: _static/p53/dssp.png
         :scale: 35
