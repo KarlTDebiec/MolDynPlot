@@ -34,6 +34,29 @@ def test_rmsd():
 
     # Write hdf5
 
+def test_radgyr():
+    # Read cpptraj
+    cpptraj_df = TimeSeriesDataset(
+      infile="data/p53/radgyr.cpptraj",
+      dt=0.1,
+      toffset=-0.1).timeseries_df
+
+    # Read text
+    text_df = TimeSeriesDataset(
+      infile="data/p53/radgyr.dat").timeseries_df
+
+    # Read hdf5
+    hdf5_df = TimeSeriesDataset(
+      infile="data/p53/radgyr.h5").timeseries_df
+
+    # Compare
+    assert_frame_equal(cpptraj_df, hdf5_df)
+    assert_frame_equal(cpptraj_df, text_df)
+
+    # Write text
+
+    # Write hdf5
+
 def test_perresrmsd():
     # Read cpptraj
     cpptraj_df = TimeSeriesDataset(
