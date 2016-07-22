@@ -10,6 +10,31 @@ Introduction
 MolDynPlot is a Python package used to design matplotlib-based figures of
 Molecular Dynamics (MD) simulation data using the simple text format YAML.
 
+Example Outputs
+===============
+
+TimeSeriesFigureManager.py
+--------------------------
+
+Root-mean standard deviation:
+
+.. image:: _static/p53/rmsd.png
+
+Radius of gyration:
+
+.. image:: _static/p53/radgyr.png
+
+TimeSeries2DFigureManager.py
+----------------------------
+
+Per-residue Root-mean standard deviation:
+
+.. image:: _static/p53/perresrmsd.png
+
+Dictionary of secondary structure prediction:
+
+.. image:: _static/p53/dssp.png
+
 Dependencies
 ------------
 
