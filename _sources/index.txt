@@ -1,6 +1,11 @@
 MolDynPlot
 ==========
 .. include:: ../README.rst
+    :end-before: github_start
+
+.. include:: ../README.rst
+    :start-after: github_end
+
 .. include:: ../LICENSE
 
 Contents
