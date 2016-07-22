@@ -5,9 +5,11 @@ figures:
         savefig_kw:
             dpi: 300
         left:       0.70
+        bottom:     0.90
         sub_height: 1.50
         shared_legend_kw:
-            left:   0.70
+            left:       0.70
+            sub_height: 0.50
         subplots:
             0:
                 title: "p53 Peptide"

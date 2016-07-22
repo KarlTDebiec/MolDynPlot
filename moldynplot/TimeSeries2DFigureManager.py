@@ -116,6 +116,8 @@ class TimeSeries2DFigureManager(FigureManager):
                  {color: !!python/object/apply:moldynplot.dssp_cmap [6,0,7]}]
               - ["Bend",
                  {color: !!python/object/apply:moldynplot.dssp_cmap [7,0,7]}]
+            legend_kw:
+              title: Secondary Structure
         draw_subplot:
           ylabel: Residue
         draw_dataset:
