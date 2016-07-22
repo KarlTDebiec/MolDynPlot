@@ -9,8 +9,34 @@
 #   BSD license. See the LICENSE file for details.
 ################################### MODULES ###################################
 from pandas.util.testing import assert_frame_equal
-from moldynplot.Dataset import TimeSeriesDataset
+from moldynplot.Dataset import SequenceDataset, TimeSeriesDataset
 ################################## FUNCTIONS ##################################
+def test_sequence():
+    # Read text
+    text_df = SequenceDataset(
+      infile="data/gb3/relax_s2.dat").sequence_df
+
+    # Read hdf5
+    hdf5_df = SequenceDataset(
+      infile="data/gb3/relax_s2.h5").sequence_df
+
+    # Merge text
+    merged_text_df = SequenceDataset(
+      infiles=["data/gb3/relax.dat", "data/gb3/s2.dat"]).sequence_df
+
+    # Merge hdf5
+    merged_hdf5_df = SequenceDataset(
+      infiles=["data/gb3/relax.h5", "data/gb3/s2.h5"]).sequence_df
+
+    # Compare
+    assert_frame_equal(text_df, hdf5_df)
+    assert_frame_equal(text_df, merged_text_df)
+    assert_frame_equal(hdf5_df, merged_hdf5_df)
+
+    # Write text
+
+    # Write hdf5
+
 def test_rmsd():
     # Read cpptraj
     cpptraj_df = TimeSeriesDataset(
@@ -116,6 +142,7 @@ def test_dssp():
     # Write hdf5
 
 if __name__ == "__main__":
+    test_sequence()
     test_rmsd()
     test_perresrmsd()
     test_dssp()
