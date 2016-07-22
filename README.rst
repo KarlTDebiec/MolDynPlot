@@ -24,6 +24,10 @@ Root-mean standard deviation:
     :scale: 10
     :align: center
 
+.. raw:: html
+
+   <big>text</big>
+
 Radius of gyration:
 
 .. image:: doc/_static/p53/radgyr.png
