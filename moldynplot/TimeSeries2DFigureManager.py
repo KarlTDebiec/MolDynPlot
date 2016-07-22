@@ -29,10 +29,14 @@ class TimeSeries2DFigureManager(FigureManager):
     Per-residue root-mean standard deviation (``perresrmsd``):
 
     .. image:: _static/p53/perresrmsd.png
+        :scale: 35
+        :align: center
 
     Dictionary of secondary structure prediction (``dssp``):
 
     .. image:: _static/p53/dssp.png
+        :scale: 35
+        :align: center
     """
 
     defaults = """

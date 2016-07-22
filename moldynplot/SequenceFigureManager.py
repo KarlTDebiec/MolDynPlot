@@ -28,6 +28,8 @@ class SequenceFigureManager(FigureManager):
     Relaxation (``relax_4_s2``):
 
     .. image:: _static/gb3/relax.png
+        :scale: 35
+        :align: center
     """
 
     defaults = """

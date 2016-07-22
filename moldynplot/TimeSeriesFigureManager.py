@@ -29,10 +29,14 @@ class TimeSeriesFigureManager(FigureManager):
     Root-mean standard deviation (``rmsd``):
 
     .. image:: _static/p53/rmsd.png
+        :scale: 35
+        :align: center
 
     Radius of gyration (``radgyr``):
 
     .. image:: _static/p53/radgyr.png
+        :scale: 35
+        :align: center
     """
 
     defaults = """
