@@ -24,7 +24,14 @@ class TimeSeries2DFigureManager(FigureManager):
     """
     Manages the generation of 2D time series figures.
 
+    **Supported Presets:**
+
+    Per-residue Root-mean standard deviation (``perresrmsd``):
+
     .. image:: _static/p53/perresrmsd.png
+
+    Dictionary of secondary structure prediction (``dssp``):
+
     .. image:: _static/p53/dssp.png
     """
 

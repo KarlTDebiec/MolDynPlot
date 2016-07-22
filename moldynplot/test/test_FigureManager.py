@@ -17,6 +17,11 @@ def test_rmsd():
     tsfm.draw_report(yaml_spec="yaml/p53/rmsd.yml")
     compare_images("rmsd.png", "figure/p53/rmsd.png", tol=0)
 
+def test_radgyr():
+    tsfm = TimeSeriesFigureManager()
+    tsfm.draw_report(yaml_spec="yaml/p53/radgyr.yml")
+    compare_images("radgyr.png", "figure/p53/radgyr.png", tol=0)
+
 def test_perresrmsd():
     tsfm = TimeSeries2DFigureManager()
     tsfm.draw_report(yaml_spec="yaml/p53/perresrmsd.yml")
@@ -29,5 +34,6 @@ def test_dssp():
 
 if __name__ == "__main__":
     test_rmsd()
+    test_radgyr()
     test_perresrmsd()
     test_dssp()

@@ -24,7 +24,15 @@ class TimeSeriesFigureManager(FigureManager):
     """
     Manages the generation of time series figures.
 
+    **Supported Presets:**
+
+    Root-mean standard deviation (``rmsd``):
+
     .. image:: _static/p53/rmsd.png
+
+    Radius of gyration (``radgyr``):
+
+    .. image:: _static/p53/radgyr.png
     """
 
     defaults = """
@@ -144,12 +152,10 @@ class TimeSeriesFigureManager(FigureManager):
               grid: !!python/object/apply:numpy.linspace [0,10,1000]
             read_csv_kw:
               header: 0
-              names: [frame, rmsd]
-      rg:
+              names: ["frame", "rmsd"]
+      radgyr:
         class: content
         help: Radius of gyration (Rg)
-        draw_figure:
-          multi_yticklabels: [0,5,10,15,20,25,30]
         draw_subplot:
           ylabel: $R_g$ (Å)
           yticks: [0,5,10,15,20,25,30]
@@ -164,9 +170,8 @@ class TimeSeriesFigureManager(FigureManager):
               bandwidth: 0.1
               grid: !!python/object/apply:numpy.linspace [0,30,1000]
             read_csv_kw:
-              delim_whitespace: True
               header: 0
-              names: [frame, rg, rgmax]
+              names: ["frame", "rg", "rg max"]
       rotdif:
         class: content
         help: Rotational correlatio time (τc)
@@ -357,10 +362,15 @@ class TimeSeriesFigureManager(FigureManager):
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, **dataset_kw)
-        if dataset is not None and hasattr(dataset, "timeseries_df"):
-            timeseries = dataset.timeseries_df
-        else:
-            timeseries = None
+
+        # Verbose output
+        if verbose >= 2:
+            print(column)
+            if hasattr(dataset, "timeseries_df"):
+                print("mean  {0}: {1:6.3f}".format(column,
+                  dataset.timeseries_df[column].mean()))
+                print("stdev {0}: {1:6.3f}".format(column,
+                  dataset.timeseries_df[column].std()))
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -374,16 +384,16 @@ class TimeSeriesFigureManager(FigureManager):
             if "x" in fill_between_kw:
                 fb_x = fill_between_kw.pop("x")
             else:
-                fb_x = timeseries.index.values
+                fb_x = dataset.timeseries_df.index.values
             if "ylb" in fill_between_kw:
                 fb_ylb = fill_between_kw.pop("ylb")
             elif "fill_between_lb_key" in fill_between_kw:
                 fill_between_lb_key = fill_between_kw.pop(
                   "fill_between_lb_key")
-                fb_ylb = timeseries[fill_between_lb_key]
+                fb_ylb = dataset.timeseries_df[fill_between_lb_key]
             elif "fill_between_lb_key" in kwargs:
                 fill_between_lb_key = kwargs.get( "fill_between_lb_key")
-                fb_ylb = timeseries[fill_between_lb_key]
+                fb_ylb = dataset.timeseries_df[fill_between_lb_key]
             else:
                 warn("inappropriate fill_between settings")
             if "yub" in fill_between_kw:
@@ -391,32 +401,30 @@ class TimeSeriesFigureManager(FigureManager):
             elif "fill_between_ub_key" in fill_between_kw:
                 fill_between_ub_key = fill_between_kw.pop(
                   "fill_between_ub_key")
-                fb_yub = timeseries[fill_between_ub_key]
+                fb_yub = dataset.timeseries_df[fill_between_ub_key]
             elif "fill_between_ub_key" in kwargs:
                 fill_between_ub_key = kwargs.get( "fill_between_ub_key")
-                fb_yub = timeseries[fill_between_ub_key]
+                fb_yub = dataset.timeseries_df[fill_between_ub_key]
             else:
                 warn("inappropriate fill_between settings")
             subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
 
         # Draw plot
         if draw_plot:
-            if verbose >= 2:
-                print("mean  {0}: {1:6.3f}".format(column,
-                  timeseries[column].mean()))
-                print("stdev {0}: {1:6.3f}".format(column,
-                  timeseries[column].std()))
-            plot = subplot.plot(timeseries.index.values, timeseries[column],
-                     **plot_kw)[0]
-            handle_kw = multi_get_copy("handle_kw", kwargs, {})
-            handle_kw["mfc"] = plot.get_color()
-            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
-            if handles is not None and label is not None:
-                handles[label] = handle
+            if not hasattr(dataset, "timeseries_df"):
+                warn("'draw_plot' is enabled but dataset does not have the "
+                     "necessary attribute 'timeseries_df', skipping.")
+            else:
+                plot = subplot.plot(dataset.timeseries_df.index.values,
+                  dataset.timeseries_df[column], **plot_kw)[0]
+                handle_kw = multi_get_copy("handle_kw", kwargs, {})
+                handle_kw["mfc"] = plot.get_color()
+                handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
+                if handles is not None and label is not None:
+                    handles[label] = handle
 
         # Draw pdist
         if draw_pdist:
-
             if not hasattr(dataset, "pdist_df"):
                 warn("'draw_pdist' is enabled but dataset does not have the "
                      "necessary attribute 'pdist_df', skipping.")
