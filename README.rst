@@ -18,6 +18,11 @@ TimeSeriesFigureManager.py
 
 Root-mean standard deviation:
 
+.. only:: github
+
+    .. image:: _static/p53/rmsd.png
+
+
 .. only:: html
 
     .. image:: doc/_static/p53/rmsd.png
