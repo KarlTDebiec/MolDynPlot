@@ -12,7 +12,6 @@ Generates one or more sequence figures to specifications in a YAML file.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
-import matplotlib
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
@@ -23,6 +22,12 @@ from .myplotspec.manage_kwargs import manage_kwargs
 class SequenceFigureManager(FigureManager):
     """
     Manages the generation of sequence figures.
+
+    **Supported Presets:**
+
+    Relaxation (``relax_4_s2``):
+
+    .. image:: _static/gb3/relax.png
     """
 
     defaults = """
@@ -36,6 +41,11 @@ class SequenceFigureManager(FigureManager):
             top: off
           shared_legend: True
           shared_legend_kw:
+            spines: False
+            handle_kw:
+              ls: none
+              marker: s
+              mec: black
             legend_kw:
               frameon: False
               loc: 9

@@ -23,6 +23,11 @@ Time Series:
 
 .. image:: doc/_static/p53/dssp.png
 
+Sequence:
+
+.. image:: doc/_static/gb3/relax.png
+
+
 .. github_end
 
 .. only:: html
@@ -36,6 +41,12 @@ Time Series:
     2D Time Series:
 
     .. image:: _static/p53/dssp.png
+        :scale: 35
+        :align: center
+
+    Sequence:
+
+    .. image:: _static/gb3/relax.png
         :scale: 35
         :align: center
 
