@@ -47,29 +47,29 @@ def test_hsqc():
 
 def test_sequence():
     # Read text
-    text_df = SequenceDataset(
-      infile="data/gb3/relax_s2.dat").sequence_df
+    text = SequenceDataset(infile="data/gb3/relax_s2.dat")
 
     # Read hdf5
-    hdf5_df = SequenceDataset(
-      infile="data/gb3/relax_s2.h5").sequence_df
+    hdf5 = SequenceDataset(infile="data/gb3/relax_s2.h5")
+    assert_frame_equal(text.sequence_df, hdf5.sequence_df)
 
     # Merge text
-    merged_text_df = SequenceDataset(
-      infiles=["data/gb3/relax.dat", "data/gb3/s2.dat"]).sequence_df
+    merged_text = SequenceDataset(
+      infiles=["data/gb3/relax.dat", "data/gb3/s2.dat"])
+    assert_frame_equal(text.sequence_df, merged_text.sequence_df)
 
     # Merge hdf5
-    merged_hdf5_df = SequenceDataset(
-      infiles=["data/gb3/relax.h5", "data/gb3/s2.h5"]).sequence_df
-
-    # Compare
-    assert_frame_equal(text_df, hdf5_df)
-    assert_frame_equal(text_df, merged_text_df)
-    assert_frame_equal(hdf5_df, merged_hdf5_df)
+    merged_hdf5 = SequenceDataset(
+      infiles=["data/gb3/relax.h5", "data/gb3/s2.h5"])
+    assert_frame_equal(text.sequence_df, merged_hdf5.sequence_df)
 
     # Write text
+    text.write(dataframe=text.sequence_df, outfile="relax_s2.dat")
+    assert(cmp("relax_s2.dat", "data/gb3/relax_s2.dat") == True)
 
     # Write hdf5
+    text.write(dataframe=text.sequence_df, outfile="relax_s2.h5")
+    assert(h5_cmp("relax_s2.h5", "data/gb3/relax_s2.h5") == True)
 
 def test_rmsd():
     # Read cpptraj
@@ -177,7 +177,7 @@ def test_dssp():
 
 if __name__ == "__main__":
     test_sequence()
-    test_rmsd()
-    test_perresrmsd()
-    test_dssp()
+#    test_rmsd()
+#    test_perresrmsd()
+#    test_dssp()
     test_hsqc()

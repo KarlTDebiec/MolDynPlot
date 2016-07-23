@@ -6,5 +6,5 @@
 .DS_Store
 build
 doc/_build
-moldynplot/test/*.png
+moldynplot/test/*.{dat,h5,png}
 moldynplot/test/figure/*/*-failed-diff.png
