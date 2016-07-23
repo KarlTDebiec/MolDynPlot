@@ -23,6 +23,12 @@ from .myplotspec.manage_kwargs import manage_kwargs
 class HSQCFigureManager(FigureManager):
     """
     Manages the generation of HSQC figures.
+
+    **Sample Output:**
+
+    .. image:: _static/mocvnh3/hsqc.png
+        :scale: 35
+        :align: center
     """
 
     defaults = """
