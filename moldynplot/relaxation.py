@@ -338,7 +338,6 @@ def process_relax(relax_type, peaklist, infiles, delays, error_method,
     import nmrglue
     import numpy as np
     import pandas as pd
-    from scipy.interpolate import RectBivariateSpline
     from scipy.optimize import curve_fit
 
     # Process arguments

@@ -1044,7 +1044,20 @@ class HSQCDataset(Dataset):
 
     def read(self, **kwargs):
         """
-        Reads HSQC from one or more *infiles* into a DataFrame.
+        Reads HSQC data from one or more *infiles* into a DataFrame.
+
+        Arguments:
+          infile{s} (str): Path(s) to input file(s); may contain
+            environment variables and wildcards
+          dataframe_kw (dict): Keyword arguments passed to
+            :class:`DataFrame<pandas.DataFrame>` (hdf5 only)
+          read_csv_kw (dict): Keyword arguments passed to
+            :func:`read_csv<pandas.read_csv>` (text only)
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          DataFrame: DataFrame
         """
         import re
         from .myplotspec import multi_pop_merged
@@ -1055,25 +1068,169 @@ class HSQCDataset(Dataset):
         if len(infiles) == 0:
             raise Exception(sformat("""No infiles found matching
             '{0}'""".format(infile_args)))
+        elif len(infiles) > 1:
+            raise Exception("HSQCDataset only supports a single infile")
         re_h5 = re.compile(
           r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
           flags=re.UNICODE)
 
         # Load Data
-        dfs = []
-        for infile in infiles:
-            if infile.endswith(".ft"):
-                df = self._read_nmr(infile, **kwargs)
-            elif re_h5.match(infile):
-                df = self._read_hdf5(infile, **kwargs)
-            else:
-                df = self._read_text(infile, **kwargs)
-            dfs.append(df)
-
-        if len(dfs) > 1:
-            raise Exception("HSQCDataset only supports a single infile")
-        df = dfs.pop(0)
+        infile = infiles[0]
+        if infile.endswith(".ft"):
+            df = self._read_nmr(infile, **kwargs)
+        elif re_h5.match(infile):
+            df = self._read_hdf5(infile, **kwargs)
+        else:
+            df = self._read_text(infile, **kwargs)
         df = df.astype(np.float32)
+
+        return df
+
+class PeakListDataset(SequenceDataset):
+    """
+    Represents an NMR peak list data.
+    """
+
+    @staticmethod
+    def construct_argparser(parser_or_subparsers=None, **kwargs):
+        """
+        Adds arguments to an existing argument parser, constructs a
+        subparser, or constructs a new parser
+
+        Arguments:
+          parser_or_subparsers (ArgumentParser, _SubParsersAction,
+            optional): If ArgumentParser, existing parser to which
+            arguments will be added; if _SubParsersAction, collection of
+            subparsers to which a new argument parser will be added; if
+            None, a new argument parser will be generated
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          ArgumentParser: Argument parser or subparser
+        """
+        import argparse
+
+        # Process arguments
+        help_message = """Process NMR peak list data"""
+        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
+            parser = parser_or_subparsers
+        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
+            parser = parser_or_subparsers.add_parser(
+              name        = "peaklist",
+              description = help_message,
+              help        = help_message)
+        elif parser is None:
+            parser = argparse.ArgumentParser(
+              description = help_message)
+
+        # Defaults
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=PeakListDataset)
+
+        # Arguments unique to this class
+
+        # Arguments inherited from superclass
+        SequenceDataset.construct_argparser(parser)
+
+        return parser
+
+    def __init__(self, calc_pdist=False, outfile=None, interactive=False,
+        **kwargs):
+        """
+        Arguments:
+          infile{s} (list): Path(s) to input file(s); may contain
+            environment variables and wildcards
+          use_indexes (list): Residue indexes to select from DataFrame,
+            once DataFrame has already been loaded
+          calc_pdist (bool): Calculate probability distribution
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
+          dataset_cache (dict): Cache of previously-loaded Datasets
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        pd.set_option('display.width', 1000)
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        self.dataset_cache = kwargs.get("dataset_cache", None)
+
+        # Read data
+        self.sequence_df = self.read(**kwargs)
+        if verbose >= 2:
+            if verbose >= 1:
+                print("Processed sequence DataFrame:")
+                print(self.sequence_df)
+
+        # Cut data
+        if "use_indexes" in kwargs:
+            use_indexes = np.array(kwargs.pop("use_indexes"))
+            res_index = np.array([int(i.split(":")[1])
+              for i in self.sequence_df.index.values])
+            self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
+
+        # Write data
+        if outfile is not None:
+            self.write(df=self.sequence_df, outfile=outfile, **kwargs)
+
+        # Interactive prompt
+        if interactive:
+            embed()
+
+    def read(self, **kwargs):
+        """
+        Reads sequence from one or more *infiles* into a DataFrame.
+
+        Extends :class:`Dataset<myplotspec.Dataset.Dataset>` with
+        option to read in residue indexes.
+        """
+        from os import devnull
+        import re
+        from subprocess import Popen, PIPE
+        from sys import exit
+        from .myplotspec import multi_pop_merged
+
+        # Process arguments
+        infile_args = multi_pop_merged(["infile", "infiles"], kwargs)
+        infiles = self.infiles = self.process_infiles(infiles=infile_args)
+        if len(infiles) == 0:
+            raise Exception(sformat("""No infiles found matching
+            '{0}'""".format(infile_args)))
+        elif len(infiles) > 1:
+            raise Exception("PeakListDataset only supports a single infile")
+        re_h5 = re.compile(
+          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+          flags=re.UNICODE)
+
+        # Load Data
+        infile = infiles[0]
+        print(infile)
+        if re_h5.match(infile):
+            df = self._read_hdf5(infile, **kwargs)
+        else:
+            with open(devnull, "w") as fnull:
+                header = " ".join(Popen("head -n 1 {0}".format(infile),
+                  stdout=PIPE, stderr=fnull, shell=True
+                  ).stdout.read().strip().split("\t"))
+            ccpnmr_header = sformat("""Number # Position F1 Position F2 Assign
+              F1 Assign F2 Height Volume Line Width F1 (Hz) Line Width F2 (Hz)
+              Merit Details Fit Method Vol. Method""")
+            if (header == ccpnmr_header):
+                read_csv_kw = dict(
+                  delimiter = "\t")
+                read_csv_kw.update(kwargs.get("read_csv_kw", {}))
+                kwargs["read_csv_kw"] = read_csv_kw
+            df = self._read_text(infile, **kwargs)
+
+        # Load index, if applicable
+        df = self._read_index(df, **kwargs)
+
+        # Sort
+        if df.index.name == "residue":
+            df = df.loc[sorted(df.index.values,
+                   key=lambda x: int(x.split(":")[1]))]
+        else:
+            df = df.loc[sorted(df.index.values)]
 
         return df
 
@@ -2107,6 +2264,7 @@ if __name__ == "__main__":
     IREDRelaxDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
     HSQCDataset.construct_argparser(subparsers)
+    PeakListDataset.construct_argparser(subparsers)
 
     kwargs  = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
