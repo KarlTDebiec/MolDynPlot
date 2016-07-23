@@ -27,6 +27,9 @@ Sequence:
 
 .. image:: doc/_static/gb3/s2.png
 
+NMR HSQC:
+
+.. image:: doc/_static/mocvnh3/hsqc.png
 
 .. github_end
 
@@ -47,6 +50,11 @@ Sequence:
     Sequence:
 
     .. image:: _static/gb3/s2.png
+        :scale: 35
+        :align: center
+    NMR HSQC:
+
+    .. image:: _static/mocvnh3/hsqc.png
         :scale: 35
         :align: center
 

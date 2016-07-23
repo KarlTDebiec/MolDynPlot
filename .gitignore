@@ -6,5 +6,7 @@
 .DS_Store
 build
 doc/_build
+moldynplot/test/*.dat
+moldynplot/test/*.h5
 moldynplot/test/*.png
 moldynplot/test/figure/*/*-failed-diff.png
