@@ -1216,14 +1216,22 @@ class PeakListDataset(SequenceDataset):
               F1 Assign F2 Height Volume Line Width F1 (Hz) Line Width F2 (Hz)
               Merit Details Fit Method Vol. Method""")
             if (header == ccpnmr_header):
+                def convert_name(name):
+                    return "{0}:{1}".format(name[-4:-1].upper(), name[2:-4])
                 read_csv_kw = dict(
-                  delimiter = "\t")
+                  index_col = None,
+                  delimiter = "\t",
+                  dtype = {"Position F1": np.float32,
+                    "Position F2": np.float32, "Assign F1": np.str},
+                  usecols = ["Position F1", "Position F2", "Assign F1"],
+                  converters = {"Assign F1": convert_name})
                 read_csv_kw.update(kwargs.get("read_csv_kw", {}))
                 kwargs["read_csv_kw"] = read_csv_kw
-            df = self._read_text(infile, **kwargs)
-
-        # Load index, if applicable
-        df = self._read_index(df, **kwargs)
+                df = self._read_text(infile, **kwargs)
+                df.columns = ["1H", "15N", "residue"]
+                self.sequence_df.set_index("residue", inplace=True
+            else:
+                df = self._read_text(infile, **kwargs)
 
         # Sort
         if df.index.name == "residue":
