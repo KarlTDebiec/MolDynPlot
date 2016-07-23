@@ -626,6 +626,22 @@ probability distribution calculation</li>
 <dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.TimeSeriesDataset" title="moldynplot.Dataset.TimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.TimeSeriesDataset</span></code></a>, <a class="reference internal" href="#moldynplot.Dataset.IREDRelaxDataset" title="moldynplot.Dataset.IREDRelaxDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.IREDRelaxDataset</span></code></a></p>
 <p>Represents iRED NMR relaxation data as a function of time and
 residue number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile{s}</strong> (<em>str</em>) &#8211; Path to input file, may contain environment
+variables</li>
+<li><strong>interactive</strong> (<em>bool</em>) &#8211; Provide iPython prompt and reading and
+processing data</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="staticmethod">
 <dt id="moldynplot.Dataset.IREDTimeSeriesDataset.construct_argparser">
 <em class="property">static </em><code class="descname">construct_argparser</code><span class="sig-paren">(</span><em>parser_or_subparsers=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDTimeSeriesDataset.construct_argparser" title="Permalink to this definition">¶</a></dt>
@@ -798,16 +814,16 @@ dataset</td>
 <h2>HSQCDataset<a class="headerlink" href="#hsqcdataset" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="moldynplot.Dataset.HSQCDataset">
-<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">HSQCDataset</code><span class="sig-paren">(</span><em>downsample=None</em>, <em>calc_pdist=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.HSQCDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">HSQCDataset</code><span class="sig-paren">(</span><em>hoffset=0</em>, <em>noffset=0</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.HSQCDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.Dataset.Dataset</span></code></p>
 <p>Represents NMR HSQC data.</p>
 <dl class="attribute">
 <dt id="HSQCDataset.hsqc_df">
 <code class="descname">hsqc_df</code><a class="headerlink" href="#HSQCDataset.hsqc_df" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>DataFrame</em></p>
-<p>DataFrame whose two-dimensional index corresponds to
-hydrogen and nitrogen chemical shift in ppm and whose columns
-correspond to intensity</p>
+<p>DataFrame whose two-dimensional index
+corresponds to hydrogen and nitrogen chemical shift in ppm and
+whose columns correspond to intensity</p>
 </dd></dl>
 
 <table class="docutils field-list" frame="void" rules="none">
@@ -815,8 +831,14 @@ correspond to intensity</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>infile</strong> (<em>str</em>) &#8211; Path to input file, may contain environment
-variables</li>
+<li><strong>infile{s}</strong> (<em>list</em>) &#8211; Path(s) to input file(s); may contain
+environment variables and wildcards</li>
+<li><strong>hoffset</strong> (<em>float, optional</em>) &#8211; Offset added to 1H dimension</li>
+<li><strong>noffset</strong> (<em>float, optional</em>) &#8211; Offset added to 15N dimension</li>
+<li><strong>outfile</strong> (<em>str, optional</em>) &#8211; Path to output file; may contain
+environment variables</li>
+<li><strong>interactive</strong> (<em>bool</em>) &#8211; Provide iPython prompt and reading and
+processing data</li>
 <li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
 <li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
 </ul>
@@ -824,10 +846,58 @@ variables</li>
 </tr>
 </tbody>
 </table>
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.HSQCDataset.construct_argparser">
+<em class="property">static </em><code class="descname">construct_argparser</code><span class="sig-paren">(</span><em>parser_or_subparsers=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.HSQCDataset.construct_argparser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds arguments to an existing argument parser, constructs a
+subparser, or constructs a new parser</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>(ArgumentParser, _SubParsersAction,</strong> (<em>parser_or_subparsers</em>) &#8211; optional): If ArgumentParser, existing parser to which
+arguments will be added; if _SubParsersAction, collection of
+subparsers to which a new argument parser will be added; if
+None, a new argument parser will be generated</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
+Argument parser or subparser</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="moldynplot.Dataset.HSQCDataset.read">
 <code class="descname">read</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.HSQCDataset.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads HSQC from one or more <em>infiles</em> into a DataFrame.</p>
+<dd><p>Reads HSQC data from one or more <em>infiles</em> into a DataFrame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>infile{s}</strong> (<em>str</em>) &#8211; Path(s) to input file(s); may contain
+environment variables and wildcards</li>
+<li><strong>dataframe_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.18.1)"><code class="xref py py-class docutils literal"><span class="pre">DataFrame</span></code></a> (hdf5 only)</li>
+<li><strong>read_csv_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_csv.html#pandas.read_csv" title="(in pandas v0.18.1)"><code class="xref py py-func docutils literal"><span class="pre">read_csv</span></code></a> (text only)</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>DataFrame</em> &#8211;
+DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

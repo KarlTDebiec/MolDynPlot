@@ -153,7 +153,6 @@ will additions specific for molecular dynamics simulation data.</p>
 <em class="property">class </em><code class="descclassname">moldynplot.CorrFigureManager.</code><code class="descname">CorrFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.CorrFigureManager.CorrFigureManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
 <p>Manages the generation of correlation figures.</p>
-<p>Initializes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -187,7 +186,8 @@ file.</p>
 <em class="property">class </em><code class="descclassname">moldynplot.HSQCFigureManager.</code><code class="descname">HSQCFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.HSQCFigureManager.HSQCFigureManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
 <p>Manages the generation of HSQC figures.</p>
-<p>Initializes.</p>
+<p><strong>Sample Output:</strong></p>
+<a class="reference internal image-reference" href="_images/hsqc.png"><img alt="_images/hsqc.png" class="align-center" src="_images/hsqc.png" style="width: 472.5px; height: 346.5px;" /></a>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -203,9 +203,35 @@ provided pulled from self.defaults</li>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="staticmethod">
+<dt id="moldynplot.HSQCFigureManager.HSQCFigureManager.get_slice">
+<em class="property">static </em><code class="descname">get_slice</code><span class="sig-paren">(</span><em>collection</em>, <em>lower_bound</em>, <em>upper_bound</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.HSQCFigureManager.HSQCFigureManager.get_slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts a slice from a collection; used to avoid plotting data
+outside the visible region of a figure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>collection</strong> (<em>ndarry</em>) &#8211; Complete array sorted in increasing order</li>
+<li><strong>lower_bound</strong> (<em>float</em>) &#8211; Lower bound of region to slice out; slice
+will start 1 below this cutoff</li>
+<li><strong>upper_bound</strong> (<em>float</em>) &#8211; Upper bound of region to slice out; slice
+will start 1 above this cutoff</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>slice</em> &#8211;
+slice</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
 <dt id="moldynplot.HSQCFigureManager.HSQCFigureManager.get_contour_levels">
-<code class="descname">get_contour_levels</code><span class="sig-paren">(</span><em>I</em>, <em>cutoff=0.9875</em>, <em>n_levels=10</em>, <em>min_level=None</em>, <em>max_level=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.HSQCFigureManager.HSQCFigureManager.get_contour_levels" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">get_contour_levels</code><span class="sig-paren">(</span><em>I</em>, <em>cutoff=0.9875</em>, <em>n_levels=10</em>, <em>min_level=None</em>, <em>max_level=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.HSQCFigureManager.HSQCFigureManager.get_contour_levels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates contour levels.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -215,12 +241,13 @@ provided pulled from self.defaults</li>
 <li><strong>I</strong> (<em>ndarray</em>) &#8211; Intensity</li>
 <li><strong>cutoff</strong> (<em>float</em>) &#8211; Proportion of Intensity below minimum level</li>
 <li><strong>n_levels</strong> (<em>int</em>) &#8211; Number of contour levels</li>
-<li><strong>min_level</strong> (<em>float</em>) &#8211; Minimum contour level</li>
-<li><strong>max_level</strong> (<em>float</em>) &#8211; Maximum contour level; default = max(I)</li>
+<li><strong>min_level</strong> (<em>float</em>) &#8211; Intensity level of lowest contour level</li>
+<li><strong>max_level</strong> (<em>float</em>) &#8211; Intensity level of highest contour level;
+default = max(I)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>(ndarray)</em> &#8211;
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ndarray</em> &#8211;
 levels</p>
 </td>
 </tr>
@@ -238,17 +265,27 @@ levels</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>subplot</strong> (<em>Axes</em>) &#8211; Axes on which to draw</li>
-<li><strong>draw_pdist</strong> (<em>bool</em>) &#8211; Draw contour</li>
-<li><strong>draw_fill_between</strong> (<em>bool</em>) &#8211; Fill between specified region for this
-dataset</li>
-<li><strong>draw_mean</strong> (<em>bool</em>) &#8211; Draw point at mean value of this dataset</li>
 <li><strong>dataset_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to passed to
 <code class="xref py py-meth docutils literal"><span class="pre">load_dataset()</span></code></li>
-<li><strong>plot_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure plot</li>
-<li><strong>fill_between_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure
-fill_between</li>
-<li><strong>pdist_kw</strong> (<em>dict</em>) &#8211; Keyword arguments using to configure probability
-distribution</li>
+<li><strong>plot_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to methods of
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v1.5.1)"><code class="xref py py-class docutils literal"><span class="pre">Axes</span></code></a></li>
+<li><strong>draw_contour</strong> (<em>bool</em>) &#8211; Draw contour</li>
+<li><strong>contour_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.contour" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">contour</span></code></a> or
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.contourf" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">contourf</span></code></a></li>
+<li><strong>contour_kw[levels]</strong> (<em>ndarray, list</em>) &#8211; Contour levels; if
+omitted; will be calculated using <a class="reference internal" href="#moldynplot.HSQCFigureManager.HSQCFigureManager.get_contour_levels" title="moldynplot.HSQCFigureManager.HSQCFigureManager.get_contour_levels"><code class="xref py py-meth docutils literal"><span class="pre">get_contour_levels()</span></code></a></li>
+<li><strong>contour_kw[cmap]</strong> (<em>LinearSegmentedColormap</em>) &#8211; Color map used for
+contours; if omitted, a uniform colormap will be generated
+from contour_kw[color] using <code class="xref py py-func docutils literal"><span class="pre">moldynplot.myplotspec.get_cmap()</span></code></li>
+<li><strong>contour_kw[fill]</strong> (<em>bool</em>) &#8211; If true, draw filled contour levels
+using <a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.contourf" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">contourf</span></code></a>; if
+false, draw contour lines using
+<a class="reference external" href="http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.contour" title="(in Matplotlib v1.5.1)"><code class="xref py py-meth docutils literal"><span class="pre">contour</span></code></a></li>
+<li><strong>handles</strong> (<em>OrderedDict</em>) &#8211; Nacsent collection of legend handles</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; Name to be assigned to egend handle</li>
+<li><strong>handle_kw</strong> (<em>dict</em>) &#8211; Keyword arguments used to configure legend
+handle</li>
 <li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
 <li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
 </ul>
@@ -270,7 +307,6 @@ file.</p>
 <em class="property">class </em><code class="descclassname">moldynplot.MDGXFigureManager.</code><code class="descname">MDGXFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.MDGXFigureManager.MDGXFigureManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
 <p>Manages the generation of MDGX figures.</p>
-<p>Initializes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -303,7 +339,6 @@ in a YAML file.</p>
 <em class="property">class </em><code class="descclassname">moldynplot.PDistFigureManager.</code><code class="descname">PDistFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.PDistFigureManager.PDistFigureManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
 <p>Manages the generation of probability distribution figures.</p>
-<p>Initializes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -375,7 +410,6 @@ file.</p>
 <em class="property">class </em><code class="descclassname">moldynplot.SAXSFigureManager.</code><code class="descname">SAXSFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.SAXSFigureManager.SAXSFigureManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
 <p>Manages the generation of time series figures</p>
-<p>Initializes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -405,7 +439,6 @@ provided pulled from self.defaults</li>
 <p><strong>Supported Presets:</strong></p>
 <p>Relaxation (<code class="docutils literal"><span class="pre">relax_4_s2</span></code>):</p>
 <a class="reference internal image-reference" href="_images/relax.png"><img alt="_images/relax.png" class="align-center" src="_images/relax.png" style="width: 372.75px; height: 551.25px;" /></a>
-<p>Initializes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -433,7 +466,6 @@ YAML file.</p>
 <em class="property">class </em><code class="descclassname">moldynplot.StateProbFigureManager.</code><code class="descname">StateProbFigureManager</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.StateProbFigureManager.StateProbFigureManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.FigureManager.FigureManager</span></code></p>
 <p>Class to manage the generation of probability distribution figures</p>
-<p>Initializes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -491,7 +523,6 @@ file.</p>
 <a class="reference internal image-reference" href="_images/rmsd.png"><img alt="_images/rmsd.png" class="align-center" src="_images/rmsd.png" style="width: 630.0px; height: 288.75px;" /></a>
 <p>Radius of gyration (<code class="docutils literal"><span class="pre">radgyr</span></code>):</p>
 <a class="reference internal image-reference" href="_images/radgyr.png"><img alt="_images/radgyr.png" class="align-center" src="_images/radgyr.png" style="width: 630.0px; height: 288.75px;" /></a>
-<p>Initializes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -555,7 +586,6 @@ file.</p>
 <a class="reference internal image-reference" href="_images/perresrmsd.png"><img alt="_images/perresrmsd.png" class="align-center" src="_images/perresrmsd.png" style="width: 556.5px; height: 267.75px;" /></a>
 <p>Dictionary of secondary structure prediction (<code class="docutils literal"><span class="pre">dssp</span></code>):</p>
 <a class="reference internal image-reference" href="_images/dssp.png"><img alt="_images/dssp.png" class="align-center" src="_images/dssp.png" style="width: 556.5px; height: 278.25px;" /></a>
-<p>Initializes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
