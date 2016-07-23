@@ -9,6 +9,7 @@
 #   BSD license. See the LICENSE file for details.
 ################################### MODULES ###################################
 from matplotlib.testing.compare import compare_images
+from moldynplot.HSQCFigureManager import HSQCFigureManager
 from moldynplot.SequenceFigureManager import SequenceFigureManager
 from moldynplot.TimeSeriesFigureManager import TimeSeriesFigureManager
 from moldynplot.TimeSeries2DFigureManager import TimeSeries2DFigureManager
@@ -38,9 +39,15 @@ def test_dssp():
     tsfm.draw_report(yaml_spec="yaml/p53/dssp.yml")
     compare_images("dssp.png", "figure/p53/dssp.png", tol=0)
 
+def test_hsqc():
+    hsqcfm = HSQCFigureManager()
+    hsqcfm.draw_report(yaml_spec="yaml/mocvnh3/hsqc.yml")
+    compare_images("hsqc.png", "figure/mocvnh3/hsqc.png", tol=0)
+
 if __name__ == "__main__":
     test_relax()
     test_rmsd()
     test_radgyr()
     test_perresrmsd()
     test_dssp()
+    test_hsqc()

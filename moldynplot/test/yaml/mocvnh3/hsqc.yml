@@ -1,0 +1,22 @@
+preset: [manuscript]
+figures:
+    0:
+        outfile: hsqc.png
+        savefig_kw:
+            dpi: 300
+        subplots:
+            all:
+                xticks:      [5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5]
+                xticklabels: [5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5]
+                ybound:      [102.5, 132.5]
+                yticks:      [105,110,115,120,125,130]
+                yticklabels: [105,110,115,120,125,130]
+                legend: True
+            0:
+                datasets:
+                    0:
+                        label: "MoCVNH3"
+                        dataset_kw:
+                            infile: data/mocvnh3/hsqc.ft
+                        plot_kw:
+                            color: blue

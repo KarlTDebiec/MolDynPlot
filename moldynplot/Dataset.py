@@ -888,9 +888,9 @@ class HSQCDataset(Dataset):
     Represents NMR HSQC data.
 
     Attributes:
-      hsqc_df (DataFrame): DataFrame whose two-dimensional index corresponds to
-        hydrogen and nitrogen chemical shift in ppm and whose columns
-        correspond to intensity
+      hsqc_df (DataFrame): DataFrame whose two-dimensional index
+        corresponds to hydrogen and nitrogen chemical shift in ppm and
+        whose columns correspond to intensity
     """
 
     def __init__(self, downsample=None, calc_pdist=False, outfile=None,
