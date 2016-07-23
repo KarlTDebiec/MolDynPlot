@@ -115,32 +115,30 @@ def test_radgyr():
 
 def test_perresrmsd():
     # Read cpptraj
-    cpptraj_df = TimeSeriesDataset(
-      infile="data/p53/perresrmsd.cpptraj",
-      dt=0.1,
-      toffset=-0.1).timeseries_df
+    import numpy as np
+    cpptraj = TimeSeriesDataset(infile="data/p53/perresrmsd.cpptraj",
+      dt=0.1, toffset=-0.1, dtype=np.float32)
 
     # Read text
-    text_df = TimeSeriesDataset(
-      infile="data/p53/perresrmsd.dat").timeseries_df
+    text = TimeSeriesDataset(infile="data/p53/perresrmsd.dat",
+      dtype=np.float32)
+    assert_frame_equal(cpptraj.timeseries_df, text.timeseries_df)
 
     # Read hdf5
-    hdf5_df = TimeSeriesDataset(
-      infile="data/p53/perresrmsd.h5").timeseries_df
+    hdf5 = TimeSeriesDataset(infile="data/p53/perresrmsd.h5")
+    assert_frame_equal(cpptraj.timeseries_df, hdf5.timeseries_df)
 
     # Read legacy hdf5
-    lgcy_df = TimeSeriesDataset(
-      infile="data/p53/perresrmsd_legacy.h5",
-      dt=0.1).timeseries_df
-
-    # Compare
-    assert_frame_equal(cpptraj_df, hdf5_df)
-    assert_frame_equal(cpptraj_df, text_df)
-    assert_frame_equal(cpptraj_df, lgcy_df)
+    legacy = TimeSeriesDataset(infile="data/p53/perresrmsd_legacy.h5", dt=0.1)
+    assert_frame_equal(cpptraj.timeseries_df, legacy.timeseries_df)
 
     # Write text
+    cpptraj.write(dataframe=text.timeseries_df, outfile="perresrmsd.dat")
+    assert(cmp("perresrmsd.dat", "data/p53/perresrmsd.dat") == True)
 
     # Write hdf5
+    cpptraj.write(dataframe=text.timeseries_df, outfile="perresrmsd.h5")
+    assert(h5_cmp("perresrmsd.h5", "data/p53/perresrmsd.h5") == True)
 
 def test_dssp():
     # Read cpptraj
@@ -174,7 +172,7 @@ def test_dssp():
 if __name__ == "__main__":
 #    test_sequence()
 #    test_rmsd()
-    test_radgyr()
-#    test_perresrmsd()
+#    test_radgyr()
+    test_perresrmsd()
 #    test_dssp()
 #    test_hsqc()
