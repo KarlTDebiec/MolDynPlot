@@ -16,6 +16,7 @@ from __future__ import absolute_import,division,print_function,unicode_literals
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
+import numpy as np
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
@@ -155,7 +156,20 @@ class HSQCFigureManager(FigureManager):
 
     @staticmethod
     def get_slice(collection, lower_bound, upper_bound):
-        import numpy as np
+        """
+        Extracts a slice from a collection; used to avoid plotting data
+        outside the visible region of a figure
+
+        Arguments:
+          collection (ndarry): Complete array sorted in increasing order
+          lower_bound (float): Lower bound of region to slice out; slice
+            will start 1 below this cutoff
+          upper_bound (float): Upper bound of region to slice out; slice
+            will start 1 above this cutoff
+
+        Returns:
+          slice: slice
+        """
 
         try:
             min_index = np.where(collection < lower_bound)[0][0] + 1
@@ -167,7 +181,8 @@ class HSQCFigureManager(FigureManager):
             max_index = 0
         return slice(max_index, min_index, 1)
 
-    def get_contour_levels(self, I, cutoff=0.9875, n_levels=10, min_level=None,
+    @staticmethod
+    def get_contour_levels(I, cutoff=0.9875, n_levels=10, min_level=None,
         max_level=None, **kwargs):
         """
         Generates contour levels.
@@ -176,18 +191,16 @@ class HSQCFigureManager(FigureManager):
           I (ndarray): Intensity
           cutoff (float): Proportion of Intensity below minimum level
           n_levels (int): Number of contour levels
-          min_level (float): Minimum contour level
-          max_level (float): Maximum contour level; default = max(I)
+          min_level (float): Intensity level of lowest contour level
+          max_level (float): Intensity level of highest contour level;
+            default = max(I)
 
         Returns:
-          (ndarray): levels
+          ndarray: levels
 
         .. todo::
             - Support negative contour levels
-            - Write partner function to analyze amino acid sequence,
-              estimate number of peaks, and choose appropriate cutoff
         """
-        import numpy as np
 
         I_flat    = np.sort(I.flatten())
         if min_level is None:
@@ -209,22 +222,34 @@ class HSQCFigureManager(FigureManager):
 
         Arguments:
           subplot (Axes): Axes on which to draw
-          draw_pdist (bool): Draw contour
-          draw_fill_between (bool): Fill between specified region for this
-            dataset
-          draw_mean (bool): Draw point at mean value of this dataset
           dataset_kw (dict): Keyword arguments used to passed to
             :meth:`load_dataset`
-          plot_kw (dict): Keyword arguments used to configure plot
-          fill_between_kw (dict): Keyword arguments used to configure
-            fill_between
-          pdist_kw (dict): Keyword arguments using to configure probability
-            distribution
+          plot_kw (dict): Keyword arguments passed to methods of
+            :class:`Axes<matplotlib.axes.Axes>`
+          draw_contour (bool): Draw contour
+          contour_kw (dict): Keyword arguments passed to
+            :meth:`contour<matplotlib.axes.Axes.contour>` or
+            :meth:`contourf<matplotlib.axes.Axes.contourf>`
+          contour_kw[levels] (ndarray, list): Contour levels; if
+            omitted; will be calculated using :meth:`get_contour_levels`
+          contour_kw[cmap] (LinearSegmentedColormap): Color map used for
+            contours; if omitted, a uniform colormap will be generated
+            from contour_kw[color] using :func:`moldynplot.myplotspec.get_cmap`
+          contour_kw[fill] (bool): If true, draw filled contour levels
+            using :meth:`contourf<matplotlib.axes.Axes.contourf>`; if
+            false, draw contour lines using
+            :meth:`contour<matplotlib.axes.Axes.contour>`
+          handles (OrderedDict): Nacsent collection of legend handles
+          label (str): Name to be assigned to egend handle
+          handle_kw (dict): Keyword arguments used to configure legend
+            handle
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
+
+        .. todo:
+          - Move x and y axis inversion to FigureManager base class'
+            draw_subplot
         """
-        import numpy as np
-#        from . import get_cmap
         from .myplotspec import get_cmap, get_colors, multi_get_copy
 
         # Cheap way to invert axes without overriding draw_subplot
@@ -239,8 +264,9 @@ class HSQCFigureManager(FigureManager):
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, **dataset_kw)
-        if dataset is not None and hasattr(dataset, "hsqc_df"):
-            hsqc = dataset.hsqc_df
+        if dataset is not None:
+            if hasattr(dataset, "hsqc_df"): hsqc_df = dataset.hsqc_df
+            else:                           hsqc_df = None
         else:
             hsqc = None
 
@@ -253,11 +279,11 @@ class HSQCFigureManager(FigureManager):
             contour_kw = plot_kw.copy()
             contour_kw.update(kwargs.get("contour_kw", {}))
             get_colors(contour_kw)
-            hsqc.index.levels[0].size
-            ct_H = hsqc.index.levels[0]
-            ct_N = hsqc.index.levels[1]
-            ct_I = hsqc.values.reshape((hsqc.index.levels[0].size,
-                     hsqc.index.levels[1].size)).T
+            hsqc_df.index.levels[0].size
+            ct_H = hsqc_df.index.levels[0]
+            ct_N = hsqc_df.index.levels[1]
+            ct_I = hsqc_df.values.reshape((hsqc_df.index.levels[0].size,
+                     hsqc_df.index.levels[1].size)).T
             if "levels" not in contour_kw:
                 contour_kw["levels"] = self.get_contour_levels(ct_I,
                   **kwargs)
