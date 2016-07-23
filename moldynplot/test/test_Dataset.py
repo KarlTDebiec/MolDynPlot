@@ -9,6 +9,7 @@
 #   BSD license. See the LICENSE file for details.
 ################################### MODULES ###################################
 from filecmp import cmp
+import numpy as np
 from pandas.util.testing import assert_frame_equal
 from moldynplot.Dataset import (HSQCDataset, SequenceDataset,
                                 TimeSeriesDataset)
@@ -115,7 +116,6 @@ def test_radgyr():
 
 def test_perresrmsd():
     # Read cpptraj
-    import numpy as np
     cpptraj = TimeSeriesDataset(infile="data/p53/perresrmsd.cpptraj",
       dt=0.1, toffset=-0.1, dtype=np.float32)
 
@@ -142,37 +142,33 @@ def test_perresrmsd():
 
 def test_dssp():
     # Read cpptraj
-    cpptraj_df = TimeSeriesDataset(
-      infile="data/p53/dssp.cpptraj",
-      dt=0.1,
-      toffset=-0.1).timeseries_df
+    cpptraj = TimeSeriesDataset(infile="data/p53/dssp.cpptraj", dt=0.1,
+      toffset=-0.1, dtype=np.uint8)
 
     # Read text
-    text_df = TimeSeriesDataset(
-      infile="data/p53/dssp.dat").timeseries_df
+    text = TimeSeriesDataset(infile="data/p53/dssp.dat", dtype=np.uint8)
+    assert_frame_equal(cpptraj.timeseries_df, text.timeseries_df)
 
     # Read hdf5
-    hdf5_df = TimeSeriesDataset(
-      infile="data/p53/dssp.h5").timeseries_df
+    hdf5 = TimeSeriesDataset(infile="data/p53/dssp.h5")
+    assert_frame_equal(cpptraj.timeseries_df, hdf5.timeseries_df)
 
     # Read legacy hdf5
-    lgcy_df = TimeSeriesDataset(
-      infile="data/p53/dssp_legacy.h5",
-      dt=0.1).timeseries_df
-
-    # Compare
-    assert_frame_equal(cpptraj_df, hdf5_df)
-    assert_frame_equal(cpptraj_df, text_df)
-    assert_frame_equal(cpptraj_df, lgcy_df)
+    legacy = TimeSeriesDataset(infile="data/p53/dssp_legacy.h5", dt=0.1)
+    assert_frame_equal(cpptraj.timeseries_df, legacy.timeseries_df)
 
     # Write text
+    cpptraj.write(dataframe=text.timeseries_df, outfile="dssp.dat")
+    assert(cmp("dssp.dat", "data/p53/dssp.dat") == True)
 
     # Write hdf5
+    cpptraj.write(dataframe=text.timeseries_df, outfile="dssp.h5")
+    assert(h5_cmp("dssp.h5", "data/p53/dssp.h5") == True)
 
 if __name__ == "__main__":
-#    test_sequence()
-#    test_rmsd()
-#    test_radgyr()
+    test_sequence()
+    test_rmsd()
+    test_radgyr()
     test_perresrmsd()
-#    test_dssp()
-#    test_hsqc()
+    test_dssp()
+    test_hsqc()
