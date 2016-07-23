@@ -73,26 +73,24 @@ def test_sequence():
 
 def test_rmsd():
     # Read cpptraj
-    cpptraj_df = TimeSeriesDataset(
-      infile="data/p53/rmsd.cpptraj",
-      dt=0.1,
-      toffset=-0.1).timeseries_df
+    cpptraj = TimeSeriesDataset(infile="data/p53/rmsd.cpptraj",
+      dt=0.1, toffset=-0.1)
 
     # Read text
-    text_df = TimeSeriesDataset(
-      infile="data/p53/rmsd.dat").timeseries_df
+    text = TimeSeriesDataset(infile="data/p53/rmsd.dat")
+    assert_frame_equal(cpptraj.timeseries_df, text.timeseries_df)
 
     # Read hdf5
-    hdf5_df = TimeSeriesDataset(
-      infile="data/p53/rmsd.h5").timeseries_df
-
-    # Compare
-    assert_frame_equal(cpptraj_df, hdf5_df)
-    assert_frame_equal(cpptraj_df, text_df)
+    hdf5 = TimeSeriesDataset(infile="data/p53/rmsd.h5")
+    assert_frame_equal(cpptraj.timeseries_df, hdf5.timeseries_df)
 
     # Write text
+    cpptraj.write(dataframe=text.timeseries_df, outfile="rmsd.dat")
+    assert(cmp("rmsd.dat", "data/p53/rmsd.dat") == True)
 
     # Write hdf5
+    cpptraj.write(dataframe=text.timeseries_df, outfile="rmsd.h5")
+    assert(h5_cmp("rmsd.h5", "data/p53/rmsd.h5") == True)
 
 def test_radgyr():
     # Read cpptraj
@@ -176,8 +174,8 @@ def test_dssp():
     # Write hdf5
 
 if __name__ == "__main__":
-    test_sequence()
-#    test_rmsd()
+#    test_sequence()
+    test_rmsd()
 #    test_perresrmsd()
 #    test_dssp()
-    test_hsqc()
+#    test_hsqc()
