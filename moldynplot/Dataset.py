@@ -1028,10 +1028,10 @@ class HSQCDataset(Dataset):
         if verbose >= 1:
             wiprint("""Reading DataFrame from '{0}' """.format(infile))
         parameters, intensity = nmrglue.pipe.read(infile)
-        hydrogen  = nmrglue.pipe.make_uc(parameters, intensity,
-                       dim=1).ppm_scale()
-        nitrogen  = nmrglue.pipe.make_uc(parameters, intensity,
-                        dim=0).ppm_scale()
+        hydrogen  = np.array(nmrglue.pipe.make_uc(parameters, intensity,
+                       dim=1).ppm_scale(), np.float32)
+        nitrogen  = np.array(nmrglue.pipe.make_uc(parameters, intensity,
+                        dim=0).ppm_scale(), np.float32)
 
         index = pd.MultiIndex.from_product([nitrogen, hydrogen],
           names=["15N", "1H"])
@@ -1073,6 +1073,7 @@ class HSQCDataset(Dataset):
         if len(dfs) > 1:
             raise Exception("HSQCDataset only supports a single infile")
         df = dfs.pop(0)
+        df = df.astype(np.float32)
 
         return df
 
