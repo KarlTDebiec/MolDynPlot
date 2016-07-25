@@ -1604,6 +1604,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDRelaxDataset):
         Arguments:
           relax_dfs (list): DataFrames containing data from relax infiles
           order_dfs (list): DataFrames containing data from order infiles
+          verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
 
         Returns:
@@ -1657,37 +1658,66 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDRelaxDataset):
 
         return df
 
-    def timeseries_to_sequence(self, timeseries_df, **kwargs):
+    def timeseries_to_sequence(self, **kwargs):
         """
-        Calculates the average and standard error of relaxation, prepares
-        sequence DataFrame.
+        Calculates the mean and standard error over a timeseries.
 
-        .. todo:
-          - Make this general case, should be able to unstack properly
+        Arguments:
+          {timeseries_}d{ata}f{rame} (DataFrame): Timeseries over which
+            to calculate mean and standard error; if omitted looks for
+            :attr:`timeseries_df`
+          block_kw (dict): Keyword arguments passed to
+            :class:`fpblockaverager.FPBlockAverager`
+          block_kw[all_factors] (bool): Use all factors by which the
+          dataset is divisible rather than only factors of two
+          block_kw[min_n_blocks] (int): Minimum number of blocks after
+            transformation
+          block_kw[max_cut] (float): Maximum proportion of dataset of
+            omit in transformation
+          block_kw[fit_exp] (bool): Fit exponential curve
+          block_kw[fit_sig] (bool): Fit sigmoid curve
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          DataFrame: Sequence dataframe including mean and standard
+          error for each column in *timeseries_df*
         """
+        from .myplotspec import multi_get
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
+        timeseries_df = multi_get(["timeseries_dataframe", "timeseries_df",
+              "dataframe", "df"], kwargs)
+        if timeseries_df is None:
+            if hasattr(self, "timeseries_df"):
+                timeseries_df = self.timeseries_df
+            else:
+                raise Exception("Cannot find timeseries DataFrame")
         if verbose >= 1:
             wiprint("""Calculating mean and standard error over timeseries""")
 
         sequence_df = pd.DataFrame(data=timeseries_df.mean(axis=0))
 
         from .fpblockaverager.FPBlockAverager import FPBlockAverager
-        ba = FPBlockAverager(timeseries_df, **kwargs)
-#        self.p = ba.parameters.loc[("exp", "a (se)")]
-#        self.p.index = pd.MultiIndex.from_tuples(map(eval, self.p.index.values))
-#        self.p.index = self.p.index.set_levels([c+" se" for c in
-#        self.p.index.levels[1].values], level=1)
-#
-#        a =sequence_df.squeeze().unstack()
-#        b = self.p.unstack()
-#        c = a.join(b)
-#        c = c[["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
-#        self.sequence_df = c
-#        c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
-#        sequence_df = c
+        block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=True,
+                        fit_exp=True, fit_sig=False)
+        block_kw.update(kwargs.get("block_kw", {}))
+        block_averager = FPBlockAverager(timeseries_df, **block_kw)
+        errors       = block_averager.parameters.loc[("exp", "a (se)")]
+        errors.index = pd.MultiIndex.from_tuples(map(eval, errors.index.values))
+        errors.index = errors.index.set_levels([c+" se" for c in
+                        errors.index.levels[1].values], level=1)
 
+        a = sequence_df.squeeze().unstack()
+        b = errors.unstack()
+        c = a.join(b)
+        c = c[["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
+        self.sequence_df = c
+        c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
+        sequence_df = c
+
+        self.block_averager = block_averager
         return sequence_df
 
     def __init__(self, dt=None, toffset=None, downsample=None,
@@ -1744,8 +1774,8 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDRelaxDataset):
 
         # Prepare sequence dataframe using averages and block standard errors
         if calc_mean:
-            self.sequence_df = self.timeseries_to_sequence(self.timeseries_df,
-                                 **kwargs)
+            self.sequence_df = self.timeseries_to_sequence(
+                                 df=self.timeseries_df, **kwargs)
             # Output to screen
             if verbose >= 2:
                 print("Processed sequence DataFrame:")
