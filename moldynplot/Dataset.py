@@ -1155,8 +1155,6 @@ class RelaxSequenceDataset(SequenceDataset):
             use_indexes = np.array(kwargs.pop("use_indexes"), np.int)
             res_index = np.array([int(i.split(":")[1])
               for i in self.sequence_df.index.values])
-            print(use_indexes)
-            print(res_index)
             self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
 
         # Calculate r2/r1 ratio
