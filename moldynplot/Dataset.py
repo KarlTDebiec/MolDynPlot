@@ -1654,8 +1654,6 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDRelaxDataset):
         elif order_df is None and relax_df is not None:
             df = relax_df
 
-        df.columns.names = ["residue", "parameter"]
-
         return df
 
     def timeseries_to_sequence(self, **kwargs):
