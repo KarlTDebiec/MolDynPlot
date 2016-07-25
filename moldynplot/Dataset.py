@@ -173,13 +173,10 @@ class SequenceDataset(Dataset):
 
         # Read data
         self.sequence_df = self.read(**kwargs)
-        if verbose >= 2:
-            wiprint("Processed sequence DataFrame:")
-            print(self.sequence_df)
 
         # Cut data
         if "use_indexes" in kwargs:
-            use_indexes = np.array(kwargs.pop("use_indexes"))
+            use_indexes = np.array(kwargs.pop("use_indexes"), np.int)
             res_index = np.array([int(i.split(":")[1])
               for i in self.sequence_df.index.values])
             self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
@@ -187,6 +184,11 @@ class SequenceDataset(Dataset):
         # Calculate probability distribution
         if calc_pdist:
             self.pdist_df = self.calc_pdist(df=self.sequence_df, **kwargs)
+
+        # Output data
+        if verbose >= 2:
+            wiprint("Processed sequence DataFrame:")
+            print(self.sequence_df)
 
         # Write data
         if outfile is not None:
@@ -1147,16 +1149,14 @@ class RelaxSequenceDataset(SequenceDataset):
 
         # Read data
         self.sequence_df = self.read(**kwargs)
-        if verbose >= 2:
-            if verbose >= 1:
-                print("Processed sequence DataFrame:")
-                print(self.sequence_df)
 
         # Cut data
         if "use_indexes" in kwargs:
-            use_indexes = np.array(kwargs.pop("use_indexes"))
+            use_indexes = np.array(kwargs.pop("use_indexes"), np.int)
             res_index = np.array([int(i.split(":")[1])
               for i in self.sequence_df.index.values])
+            print(use_indexes)
+            print(res_index)
             self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
 
         # Calculate r2/r1 ratio
@@ -1170,6 +1170,12 @@ class RelaxSequenceDataset(SequenceDataset):
         # Calculate probability distribution
         if calc_pdist:
             self.pdist_df = self.calc_pdist(df=self.sequence_df, **kwargs)
+
+        # Output data
+        if verbose >= 2:
+            if verbose >= 1:
+                print("Processed sequence DataFrame:")
+                print(self.sequence_df)
 
         # Write data
         if outfile is not None:

@@ -480,6 +480,9 @@ def process_hetnoe(peaklist, infiles, outfile, verbose=1, debug=0, **kwargs):
     relax["sat"] = relax.apply(calc_intensity, axis=1)
     sat_se = intensity[np.logical_and(intensity > -intensity.std(),
       intensity < intensity.std())].std()
+    print(sat_se)
+    sat_se = 54588.8
+    print(sat_se)
 
     if verbose >= 1:
         print("Loading intensities from '{0}'".format(infiles[1]))
@@ -487,6 +490,9 @@ def process_hetnoe(peaklist, infiles, outfile, verbose=1, debug=0, **kwargs):
     relax["nosat"] = relax.apply(calc_intensity, axis=1)
     nosat_se = intensity[np.logical_and(intensity > -intensity.std(),
       intensity < intensity.std())].std()
+    print(nosat_se)
+    nosat_se = 58479.8
+    print(nosat_se)
 
     relax["noe"] = relax["sat"] / relax["nosat"]
     relax["noe_se"] = np.sqrt((sat_se / relax["sat"]) ** 2 +
