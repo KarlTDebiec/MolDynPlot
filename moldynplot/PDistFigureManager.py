@@ -87,7 +87,7 @@ class PDistFigureManager(FigureManager):
             zorder: 11
     """
     available_presets = """
-      rg:
+      radgyr:
         class: content
         help: Radius of Gyration (Rg)
         draw_figure:

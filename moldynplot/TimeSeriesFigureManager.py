@@ -174,8 +174,9 @@ class TimeSeriesFigureManager(FigureManager):
               bandwidth: 0.1
               grid: !!python/object/apply:numpy.linspace [0,30,1000]
             read_csv_kw:
+              delim_whitespace: True
               header: 0
-              names: ["frame", "rg", "rg max"]
+              names: [frame, rg, rg max]
       rotdif:
         class: content
         help: Rotational correlatio time (τc)
