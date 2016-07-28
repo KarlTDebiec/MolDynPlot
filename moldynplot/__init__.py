@@ -121,3 +121,61 @@ def three_one(three):
             "LEU": "L", "LYS": "K", "LYN": "K", "MET": "M", "PHE": "F",
             "PRO": "P", "SER": "S", "THR": "T", "TRP": "W", "TYR": "Y",
             "VAL": "V" }[three.upper()]
+
+def multiprocess_map(function, arguments, n_processes=1):
+    """
+    Runs a function with arguments using n_processes.
+
+    Meant as a replacement for :func:`multiproccessing.Pool.imap_unordered`,
+    which can only accept module-level functions.
+
+    Arguments:
+      function (function): Function to run
+      arguments (list): Iterable of arguments to pass to function
+      n_processes (int): Number of processes to use
+
+    Returns:
+      list: results returned from function
+    """
+    from multiprocessing import Queue, Process
+
+    def spawn(function):
+        """
+        Arguments:
+          function: Function to run
+
+        Returns:
+          function: New Function that accepts arguments from queue_in
+          and outputs results of function to queue_out
+        """
+        def run_function(queue_in, queue_out):
+            while True:
+                i, argument = queue_in.get()
+                if i is None: break         # 'None' signals that queue is empty
+                queue_out.put((i, function(argument)))
+        return run_function
+
+    # Initialize queues
+    queue_in   = Queue(1)
+    queue_out  = Queue()
+
+    # Initialize processes and link to input and output queues
+    processes = [Process(target = spawn(function),
+      args = (queue_in, queue_out)) for i in range(n_processes)]
+    for p in processes:
+        p.daemon = True
+        p.start()
+
+    # Construct input queue, including 'None' signals to terminate
+    input = [queue_in.put((i, argument))
+      for i, argument in enumerate(arguments)]
+    for i in range(n_processes):
+        queue_in.put((None, None))
+
+    # Retrieve output queue
+    output = [queue_out.get() for i in range(len(input))]
+
+    # Rejoin processes and return results
+    for p in processes: p.join()
+    return [x for i, x in sorted(output)]
+
