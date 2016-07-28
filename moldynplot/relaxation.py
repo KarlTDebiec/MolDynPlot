@@ -535,14 +535,14 @@ def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
     para_relax = pd.read_csv(para_infile, index_col=0, delimiter=r"\s\s+")
     para_relax.index.name = "residue"
 
-    relax = dia_relax[["1H", "15N", "dia", "dia_se"]]
-    relax = pd.concat((relax, para_relax[["para", "para_se"]]), axis=1)
+    relax = dia_relax[["1H", "15N", "dia", "dia se"]]
+    relax = pd.concat((relax, para_relax[["para", "para se"]]), axis=1)
 
     relax["pre"] = relax["dia"] / relax["para"]
-    relax["pre_se"] = np.sqrt((relax["dia_se"] / relax["dia"]) ** 2 +
-      (relax["para_se"] / relax["para"]) ** 2) * relax["pre"]
+    relax["pre se"] = np.sqrt((relax["dia se"] / relax["dia"]) ** 2 +
+      (relax["para se"] / relax["para"]) ** 2) * relax["pre"]
     relax["pre"][np.isinf(relax["pre"])] = 0
-    relax["pre_se"][np.isnan(relax["pre_se"])] = 0
+    relax["pre se"][np.isnan(relax["pre se"])] = 0
     print(relax)
 
     # Write outfile
