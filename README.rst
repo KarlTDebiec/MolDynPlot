@@ -58,6 +58,13 @@ NMR HSQC:
         :scale: 35
         :align: center
 
+Publications Prepared Using MolDynPlot
+--------------------------------------
+
+- `Further along the Road Less Traveled: AMBER ff15ipq, an Original Protein
+  Force Field Built on a Self-Consistent Physical Model
+  <http://pubs.acs.org/doi/abs/10.1021/acs.jctc.6b00567>`_
+
 Dependencies
 ------------
 

@@ -479,6 +479,9 @@ def process_hetnoe(peaklist, infiles, outfile, verbose=1, debug=0, **kwargs):
     relax["sat"] = relax.apply(calc_intensity, axis=1)
     sat_se = intensity[np.logical_and(intensity > -intensity.std(),
       intensity < intensity.std())].std()
+    print(sat_se)
+    sat_se = 54588.8
+    print(sat_se)
 
     if verbose >= 1:
         print("Loading intensities from '{0}'".format(infiles[1]))
@@ -486,6 +489,9 @@ def process_hetnoe(peaklist, infiles, outfile, verbose=1, debug=0, **kwargs):
     relax["nosat"] = relax.apply(calc_intensity, axis=1)
     nosat_se = intensity[np.logical_and(intensity > -intensity.std(),
       intensity < intensity.std())].std()
+    print(nosat_se)
+    nosat_se = 58479.8
+    print(nosat_se)
 
     relax["noe"] = relax["sat"] / relax["nosat"]
     relax["noe_se"] = np.sqrt((sat_se / relax["sat"]) ** 2 +
@@ -528,14 +534,14 @@ def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
     para_relax = pd.read_csv(para_infile, index_col=0, delimiter=r"\s\s+")
     para_relax.index.name = "residue"
 
-    relax = dia_relax[["1H", "15N", "dia", "dia_se"]]
-    relax = pd.concat((relax, para_relax[["para", "para_se"]]), axis=1)
+    relax = dia_relax[["1H", "15N", "dia", "dia se"]]
+    relax = pd.concat((relax, para_relax[["para", "para se"]]), axis=1)
 
     relax["pre"] = relax["dia"] / relax["para"]
-    relax["pre_se"] = np.sqrt((relax["dia_se"] / relax["dia"]) ** 2 +
-      (relax["para_se"] / relax["para"]) ** 2) * relax["pre"]
+    relax["pre se"] = np.sqrt((relax["dia se"] / relax["dia"]) ** 2 +
+      (relax["para se"] / relax["para"]) ** 2) * relax["pre"]
     relax["pre"][np.isinf(relax["pre"])] = 0
-    relax["pre_se"][np.isnan(relax["pre_se"])] = 0
+    relax["pre se"][np.isnan(relax["pre se"])] = 0
     print(relax)
 
     # Write outfile

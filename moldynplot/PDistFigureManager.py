@@ -87,7 +87,7 @@ class PDistFigureManager(FigureManager):
             zorder: 11
     """
     available_presets = """
-      rg:
+      radgyr:
         class: content
         help: Radius of Gyration (Rg)
         draw_figure:
@@ -192,7 +192,7 @@ class PDistFigureManager(FigureManager):
         help: Three stacked plots including R1, R2, and HetNOE
         draw_figure:
           nrows: 3
-          shared_ylabel: "Prbability Distribution"
+          shared_ylabel: "Probability Distribution"
           subplots:
             0:
               preset: r1
@@ -208,7 +208,7 @@ class PDistFigureManager(FigureManager):
         help: Four stacked plots including R1, R2, R2/R1, and HetNOE
         draw_figure:
           nrows: 4
-          shared_ylabel: "Prbability Distribution"
+          shared_ylabel: "Probability Distribution"
           subplots:
             0:
               preset: r1
@@ -227,7 +227,7 @@ class PDistFigureManager(FigureManager):
         help: Two stacked plots including R2/R1 rotdif
         draw_figure:
           nrows: 2
-          shared_ylabel: "Prbability Distribution"
+          shared_ylabel: "Probability Distribution"
           subplots:
             0:
               preset: r2/r1
