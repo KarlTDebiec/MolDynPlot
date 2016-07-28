@@ -17,7 +17,7 @@ specific for molecular dynamics simulation data.
   - Move relaxation error here
   - Move relaxation heteronuclear noe here
   - Move relaxation pre ratio here
-  - Move SAXS here
+  - Move SAXS parsing here
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
@@ -541,6 +541,9 @@ class TimeSeriesDataset(Dataset):
         if verbose >= 2:
             print("Processed timeseries DataFrame:")
             print(self.timeseries_df)
+            if calc_pdist:
+                print("Processed pdist DataFrame:")
+                print(self.pdist_df)
 
         # Write data
         if outfile is not None:
@@ -783,6 +786,124 @@ class TimeSeriesDataset(Dataset):
         self.block_averager = block_averager
         return sequence_df
 
+class PRETimeSeriesDataset(TimeSeriesDataset):
+    """
+    Represents paramagnetic relaxation enhancement data as a function of time
+    and residue number.
+    """
+
+    @staticmethod
+    def construct_argparser(parser_or_subparsers=None, **kwargs):
+        """
+        Adds arguments to an existing argument parser, constructs a
+        subparser, or constructs a new parser
+
+        Arguments:
+          parser_or_subparsers (ArgumentParser, _SubParsersAction,
+            optional): If ArgumentParser, existing parser to which
+            arguments will be added; if _SubParsersAction, collection of
+            subparsers to which a new argument parser will be added; if
+            None, a new argument parser will be generated
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          ArgumentParser: Argument parser or subparser
+        """
+        import argparse
+
+        # Process arguments
+        help_message = """Process simulated paramagnetic relaxation enhancement
+          data from MD simulation """
+        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
+            parser = parser_or_subparsers
+        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
+            parser = parser_or_subparsers.add_parser(
+              name        = "pre_timeseries",
+              description = help_message,
+              help        = help_message)
+        elif parser is None:
+            parser = argparse.ArgumentParser(
+              description = help_message)
+
+        # Defaults
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=PRETimeSeriesDataset)
+
+        # Arguments unique to this class
+
+        # Arguments inherited from superclass
+        TimeSeriesDataset.construct_argparser(parser)
+
+        return parser
+
+    def __init__(self, dt=None, toffset=None, downsample=None,
+        calc_pdist=False, outfile=None, interactive=False, **kwargs):
+        """
+        Arguments:
+          infile{s} (list): Path(s) to input file(s); may contain
+            environment variables and wildcards
+          dt (float): Time interval between points; units unspecified
+          toffset (float): Time offset to be added to all points (i.e.
+            time of first point)
+          downsample (int): Interval by which to downsample points
+          downsample_mode (str): Method of downsampling; may be 'mean'
+            or 'mode'
+          calc_pdist (bool): Calculate probability distribution
+          pdist_key (str): Column of which to calculate probability
+            distribution
+          kde_kw (dict): Keyword arguments passed to
+            sklearn.neighbors.KernelDensity; key argument is 'bandwidth'
+          grid (ndarray): Grid on which to calculate probability
+            distribution
+          interactive (bool): Provide iPython prompt and reading and
+            processing data
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+
+        # Load
+        self.timeseries_df = self.read(**kwargs)
+
+        # Convert from frame index to time
+        if dt:
+            self.timeseries_df.set_index(self.timeseries_df.index.values *
+              float(dt), inplace=True)
+            self.timeseries_df.index.name = "time"
+
+        # Offset time
+        if toffset:
+            index_name = self.timeseries_df.index.name
+            self.timeseries_df.set_index(self.timeseries_df.index.values +
+              float(toffset), inplace=True)
+            self.timeseries_df.index.name = index_name
+
+        # Downsample
+        if downsample:
+            self.timeseries_df = self.downsample(downsample, **kwargs)
+
+        # Calculate probability distibution
+        if calc_pdist:
+            self.pdist_df = self.calc_pdist(**kwargs)
+
+        # Output to screen
+        if verbose >= 2:
+            print("Processed timeseries DataFrame:")
+            print(self.timeseries_df)
+            if calc_pdist:
+                print("Processed pdist DataFrame:")
+                print(self.pdist_df)
+
+        # Write data
+        if outfile is not None:
+            self.write(df=self.timeseries_df, outfile=outfile, **kwargs)
+
+        # Interactive prompt
+        if interactive:
+            embed()
+    
 class SAXSDataset(Dataset):
     """
     Represents Small-Angle X-ray Scattering Data.
@@ -2531,6 +2652,7 @@ if __name__ == "__main__":
     RelaxSequenceDataset.construct_argparser(subparsers)
     IREDRelaxDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
+    PRETimeSeriesDataset.construct_argparser(subparsers)
     HSQCDataset.construct_argparser(subparsers)
     PeakListDataset.construct_argparser(subparsers)
 

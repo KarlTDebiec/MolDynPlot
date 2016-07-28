@@ -20,6 +20,11 @@ IREDTimeSeriesDataset
 :::::::::::::::::::::
 See :class:`moldynplot.Dataset.IREDTimeSeriesDataset`.
 
+PeaklistDataset
+~~~~~~~~~~~~~~~
+.. autoclass::  moldynplot.Dataset.PeaklistDataset
+
+
 TimeSeriesDataset
 -----------------
 .. autoclass::  moldynplot.Dataset.TimeSeriesDataset
@@ -35,6 +40,10 @@ _______________________
 SAXSTimeSeriesDataset
 _____________________
 .. autoclass::  moldynplot.Dataset.SAXSTimeSeriesDataset
+
+PRETimeSeriesDataset
+____________________
+.. autoclass::  moldynplot.Dataset.PRETimeSeriesDataset
 
 
 CorrDataset
