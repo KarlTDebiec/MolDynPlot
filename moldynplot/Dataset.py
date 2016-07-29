@@ -14,6 +14,7 @@ specific for molecular dynamics simulation data.
 
 .. todo:
   - FIX SEPARATION AND ORDERING OF ARGUMENT GROUPS: input, action, output
+  - Move in fast text parser
   - Move relaxation error here
   - Move relaxation heteronuclear noe here
   - Move relaxation pre ratio here

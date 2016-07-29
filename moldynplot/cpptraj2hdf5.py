@@ -282,6 +282,14 @@ if __name__ == "__main__":
       address     = "secstruct",
       dtype       = np.uint8,
       scaleoffset = 3)
+    kind_subparser.add_parser(
+      name        = "pre",
+      parents     = [cpptraj_parser],
+      help        = "PRE, actually output from cpptraj's 'distance'"
+                     ).set_defaults(
+      address     = "pre",
+      dtype       = np.float32,
+      scaleoffset = 4)
 
     # Verbosity
     for p in kind_subparser.choices.values():
