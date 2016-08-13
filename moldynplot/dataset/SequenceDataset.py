@@ -72,8 +72,7 @@ class SequenceDataset(Dataset):
         import argparse
 
         # Process arguments
-        help_message = """Process data that is a function of amino acid
-          sequence"""
+        help_message = """Process standard data"""
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
@@ -414,12 +413,12 @@ class ChemicalShiftDataset(SequenceDataset):
         import argparse
 
         # Process arguments
-        help_message = """Process NMR peak list data"""
+        help_message = """Process NMR chemical shift data"""
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
             parser = parser_or_subparsers.add_parser(
-              name        = "peaklist",
+              name        = "chemical_shift",
               description = help_message,
               help        = help_message)
         elif parser is None:
@@ -747,7 +746,7 @@ class RelaxDataset(SequenceDataset):
         import argparse
 
         # Process arguments
-        help_message = """Process relaxation data"""
+        help_message = """Process NMR relaxation data"""
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
@@ -886,11 +885,9 @@ class IREDDataset(RelaxDataset):
         import argparse
 
         # Process arguments
-        help_message = """Process relaxation data calculated from MD simulation
-            using the iRED method as implemented in cpptraj; treat infiles as
-            independent simulations; processed results are the average across
-            the simulations, including standard errors calculated using
-            standard deviation"""
+        help_message = """Process NMR relaxation data calculated from MD
+                       simulation using the iRED method as implemented in
+                       cpptraj"""
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
@@ -1171,15 +1168,16 @@ if __name__ == "__main__":
 
     # Prepare argument parser
     parser = argparse.ArgumentParser(
-      description = """Processes datasets""")
+      description = """Processes data that is a function of amino acid
+                    sequence""")
     subparsers = parser.add_subparsers(
       dest        = "mode",
       description = "")
 
     SequenceDataset.construct_argparser(subparsers)
+    ChemicalShiftDataset.construct_argparser(subparsers)
     RelaxDataset.construct_argparser(subparsers)
     IREDDataset.construct_argparser(subparsers)
-    ChemicalShiftDataset.construct_argparser(subparsers)
 
     kwargs  = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)

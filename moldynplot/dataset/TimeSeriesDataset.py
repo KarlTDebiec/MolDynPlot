@@ -11,6 +11,8 @@
 .. todo:
   - Fix separation and ordering of argument groups: input, action, output
   - Move in faster text loader from cpptraj2hdf5.py
+  - Re-implement NatConTimeSeriesDataset
+  - Re-implement SAXSTimeSeriesDataset
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
@@ -56,7 +58,7 @@ class TimeSeriesDataset(Dataset):
         import argparse
 
         # Process arguments
-        help_message = """Process data that is a function of time"""
+        help_message = """Process standard data"""
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
@@ -74,10 +76,10 @@ class TimeSeriesDataset(Dataset):
 
         # Arguments unique to this class
         arg_groups = {ag.title: ag for ag in parser._action_groups}
-        action_group = arg_groups.get("action",
-          parser.add_argument_group("action"))
 
         # Action arguments
+        action_group = arg_groups.get("action",
+          parser.add_argument_group("action"))
         try:
             action_group.add_argument(
               "-dt",
@@ -446,13 +448,12 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
         import argparse
 
         # Process arguments
-        help_message = """Process simulated paramagnetic relaxation enhancement
-          data from MD simulation """
+        help_message = """Process paramagnetic relaxation enhancement data"""
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
             parser = parser_or_subparsers.add_parser(
-              name        = "pre_timeseries",
+              name        = "pre",
               description = help_message,
               help        = help_message)
         elif parser is None:
@@ -565,17 +566,13 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
         import argparse
 
         # Process arguments
-        help_message = """Process relaxation data calculated from MD
-          simulation using the iRED method as implemented in cpptraj;
-          treat infiles as consecutive (potentially overlapping)
-          excerpts of a longer simulation; processed results are a
-          timeseries and the average across the timeseries, including
-          standard errors calculated using block averaging"""
+        help_message = """Process NMR relaxation data calculated from MD
+          simulation using the iRED method as implemented in cpptraj"""
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
             parser = parser_or_subparsers.add_parser(
-              name        = "ired_timeseries",
+              name        = "ired",
               description = help_message,
               help        = help_message)
         elif parser is None:
@@ -932,7 +929,7 @@ if __name__ == "__main__":
 
     # Prepare argument parser
     parser = argparse.ArgumentParser(
-      description = """Processes datasets""")
+      description = """Processes data that is a function of time""")
     subparsers = parser.add_subparsers(
       dest        = "mode",
       description = "")
@@ -940,6 +937,8 @@ if __name__ == "__main__":
     TimeSeriesDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
     PRETimeSeriesDataset.construct_argparser(subparsers)
+#    NatConTimeSeriesDataset.construct_argparser(subparsers)
+#    SAXSTimeSeriesDataset.construct_argparser(subparsers)
 
     kwargs  = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
