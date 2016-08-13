@@ -4,84 +4,85 @@
 
 Datasets
 ========
-Moldynplot includes several dataset classes that build on
+MolDynPlot includes several dataset classes that build on
 :class:`Dataset<myplotspec:myplotspec.Dataset.Dataset>` will additions
 specific for molecular dynamics simulation data.
-
-SequenceDataset
----------------
-.. autoclass::  moldynplot.Dataset.SequenceDataset
-
-RelaxSequenceDataset
-____________________
-.. autoclass::  moldynplot.Dataset.RelaxSequenceDataset
-
-IREDRelaxDataset
-~~~~~~~~~~~~~~~~
-.. autoclass::  moldynplot.Dataset.IREDRelaxDataset
-
-IREDTimeSeriesDataset
-:::::::::::::::::::::
-See :class:`moldynplot.Dataset.IREDTimeSeriesDataset`.
-
-PeaklistDataset
-~~~~~~~~~~~~~~~
-.. autoclass::  moldynplot.Dataset.PeaklistDataset
-
-
-TimeSeriesDataset
------------------
-.. autoclass::  moldynplot.Dataset.TimeSeriesDataset
-
-IREDTimeSeriesDataset
-_____________________
-.. autoclass::  moldynplot.Dataset.IREDTimeSeriesDataset
-
-NatConTimeSeriesDataset
-_______________________
-.. autoclass::  moldynplot.Dataset.NatConTimeSeriesDataset
-
-SAXSTimeSeriesDataset
-_____________________
-.. autoclass::  moldynplot.Dataset.SAXSTimeSeriesDataset
-
-PRETimeSeriesDataset
-____________________
-.. autoclass::  moldynplot.Dataset.PRETimeSeriesDataset
 
 
 CorrDataset
 -----------
-.. autoclass::  moldynplot.Dataset.CorrDataset
+.. autoclass::  moldynplot.dataset.CorrDataset.CorrDataset
 
 
 HSQCDataset
 -----------
-.. autoclass::  moldynplot.Dataset.HSQCDataset
-
-
-SAXSDataset
------------
-.. autoclass::  moldynplot.Dataset.SAXSDataset
-
-SAXSExperimentDataset
-_____________________
-.. autoclass::  moldynplot.Dataset.SAXSExperimentDataset
-
-SAXSTimeSeriesDataset
-_____________________
-See :class:`moldynplot.Dataset.SAXSTimeSeriesDataset`.
-
-SAXSDiffDataset
-_______________
-.. autoclass::  moldynplot.Dataset.SAXSDiffDataset
+.. autoclass::  moldynplot.dataset.HSQCDataset.HSQCDataset
 
 
 MDGXDataset
 -----------
-.. autoclass::  moldynplot.Dataset.MDGXDataset
+.. autoclass::  moldynplot.dataset.MDGXDataset.MDGXDataset
+
+
+SAXSDataset
+-----------
+.. autoclass::  moldynplot.dataset.SAXSDataset.SAXSDataset
+
+SAXSDiffDataset
+_______________
+.. autoclass::  moldynplot.dataset.SAXSDataset.SAXSDiffDataset
+
+SAXSExperimentDataset
+_____________________
+.. autoclass::  moldynplot.dataset.SAXSDataset.SAXSExperimentDataset
+
+SAXSTimeSeriesDataset
+_____________________
+See :class:`moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset`.
+
+
+SequenceDataset
+---------------
+.. autoclass::  moldynplot.dataset.SequenceDataset.SequenceDataset
+
+ChemicalShiftDataset
+____________________
+.. autoclass::  moldynplot.dataset.SequenceDataset.ChemicalShiftDataset
+
+RelaxDataset
+____________
+.. autoclass::  moldynplot.dataset.SequenceDataset.RelaxDataset
+
+IREDDataset
+~~~~~~~~~~~
+.. autoclass::  moldynplot.dataset.SequenceDataset.IREDDataset
+
+IREDTimeSeriesDataset
+:::::::::::::::::::::
+See :class:`moldynplot.dataset.TimeSeriesDataset.IREDTimeSeriesDataset`.
+
+
+TimeSeriesDataset
+-----------------
+.. autoclass::  moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+
+IREDTimeSeriesDataset
+_____________________
+.. autoclass::  moldynplot.dataset.TimeSeriesDataset.IREDTimeSeriesDataset
+
+NatConTimeSeriesDataset
+_______________________
+.. autoclass::  moldynplot.dataset.TimeSeriesDataset.NatConTimeSeriesDataset
+
+PRETimeSeriesDataset
+____________________
+.. autoclass::  moldynplot.dataset.TimeSeriesDataset.PRETimeSeriesDataset
+
+SAXSTimeSeriesDataset
+_____________________
+.. autoclass::  moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset
 
 
 H5Dataset
 ---------
-.. autoclass::  moldynplot.Dataset.H5Dataset
+.. autoclass::  moldynplot.dataset.H5Dataset

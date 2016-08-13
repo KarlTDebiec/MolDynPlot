@@ -4,7 +4,7 @@
 
 Figure Managers
 ===============
-Moldynplot includes several figure managers that build on
+MolDynPlot includes several figure managers that build on
 :class:`FigureManager<myplotspec:myplotspec.FigureManager.FigureManager>`
 with additions specific for molecular dynamics simulation data.
 
