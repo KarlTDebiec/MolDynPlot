@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta content="github.com/KarlTDebiec/MolDynPlot" name="github_url" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Datasets &mdash; MolDynPlot 16-06-29 documentation</title>
@@ -87,6 +88,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#sequencedataset">SequenceDataset</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#relaxsequencedataset">RelaxSequenceDataset</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#iredrelaxdataset">IREDRelaxDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#peaklistdataset">PeaklistDataset</a></li>
 </ul>
 </li>
 </ul>
@@ -95,6 +97,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#id1">IREDTimeSeriesDataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#natcontimeseriesdataset">NatConTimeSeriesDataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#saxstimeseriesdataset">SAXSTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pretimeseriesdataset">PRETimeSeriesDataset</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#corrdataset">CorrDataset</a></li>
@@ -144,7 +147,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/datasets.txt" rel="nofollow"> View page source</a>
+            <a href="https://github.com/KarlTDebiec/MolDynPlot/blob/master/doc/datasets.rst" class="fa fa-github"> Edit on GitHub</a>
           
         
       </li>
@@ -497,6 +500,9 @@ iRED sequence DataFrame</p>
 <p>See <a class="reference internal" href="#moldynplot.Dataset.IREDTimeSeriesDataset" title="moldynplot.Dataset.IREDTimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.IREDTimeSeriesDataset</span></code></a>.</p>
 </div>
 </div>
+<div class="section" id="peaklistdataset">
+<h4>PeaklistDataset<a class="headerlink" href="#peaklistdataset" title="Permalink to this headline">¶</a></h4>
+</div>
 </div>
 </div>
 <div class="section" id="timeseriesdataset">
@@ -528,7 +534,7 @@ time of first point)</li>
 <li><strong>downsample</strong> (<em>int</em>) &#8211; Interval by which to downsample points</li>
 <li><strong>downsample_mode</strong> (<em>str</em>) &#8211; Method of downsampling; may be &#8216;mean&#8217;
 or &#8216;mode&#8217;</li>
-<li><strong>pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution</li>
+<li><strong>calc_pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution</li>
 <li><strong>pdist_key</strong> (<em>str</em>) &#8211; Column of which to calculate probability
 distribution</li>
 <li><strong>kde_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
@@ -616,13 +622,49 @@ probability distribution calculation</li>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="moldynplot.Dataset.TimeSeriesDataset.timeseries_to_sequence">
+<code class="descname">timeseries_to_sequence</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.TimeSeriesDataset.timeseries_to_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the mean and standard error over a timeseries.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>{timeseries}d{ata}f{rame}</strong> (<em>DataFrame</em>) &#8211; Timeseries over which
+to calculate mean and standard error; if omitted looks for
+<a class="reference internal" href="#TimeSeriesDataset.timeseries_df" title="TimeSeriesDataset.timeseries_df"><code class="xref py py-attr docutils literal"><span class="pre">timeseries_df</span></code></a></li>
+<li><strong>block_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+<code class="xref py py-class docutils literal"><span class="pre">fpblockaverager.FPBlockAverager</span></code></li>
+<li><strong>block_kw[all_factors]</strong> (<em>bool</em>) &#8211; Use all factors by which the</li>
+<li><strong>is divisible rather than only factors of two</strong> (<em>dataset</em>) &#8211; </li>
+<li><strong>block_kw[min_n_blocks]</strong> (<em>int</em>) &#8211; Minimum number of blocks after
+transformation</li>
+<li><strong>block_kw[max_cut]</strong> (<em>float</em>) &#8211; Maximum proportion of dataset of
+omit in transformation</li>
+<li><strong>block_kw[fit_exp]</strong> (<em>bool</em>) &#8211; Fit exponential curve</li>
+<li><strong>block_kw[fit_sig]</strong> (<em>bool</em>) &#8211; Fit sigmoid curve</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>DataFrame</em> &#8211;
+Sequence dataframe including mean and standard
+error for each column in <em>timeseries_df</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <div class="section" id="id1">
 <h3>IREDTimeSeriesDataset<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="moldynplot.Dataset.IREDTimeSeriesDataset">
-<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">IREDTimeSeriesDataset</code><span class="sig-paren">(</span><em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDTimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">IREDTimeSeriesDataset</code><span class="sig-paren">(</span><em>dt=None</em>, <em>toffset=None</em>, <em>downsample=None</em>, <em>calc_pdist=False</em>, <em>calc_mean=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDTimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.TimeSeriesDataset" title="moldynplot.Dataset.TimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.TimeSeriesDataset</span></code></a>, <a class="reference internal" href="#moldynplot.Dataset.IREDRelaxDataset" title="moldynplot.Dataset.IREDRelaxDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.IREDRelaxDataset</span></code></a></p>
 <p>Represents iRED NMR relaxation data as a function of time and
 residue number.</p>
@@ -631,8 +673,15 @@ residue number.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>infile{s}</strong> (<em>str</em>) &#8211; Path to input file, may contain environment
-variables</li>
+<li><strong>infile{s}</strong> (<em>list</em>) &#8211; Path(s) to input file(s); may contain
+environment variables and wildcards</li>
+<li><strong>dt</strong> (<em>float</em>) &#8211; Time interval between points; units unspecified</li>
+<li><strong>toffset</strong> (<em>float</em>) &#8211; Time offset to be added to all points (i.e.
+time of first point)</li>
+<li><strong>downsample</strong> (<em>int</em>) &#8211; Interval by which to downsample points</li>
+<li><strong>downsample_mode</strong> (<em>str</em>) &#8211; Method of downsampling; may be &#8216;mean&#8217;
+or &#8216;mode&#8217;</li>
+<li><strong>calc_pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution</li>
 <li><strong>interactive</strong> (<em>bool</em>) &#8211; Provide iPython prompt and reading and
 processing data</li>
 <li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
@@ -679,6 +728,7 @@ Argument parser or subparser</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>relax_dfs</strong> (<em>list</em>) &#8211; DataFrames containing data from relax infiles</li>
 <li><strong>order_dfs</strong> (<em>list</em>) &#8211; DataFrames containing data from order infiles</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
 <li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
 </ul>
 </td>
@@ -689,13 +739,6 @@ Averaged DataFrame including relax and order</p>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="moldynplot.Dataset.IREDTimeSeriesDataset.timeseries_to_sequence">
-<code class="descname">timeseries_to_sequence</code><span class="sig-paren">(</span><em>timeseries_df</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.IREDTimeSeriesDataset.timeseries_to_sequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates the average and standard error of relaxation, prepares
-sequence DataFrame.</p>
 </dd></dl>
 
 <dl class="method">
@@ -769,6 +812,72 @@ time of first point)</li>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</div>
+<div class="section" id="pretimeseriesdataset">
+<h3>PRETimeSeriesDataset<a class="headerlink" href="#pretimeseriesdataset" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldynplot.Dataset.PRETimeSeriesDataset">
+<em class="property">class </em><code class="descclassname">moldynplot.Dataset.</code><code class="descname">PRETimeSeriesDataset</code><span class="sig-paren">(</span><em>dt=None</em>, <em>toffset=None</em>, <em>downsample=None</em>, <em>calc_pdist=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.PRETimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldynplot.Dataset.TimeSeriesDataset" title="moldynplot.Dataset.TimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.Dataset.TimeSeriesDataset</span></code></a></p>
+<p>Represents paramagnetic relaxation enhancement data as a function of time
+and residue number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>infile{s}</strong> (<em>list</em>) &#8211; Path(s) to input file(s); may contain
+environment variables and wildcards</li>
+<li><strong>dt</strong> (<em>float</em>) &#8211; Time interval between points; units unspecified</li>
+<li><strong>toffset</strong> (<em>float</em>) &#8211; Time offset to be added to all points (i.e.
+time of first point)</li>
+<li><strong>downsample</strong> (<em>int</em>) &#8211; Interval by which to downsample points</li>
+<li><strong>downsample_mode</strong> (<em>str</em>) &#8211; Method of downsampling; may be &#8216;mean&#8217;
+or &#8216;mode&#8217;</li>
+<li><strong>calc_pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution</li>
+<li><strong>pdist_key</strong> (<em>str</em>) &#8211; Column of which to calculate probability
+distribution</li>
+<li><strong>kde_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
+sklearn.neighbors.KernelDensity; key argument is &#8216;bandwidth&#8217;</li>
+<li><strong>grid</strong> (<em>ndarray</em>) &#8211; Grid on which to calculate probability
+distribution</li>
+<li><strong>interactive</strong> (<em>bool</em>) &#8211; Provide iPython prompt and reading and
+processing data</li>
+<li><strong>verbose</strong> (<em>int</em>) &#8211; Level of verbose output</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="moldynplot.Dataset.PRETimeSeriesDataset.construct_argparser">
+<em class="property">static </em><code class="descname">construct_argparser</code><span class="sig-paren">(</span><em>parser_or_subparsers=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.Dataset.PRETimeSeriesDataset.construct_argparser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds arguments to an existing argument parser, constructs a
+subparser, or constructs a new parser</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>(ArgumentParser, _SubParsersAction,</strong> (<em>parser_or_subparsers</em>) &#8211; optional): If ArgumentParser, existing parser to which
+arguments will be added; if _SubParsersAction, collection of
+subparsers to which a new argument parser will be added; if
+None, a new argument parser will be generated</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Additional keyword arguments</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
+Argument parser or subparser</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>

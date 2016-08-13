@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta content="github.com/KarlTDebiec/MolDynPlot" name="github_url" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Functions &mdash; MolDynPlot 16-06-29 documentation</title>
@@ -118,7 +119,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/functions.txt" rel="nofollow"> View page source</a>
+            <a href="https://github.com/KarlTDebiec/MolDynPlot/blob/master/doc/functions.rst" class="fa fa-github"> Edit on GitHub</a>
           
         
       </li>
@@ -203,6 +204,31 @@ but lost by conversion.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> &#8211;
 Corresponding one-letter amino acid code</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldynplot.multiprocess_map">
+<code class="descclassname">moldynplot.</code><code class="descname">multiprocess_map</code><span class="sig-paren">(</span><em>function</em>, <em>arguments</em>, <em>n_processes=1</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.multiprocess_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs a function with arguments using n_processes.</p>
+<p>Meant as a replacement for <code class="xref py py-func docutils literal"><span class="pre">multiproccessing.Pool.imap_unordered()</span></code>,
+which can only accept module-level functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>function</strong> (<em>function</em>) &#8211; Function to run</li>
+<li><strong>arguments</strong> (<em>list</em>) &#8211; Iterable of arguments to pass to function</li>
+<li><strong>n_processes</strong> (<em>int</em>) &#8211; Number of processes to use</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> &#8211;
+results returned from function</p>
+</td>
 </tr>
 </tbody>
 </table>
