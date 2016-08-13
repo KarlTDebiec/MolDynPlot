@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot.Dataset.TimeSeriesDataset.py
+#   moldynplot.dataset.TimeSeriesDataset.py
 #
 #   Copyright (C) 2015-2016 Karl T Debiec
 #   All rights reserved.
@@ -21,10 +21,10 @@ from IPython import embed
 import h5py
 import numpy as np
 import pandas as pd
-from .myplotspec.Dataset import Dataset
-from .myplotspec import sformat, wiprint
-from .dataset.SequenceDataset import RelaxDataset, IREDDataset
-from .dataset.SAXSDataset import SAXSDataset
+from ..myplotspec.Dataset import Dataset
+from ..myplotspec import sformat, wiprint
+from .SequenceDataset import RelaxDataset, IREDDataset
+from .SAXSDataset import SAXSDataset
 ################################### CLASSES ###################################
 class TimeSeriesDataset(Dataset):
     """
@@ -382,7 +382,7 @@ class TimeSeriesDataset(Dataset):
         .. todo:
           - Make general, not specific to sequence data
         """
-        from .myplotspec import multi_get
+        from ..myplotspec import multi_get
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
@@ -744,7 +744,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
         DataFrame.
         """
         import re
-        from .myplotspec import multi_pop_merged
+        from ..myplotspec import multi_pop_merged
 
         # Process arguments
         infile_args = multi_pop_merged(["infile", "infiles"], kwargs)

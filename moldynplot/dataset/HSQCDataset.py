@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot.Dataset.HSQCDataset.py
+#   moldynplot.dataset.HSQCDataset.py
 #
 #   Copyright (C) 2015-2016 Karl T Debiec
 #   All rights reserved.
@@ -20,8 +20,8 @@ from IPython import embed
 import h5py
 import numpy as np
 import pandas as pd
-from .myplotspec.Dataset import Dataset
-from .myplotspec import sformat, wiprint
+from ..myplotspec.Dataset import Dataset
+from ..myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class HSQCDataset(Dataset):
     """
@@ -200,7 +200,7 @@ class HSQCDataset(Dataset):
           DataFrame: DataFrame
         """
         import re
-        from .myplotspec import multi_pop_merged
+        from ..myplotspec import multi_pop_merged
 
         # Process arguments
         infile_args = multi_pop_merged(["infile", "infiles"], kwargs)

@@ -60,7 +60,7 @@ class CorrFigureManager(FigureManager):
             linestyle: '-'
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.CorrDataset
+            cls: moldynplot.dataset.CorrDataset.CorrDataset
             x_kw:
               read_csv_kw:
                 delim_whitespace: True

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot.Dataset.SequenceDataset.py
+#   moldynplot.dataset.SequenceDataset.py
 #
 #   Copyright (C) 2015-2016 Karl T Debiec
 #   All rights reserved.
@@ -8,17 +8,11 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Moldynplot includes several dataset classes that build on
-:class:`Dataset<myplotspec.Dataset.Dataset>` with additions
-specific for molecular dynamics simulation data.
-
 .. todo:
-  - FIX SEPARATION AND ORDERING OF ARGUMENT GROUPS: input, action, output
-  - Move in fast text parser
+  - Fix separation and ordering of argument groups: input, action, output
   - Move relaxation error here
   - Move relaxation heteronuclear noe here
   - Move relaxation pre ratio here
-  - Move SAXS parsing here
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
@@ -29,8 +23,8 @@ from IPython import embed
 import h5py
 import numpy as np
 import pandas as pd
-from .myplotspec.Dataset import Dataset
-from .myplotspec import sformat, wiprint
+from ..myplotspec.Dataset import Dataset
+from ..myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class SequenceDataset(Dataset):
     """
@@ -130,7 +124,7 @@ class SequenceDataset(Dataset):
           tuple: Cache key; contains arguments sufficient to reconstruct
           dataset
         """
-        from .myplotspec import multi_pop_merged
+        from ..myplotspec import multi_pop_merged
 
         # Process arguments
         infiles = multi_pop_merged(["infile", "infiles"], kwargs)
@@ -550,7 +544,7 @@ class ChemicalShiftDataset(SequenceDataset):
         from os import devnull
         import re
         from subprocess import Popen, PIPE
-        from .myplotspec import multi_pop_merged
+        from ..myplotspec import multi_pop_merged
 
         # Functions
         def convert_name(name):
@@ -1135,7 +1129,7 @@ class IREDDataset(RelaxDataset):
           df (DataFrame): iRED sequence DataFrame
         """
         import re
-        from .myplotspec import multi_pop_merged
+        from ..myplotspec import multi_pop_merged
 
         # Process arguments
         infile_args = multi_pop_merged(["infile", "infiles"], kwargs)

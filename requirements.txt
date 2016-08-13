@@ -5,3 +5,4 @@ pandas
 pyyaml
 scipy
 scikit-learn
+nmrglue

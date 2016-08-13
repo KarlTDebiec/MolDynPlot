@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot.Dataset.MDGXDataset.py
+#   moldynplot.dataset.MDGXDataset.py
 #
 #   Copyright (C) 2015-2016 Karl T Debiec
 #   All rights reserved.
@@ -21,8 +21,8 @@ from IPython import embed
 import h5py
 import numpy as np
 import pandas as pd
-from .myplotspec.Dataset import Dataset
-from .myplotspec import sformat, wiprint
+from ..myplotspec.Dataset import Dataset
+from ..myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class MDGXDataset(Dataset):
     """

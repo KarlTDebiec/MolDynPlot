@@ -73,7 +73,7 @@ class MDGXFigureManager(FigureManager):
             linestyle: '-'
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.MDGXDataset
+            cls: moldynplot.dataset.MDGXDataset.MDGXDataset
             read_csv_kw:
               delim_whitespace: True
               names: [topology, restart, qm_energy, mm_energy]

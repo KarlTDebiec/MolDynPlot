@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot.Dataset.__init__.py
+#   moldynplot.dataset.__init__.py
 #
 #   Copyright (C) 2015-2016 Karl T Debiec
 #   All rights reserved.
@@ -16,7 +16,7 @@ if __name__ == "__main__":
     import moldynplot
 import h5py
 import numpy as np
-from .myplotspec.Dataset import Dataset
+from ..myplotspec.Dataset import Dataset
 ################################### CLASSES ###################################
 class H5Dataset(object):
     """

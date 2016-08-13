@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot.Dataset.SAXSDataset.py
+#   moldynplot.dataset.SAXSDataset.py
 #
 #   Copyright (C) 2015-2016 Karl T Debiec
 #   All rights reserved.
@@ -25,8 +25,8 @@ from IPython import embed
 import h5py
 import numpy as np
 import pandas as pd
-from .myplotspec.Dataset import Dataset
-from .myplotspec import sformat, wiprint
+from ..myplotspec.Dataset import Dataset
+from ..myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class SAXSDataset(Dataset):
     """
@@ -156,7 +156,7 @@ class SAXSDiffDataset(SAXSDataset):
 #
 #        Arguments documented under :func:`__init__`.
 #        """
-#        from .myplotspec import multi_get_copy
+#        from ..myplotspec import multi_get_copy
 #
 #        minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})
 #        minuend_class = dataset_classes[minuend_kw["kind"].lower()]
@@ -176,7 +176,7 @@ class SAXSDiffDataset(SAXSDataset):
         """
         """
         from sys import exit
-        from .myplotspec import multi_get_copy
+        from ..myplotspec import multi_get_copy
 
         self.dataset_cache = dataset_cache
 

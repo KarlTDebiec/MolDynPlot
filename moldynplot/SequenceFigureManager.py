@@ -77,7 +77,7 @@ class SequenceFigureManager(FigureManager):
             verticalalignment: top
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.SequenceDataset
+            cls: moldynplot.dataset.SequenceDataset.SequenceDataset
             read_csv_kw:
               delimiter: "\\\\s\\\\s+"
               index_col: 0
@@ -109,7 +109,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [0,1,2,3,4,5]
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.RelaxSequenceDataset
+            cls: moldynplot.dataset.SequenceDataset.RelaxDataset
           column:    "r1"
           column_se: "r1 se"
       r2:
@@ -120,7 +120,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [0,2,4,6,8,10,12,14,16,18,20]
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.RelaxSequenceDataset
+            cls: moldynplot.dataset.SequenceDataset.RelaxDataset
           column:    "r2"
           column_se: "r2 se"
       r2/r1:
@@ -132,7 +132,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [3,4,5,6,7,8,9,10,11]
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.RelaxSequenceDataset
+            cls: moldynplot.dataset.SequenceDataset.RelaxDataset
           column:    "r2/r1"
           column_se: "r2/r1 se"
       hetnoe:
@@ -143,7 +143,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.RelaxSequenceDataset
+            cls: moldynplot.dataset.SequenceDataset.RelaxDataset
           column:    "noe"
           column_se: "noe se"
       s2:
@@ -154,7 +154,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.RelaxSequenceDataset
+            cls: moldynplot.dataset.SequenceDataset.RelaxDataset
           column:    "s2"
           column_se: "s2 se"
       error:

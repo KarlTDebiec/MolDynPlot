@@ -132,7 +132,7 @@ class TimeSeriesFigureManager(FigureManager):
         draw_dataset:
           column: percent_native_contacts
           dataset_kw:
-            cls: moldynplot.Dataset.NatConTimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.NatConTimeSeriesDataset
             downsample_mode: mean
           partner_kw:
             yticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
@@ -149,7 +149,7 @@ class TimeSeriesFigureManager(FigureManager):
           partner_kw:
             yticks: [0,2,4,6,8,10]
           dataset_kw:
-            cls: moldynplot.Dataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
               bandwidth: 0.1
@@ -168,7 +168,7 @@ class TimeSeriesFigureManager(FigureManager):
           partner_kw:
             yticks: [0,5,10,15,20,25,30]
           dataset_kw:
-            cls: moldynplot.Dataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
               bandwidth: 0.1
@@ -188,7 +188,7 @@ class TimeSeriesFigureManager(FigureManager):
           partner_kw:
             yticks: [0,5,10,15]
           dataset_kw:
-            cls: moldynplot.Dataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
               bandwidth:

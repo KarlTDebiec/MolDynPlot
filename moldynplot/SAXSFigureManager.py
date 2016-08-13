@@ -90,7 +90,7 @@ class SAXSFigureManager(FigureManager):
         help: Data from simulation (saxs_md, crysol, foxs)
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.SAXSTimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset
             calc_mean: True
             calc_error: True
       experiment:
@@ -98,7 +98,7 @@ class SAXSFigureManager(FigureManager):
         help: Data from experiment
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.SAXSExperimentDataset
+            cls: moldynplot.dataset.SAXSDataset.SAXSExperimentDataset
             read_csv_kw:
               engine: python
               skiprows: 2
@@ -112,7 +112,7 @@ class SAXSFigureManager(FigureManager):
         help: Data back-calculated from molecular envelope
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.SAXSExperimentDataset
+            cls: moldynplot.dataset.SAXSDataset.SAXSExperimentDataset
             read_csv_kw:
               engine: python
               skiprows: 1
@@ -165,7 +165,7 @@ class SAXSFigureManager(FigureManager):
                          "0.005", "0.010", "0.015", "0.020"]
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.SAXSDiffDataset
+            cls: moldynplot.dataset.SAXSDataset.SAXSDiffDataset
       presentation:
         class: target
         inherits: presentation

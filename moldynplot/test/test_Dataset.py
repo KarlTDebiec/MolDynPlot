@@ -11,8 +11,9 @@
 from filecmp import cmp
 import numpy as np
 from pandas.util.testing import assert_frame_equal
-from moldynplot.Dataset import (HSQCDataset, SequenceDataset,
-                                TimeSeriesDataset)
+from moldynplot.dataset.HSQCDataset import HSQCDataset
+from moldynplot.dataset.SequenceDataset import SequenceDataset
+from moldynplot.dataset.TimeSeriesDataset import TimeSeriesDataset
 ################################## FUNCTIONS ##################################
 def h5_cmp(file_1, file_2):
     from os import devnull

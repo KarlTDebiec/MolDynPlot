@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot.Dataset.CorrDataset.py
+#   moldynplot.dataset.CorrDataset.py
 #
 #   Copyright (C) 2015-2016 Karl T Debiec
 #   All rights reserved.
@@ -21,8 +21,8 @@ from IPython import embed
 import h5py
 import numpy as np
 import pandas as pd
-from .myplotspec.Dataset import Dataset
-from .myplotspec import sformat, wiprint
+from ..myplotspec.Dataset import Dataset
+from ..myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class CorrDataset(Dataset):
     """
@@ -36,7 +36,7 @@ class CorrDataset(Dataset):
         cache.
         """
         import six
-        from .myplotspec import multi_get_copy
+        from ..myplotspec import multi_get_copy
 
         x_kw = multi_get_copy(["x", "x_kw"], kwargs, {})
         x_cls = x_kw.get("cls", Dataset)
@@ -76,7 +76,7 @@ class CorrDataset(Dataset):
     def __init__(self, verbose=1, debug=0, **kwargs):
         """
         """
-        from .myplotspec import multi_get_copy
+        from ..myplotspec import multi_get_copy
 
         # Load
         x_kw = multi_get_copy(["x", "x_kw"], kwargs, {})

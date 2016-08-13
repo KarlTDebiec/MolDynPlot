@@ -88,7 +88,7 @@ class HSQCFigureManager(FigureManager):
             frameon: True
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.Dataset.HSQCDataset
+            cls: moldynplot.dataset.HSQCDataset.HSQCDataset
           cutoff: 0.970
           plot_kw:
             zorder: 10
