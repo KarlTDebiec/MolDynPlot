@@ -18,7 +18,8 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
-    "sphinx.ext.todo" ]
+    "sphinx.ext.todo",
+    "sphinxcontrib.argdoc"]
 source_suffix = ".rst"
 source_encoding = "utf-8"
 napoleon_use_rtype = False
@@ -33,12 +34,12 @@ project   = "MolDynPlot"
 copyright = "2015-2016, Karl T Debiec"
 author    = "Karl T Debiec"
 version   = "0.1.0"
-release   = "16-06-29"
+release   = "16-08-03"
 
 exclude_patterns  = ["_build"]
 pygments_style    = "sphinx"
 html_theme        = "sphinx_rtd_theme"
-html_theme_path   = sphinx_rtd_theme.get_html_theme_path()
+html_theme_path   = [sphinx_rtd_theme.get_html_theme_path()]
 html_static_path  = ["_static"]
 htmlhelp_basename = "MolDynPlot"
 

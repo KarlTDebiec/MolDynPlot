@@ -8,6 +8,8 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
+Processes data that is a function of amino acid sequence
+
 .. todo:
   - Fix separation and ordering of argument groups: input, action, output
   - Move relaxation error here
@@ -1162,14 +1164,14 @@ class IREDDataset(RelaxDataset):
 
         return df
 
+
 #################################### MAIN #####################################
-if __name__ == "__main__":
+def main():
     import argparse
 
     # Prepare argument parser
     parser = argparse.ArgumentParser(
-      description = """Processes data that is a function of amino acid
-                    sequence""")
+      description = __doc__)
     subparsers = parser.add_subparsers(
       dest        = "mode",
       description = "")
@@ -1181,3 +1183,6 @@ if __name__ == "__main__":
 
     kwargs  = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
+
+if __name__ == "__main__":
+    main()

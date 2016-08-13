@@ -8,6 +8,8 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
+Processes data that is a function of time
+
 .. todo:
   - Fix separation and ordering of argument groups: input, action, output
   - Move in faster text loader from cpptraj2hdf5.py
@@ -448,7 +450,8 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
         import argparse
 
         # Process arguments
-        help_message = """Process paramagnetic relaxation enhancement data"""
+        help_message = """Process NMR paramagnetic relaxation enhancement
+                       data"""
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
@@ -923,13 +926,14 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
 #            se.name = "intensity_se"
 #            dataframe = self.dataframe = pd.concat([dataframe, se], axis=1)
 
+
 #################################### MAIN #####################################
-if __name__ == "__main__":
+def main():
     import argparse
 
     # Prepare argument parser
     parser = argparse.ArgumentParser(
-      description = """Processes data that is a function of time""")
+      description = __doc__)
     subparsers = parser.add_subparsers(
       dest        = "mode",
       description = "")
@@ -942,3 +946,6 @@ if __name__ == "__main__":
 
     kwargs  = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
+
+if __name__ == "__main__":
+    main()

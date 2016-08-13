@@ -43,6 +43,11 @@ See :class:`moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset`.
 
 SequenceDataset
 ---------------
+.. automodule::   moldynplot.dataset.SequenceDataset
+    :no-members:
+
+SequenceDataset
+_______________
 .. autoclass::  moldynplot.dataset.SequenceDataset.SequenceDataset
 
 ChemicalShiftDataset
@@ -64,7 +69,12 @@ See :class:`moldynplot.dataset.TimeSeriesDataset.IREDTimeSeriesDataset`.
 
 TimeSeriesDataset
 -----------------
-.. autoclass::  moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+.. automodule::   moldynplot.dataset.TimeSeriesDataset
+    :no-members:
+
+TimeSeriesDataset
+_________________
+.. autoclass::   moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
 
 IREDTimeSeriesDataset
 _____________________
