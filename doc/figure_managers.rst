@@ -1,8 +1,12 @@
+.. This is ignored and I have no idea why
+.. meta::
+    :github_url: github.com/KarlTDebiec/MolDynPlot
+
 Figure Managers
 ===============
 Moldynplot includes several figure managers that build on
 :class:`FigureManager<myplotspec:myplotspec.FigureManager.FigureManager>`
-will additions specific for molecular dynamics simulation data.
+with additions specific for molecular dynamics simulation data.
 
 CorrFigureManager
 -----------------

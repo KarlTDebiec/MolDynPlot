@@ -1,3 +1,7 @@
+.. This is ignored and I have no idea why
+.. meta::
+    :github_url: github.com/KarlTDebiec/MolDynPlot
+
 Datasets
 ========
 Moldynplot includes several dataset classes that build on

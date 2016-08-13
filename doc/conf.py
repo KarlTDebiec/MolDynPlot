@@ -24,7 +24,7 @@ source_encoding = "utf-8"
 napoleon_use_rtype = False
 intersphinx_mapping = {
   "h5py":       ("http://docs.h5py.org/en/latest",              None),
-  "matplotlib": ("http://matplotlib.org",        None),
+  "matplotlib": ("http://matplotlib.org",                       None),
   "myplotspec": ("http://karltdebiec.github.io/myplotspec",     None),
   "nmrglue":    ("http://nmrglue.readthedocs.io/en/latest",     None),
   "pandas":     ("http://pandas.pydata.org/pandas-docs/stable", None)}
@@ -41,6 +41,17 @@ html_theme        = "sphinx_rtd_theme"
 html_theme_path   = sphinx_rtd_theme.get_html_theme_path()
 html_static_path  = ["_static"]
 htmlhelp_basename = "MolDynPlot"
+
+# This dictionary enables the "Edit on GitHub" button with links direct to rst
+# pages. These pages are fairly useless since autodoc is in use
+html_context = dict(
+    display_github = True,
+    github_user    = "KarlTDebiec",
+    github_repo    = "MolDynPlot",
+    github_version = "master",
+    conf_py_path   = "/doc/",
+    source_suffix  = source_suffix,
+)
 
 autoclass_content     = "both"
 autodoc_member_order  = "bysource"
