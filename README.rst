@@ -65,6 +65,9 @@ Publications Prepared Using MolDynPlot
   Force Field Built on a Self-Consistent Physical Model
   <http://pubs.acs.org/doi/abs/10.1021/acs.jctc.6b00567>`_
 
+- `Evaluating the Strength of Salt Bridges: A Comparison of Current
+  Biomolecular Force Fields <http://pubs.acs.org/doi/abs/10.1021/jp500958r>`_
+
 Dependencies
 ------------
 
