@@ -71,16 +71,28 @@ Publications Prepared Using MolDynPlot
 Dependencies
 ------------
 
-MolDynPlot supports Python 2.7 and 3.4, and requires the following
-packages:
+MolDynPlot supports Python 2.7, and requires the following packages:
 
-- h5py
-- ipython
-- matplotlib
-- pandas
-- pyyaml
-- scikit-learn
-- scipy
+- `h5py <https://github.com/h5py/h5py>`_
+- `ipython <https://github.com/ipython/ipython>`_
+- `matplotlib <https://github.com/matplotlib/matplotlib>`_
+- `pandas <https://github.com/pydata/pandas>`_
+- `pyyaml <https://github.com/yaml/pyyaml>`_
+- `scikit-learn <https://github.com/scikit-learn/scikit-learn>`_
+- `scipy <https://github.com/scipy/scipy>`_
+
+Testing requires the following additional packages:
+
+- `pytest <https://github.com/pytest-dev/pytest>`_
+- `pytest-cov <https://github.com/pytest-dev/pytest-cov>`_
+- `coveralls <https://github.com/coagulant/coveralls-python>`_
+
+Building the documentation requires the following additional packages:
+
+- `sphinx <https://github.com/sphinx-doc/sphinx>`_
+- `sphinxcontrib.argdoc <https://bitbucket.org/birkenfeld/sphinx-contrib>`_
+  (`fork including modified section headings
+  <https://bitbucket.org/karl_debiec/sphinx-contrib>`_)
 
 Installation
 ------------
