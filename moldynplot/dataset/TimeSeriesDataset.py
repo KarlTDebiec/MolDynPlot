@@ -386,6 +386,7 @@ class TimeSeriesDataset(Dataset):
         .. todo:
           - Make general, not specific to sequence data
         """
+        from ..fpblockaverager.FPBlockAverager import FPBlockAverager
         from ..myplotspec import multi_get
 
         # Process arguments
@@ -402,7 +403,6 @@ class TimeSeriesDataset(Dataset):
 
         sequence_df = pd.DataFrame(data=timeseries_df.mean(axis=0))
 
-        from .fpblockaverager.FPBlockAverager import FPBlockAverager
         block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=True,
                         fit_exp=True, fit_sig=False)
         block_kw.update(kwargs.get("block_kw", {}))
@@ -641,7 +641,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
             if verbose >= 1:
                 wiprint("""Concatenating timeseries from {0} relaxation
                         infiles""".format(len(relax_dfs)))
-            relax_df = pd.concat([df.stack() for df in relax_dfs],
+            relax_df = pd.concat([rdf.stack() for rdf in relax_dfs],
                          axis=1).transpose()
         else:
             relax_df = None
@@ -651,7 +651,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
             if verbose >= 1:
                 wiprint("""Concatenating timeseries from {0} order parameter
                         infiles""".format(len(order_dfs)))
-            order_df = pd.concat([df.stack() for df in order_dfs],
+            order_df = pd.concat([odf.stack() for odf in order_dfs],
                          axis=1).transpose()
         else:
             order_df = None
