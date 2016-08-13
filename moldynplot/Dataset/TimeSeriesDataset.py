@@ -417,6 +417,7 @@ class TimeSeriesDataset(Dataset):
         self.block_averager = block_averager
         return sequence_df
 
+
 class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
     """
     Represents paramagnetic relaxation enhancement data as a function of time
@@ -534,7 +535,8 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
         # Interactive prompt
         if interactive:
             embed()
-    
+
+
 class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
     """
     Represents iRED NMR relaxation data as a function of time and
@@ -781,6 +783,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
         df = self.concatenate_timeseries(timeseries_dfs, relax_dfs, order_dfs)
         df.index.name = "frame"
         return df
+
 
 class NatConTimeSeriesDataset(TimeSeriesDataset):
     """

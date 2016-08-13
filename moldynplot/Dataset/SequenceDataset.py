@@ -394,6 +394,7 @@ class SequenceDataset(Dataset):
 
         return pdist
 
+
 class ChemicalShiftDataset(SequenceDataset):
     """
     Represents an NMR peak list data.
@@ -726,6 +727,7 @@ class ChemicalShiftDataset(SequenceDataset):
         df = df.join(fit)
         return df
 
+
 class RelaxDataset(SequenceDataset):
     """
     Represents NMR relaxation data as a function of residue number.
@@ -863,6 +865,7 @@ class RelaxDataset(SequenceDataset):
                           row["code"],row["index"],row["r2"],row["r2 se"]))
                         noe_file.write("{0}\t{1}\t{2}\t{3}\n".format(
                           row["code"],row["index"],row["noe"],row["noe se"]))
+
 
 class IREDDataset(RelaxSequenceDataset):
     """

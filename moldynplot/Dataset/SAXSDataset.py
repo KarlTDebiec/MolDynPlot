@@ -118,6 +118,7 @@ class SAXSDataset(Dataset):
 
         return scale
 
+
 class SAXSExperimentDataset(SAXSDataset):
     """
     Manages Small Angle X-ray Scattering experimental datasets.
@@ -140,6 +141,7 @@ class SAXSExperimentDataset(SAXSDataset):
         # Scale
         if scale:
             self.scale(scale, **kwargs)
+
 
 class SAXSDiffDataset(SAXSDataset):
     """
