@@ -9,7 +9,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Datasets &mdash; MolDynPlot 16-06-29 documentation</title>
+  <title>Datasets &mdash; MolDynPlot 16-08-03 documentation</title>
   
 
   
@@ -31,7 +31,7 @@
   
 
   
-    <link rel="top" title="MolDynPlot 16-06-29 documentation" href="index.html"/>
+    <link rel="top" title="MolDynPlot 16-08-03 documentation" href="index.html"/>
         <link rel="next" title="Functions" href="functions.html"/>
         <link rel="prev" title="Figure Managers" href="figure_managers.html"/> 
 
@@ -84,7 +84,7 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="figure_managers.html">Figure Managers</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Datasets</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Datasets</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#corrdataset">CorrDataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#hsqcdataset">HSQCDataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mdgxdataset">MDGXDataset</a></li>
@@ -94,7 +94,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#saxstimeseriesdataset">SAXSTimeSeriesDataset</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#sequencedataset">SequenceDataset</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.dataset.SequenceDataset">SequenceDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#command-line-arguments">Command-line arguments</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#optional-arguments">Optional arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#subcommands">Subcommands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">SequenceDataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#chemicalshiftdataset">ChemicalShiftDataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#relaxdataset">RelaxDataset</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ireddataset">IREDDataset</a></li>
@@ -102,11 +108,17 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#timeseriesdataset">TimeSeriesDataset</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id1">IREDTimeSeriesDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-moldynplot.dataset.TimeSeriesDataset">TimeSeriesDataset</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id13">Command-line arguments</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id14">Optional arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id15">Subcommands</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id29">TimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id30">IREDTimeSeriesDataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#natcontimeseriesdataset">NatConTimeSeriesDataset</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pretimeseriesdataset">PRETimeSeriesDataset</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id2">SAXSTimeSeriesDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id31">SAXSTimeSeriesDataset</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#h5dataset">H5Dataset</a></li>
@@ -135,7 +147,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -188,8 +200,7 @@ dataset.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cache_key</strong> (<em>tuple</em>) &#8211; key with which dataset object is stored in
 dataset cache</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> &#8211;
-message to be used when reloading previously-loaded
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>str</em> &#8211; message to be used when reloading previously-loaded
 dataset</td>
 </tr>
 </tbody>
@@ -209,8 +220,7 @@ dataset</td>
 <dl class="attribute">
 <dt id="HSQCDataset.hsqc_df">
 <code class="descname">hsqc_df</code><a class="headerlink" href="#HSQCDataset.hsqc_df" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>DataFrame</em></p>
-<p>DataFrame whose two-dimensional index
+<dd><p><em>DataFrame</em> &#8211; DataFrame whose two-dimensional index
 corresponds to hydrogen and nitrogen chemical shift in ppm and
 whose columns correspond to intensity</p>
 </dd></dl>
@@ -253,8 +263,7 @@ None, a new argument parser will be generated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
-Argument parser or subparser</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211; Argument parser or subparser</p>
 </td>
 </tr>
 </tbody>
@@ -281,8 +290,7 @@ environment variables and wildcards</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>DataFrame</em> &#8211;
-DataFrame</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>DataFrame</em> &#8211; DataFrame</p>
 </td>
 </tr>
 </tbody>
@@ -405,28 +413,429 @@ variables</li>
 <p>See <a class="reference internal" href="#moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset" title="moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset"><code class="xref py py-class docutils literal"><span class="pre">moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset</span></code></a>.</p>
 </div>
 </div>
-<div class="section" id="sequencedataset">
-<h2>SequenceDataset<a class="headerlink" href="#sequencedataset" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-moldynplot.dataset.SequenceDataset">
+<span id="sequencedataset"></span><h2>SequenceDataset<a class="headerlink" href="#module-moldynplot.dataset.SequenceDataset" title="Permalink to this headline">¶</a></h2>
+<p>Processes data that is a function of amino acid sequence</p>
+<hr class="docutils" />
+<div class="section" id="command-line-arguments">
+<h3>Command-line arguments<a class="headerlink" href="#command-line-arguments" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="optional-arguments">
+<h4>Optional arguments<a class="headerlink" href="#optional-arguments" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="39%" />
+<col width="61%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code>, <code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>show this help message and exit</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="subcommands">
+<h4>Subcommands<a class="headerlink" href="#subcommands" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">sequence</span></code></td>
+<td>Process standard data</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">chemical_shift</span></code></td>
+<td>Process NMR chemical shift data</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">relax</span></code></td>
+<td>Process NMR relaxation data</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">ired</span></code></td>
+<td>Process NMR relaxation data calculated from MD simulation using the iRED method as implemented in cpptraj</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<hr class="docutils" />
+<div class="section" id="sequence-subcommand">
+<h5><code class="docutils literal"><span class="pre">sequence</span></code> subcommand<a class="headerlink" href="#sequence-subcommand" title="Permalink to this headline">¶</a></h5>
+<p>Process standard data</p>
+<div class="section" id="id1">
+<h6>Optional arguments<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code>, <code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>show this help message and exit</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-v</span></code>, <code class="docutils literal"><span class="pre">--verbose</span></code></td>
+<td>enable verbose output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code>, <code class="docutils literal"><span class="pre">--quiet</span></code></td>
+<td>disable verbose output</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-d</span></code>, <code class="docutils literal"><span class="pre">--debug</span></code></td>
+<td>enable debug output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-I</span></code>, <code class="docutils literal"><span class="pre">--interactive</span></code></td>
+<td>enable interactive ipython terminal after loading and processing data</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="input">
+<h6>Input<a class="headerlink" href="#input" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-indexfile</span>&nbsp; <span class="pre">INDEXFILE</span></code></td>
+<td>text file from which to load residue names; should list amino acids in the form &#8216;XAA:#&#8217; separated by whitespace; if omitted will be taken from rows of first infile; may contain environment variables</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-infiles</span>&nbsp; <span class="pre">INFILE</span> <span class="pre">[INFILE</span> <span class="pre">...]</span></code></td>
+<td>file(s) from which to load data; may be text or hdf5; may contain environment variables and wildcards</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="output">
+<h6>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-outfile</span>&nbsp; <span class="pre">OUTFILE</span></code></td>
+<td>text or hdf5 file to which processed DataFrame will be output; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="chemical-shift-subcommand">
+<h5><code class="docutils literal"><span class="pre">chemical_shift</span></code> subcommand<a class="headerlink" href="#chemical-shift-subcommand" title="Permalink to this headline">¶</a></h5>
+<p>Process NMR chemical shift data</p>
+<div class="section" id="id2">
+<h6>Optional arguments<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code>, <code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>show this help message and exit</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-v</span></code>, <code class="docutils literal"><span class="pre">--verbose</span></code></td>
+<td>enable verbose output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code>, <code class="docutils literal"><span class="pre">--quiet</span></code></td>
+<td>disable verbose output</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-d</span></code>, <code class="docutils literal"><span class="pre">--debug</span></code></td>
+<td>enable debug output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-I</span></code>, <code class="docutils literal"><span class="pre">--interactive</span></code></td>
+<td>enable interactive ipython terminal after loading and processing data</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id3">
+<h6>Input<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-delays</span>&nbsp; <span class="pre">DELAY</span> <span class="pre">[DELAY</span> <span class="pre">...]</span></code></td>
+<td>delays for each infile, if infiles represent a series; number of delays must match number of infiles</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-indexfile</span>&nbsp; <span class="pre">INDEXFILE</span></code></td>
+<td>text file from which to load residue names; should list amino acids in the form &#8216;XAA:#&#8217; separated by whitespace; if omitted will be taken from rows of first infile; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="action">
+<h6>Action<a class="headerlink" href="#action" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-relax</span>&nbsp; <span class="pre">[CALC_RELAX]</span></code></td>
+<td>Calculate relaxation rates and standard errors; may additionally specify kind of relaxation being measured (e.g. r1, r2)</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id4">
+<h6>Input<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="74%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-infiles</span>&nbsp; <span class="pre">INFILE</span> <span class="pre">[INFILE</span> <span class="pre">...]</span></code></td>
+<td>file(s) from which to load data; may be text or hdf5; may contain environment variables and wildcards</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id5">
+<h6>Output<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-outfile</span>&nbsp; <span class="pre">OUTFILE</span></code></td>
+<td>text or hdf5 file to which processed DataFrame will be output; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="relax-subcommand">
+<h5><code class="docutils literal"><span class="pre">relax</span></code> subcommand<a class="headerlink" href="#relax-subcommand" title="Permalink to this headline">¶</a></h5>
+<p>Process NMR relaxation data</p>
+<div class="section" id="id6">
+<h6>Optional arguments<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code>, <code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>show this help message and exit</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-v</span></code>, <code class="docutils literal"><span class="pre">--verbose</span></code></td>
+<td>enable verbose output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code>, <code class="docutils literal"><span class="pre">--quiet</span></code></td>
+<td>disable verbose output</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-d</span></code>, <code class="docutils literal"><span class="pre">--debug</span></code></td>
+<td>enable debug output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-I</span></code>, <code class="docutils literal"><span class="pre">--interactive</span></code></td>
+<td>enable interactive ipython terminal after loading and processing data</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id7">
+<h6>Input<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-indexfile</span>&nbsp; <span class="pre">INDEXFILE</span></code></td>
+<td>text file from which to load residue names; should list amino acids in the form &#8216;XAA:#&#8217; separated by whitespace; if omitted will be taken from rows of first infile; may contain environment variables</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-infiles</span>&nbsp; <span class="pre">INFILE</span> <span class="pre">[INFILE</span> <span class="pre">...]</span></code></td>
+<td>file(s) from which to load data; may be text or hdf5; may contain environment variables and wildcards</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id8">
+<h6>Output<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-outfile</span>&nbsp; <span class="pre">OUTFILE</span></code></td>
+<td>text or hdf5 file to which processed DataFrame will be output; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="ired-subcommand">
+<h5><code class="docutils literal"><span class="pre">ired</span></code> subcommand<a class="headerlink" href="#ired-subcommand" title="Permalink to this headline">¶</a></h5>
+<p>Process NMR relaxation data calculated from MD simulation using the iRED
+method as implemented in cpptraj</p>
+<div class="section" id="id9">
+<h6>Optional arguments<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code>, <code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>show this help message and exit</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-v</span></code>, <code class="docutils literal"><span class="pre">--verbose</span></code></td>
+<td>enable verbose output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code>, <code class="docutils literal"><span class="pre">--quiet</span></code></td>
+<td>disable verbose output</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-d</span></code>, <code class="docutils literal"><span class="pre">--debug</span></code></td>
+<td>enable debug output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-I</span></code>, <code class="docutils literal"><span class="pre">--interactive</span></code></td>
+<td>enable interactive ipython terminal after loading and processing data</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id10">
+<h6>Input<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-infiles</span>&nbsp; <span class="pre">INFILE</span> <span class="pre">[INFILE</span> <span class="pre">...]</span></code></td>
+<td>File(s) from which to load data; may be text or hdf5; if text, may be pandas-formatted DataFrames, or may be cpptraj-formatted iRED output; may contain environment variables and wildcards</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-indexfile</span>&nbsp; <span class="pre">INDEXFILE</span></code></td>
+<td>text file from which to load residue names; should list amino acids in the form &#8216;XAA:#&#8217; separated by whitespace; if omitted will be taken from rows of first infile; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id11">
+<h6>Output<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-outfile</span>&nbsp; <span class="pre">OUTFILE</span></code></td>
+<td>text or hdf5 file to which processed DataFrame will be output; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="id12">
+<h3>SequenceDataset<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="moldynplot.dataset.SequenceDataset.SequenceDataset">
 <em class="property">class </em><code class="descclassname">moldynplot.dataset.SequenceDataset.</code><code class="descname">SequenceDataset</code><span class="sig-paren">(</span><em>calc_pdist=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.dataset.SequenceDataset.SequenceDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.Dataset.Dataset</span></code></p>
 <p>Represents data that is a function of amino acid sequence.</p>
 <dl class="attribute">
-<dt id="SequenceDataset.sequence_df">
-<code class="descname">sequence_df</code><a class="headerlink" href="#SequenceDataset.sequence_df" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>DataFrame</em></p>
-<p>DataFrame whose index corresponds to
+<dt id="moldynplot.dataset.SequenceDataset.SequenceDataset.sequence_df">
+<code class="descname">sequence_df</code><a class="headerlink" href="#moldynplot.dataset.SequenceDataset.SequenceDataset.sequence_df" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>DataFrame</em> &#8211; DataFrame whose index corresponds to
 amino acid residue number in the form <code class="docutils literal"><span class="pre">XAA:#</span></code> and whose
 columns are a series of quantities specific to each residue.
 Standard errors of these quantities may be represented by
 adjacent columns with &#8216; se&#8217; appended to their names.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>               r1     r1 se        r2     r2 se  ...
-residue
-GLN:2    2.451434  0.003734  5.041334  0.024776  ...
-TYR:3    2.443613  0.004040  5.138383  0.025376  ...
-LYS:4    2.511626  0.004341  5.589428  0.026236  ...
-...      ...       ...       ...       ...       ...
+<div class="highlight-default"><div class="highlight"><pre><span></span>               <span class="n">r1</span>     <span class="n">r1</span> <span class="n">se</span>        <span class="n">r2</span>     <span class="n">r2</span> <span class="n">se</span>  <span class="o">...</span>
+<span class="n">residue</span>
+<span class="n">GLN</span><span class="p">:</span><span class="mi">2</span>    <span class="mf">2.451434</span>  <span class="mf">0.003734</span>  <span class="mf">5.041334</span>  <span class="mf">0.024776</span>  <span class="o">...</span>
+<span class="n">TYR</span><span class="p">:</span><span class="mi">3</span>    <span class="mf">2.443613</span>  <span class="mf">0.004040</span>  <span class="mf">5.138383</span>  <span class="mf">0.025376</span>  <span class="o">...</span>
+<span class="n">LYS</span><span class="p">:</span><span class="mi">4</span>    <span class="mf">2.511626</span>  <span class="mf">0.004341</span>  <span class="mf">5.589428</span>  <span class="mf">0.026236</span>  <span class="o">...</span>
+<span class="o">...</span>      <span class="o">...</span>       <span class="o">...</span>       <span class="o">...</span>       <span class="o">...</span>       <span class="o">...</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -441,7 +850,7 @@ environment variables and wildcards</li>
 <li><strong>use_indexes</strong> (<em>list</em>) &#8211; Residue indexes to select from DataFrame,
 once DataFrame has already been loaded</li>
 <li><strong>calc_pdist</strong> (<em>bool</em>) &#8211; Calculate probability distribution
-using <code class="xref py py-meth docutils literal"><span class="pre">calc_pdist()</span></code></li>
+using <a class="reference internal" href="#moldynplot.dataset.SequenceDataset.SequenceDataset.calc_pdist" title="moldynplot.dataset.SequenceDataset.SequenceDataset.calc_pdist"><code class="xref py py-meth docutils literal"><span class="pre">calc_pdist()</span></code></a></li>
 <li><strong>dataset_cache</strong> (<em>dict</em>) &#8211; Cache of previously-loaded Datasets</li>
 <li><strong>interactive</strong> (<em>bool</em>) &#8211; Provide iPython prompt and reading and
 processing data</li>
@@ -470,8 +879,7 @@ None, a new argument parser will be generated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
-Argument parser or subparser</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211; Argument parser or subparser</p>
 </td>
 </tr>
 </tbody>
@@ -488,8 +896,7 @@ for argument details.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>tuple</em> &#8211;
-Cache key; contains arguments sufficient to reconstruct
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><em>tuple</em> &#8211; Cache key; contains arguments sufficient to reconstruct
 dataset</td>
 </tr>
 </tbody>
@@ -545,8 +952,7 @@ error of each value will be used</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>dict</em> &#8211;
-Dictionary whose keys are columns in <em>df</em> and values are
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>dict</em> &#8211; Dictionary whose keys are columns in <em>df</em> and values are
 DataFrames whose indexes are the <em>grid</em> for that column and
 contain a single column &#8216;probability&#8217; containing the
 normalized probability at each grid point</p>
@@ -558,6 +964,7 @@ normalized probability at each grid point</p>
 
 </dd></dl>
 
+</div>
 <div class="section" id="chemicalshiftdataset">
 <h3>ChemicalShiftDataset<a class="headerlink" href="#chemicalshiftdataset" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
@@ -605,8 +1012,7 @@ None, a new argument parser will be generated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
-Argument parser or subparser</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211; Argument parser or subparser</p>
 </td>
 </tr>
 </tbody>
@@ -646,8 +1052,7 @@ to use for error calculation</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>DataFrame</em> &#8211;
-Sequence DataFrame with additional columns for
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>DataFrame</em> &#8211; Sequence DataFrame with additional columns for
 relaxation rate and standard error</p>
 </td>
 </tr>
@@ -703,8 +1108,7 @@ None, a new argument parser will be generated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
-Argument parser or subparser</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211; Argument parser or subparser</p>
 </td>
 </tr>
 </tbody>
@@ -764,8 +1168,7 @@ None, a new argument parser will be generated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
-Argument parser or subparser</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211; Argument parser or subparser</p>
 </td>
 </tr>
 </tbody>
@@ -788,8 +1191,7 @@ iRED datasets.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>df</strong> (<em>DataFrame</em>) &#8211;
-Averaged DataFrame including relax and order</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>df</strong> (<em>DataFrame</em>) &#8211; Averaged DataFrame including relax and order</p>
 </td>
 </tr>
 </tbody>
@@ -828,8 +1230,7 @@ variables</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>df</strong> (<em>DataFrame</em>) &#8211;
-iRED sequence DataFrame</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>df</strong> (<em>DataFrame</em>) &#8211; iRED sequence DataFrame</p>
 </td>
 </tr>
 </tbody>
@@ -845,18 +1246,382 @@ iRED sequence DataFrame</p>
 </div>
 </div>
 </div>
-<div class="section" id="timeseriesdataset">
-<h2>TimeSeriesDataset<a class="headerlink" href="#timeseriesdataset" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-moldynplot.dataset.TimeSeriesDataset">
+<span id="timeseriesdataset"></span><h2>TimeSeriesDataset<a class="headerlink" href="#module-moldynplot.dataset.TimeSeriesDataset" title="Permalink to this headline">¶</a></h2>
+<p>Processes data that is a function of time</p>
+<hr class="docutils" />
+<div class="section" id="id13">
+<h3>Command-line arguments<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id14">
+<h4>Optional arguments<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="39%" />
+<col width="61%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code>, <code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>show this help message and exit</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id15">
+<h4>Subcommands<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">timeseries</span></code></td>
+<td>Process standard data</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">ired</span></code></td>
+<td>Process NMR relaxation data calculated from MD simulation using the iRED method as implemented in cpptraj</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">pre</span></code></td>
+<td>Process NMR paramagnetic relaxation enhancement data</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<hr class="docutils" />
+<div class="section" id="timeseries-subcommand">
+<h5><code class="docutils literal"><span class="pre">timeseries</span></code> subcommand<a class="headerlink" href="#timeseries-subcommand" title="Permalink to this headline">¶</a></h5>
+<p>Process standard data</p>
+<div class="section" id="id16">
+<h6>Optional arguments<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code>, <code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>show this help message and exit</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-v</span></code>, <code class="docutils literal"><span class="pre">--verbose</span></code></td>
+<td>enable verbose output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code>, <code class="docutils literal"><span class="pre">--quiet</span></code></td>
+<td>disable verbose output</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-d</span></code>, <code class="docutils literal"><span class="pre">--debug</span></code></td>
+<td>enable debug output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-I</span></code>, <code class="docutils literal"><span class="pre">--interactive</span></code></td>
+<td>enable interactive ipython terminal after loading and processing data</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id17">
+<h6>Action<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="37%" />
+<col width="63%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-dt</span>&nbsp; <span class="pre">DT</span></code></td>
+<td>time between frames</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-toffset</span>&nbsp; <span class="pre">TOFFSET</span></code></td>
+<td>offset to add to index (time or frame number)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-downsample</span>&nbsp; <span class="pre">DOWNSAMPLE</span></code></td>
+<td>factor by which to downsample data</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--pdist</span></code></td>
+<td>calculate probability distribution over timeseries</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id18">
+<h6>Input<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="74%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-infiles</span>&nbsp; <span class="pre">INFILE</span> <span class="pre">[INFILE</span> <span class="pre">...]</span></code></td>
+<td>file(s) from which to load data; may be text or hdf5; may contain environment variables and wildcards</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id19">
+<h6>Output<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-outfile</span>&nbsp; <span class="pre">OUTFILE</span></code></td>
+<td>text or hdf5 file to which processed DataFrame will be output; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="id20">
+<h5><code class="docutils literal"><span class="pre">ired</span></code> subcommand<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h5>
+<p>Process NMR relaxation data calculated from MD simulation using the iRED
+method as implemented in cpptraj</p>
+<div class="section" id="id21">
+<h6>Optional arguments<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code>, <code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>show this help message and exit</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-v</span></code>, <code class="docutils literal"><span class="pre">--verbose</span></code></td>
+<td>enable verbose output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code>, <code class="docutils literal"><span class="pre">--quiet</span></code></td>
+<td>disable verbose output</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-d</span></code>, <code class="docutils literal"><span class="pre">--debug</span></code></td>
+<td>enable debug output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-I</span></code>, <code class="docutils literal"><span class="pre">--interactive</span></code></td>
+<td>enable interactive ipython terminal after loading and processing data</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id22">
+<h6>Action<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="37%" />
+<col width="63%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--mean</span></code></td>
+<td>Calculate mean and standard error over timeseries</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-dt</span>&nbsp; <span class="pre">DT</span></code></td>
+<td>time between frames</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-toffset</span>&nbsp; <span class="pre">TOFFSET</span></code></td>
+<td>offset to add to index (time or frame number)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-downsample</span>&nbsp; <span class="pre">DOWNSAMPLE</span></code></td>
+<td>factor by which to downsample data</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--pdist</span></code></td>
+<td>calculate probability distribution over timeseries</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id23">
+<h6>Input<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-infiles</span>&nbsp; <span class="pre">INFILE</span> <span class="pre">[INFILE</span> <span class="pre">...]</span></code></td>
+<td>File(s) from which to load data; may be text or hdf5; if text, may be pandas-formatted DataFrames, or may be cpptraj-formatted iRED output; may contain environment variables and wildcards</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-indexfile</span>&nbsp; <span class="pre">INDEXFILE</span></code></td>
+<td>text file from which to load residue names; should list amino acids in the form &#8216;XAA:#&#8217; separated by whitespace; if omitted will be taken from rows of first infile; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id24">
+<h6>Output<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-outfile</span>&nbsp; <span class="pre">OUTFILE</span></code></td>
+<td>text or hdf5 file to which processed DataFrame will be output; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="pre-subcommand">
+<h5><code class="docutils literal"><span class="pre">pre</span></code> subcommand<a class="headerlink" href="#pre-subcommand" title="Permalink to this headline">¶</a></h5>
+<p>Process NMR paramagnetic relaxation enhancement data</p>
+<div class="section" id="id25">
+<h6>Optional arguments<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code>, <code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>show this help message and exit</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-v</span></code>, <code class="docutils literal"><span class="pre">--verbose</span></code></td>
+<td>enable verbose output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code>, <code class="docutils literal"><span class="pre">--quiet</span></code></td>
+<td>disable verbose output</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-d</span></code>, <code class="docutils literal"><span class="pre">--debug</span></code></td>
+<td>enable debug output, may be specified more than once</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-I</span></code>, <code class="docutils literal"><span class="pre">--interactive</span></code></td>
+<td>enable interactive ipython terminal after loading and processing data</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id26">
+<h6>Action<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="37%" />
+<col width="63%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-dt</span>&nbsp; <span class="pre">DT</span></code></td>
+<td>time between frames</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-toffset</span>&nbsp; <span class="pre">TOFFSET</span></code></td>
+<td>offset to add to index (time or frame number)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-downsample</span>&nbsp; <span class="pre">DOWNSAMPLE</span></code></td>
+<td>factor by which to downsample data</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--pdist</span></code></td>
+<td>calculate probability distribution over timeseries</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id27">
+<h6>Input<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="74%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-infiles</span>&nbsp; <span class="pre">INFILE</span> <span class="pre">[INFILE</span> <span class="pre">...]</span></code></td>
+<td>file(s) from which to load data; may be text or hdf5; may contain environment variables and wildcards</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="id28">
+<h6>Output<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h6>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Argument</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-outfile</span>&nbsp; <span class="pre">OUTFILE</span></code></td>
+<td>text or hdf5 file to which processed DataFrame will be output; may contain environment variables</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="id29">
+<h3>TimeSeriesDataset<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset">
 <em class="property">class </em><code class="descclassname">moldynplot.dataset.TimeSeriesDataset.</code><code class="descname">TimeSeriesDataset</code><span class="sig-paren">(</span><em>dt=None</em>, <em>toffset=None</em>, <em>downsample=None</em>, <em>calc_pdist=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldynplot.myplotspec.Dataset.Dataset</span></code></p>
 <p>Represents data as a function of time.</p>
 <dl class="attribute">
-<dt id="TimeSeriesDataset.timeseries_df">
-<code class="descname">timeseries_df</code><a class="headerlink" href="#TimeSeriesDataset.timeseries_df" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>DataFrame</em></p>
-<p>DataFrame whose index corresponds to
+<dt id="moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset.timeseries_df">
+<code class="descname">timeseries_df</code><a class="headerlink" href="#moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset.timeseries_df" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>DataFrame</em> &#8211; DataFrame whose index corresponds to
 time as represented by frame number or chemical time and whose
 columns are a series of quantities as a function of time.</p>
 </dd></dl>
@@ -913,8 +1678,7 @@ None, a new argument parser will be generated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
-Argument parser or subparser</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211; Argument parser or subparser</p>
 </td>
 </tr>
 </tbody>
@@ -973,7 +1737,7 @@ probability distribution calculation</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>{timeseries}d{ata}f{rame}</strong> (<em>DataFrame</em>) &#8211; Timeseries over which
 to calculate mean and standard error; if omitted looks for
-<a class="reference internal" href="#TimeSeriesDataset.timeseries_df" title="TimeSeriesDataset.timeseries_df"><code class="xref py py-attr docutils literal"><span class="pre">timeseries_df</span></code></a></li>
+<a class="reference internal" href="#moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset.timeseries_df" title="moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset.timeseries_df"><code class="xref py py-attr docutils literal"><span class="pre">timeseries_df</span></code></a></li>
 <li><strong>block_kw</strong> (<em>dict</em>) &#8211; Keyword arguments passed to
 <code class="xref py py-class docutils literal"><span class="pre">fpblockaverager.FPBlockAverager</span></code></li>
 <li><strong>block_kw[all_factors]</strong> (<em>bool</em>) &#8211; Use all factors by which the</li>
@@ -989,8 +1753,7 @@ omit in transformation</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>DataFrame</em> &#8211;
-Sequence dataframe including mean and standard
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>DataFrame</em> &#8211; Sequence dataframe including mean and standard
 error for each column in <em>timeseries_df</em></p>
 </td>
 </tr>
@@ -1000,8 +1763,9 @@ error for each column in <em>timeseries_df</em></p>
 
 </dd></dl>
 
-<div class="section" id="id1">
-<h3>IREDTimeSeriesDataset<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id30">
+<h3>IREDTimeSeriesDataset<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="moldynplot.dataset.TimeSeriesDataset.IREDTimeSeriesDataset">
 <em class="property">class </em><code class="descclassname">moldynplot.dataset.TimeSeriesDataset.</code><code class="descname">IREDTimeSeriesDataset</code><span class="sig-paren">(</span><em>dt=None</em>, <em>toffset=None</em>, <em>downsample=None</em>, <em>calc_pdist=False</em>, <em>calc_mean=False</em>, <em>outfile=None</em>, <em>interactive=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.dataset.TimeSeriesDataset.IREDTimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
@@ -1049,8 +1813,7 @@ None, a new argument parser will be generated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
-Argument parser or subparser</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211; Argument parser or subparser</p>
 </td>
 </tr>
 </tbody>
@@ -1073,8 +1836,7 @@ Argument parser or subparser</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>df</strong> (<em>DataFrame</em>) &#8211;
-Averaged DataFrame including relax and order</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>df</strong> (<em>DataFrame</em>) &#8211; Averaged DataFrame including relax and order</p>
 </td>
 </tr>
 </tbody>
@@ -1180,8 +1942,7 @@ None, a new argument parser will be generated</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211;
-Argument parser or subparser</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>ArgumentParser</em> &#8211; Argument parser or subparser</p>
 </td>
 </tr>
 </tbody>
@@ -1191,8 +1952,8 @@ Argument parser or subparser</p>
 </dd></dl>
 
 </div>
-<div class="section" id="id2">
-<h3>SAXSTimeSeriesDataset<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id31">
+<h3>SAXSTimeSeriesDataset<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset">
 <em class="property">class </em><code class="descclassname">moldynplot.dataset.TimeSeriesDataset.</code><code class="descname">SAXSTimeSeriesDataset</code><span class="sig-paren">(</span><em>infile</em>, <em>address=u'saxs'</em>, <em>downsample=None</em>, <em>calc_mean=False</em>, <em>calc_error=True</em>, <em>error_method=u'std'</em>, <em>scale=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset" title="Permalink to this definition">¶</a></dt>
@@ -1305,7 +2066,7 @@ time of first point)</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'16-06-29',
+            VERSION:'16-08-03',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
