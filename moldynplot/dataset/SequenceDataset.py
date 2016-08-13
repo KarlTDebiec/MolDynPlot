@@ -153,6 +153,8 @@ class SequenceDataset(Dataset):
             once DataFrame has already been loaded
           calc_pdist (bool): Calculate probability distribution
             using :meth:`calc_pdist`
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
           dataset_cache (dict): Cache of previously-loaded Datasets
           interactive (bool): Provide iPython prompt and reading and
             processing data
@@ -167,28 +169,28 @@ class SequenceDataset(Dataset):
         # Read data
         self.sequence_df = self.read(**kwargs)
 
-        # Cut data
+        # Process data
         if "use_indexes" in kwargs:
             use_indexes = np.array(kwargs.pop("use_indexes"), np.int)
             res_index = np.array([int(i.split(":")[1])
               for i in self.sequence_df.index.values])
             self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
 
-        # Calculate probability distribution
-        if calc_pdist:
-            self.pdist_df = self.calc_pdist(df=self.sequence_df, **kwargs)
-
         # Output data
         if verbose >= 2:
             wiprint("Processed sequence DataFrame:")
             print(self.sequence_df)
-            if calc_pdist:
-                print("Processed pdist DataFrame:")
-                print(self.pdist_df)
-
-        # Write data
         if outfile is not None:
             self.write(df=self.sequence_df, outfile=outfile, **kwargs)
+
+        # Calculate probability distribution
+        if calc_pdist:
+            pdist_kw = kwargs.get("pdist_kw", {})
+            self.pdist_df = self.calc_pdist(df=self.sequence_df,
+              verbose=verbose, **pdist_kw)
+            if verbose >= 2:
+                print("Processed pdist DataFrame:")
+                print(self.pdist_df)
 
         # Interactive prompt
         if interactive:
@@ -252,142 +254,6 @@ class SequenceDataset(Dataset):
             df = df.loc[sorted(df.index.values)]
 
         return df
-
-    def calc_pdist(self, **kwargs):
-        """
-        Calculates probability distribution across sequence.
-
-        Arguments:
-          df (DataFrame): DataFrame; probability distribution will be
-            calculated for each column using rows as data points
-          pdist_kw (dict): Keyword arguments used to configure
-            probability distribution calculation
-          pdist_kw[columns] (list): Columns for which to calculate
-            probability distribution
-          pdist_kw[mode] (ndarray, dict): Method of calculating
-            probability distribution; eventually will support 'hist' for
-            histogram and 'kde' for kernel density estimate, though
-            presently only kde is implremented
-          pdist_kw[grid] (ndarray, dict, optional): Grid on which to
-            calculate kernel density estimate; may be a single ndarray
-            that will be applied to all columns or a dictionary whose
-            keys are column names and values are ndarrays corresponding
-            to the grid for each column; for any column for which *grid*
-            is not specified, a grid of 1000 points between the minimum
-            value minus three times the standard deviation and the
-            maximum value plots three times the standard deviation will
-            be used
-          pdist_kw[bandwidth] (float, dict, str, optional): Bandwidth to
-            use for kernel density estimates; may be a single float that
-            will be applied to all columns or a dictionary whose keys
-            are column names and values are floats corresponding to the
-            bandwidth for each column; for any column for which
-            *bandwidth* is not specified, the standard deviation will be
-            used; alternatively may be 'se', in which case the standard
-            error of each value will be used
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-
-        Returns:
-          dict: Dictionary whose keys are columns in *df* and values are
-          DataFrames whose indexes are the *grid* for that column and
-          contain a single column 'probability' containing the
-          normalized probability at each grid point
-
-        .. todo:
-            - Implement flag to return single dataframe with single grid
-        """
-        from collections import OrderedDict
-        from scipy.stats import norm
-        import six
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        df      = kwargs.get("df")
-        if df is None:
-            if hasattr(self, "sequence_df"):
-                df = self.sequence_df
-            else:
-                raise()
-        pdist_kw = kwargs.get("pdist_kw", {})
-        columns = pdist_kw.get("columns",
-          [a for a in df.columns.values
-           if not a.endswith(" se")
-           and str(df[a].dtype).startswith("float")])
-        if isinstance(columns, six.string_types):
-            columns = [columns]
-        mode = pdist_kw.get("mode", "kde")
-
-        if mode == "kde":
-
-            # Prepare grids
-            grid = pdist_kw.pop("grid", None)
-            if grid is None:
-                all_grid = None
-                grid = {}
-            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
-                all_grid = np.array(grid)
-                grid = {}
-            elif isinstance(grid, dict):
-                all_grid = None
-                pass
-            for column, series in df[columns].iteritems():
-                if column in grid:
-                    grid[column] = np.array(grid[column])
-                elif all_grid is not None:
-                    grid[column] = all_grid
-                else:
-                    grid[column] = np.linspace(
-                      series.min() - 3 * series.std(),
-                      series.max() + 3 * series.std(), 1000)
-
-            # Prepare bandwidths:
-            bandwidth = pdist_kw.pop("bandwidth", None)
-            if bandwidth is None:
-                all_bandwidth = None
-                bandwidth = {}
-            elif (isinstance(bandwidth, six.string_types)
-            and   bandwidth.lower() == "se"):
-                all_bandwidth = None
-                bandwidth = "se"
-            elif isinstance(bandwidth, float):
-                all_bandwidth = float(bandwidth)
-                bandwidth = {}
-            elif isinstance(bandwidth, dict):
-                all_bandwidth = None
-                pass
-            for column, series in df[columns].iteritems():
-                if column in bandwidth:
-                    bandwidth[column] = float(bandwidth[column])
-                elif all_bandwidth is not None:
-                    bandwidth[column] = all_bandwidth
-                else:
-                    bandwidth[column] = series.std()
-
-            # Calculate probability distributions
-            pdist = OrderedDict()
-            for column in columns:
-                if verbose >= 1:
-                    print("calculating probability distribution of "
-                    "{0} using a kernel density estimate".format(column))
-                g = grid[column]
-                b = bandwidth[column]
-                pdf = np.zeros_like(g)
-                for residue, row in df.iterrows():
-                    if np.isnan(row[column]):
-                        continue
-#                    c = norm(loc=b[column], scale=b[column+" se"])
-                    pdf += norm(loc=row[column], scale=b).pdf(g)
-                pdf /= pdf.sum()
-                series_pdist = pd.DataFrame(pdf, index=g,
-                  columns=["probability"])
-                series_pdist.index.name = column
-                pdist[column] = series_pdist
-        else:
-            raise Exception("only kde is currently supported")
-
-
-        return pdist
 
 
 class ChemicalShiftDataset(SequenceDataset):

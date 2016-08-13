@@ -112,6 +112,15 @@ class TimeSeriesDataset(Dataset):
                          """)
         except argparse.ArgumentError:
             pass
+        try:
+            action_group.add_argument(
+              "--mean",
+              action   = "store_true",
+              dest     = "calc_mean",
+              help     = """Calculate mean and standard error over timeseries
+                         """)
+        except argparse.ArgumentError:
+            pass
 
         # Arguments inherited from superclass
         Dataset.construct_argparser(parser)
@@ -119,7 +128,8 @@ class TimeSeriesDataset(Dataset):
         return parser
 
     def __init__(self, dt=None, toffset=None, downsample=None,
-        calc_pdist=False, outfile=None, interactive=False, **kwargs):
+        calc_pdist=False, calc_mean=False, outfile=None, interactive=False,
+        **kwargs):
         """
         Arguments:
           infile{s} (list): Path(s) to input file(s); may contain
@@ -130,13 +140,12 @@ class TimeSeriesDataset(Dataset):
           downsample (int): Interval by which to downsample points
           downsample_mode (str): Method of downsampling; may be 'mean'
             or 'mode'
-          calc_pdist (bool): Calculate probability distribution
-          pdist_key (str): Column of which to calculate probability
-            distribution
-          kde_kw (dict): Keyword arguments passed to
-            sklearn.neighbors.KernelDensity; key argument is 'bandwidth'
-          grid (ndarray): Grid on which to calculate probability
-            distribution
+          calc_pdist (bool): Calculate probability distribution using
+            :method:`calc_pdist`; store in instance variable `pdist_df`
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
+          calc_mean (bool): Calculate mean and standard error using
+            :method:`calc_mean`; store in instance variable `sequence_df`
           interactive (bool): Provide iPython prompt and reading and
             processing data
           verbose (int): Level of verbose output
@@ -149,52 +158,67 @@ class TimeSeriesDataset(Dataset):
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
+        self.dataset_cache = kwargs.get("dataset_cache", None)
 
-        # Load
+        # Read data
         self.timeseries_df = self.read(**kwargs)
+        print(self.timeseries_df.index.name)
 
-        # Convert from frame index to time
+        # Process data
         if dt:
             self.timeseries_df.set_index(self.timeseries_df.index.values *
               float(dt), inplace=True)
             self.timeseries_df.index.name = "time"
-
-        # Offset time
         if toffset:
             index_name = self.timeseries_df.index.name
             self.timeseries_df.set_index(self.timeseries_df.index.values +
               float(toffset), inplace=True)
             self.timeseries_df.index.name = index_name
-
-        # Downsample
         if downsample:
-            self.timeseries_df = self.downsample(downsample, **kwargs)
+            self.timeseries_df = self.downsample(df=self.timeseries_df, 
+              downsample=downsample, **kwargs)
+        print(self.timeseries_df.index.name)
 
-        # Calculate probability distibution
-        if calc_pdist:
-            self.pdist_df = self.calc_pdist(**kwargs)
-
-        # Output to screen
+        # Output data
         if verbose >= 2:
             print("Processed timeseries DataFrame:")
             print(self.timeseries_df)
-            if calc_pdist:
-                print("Processed pdist DataFrame:")
-                print(self.pdist_df)
-
-        # Write data
         if outfile is not None:
             self.write(df=self.timeseries_df, outfile=outfile, **kwargs)
+
+        # Calculate probability distibution
+        if calc_pdist:
+            pdist_kw = kwargs.get("pdist_kw", {})
+            self.pdist_df = self.calc_pdist(df=self.timeseries_df,
+              verbose=verbose, **pdist_kw)
+            if verbose >= 2:
+                print("Processed pdist DataFrame:")
+                print(self.pdist_df)
+            # WRITE
+
+        # Calculate mean and standard error
+        if calc_mean:
+            block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=True,
+                            fit_exp=True, fit_sig=False)
+            block_kw.update(kwargs.get("block_kw", {}))
+            self.mean_df, self.block_averager = self.calc_mean(
+              df=self.timeseries_df, verbose=verbose, **block_kw)
+            if verbose >= 2:
+                print("Processed mean DataFrame:")
+                print(self.mean_df)
+            # WRITE
 
         # Interactive prompt
         if interactive:
             embed()
 
-    def downsample(self, downsample, downsample_mode="mean", **kwargs):
+    @staticmethod
+    def downsample(df, downsample, downsample_mode="mean", **kwargs):
         """
         Downsamples time series.
 
         Arguments:
+          df (DataFrame): Timeseries DataFrame to downsample
           downsample (int): Interval by which to downsample points
           downsample_mode (str): Method of downsampling; may be 'mean'
             or 'mode'
@@ -203,14 +227,8 @@ class TimeSeriesDataset(Dataset):
         """
         from scipy.stats.mstats import mode
 
-        # Process rguments
+        # Process arguments
         verbose = kwargs.get("verbose", 1)
-        df      = kwargs.get("df")
-        if df is None:
-            if hasattr(self, "timeseries_df"):
-                df = self.timeseries_df
-            else:
-                raise()
 
         # Truncate dataset
         reduced = df.values[:df.shape[0] - (df.shape[0] % downsample),:]
@@ -241,306 +259,53 @@ class TimeSeriesDataset(Dataset):
 
         return df
 
-#    def calc_error(self, error_method="std", **kwargs):
-#        """
-#        Calculates standard error using time series data.
-#
-#        .. todo:
-#          - Support breaking into blocks (essentially downsampling,
-#            then calculating standard error)
-#        """
-#
-#        # Arguments
-#        verbose = kwargs.get("verbose", 1)
-#        timeseries=self.timeseries
-#
-#        # Calculate standard error
-#        if error_method == "std":
-#            if verbose >= 1:
-#                print("calculating standard error using standard deviation")
-#            se = timeseries.std()
-#        elif error_method == "block":
-#            from .fpblockaverager.FPBlockAverager import FPBlockAverager
-#            if verbose >= 1:
-#                print("calculating standard error using block averaging")
-#            ba = FPBlockAverager(timeseries, **kwargs)
-#            se = ba.parameters.loc["exp", "a (se)"]
-#        else:
-#            if verbose >= 1:
-#                print("error_method '{0}' not understood, ".format(scale) +
-#                      "must be one of 'std', 'block'; not calculating error.")
-#            return
-#
-#        return se
-
-    def calc_pdist(self, **kwargs):
-        """
-        Calcualtes probability distribution of time series.
-
-        Arguments:
-          pdist_kw (dict): Keyword arguments used to configure
-            probability distribution calculation
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        from collections import OrderedDict
-        from sklearn.neighbors import KernelDensity
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        if verbose >= 1:
-            wiprint("""Calculating probability distribution over timeseries""")
-        df      = kwargs.get("df")
-        if df is None:
-            if hasattr(self, "timeseries_df"):
-                df = self.timeseries_df
-            else:
-                raise()
-
-        pdist_kw = kwargs.get("pdist_kw", {"bandwidth": 0.1})
-        mode = "kde"
-        if mode == "kde":
-
-            # Prepare bandwidths
-            bandwidth = pdist_kw.pop("bandwidth", None)
-            if bandwidth is None:
-                all_bandwidth = None
-                bandwidth = {}
-            elif isinstance(bandwidth, float):
-                all_bandwidth = bandwidth
-                bandwidth = {}
-            elif isinstance(bandwidth, dict):
-                all_bandwidth = None
-                pass
-            for column, series in df.iteritems():
-                if column in bandwidth:
-                    bandwidth[column] = float(bandwidth[column])
-                elif all_bandwidth is not None:
-                    bandwidth[column] = all_bandwidth
-                else:
-                    bandwidth[column] = series.std() / 10.0
-
-            # Prepare grids
-            grid = pdist_kw.pop("grid", None)
-            if grid is None:
-                all_grid = None
-                grid = {}
-            elif isinstance(grid, list) or isinstance(grid, np.ndarray):
-                all_grid = np.array(grid)
-                grid = {}
-            elif isinstance(grid, dict):
-                all_grid = None
-                pass
-            for column, series in df.iteritems():
-                if column in grid:
-                    grid[column] = np.array(grid[column])
-                elif all_grid is not None:
-                    grid[column] = all_grid
-                else:
-                    grid[column] = np.linspace(series.min() - series.std(),
-                                      series.max() + series.std(), 100)
-
-            # Calculate probability distributions
-            kde_kw = pdist_kw.get("kde_kw", {})
-            pdist = OrderedDict()
-            for column, series in df.iteritems():
-                if verbose >= 1:
-                   wiprint("calculating probability distribution of "
-                    "{0} using a kernel density estimate".format(column))
-                kde = KernelDensity(bandwidth=bandwidth[column], **kde_kw)
-                kde.fit(series[:, np.newaxis])
-                pdf = np.exp(kde.score_samples(grid[column][:, np.newaxis]))
-                pdf /= pdf.sum()
-                series_pdist = pd.DataFrame(pdf, index=grid[column],
-                  columns=["probability"])
-                series_pdist.index.name = column
-                pdist[column] = series_pdist
-
-            return pdist
-
-    def timeseries_to_sequence(self, **kwargs):
+    @staticmethod
+    def calc_mean(df, **kwargs):
         """
         Calculates the mean and standard error over a timeseries.
 
         Arguments:
-          {timeseries_}d{ata}f{rame} (DataFrame): Timeseries over which
-            to calculate mean and standard error; if omitted looks for
-            :attr:`timeseries_df`
-          block_kw (dict): Keyword arguments passed to
-            :class:`fpblockaverager.FPBlockAverager`
-          block_kw[all_factors] (bool): Use all factors by which the
-          dataset is divisible rather than only factors of two
-          block_kw[min_n_blocks] (int): Minimum number of blocks after
+          df (DataFrame): Timeseries DataFrame over which to calculate mean and
+            standard error of each column over rows
+          all_factors (bool): Use all factors by which the
+            dataset is divisible rather than only factors of two
+          min_n_blocks (int): Minimum number of blocks after
             transformation
-          block_kw[max_cut] (float): Maximum proportion of dataset of
+          max_cut (float): Maximum proportion of dataset of
             omit in transformation
-          block_kw[fit_exp] (bool): Fit exponential curve
-          block_kw[fit_sig] (bool): Fit sigmoid curve
+          fit_exp (bool): Fit exponential curve
+          fit_sig (bool): Fit sigmoid curve
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
 
         Returns:
-          DataFrame: Sequence dataframe including mean and standard
-          error for each column in *timeseries_df*
-
-        .. todo:
-          - Make general, not specific to sequence data
+          DataFrame: DataFrame including mean and standard error for each
+          column in *timeseries_df*
         """
         from ..fpblockaverager.FPBlockAverager import FPBlockAverager
-        from ..myplotspec import multi_get
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
-        timeseries_df = multi_get(["timeseries_dataframe", "timeseries_df",
-              "dataframe", "df"], kwargs)
-        if timeseries_df is None:
-            if hasattr(self, "timeseries_df"):
-                timeseries_df = self.timeseries_df
-            else:
-                raise Exception("Cannot find timeseries DataFrame")
         if verbose >= 1:
             wiprint("""Calculating mean and standard error over timeseries""")
 
-        sequence_df = pd.DataFrame(data=timeseries_df.mean(axis=0))
+        mean_df = pd.DataFrame(data=df.mean(axis=0))
 
-        block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=True,
-                        fit_exp=True, fit_sig=False)
-        block_kw.update(kwargs.get("block_kw", {}))
-        block_averager = FPBlockAverager(timeseries_df, **block_kw)
-        errors       = block_averager.parameters.loc[("exp", "a (se)")]
-        errors.index = pd.MultiIndex.from_tuples(map(eval, errors.index.values))
-        errors.index = errors.index.set_levels([c+" se" for c in
-                        errors.index.levels[1].values], level=1)
+        block_averager = None
+#        block_averager = FPBlockAverager(df, **kwargs)
+#        errors       = block_averager.parameters.loc[("exp", "a (se)")]
+#        errors.index = pd.MultiIndex.from_tuples(map(eval, errors.index.values))
+#        errors.index = errors.index.set_levels([c+" se" for c in
+#                        errors.index.levels[1].values], level=1)
 
-        a = sequence_df.squeeze().unstack()
-        b = errors.unstack()
-        c = a.join(b)
-        c = c[["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
-        self.sequence_df = c
-        c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
-        sequence_df = c
+#        a = mean_df.squeeze().unstack()
+#        b = errors.unstack()
+#        c = a.join(b)
+#        c = c[["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
+#        c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
+#        mean_df = c
 
-        self.block_averager = block_averager
-        return sequence_df
-
-
-class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
-    """
-    Represents paramagnetic relaxation enhancement data as a function of time
-    and residue number.
-    """
-
-    @staticmethod
-    def construct_argparser(parser_or_subparsers=None, **kwargs):
-        """
-        Adds arguments to an existing argument parser, constructs a
-        subparser, or constructs a new parser
-
-        Arguments:
-          parser_or_subparsers (ArgumentParser, _SubParsersAction,
-            optional): If ArgumentParser, existing parser to which
-            arguments will be added; if _SubParsersAction, collection of
-            subparsers to which a new argument parser will be added; if
-            None, a new argument parser will be generated
-          kwargs (dict): Additional keyword arguments
-
-        Returns:
-          ArgumentParser: Argument parser or subparser
-        """
-        import argparse
-
-        # Process arguments
-        help_message = """Process NMR paramagnetic relaxation enhancement
-                       data"""
-        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
-            parser = parser_or_subparsers
-        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "pre",
-              description = help_message,
-              help        = help_message)
-        elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
-
-        # Defaults
-        if parser.get_default("cls") is None:
-            parser.set_defaults(cls=PRETimeSeriesDataset)
-
-        # Arguments unique to this class
-
-        # Arguments inherited from superclass
-        TimeSeriesDataset.construct_argparser(parser)
-
-        return parser
-
-    def __init__(self, dt=None, toffset=None, downsample=None,
-        calc_pdist=False, outfile=None, interactive=False, **kwargs):
-        """
-        Arguments:
-          infile{s} (list): Path(s) to input file(s); may contain
-            environment variables and wildcards
-          dt (float): Time interval between points; units unspecified
-          toffset (float): Time offset to be added to all points (i.e.
-            time of first point)
-          downsample (int): Interval by which to downsample points
-          downsample_mode (str): Method of downsampling; may be 'mean'
-            or 'mode'
-          calc_pdist (bool): Calculate probability distribution
-          pdist_key (str): Column of which to calculate probability
-            distribution
-          kde_kw (dict): Keyword arguments passed to
-            sklearn.neighbors.KernelDensity; key argument is 'bandwidth'
-          grid (ndarray): Grid on which to calculate probability
-            distribution
-          interactive (bool): Provide iPython prompt and reading and
-            processing data
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-
-        # Load
-        self.timeseries_df = self.read(**kwargs)
-
-        # Convert from frame index to time
-        if dt:
-            self.timeseries_df.set_index(self.timeseries_df.index.values *
-              float(dt), inplace=True)
-            self.timeseries_df.index.name = "time"
-
-        # Offset time
-        if toffset:
-            index_name = self.timeseries_df.index.name
-            self.timeseries_df.set_index(self.timeseries_df.index.values +
-              float(toffset), inplace=True)
-            self.timeseries_df.index.name = index_name
-
-        # Downsample
-        if downsample:
-            self.timeseries_df = self.downsample(downsample, **kwargs)
-
-        # Calculate probability distibution
-        if calc_pdist:
-            self.pdist_df = self.calc_pdist(**kwargs)
-
-        # Output to screen
-        if verbose >= 2:
-            print("Processed timeseries DataFrame:")
-            print(self.timeseries_df)
-            if calc_pdist:
-                print("Processed pdist DataFrame:")
-                print(self.pdist_df)
-
-        # Write data
-        if outfile is not None:
-            self.write(df=self.timeseries_df, outfile=outfile, **kwargs)
-
-        # Interactive prompt
-        if interactive:
-            embed()
+        return mean_df, block_averager
 
 
 class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
@@ -587,20 +352,6 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
             parser.set_defaults(cls=IREDTimeSeriesDataset)
 
         # Arguments unique to this class
-        arg_groups = {ag.title: ag for ag in parser._action_groups}
-
-        # Action arguments
-        action_group = arg_groups.get("action",
-          parser.add_argument_group("action"))
-        try:
-            action_group.add_argument(
-              "--mean",
-              action   = "store_true",
-              dest     = "calc_mean",
-              help     = """Calculate mean and standard error over timeseries
-                         """)
-        except argparse.ArgumentError:
-            pass
 
         # Arguments inherited from superclass
         IREDDataset.construct_argparser(parser)
@@ -615,13 +366,15 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
         Concatenates a series of iRED datasets.
 
         Arguments:
+          timeseries_dfs (list): DataFrames containing data from
+            timeseries infiles
           relax_dfs (list): DataFrames containing data from relax infiles
           order_dfs (list): DataFrames containing data from order infiles
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
 
         Returns:
-          df (DataFrame): Averaged DataFrame including relax and order
+          DataFrame: Concatenated DataFrame including relax and order
         """
 
         # Process arguments
@@ -668,75 +421,6 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
             df = relax_df
 
         return df
-
-    def __init__(self, dt=None, toffset=None, downsample=None,
-        calc_pdist=False, calc_mean=False, outfile=None, interactive=False,
-        **kwargs):
-        """
-        Arguments:
-          infile{s} (list): Path(s) to input file(s); may contain
-            environment variables and wildcards
-          dt (float): Time interval between points; units unspecified
-          toffset (float): Time offset to be added to all points (i.e.
-            time of first point)
-          downsample (int): Interval by which to downsample points
-          downsample_mode (str): Method of downsampling; may be 'mean'
-            or 'mode'
-          calc_pdist (bool): Calculate probability distribution
-          interactive (bool): Provide iPython prompt and reading and
-            processing data
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        # Process arguments
-        verbose = kwargs.get("verbose", 1)
-        self.dataset_cache = kwargs.get("dataset_cache", None)
-
-        # Load
-        self.timeseries_df = self.read(**kwargs)
-
-        # Convert from frame index to time
-        if dt:
-            self.timeseries_df.set_index(self.timeseries_df.index.values *
-              float(dt), inplace=True)
-            self.timeseries_df.index.name = "time"
-
-        # Offset time
-        if toffset:
-            index_name = self.timeseries_df.index.name
-            self.timeseries_df.set_index(self.timeseries_df.index.values +
-              float(toffset), inplace=True)
-            self.timeseries_df.index.name = index_name
-
-        # Downsample
-        if downsample:
-            self.timeseries_df = self.downsample(downsample, **kwargs)
-
-        # Calculate probability distibution
-        if calc_pdist:
-            self.pdist_df = self.calc_pdist(**kwargs)
-
-        # Output to screen
-        if verbose >= 2:
-            print("Processed timeseries DataFrame:")
-            print(self.timeseries_df)
-
-        # Prepare sequence dataframe using averages and block standard errors
-        if calc_mean:
-            self.sequence_df = self.timeseries_to_sequence(
-                                 df=self.timeseries_df, **kwargs)
-            # Output to screen
-            if verbose >= 2:
-                print("Processed sequence DataFrame:")
-                print(self.sequence_df)
-
-        # Write data
-        if outfile is not None:
-            self.write(df=self.timeseries_df, outfile=outfile, **kwargs)
-
-        # Interactive prompt
-        if interactive:
-            embed()
 
     def read(self, **kwargs):
         """
@@ -863,6 +547,58 @@ class NatConTimeSeriesDataset(TimeSeriesDataset):
             self.pdist_y = pdist_y
 
         self.timeseries = dataframe
+
+
+class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
+    """
+    Represents paramagnetic relaxation enhancement data as a function of time
+    and residue number.
+    """
+
+    @staticmethod
+    def construct_argparser(parser_or_subparsers=None, **kwargs):
+        """
+        Adds arguments to an existing argument parser, constructs a
+        subparser, or constructs a new parser
+
+        Arguments:
+          parser_or_subparsers (ArgumentParser, _SubParsersAction,
+            optional): If ArgumentParser, existing parser to which
+            arguments will be added; if _SubParsersAction, collection of
+            subparsers to which a new argument parser will be added; if
+            None, a new argument parser will be generated
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          ArgumentParser: Argument parser or subparser
+        """
+        import argparse
+
+        # Process arguments
+        help_message = """Process NMR paramagnetic relaxation enhancement
+                       data"""
+        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
+            parser = parser_or_subparsers
+        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
+            parser = parser_or_subparsers.add_parser(
+              name        = "pre",
+              description = help_message,
+              help        = help_message)
+        elif parser is None:
+            parser = argparse.ArgumentParser(
+              description = help_message)
+
+        # Defaults
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=PRETimeSeriesDataset)
+
+        # Arguments unique to this class
+
+        # Arguments inherited from superclass
+        TimeSeriesDataset.construct_argparser(parser)
+
+        return parser
+
 
 class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
     """
