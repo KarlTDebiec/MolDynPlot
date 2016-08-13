@@ -767,7 +767,7 @@ class RelaxDataset(SequenceDataset):
 
         # Defaults
         if parser.get_default("cls") is None:
-            parser.set_defaults(cls=RelaxSequenceDataset)
+            parser.set_defaults(cls=RelaxDataset)
 
         # Arguments unique to this class
 
@@ -867,7 +867,7 @@ class RelaxDataset(SequenceDataset):
                           row["code"],row["index"],row["noe"],row["noe se"]))
 
 
-class IREDDataset(RelaxSequenceDataset):
+class IREDDataset(RelaxDataset):
     """
     Represents iRED NMR relaxation data as a function of residue number.
     """
@@ -934,7 +934,7 @@ class IREDDataset(RelaxSequenceDataset):
             pass
 
         # Arguments inherited from superclass
-        RelaxSequenceDataset.construct_argparser(parser)
+        RelaxDataset.construct_argparser(parser)
 
         return parser
 

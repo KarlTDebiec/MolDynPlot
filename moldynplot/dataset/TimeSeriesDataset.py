@@ -23,6 +23,8 @@ import numpy as np
 import pandas as pd
 from .myplotspec.Dataset import Dataset
 from .myplotspec import sformat, wiprint
+from .dataset.SequenceDataset import RelaxDataset, IREDDataset
+from .dataset.SAXSDataset import SAXSDataset
 ################################### CLASSES ###################################
 class TimeSeriesDataset(Dataset):
     """

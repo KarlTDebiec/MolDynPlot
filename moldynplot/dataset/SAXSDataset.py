@@ -121,7 +121,7 @@ class SAXSDataset(Dataset):
 
 class SAXSExperimentDataset(SAXSDataset):
     """
-    Manages Small Angle X-ray Scattering experimental datasets.
+    Represents Small Angle X-ray Scattering experimental data.
     """
 
     def __init__(self, scale=False, **kwargs):
@@ -145,7 +145,7 @@ class SAXSExperimentDataset(SAXSDataset):
 
 class SAXSDiffDataset(SAXSDataset):
     """
-    Manages Small Angle X-ray Scattering difference datasets.
+    Represents Small Angle X-ray Scattering difference data.
     """
 
 #    @classmethod

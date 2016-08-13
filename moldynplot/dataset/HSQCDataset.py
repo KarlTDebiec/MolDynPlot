@@ -25,7 +25,7 @@ from .myplotspec import sformat, wiprint
 ################################### CLASSES ###################################
 class HSQCDataset(Dataset):
     """
-    Represents NMR HSQC data.
+    Represents two-dimensional NMR data.
 
     Attributes:
       hsqc_df (DataFrame): DataFrame whose two-dimensional index
