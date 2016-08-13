@@ -12,8 +12,8 @@
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
 if __name__ == "__main__":
-    __package__ = str("moldynplot")
-    import moldynplot
+    __package__ = str("moldynplot.dataset")
+    import moldynplot.dataset
 import h5py
 import numpy as np
 from ..myplotspec.Dataset import Dataset
