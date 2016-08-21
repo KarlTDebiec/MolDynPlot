@@ -162,7 +162,6 @@ class TimeSeriesDataset(Dataset):
 
         # Read data
         self.timeseries_df = self.read(**kwargs)
-        print(self.timeseries_df.index.name)
 
         # Process data
         if dt:
@@ -177,7 +176,6 @@ class TimeSeriesDataset(Dataset):
         if downsample:
             self.timeseries_df = self.downsample(df=self.timeseries_df, 
               downsample=downsample, **kwargs)
-        print(self.timeseries_df.index.name)
 
         # Output data
         if verbose >= 2:
@@ -194,11 +192,11 @@ class TimeSeriesDataset(Dataset):
             if verbose >= 2:
                 print("Processed pdist DataFrame:")
                 print(self.pdist_df)
-            # WRITE
+            # WRITE IF STRING
 
         # Calculate mean and standard error
         if calc_mean:
-            block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=True,
+            block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
                             fit_exp=True, fit_sig=False)
             block_kw.update(kwargs.get("block_kw", {}))
             self.mean_df, self.block_averager = self.calc_mean(
@@ -206,7 +204,7 @@ class TimeSeriesDataset(Dataset):
             if verbose >= 2:
                 print("Processed mean DataFrame:")
                 print(self.mean_df)
-            # WRITE
+            # WRITE IF STRING
 
         # Interactive prompt
         if interactive:
@@ -286,21 +284,58 @@ class TimeSeriesDataset(Dataset):
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
+        fit_exp = kwargs.get("fit_exp", True)
+        fit_sig = kwargs.get("fit_sig", True)
         if verbose >= 1:
             wiprint("""Calculating mean and standard error over timeseries""")
 
-        mean_df = pd.DataFrame(data=df.mean(axis=0))
+        # Single-level columns
+        if df.columns.nlevels == 1:
+            mean_df = pd.DataFrame(data=df.mean(axis=0))[0]
+            block_averager = FPBlockAverager(df, **kwargs)
+            if fit_exp and not fit_sig:
+                errors = block_averager.parameters.loc[("exp", "a (se)")]
+            elif fit_sig and not fit_exp:
+                errors = block_averager.parameters.loc[("sig", "b (se)")]
+            elif fit_exp and fit_sig:
+                errors = block_averager.parameters.loc[("exp", "a (se)")]
+            else:
+                raise Exception()
+            errors.index = errors.index.values+" se"
+            mean_df = pd.concat([mean_df, errors])
+            mean_df = mean_df[np.array([[c, c+" se"] for c in
+            df.columns.values]).flatten()]
+            print("####################################")
+            print(mean_df)
+            print(df.columns.values)
+        # Double-level columns
+        elif df.columns.nlevels == 2:
+            mean_df = pd.DataFrame(data=df.mean(axis=0))
+            block_averager = FPBlockAverager(df, **kwargs)
+            if fit_exp and not fit_sig:
+                errors = block_averager.parameters.loc[("exp", "a (se)")]
+            elif fit_sig and not fit_exp:
+                errors = block_averager.parameters.loc[("sig", "b (se)")]
+            elif fit_exp and fit_sig:
+                errors = block_averager.parameters.loc[("exp", "a (se)")]
+            else:
+                raise Exception()
+            errors.index = pd.MultiIndex.from_tuples(map(eval,
+                             errors.index.values))
+            errors.index = errors.index.set_levels([c+" se" for c in
+                             errors.index.levels[1].values], level=1)
+            mean_df = mean_df.squeeze().unstack().join(errors.unstack)
+            print("####################################")
+            a = mean_df.squeeze().unstack()
+            print(a)
+            b = errors.unstack()
+            print(b)
+            c = a.join(b)
+            print(c)
+        # Additional levels not tested
+        else:
+            raise Exception()
 
-        block_averager = None
-#        block_averager = FPBlockAverager(df, **kwargs)
-#        errors       = block_averager.parameters.loc[("exp", "a (se)")]
-#        errors.index = pd.MultiIndex.from_tuples(map(eval, errors.index.values))
-#        errors.index = errors.index.set_levels([c+" se" for c in
-#                        errors.index.levels[1].values], level=1)
-
-#        a = mean_df.squeeze().unstack()
-#        b = errors.unstack()
-#        c = a.join(b)
 #        c = c[["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
 #        c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
 #        mean_df = c
@@ -380,14 +415,14 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
         # Process arguments
         verbose = kwargs.get("verbose", 1)
 
-        # Process timeseris
+        # Process timeseries
         if len(timeseries_dfs) >= 1:
             if verbose >= 1:
                 wiprint("""Concatenating timeseries from {0} timeseries
                         infiles""".format(len(timeseries_dfs)))
-            df = pd.concat(timeseries_dfs)
+            timeseries_df = pd.concat(timeseries_dfs)
         else:
-            df = pd.DataFrame()
+            timeseries_df = None
 
         # Process relaxation
         if len(relax_dfs) >= 1:
@@ -409,7 +444,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
         else:
             order_df = None
 
-        # Merge and sort
+        # Merge and sort relaxation and order parameters
         if relax_df is not None and order_df is not None:
             df = pd.merge(relax_df, order_df, how="outer", left_index=True,
                            right_index=True)
@@ -419,6 +454,14 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
             df = order_df
         elif order_df is None and relax_df is not None:
             df = relax_df
+        else:
+            df = None
+
+        # Append to existing timeseries_df
+        if timeseries_df is not None and df is not None:
+            df = pd.concat([timeseries_df, df])
+        elif df is None:
+            df = timeseries_df
 
         return df
 
@@ -467,7 +510,6 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
 
         # Concatenate into timeseries
         df = self.concatenate_timeseries(timeseries_dfs, relax_dfs, order_dfs)
-        df.index.name = "frame"
         return df
 
 
