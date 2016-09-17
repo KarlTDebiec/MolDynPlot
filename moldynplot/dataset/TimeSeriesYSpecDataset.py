@@ -47,28 +47,32 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         if parser.get_default("class_") is None:
             parser.set_defaults(class_=class_)
         arg_groups = {ag.title: ag for ag in parser._action_groups}
-
-        # Action arguments
+        input_group = arg_groups.get("input",
+          parser.add_argument_group("input"))
         action_group = arg_groups.get("action",
           parser.add_argument_group("action"))
-        class_.add_argument(action_group, 
+        output_group = arg_groups.get("output",
+          parser.add_argument_group("output"))
+
+        # Action arguments
+        class_.add_argument(action_group,
           "-dt",
           type     = float,
           help     = "time between frames")
-        class_.add_argument(action_group, 
+        class_.add_argument(action_group,
           "-toffset",
           type     = float,
           help     = "offset to add to index (time or frame number)")
-        class_.add_argument(action_group, 
+        class_.add_argument(action_group,
           "-downsample",
           type     = int,
           help     = "factor by which to downsample data")
-        class_.add_argument(action_group, 
+        class_.add_argument(action_group,
           "--pdist",
           action   = "store_true",
           dest     = "calc_pdist",
           help     = "calculate probability distribution over timeseries")
-        class_.add_argument(action_group, 
+        class_.add_argument(action_group,
           "--mean",
           action   = "store_true",
           dest     = "calc_mean",
@@ -127,7 +131,7 @@ class TimeSeriesYSpecDataset(YSpecDataset):
 #              float(toffset), inplace=True)
 #            self.timeseries_df.index.name = index_name
 #        if downsample:
-#            self.timeseries_df = self.downsample(df=self.timeseries_df, 
+#            self.timeseries_df = self.downsample(df=self.timeseries_df,
 #              downsample=downsample, **kwargs)
 #
 #        # Output data
