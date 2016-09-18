@@ -1,0 +1,20 @@
+presets: [manuscript, pdist, rmsd]
+figures:
+    0:
+        subplots:
+            all:
+                xbound: [0,7.3]
+                datasets:
+                    all:
+                        draw_mean: True
+                    0:
+                        color: blue
+            0:
+                title: "CVNH Domain"
+    1:
+        subplots:
+            8:
+                presets: letter
+            all:
+                datasets:
+                    10:

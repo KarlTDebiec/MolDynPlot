@@ -15,8 +15,8 @@ Future Tasks
 - [ ] NatConTimeSeriesDataset: Re-implement
 - [ ] SAXSTimeSeriesDataset: Re-implement
 
-Potenial Future Tasks
----------------------
+Potential Future Tasks
+----------------------
 
 Completed Tasks
 ---------------

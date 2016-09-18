@@ -8,7 +8,7 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Processes data that is a function of time
+Processes and represents data that is a function of time
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
@@ -84,38 +84,39 @@ class TimeSeriesYSpecDataset(YSpecDataset):
 
         return parser
 
-#    def __init__(self, dt=None, toffset=None, downsample=None,
-#        calc_pdist=False, calc_mean=False, outfile=None, interactive=False,
-#        **kwargs):
-#        """
-#        Arguments:
-#          infile{s} (list): Path(s) to input file(s); may contain
-#            environment variables and wildcards
-#          dt (float): Time interval between points; units unspecified
-#          toffset (float): Time offset to be added to all points (i.e.
-#            time of first point)
-#          downsample (int): Interval by which to downsample points
-#          downsample_mode (str): Method of downsampling; may be 'mean'
-#            or 'mode'
-#          calc_pdist (bool): Calculate probability distribution using
-#            :method:`calc_pdist`; store in instance variable `pdist_df`
-#          pdist_kw (dict): Keyword arguments used to configure
-#            probability distribution calculation
-#          calc_mean (bool): Calculate mean and standard error using
-#            :method:`calc_mean`; store in instance variable `sequence_df`
-#          interactive (bool): Provide iPython prompt and reading and
-#            processing data
-#          verbose (int): Level of verbose output
-#          kwargs (dict): Additional keyword arguments
-#
-#          .. todo:
-#            - Calculate pdist using histogram
-#            - Verbose pdist
-#        """
-#
-#        # Process arguments
-#        verbose = kwargs.get("verbose", 1)
-#        self.dataset_cache = kwargs.get("dataset_cache", None)
+    def __init__(self, dt=None, toffset=None, downsample=None,
+        calc_pdist=False, calc_mean=False, outfile=None, interactive=False,
+        **kwargs):
+        """
+        Arguments:
+          infile{s} (list): Path(s) to input file(s); may contain
+            environment variables and wildcards
+          dt (float): Time interval between points; units unspecified
+          toffset (float): Time offset to be added to all points (i.e.
+            time of first point)
+          downsample (int): Interval by which to downsample points
+          downsample_mode (str): Method of downsampling; may be 'mean'
+            or 'mode'
+          calc_pdist (bool): Calculate probability distribution using
+            :method:`calc_pdist`; store in instance variable `pdist_df`
+          pdist_kw (dict): Keyword arguments used to configure
+            probability distribution calculation
+          calc_mean (bool): Calculate mean and standard error using
+            :method:`calc_mean`; store in instance variable `sequence_df`
+          interactive (bool): Provide iPython prompt and reading and
+            processing data
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+          .. todo:
+            - Calculate pdist using histogram
+            - Verbose pdist
+        """
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        self.dataset_cache = kwargs.get("dataset_cache", None)
+        print(dt)
 #
 #        # Read data
 #        self.timeseries_df = self.read(**kwargs)
