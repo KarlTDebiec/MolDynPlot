@@ -21,3 +21,26 @@ Potential Future Tasks
 Completed Tasks
 ---------------
 
+Dataset Progress
+================
+
+======================= =============== =========== =====
+Class                   cpptraj2hdf5    dataset     yspec
+======================= =============== =========== =====
+ChemicalShiftDataset    ✓               -           -
+CorrDataset             N/A             -           -
+HSQCDataset             ✓               -           -
+IREDDataset             ✓               -           -
+IREDTimeSeriesDataset   ✓               -           -
+MDGXDataset             ✓               -           - 
+NatConTimeSeriesDataset ✓               -           -
+PRETimeSeriesDataset    ✓               -           -
+RelaxDataset            ✓               -           -
+SAXSDataset             ✓               -           -
+SAXSExpDataset          ✓               -           -
+SAXSDiffDataset         ✓               -           -
+SAXSTimeSeriesDataset   ✓               -           -
+SequenceDataset         ✓               -           -
+TimeSeriesDataset       ✓               -           -
+======================= =============== =========== =====
+
