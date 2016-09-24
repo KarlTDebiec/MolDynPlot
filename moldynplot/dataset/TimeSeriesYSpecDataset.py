@@ -29,6 +29,7 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         time as represented by frame number or chemical time and whose
         columns are a series of quantities as a function of time.
     """
+    help_groups = ["spec"]
 
     @classmethod
     def construct_argparser(class_, **kwargs):
@@ -43,9 +44,10 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         """
 
         # Process arguments
-        parser = class_.get_parser(**kwargs)
+        parser = class_.get_argparser(grouped_help=True, **kwargs)
         if parser.get_default("class_") is None:
             parser.set_defaults(class_=class_)
+        help_groups = kwargs.get("help_groups")
         arg_groups = {ag.title: ag for ag in parser._action_groups}
         input_group = arg_groups.get("input",
           parser.add_argument_group("input"))
@@ -53,6 +55,15 @@ class TimeSeriesYSpecDataset(YSpecDataset):
           parser.add_argument_group("action"))
         output_group = arg_groups.get("output",
           parser.add_argument_group("output"))
+
+        # Input arguments
+        class_.add_argument(input_group,
+          "-spec",
+          dest     = "source_spec",
+          metavar  = "SPEC",
+          type     = str,
+          help     = """file from which to load specification; see '--help
+                     spec' for more information""")
 
         # Action arguments
         class_.add_argument(action_group,
