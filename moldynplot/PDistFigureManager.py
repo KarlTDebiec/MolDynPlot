@@ -9,7 +9,7 @@
 #   BSD license. See the LICENSE file for details.
 """
 Generates one or more probability distribution figures to specifications
-in a YAML file.
+in a YAML file. 
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
@@ -136,8 +136,7 @@ class PDistFigureManager(FigureManager):
         draw_dataset:
           dataset_kw:
             pdist_kw:
-              bandwidth:
-                r1: 0.02
+              bandwidth: 0.02
           column: r1
       r2:
         class: content
@@ -148,8 +147,7 @@ class PDistFigureManager(FigureManager):
         draw_dataset:
           dataset_kw:
             pdist_kw:
-              bandwidth:
-                r2: 0.3
+              bandwidth: 0.3
           column: r2
       r2/r1:
         class: content
@@ -161,7 +159,7 @@ class PDistFigureManager(FigureManager):
           dataset_kw:
             pdist_kw:
               bandwidth:
-                "r2/r2": 0.3
+                r2/r1: 0.1
           column: r2/r1
       hetnoe:
         class: content
@@ -173,8 +171,7 @@ class PDistFigureManager(FigureManager):
           column: noe
           dataset_kw:
             pdist_kw:
-              bandwidth:
-                noe: 0.03
+              bandwidth: 0.03
       rotdif:
         class: content
         help: Format subplot for rotational diffusion
@@ -185,8 +182,7 @@ class PDistFigureManager(FigureManager):
           column: rotdif
           dataset_kw:
             pdist_kw:
-              bandwidth:
-                rotdif: 0.2
+              bandwidth: 0.2
       relaxation_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -233,6 +229,26 @@ class PDistFigureManager(FigureManager):
               preset: r2/r1
               ylabel: null
             1:
+              preset: rotdif
+              ylabel: null
+      rotdif_4:
+        class: content
+        help: Two stacked plots including R2/R1 rotdif
+        draw_figure:
+          nrows: 2
+          ncols: 2
+          shared_ylabel: "Probability Distribution"
+          subplots:
+            0:
+              preset: r2/r1
+              ylabel: null
+            1:
+              preset: r2/r1
+              ylabel: null
+            2:
+              preset: rotdif
+              ylabel: null
+            3:
               preset: rotdif
               ylabel: null
       manuscript:

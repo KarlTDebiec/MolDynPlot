@@ -677,7 +677,12 @@ class RelaxDataset(SequenceDataset):
 
         # Calculate probability distribution
         if calc_pdist:
-            self.pdist_df = self.calc_pdist(df=self.sequence_df, **kwargs)
+            pdist_kw = kwargs.get("pdist_kw", {})
+            self.pdist_df = self.calc_pdist(df=self.sequence_df,
+              verbose=verbose, **pdist_kw)
+            if verbose >= 2:
+                print("Processed pdist DataFrame:")
+                print(self.pdist_df)
 
         # Output data
         if verbose >= 2:
