@@ -324,21 +324,13 @@ class TimeSeriesDataset(Dataset):
                              errors.index.values))
             errors.index = errors.index.set_levels([c+" se" for c in
                              errors.index.levels[1].values], level=1)
-            mean_df = mean_df.squeeze().unstack().join(errors.unstack)
-            print("####################################")
-            a = mean_df.squeeze().unstack()
-            print(a)
-            b = errors.unstack()
-            print(b)
-            c = a.join(b)
-            print(c)
-        # Additional levels not tested
+            mean_df = mean_df.squeeze().unstack().join(errors.unstack())
+            mean_df = mean_df[["r1", "r1 se", "r2", "r2 se",
+                               "noe", "noe se", "s2", "s2 se"]]
+            mean_df = mean_df.loc[sorted(mean_df.index.values,
+              key=lambda x: int(x.split(":")[1]))]
         else:
-            raise Exception()
-
-#        c = c[["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
-#        c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
-#        mean_df = c
+            raise Exception("Additional MultiIndex Levels not tested")
 
         return mean_df, block_averager
 
