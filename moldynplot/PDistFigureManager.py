@@ -177,7 +177,7 @@ class PDistFigureManager(FigureManager):
         help: Format subplot for rotational diffusion
         draw_subplot:
           xlabel: "$τ_c$ (ns)"
-          xticks: [4,5,6,7,8,9,10,11,12,13,14,15]
+          xticks: [5,6,7,8,9,10,11,12,13,14]
         draw_dataset:
           column: rotdif
           dataset_kw:
