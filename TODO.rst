@@ -13,6 +13,7 @@ Future Tasks
 ------------
 - [ ] Update documentation
 - [ ] Dataset: Fix separation and ordering of argument groups
+- [ ] SAXSTimeSeriesDataset: Move parsing from cpptraj2hd5
 - [ ] TimeSeriesDataset: Incorporate faster text parsing from cpptraj2hdf5.py
 - [ ] TimeSeriesDataset: General case block error
 - [ ] NatConTimeSeriesDataset: Re-implement
