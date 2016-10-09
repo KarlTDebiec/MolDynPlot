@@ -113,7 +113,6 @@ class SAXSDataset(Dataset):
 
         if verbose >= 1:
             wiprint("scaling by factor of {0}".format(scale))
-            print(self.df)
         self.df["intensity"] *= scale
         if "intensity se" in self.df.columns.values:
             self.df["intensity se"] *= scale

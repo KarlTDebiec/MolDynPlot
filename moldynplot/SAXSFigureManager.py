@@ -284,7 +284,7 @@ class SAXSFigureManager(FigureManager):
         if draw_fill_between:
             fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
             get_colors(fill_between_kw, plot_kw)
-            x = df.index.values
+            x = np.array(df.index.values, np.float)
             if logx:
                 x = np.log10(x)
             y = df["intensity"]
@@ -309,7 +309,7 @@ class SAXSFigureManager(FigureManager):
                 y = np.log10(y)
             elif kratky:
                 y = y*x*x
-            plot = subplot.plot(x, y, **plot_kw)[0]
+            subplot.plot(x, y, **plot_kw)[0]
 
         if draw_handle:
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
