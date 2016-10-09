@@ -103,7 +103,7 @@ class SAXSFigureManager(FigureManager):
               engine: python
               skiprows: 2
               skipfooter: 5
-              names: [q, intensity, intensity_se]
+              names: [q, intensity, intensity se]
               sep: " "
               skipinitialspace: True
               index_col: 0
@@ -274,7 +274,7 @@ class SAXSFigureManager(FigureManager):
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
-        dataframe = dataset.dataframe
+        df = dataset.df
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -284,11 +284,11 @@ class SAXSFigureManager(FigureManager):
         if draw_fill_between:
             fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
             get_colors(fill_between_kw, plot_kw)
-            x = dataframe.index.values
+            x = df.index.values
             if logx:
                 x = np.log10(x)
-            y = dataframe["intensity"]
-            y_se = dataframe["intensity_se"]
+            y = df["intensity"]
+            y_se = df["intensity se"]
             if logy:
                 y_se = (y_se / (y * np.log(10)))
                 y    = np.log10(y)
@@ -301,10 +301,10 @@ class SAXSFigureManager(FigureManager):
 
         # Plot series
         if draw_plot:
-            x = dataframe.index.values
+            x = df.index.values
             if logx:
                 x = np.log10(x)
-            y = dataframe["intensity"]
+            y = df["intensity"]
             if logy:
                 y = np.log10(y)
             elif kratky:

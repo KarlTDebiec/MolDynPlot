@@ -53,6 +53,7 @@ class SAXSDataset(Dataset):
         from scipy.optimize import curve_fit
         import six
 
+        # Processs arguments
         verbose = kwargs.get("verbose", 1)
 
         # Scale by constant
@@ -70,17 +71,17 @@ class SAXSDataset(Dataset):
             # Prepare target
             target = self.load_dataset(infile=expandvars(scale),
                        loose=True).dataframe
-            if "intensity_se" in target.columns.values:
+            if "intensity se" in target.columns.values:
                 scale_se = True
             else:
                 scale_se = False
             target_q = np.array(target.index.values, np.float64)
             target_I = np.array(target["intensity"], np.float64)
             if scale_se:
-                target_Ise = np.array(target["intensity_se"], np.float64)
+                target_Ise = np.array(target["intensity se"], np.float64)
 
             # Prepare own values over x range of target
-            template = self.dataframe
+            template = self.df
             template_q  = np.array(template.index.values, np.float64)
             template_I  = np.array(template["intensity"].values, np.float64)
             indexes = np.logical_and(template_q > target_q.min(),
@@ -112,9 +113,10 @@ class SAXSDataset(Dataset):
 
         if verbose >= 1:
             wiprint("scaling by factor of {0}".format(scale))
-        self.dataframe["intensity"] *= scale
-        if "intensity_se" in self.dataframe.columns.values:
-            self.dataframe["intensity_se"] *= scale
+            print(self.df)
+        self.df["intensity"] *= scale
+        if "intensity se" in self.df.columns.values:
+            self.df["intensity se"] *= scale
 
         return scale
 
@@ -132,11 +134,11 @@ class SAXSExperimentDataset(SAXSDataset):
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
         """
-        from os.path import expandvars
 
         # Load
         super(SAXSExperimentDataset, self).__init__(**kwargs)
-        dataframe = self.dataframe
+        self.df = self.dataframe
+        del self.dataframe
 
         # Scale
         if scale:
@@ -187,13 +189,13 @@ class SAXSDiffDataset(SAXSDataset):
         minuend    = self.load_dataset(loose=True, **minuend_kw)
         subtrahend = self.load_dataset(loose=True, **subtrahend_kw)
         m_I    = minuend.dataframe["intensity"]
-        m_I_se = minuend.dataframe["intensity_se"]
+        m_I_se = minuend.dataframe["intensity se"]
         s_I    = subtrahend.dataframe["intensity"]
-        s_I_se = subtrahend.dataframe["intensity_se"]
+        s_I_se = subtrahend.dataframe["intensity se"]
         diff_I    = (m_I - s_I)
         diff_I_se = np.sqrt(m_I_se**2 +s_I_se**2)
         diff_I.name = "intensity"
-        diff_I_se.name = "intensity_se"
+        diff_I_se.name = "intensity se"
         self.dataframe = pd.concat([diff_I, diff_I_se], axis=1)
 
 #################################### MAIN #####################################

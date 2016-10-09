@@ -291,7 +291,7 @@ class TimeSeriesDataset(Dataset):
 
         # Single-level columns
         if df.columns.nlevels == 1:
-            mean_df = pd.DataFrame(data=df.mean(axis=0))[0]
+            mean_df = pd.DataFrame(data=df.mean(axis=0))
             block_averager = FPBlockAverager(df, **kwargs)
             if fit_exp and not fit_sig:
                 errors = block_averager.parameters.loc[("exp", "a (se)")]
@@ -301,13 +301,9 @@ class TimeSeriesDataset(Dataset):
                 errors = block_averager.parameters.loc[("exp", "a (se)")]
             else:
                 raise Exception()
-            errors.index = errors.index.values+" se"
-            mean_df = pd.concat([mean_df, errors])
-            mean_df = mean_df[np.array([[c, c+" se"] for c in
-            df.columns.values]).flatten()]
-            print("####################################")
-            print(mean_df)
-            print(df.columns.values)
+            mean_df = mean_df.join(errors)
+            mean_df.index.name = "q"
+            mean_df.columns = ["intensity", "intensity se"]
         # Double-level columns
         elif df.columns.nlevels == 2:
             mean_df = pd.DataFrame(data=df.mean(axis=0))
@@ -639,9 +635,9 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
     Manages Small Angle X-ray Scattering time series datasets.
     """
 
-    def __init__(self, infile, address="saxs", downsample=None,
-        calc_mean=False, calc_error=True, error_method="std", scale=False,
-        **kwargs):
+    def __init__(self, infile, address="saxs", dt=None, toffset=None,
+        downsample=None, calc_mean=False, calc_error=True, error_method="std",
+        scale=False, outfile=None, interactive=False, **kwargs):
         """
         Arguments:
           infile (str): Path to input file, may contain environment
@@ -661,41 +657,53 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         """
         from os.path import expandvars
 
-#        # Arguments
-#        verbose = kwargs.get("verbose", 1)
-#
-#        # Load
-#        with h5py.File(expandvars(infile)) as h5_file:
-#            q = ["{0:5.3f}".format(a) for a in np.array(h5_file[address+"/q"])]
-#        super(SAXSTimeSeriesDataset, self).__init__(infile=infile,
-#          address=address+"/intensity", dataframe_kw=dict(columns=q), **kwargs)
-#        timeseries = self.timeseries = self.dataframe
-#
-#        # Downsample
-#        if downsample:
-#            self.downsample(downsample, downsample_mode="mean", **kwargs)
-#
-#        # Average over time series
-#        if calc_mean:
-#            self.dataframe = dataframe = pd.DataFrame(
-#              data=timeseries.mean(axis=0), columns=["intensity"])
-#            dataframe.index.name = "q"
-#            dataframe.index = np.array(timeseries.columns.values, np.float)
-#
-#            # Scale
-#            if scale:
-##                curve_fit_kw = dict(p0=(2e-9), bounds=(0.0,0.35))
-#                curve_fit_kw = dict(p0=(2e-9))  # Not clear why bounds broke
-#                curve_fit_kw.update(kwargs.get("curve_fit_kw", {}))
-#                scale = self.scale(scale, curve_fit_kw=curve_fit_kw, **kwargs)
-#                self.timeseries *= scale
-#        elif scale:
-#            self.timeseries *= scale
-#        if calc_error:
-#            se = self.calc_error(error_method="block", **kwargs)
-#            se.name = "intensity_se"
-#            dataframe = self.dataframe = pd.concat([dataframe, se], axis=1)
+        # Arguments
+        verbose = kwargs.get("verbose", 1)
+        self.dataset_cache = kwargs.get("dataset_cache", None)
 
+        # Read data
+        with h5py.File(expandvars(infile)) as h5_file:
+            q = ["{0:5.3f}".format(a) for a in np.array(h5_file[address+"/q"])]
+        self.timeseries_df = self.read(
+          infile=infile+":/"+address+"/intensity",
+          dataframe_kw=dict(columns=q), **kwargs)
+
+        # Process data
+        if dt:
+            self.timeseries_df.set_index(self.timeseries_df.index.values *
+              float(dt), inplace=True)
+            self.timeseries_df.index.name = "time"
+        if toffset:
+            index_name = self.timeseries_df.index.name
+            self.timeseries_df.set_index(self.timeseries_df.index.values +
+              float(toffset), inplace=True)
+            self.timeseries_df.index.name = index_name
+        if downsample:
+            self.downsample(downsample, downsample_mode="mean", **kwargs)
+
+        # Output data
+        if verbose >= 2:
+            print("Processed timeseries DataFrame:")
+            print(self.timeseries_df)
+        if outfile is not None:
+            self.write(df=self.timeseries_df, outfile=outfile, **kwargs)
+
+        # Calculate mean and standard error
+        if calc_mean:
+            block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
+                            fit_exp=True, fit_sig=False)
+            block_kw.update(kwargs.get("block_kw", {}))
+            self.mean_df, self.block_averager = self.calc_mean(
+              df=self.timeseries_df, verbose=verbose, **block_kw)
+            if verbose >= 2:
+                print("Processed mean DataFrame:")
+                print(self.mean_df)
+            self.df = self.mean_df
+            # WRITE IF STRING
+
+        # Scale
+        if scale:
+            self.scale(scale, **kwargs)
 
 #################################### MAIN #####################################
 def main():
