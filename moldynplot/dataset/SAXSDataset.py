@@ -70,7 +70,7 @@ class SAXSDataset(Dataset):
 
             # Prepare target
             target = self.load_dataset(infile=expandvars(scale),
-                       loose=True).dataframe
+                       loose=True).df
             if "intensity se" in target.columns.values:
                 scale_se = True
             else:
@@ -187,15 +187,16 @@ class SAXSDiffDataset(SAXSDataset):
                           kwargs, {})
         minuend    = self.load_dataset(loose=True, **minuend_kw)
         subtrahend = self.load_dataset(loose=True, **subtrahend_kw)
-        m_I    = minuend.dataframe["intensity"]
-        m_I_se = minuend.dataframe["intensity se"]
-        s_I    = subtrahend.dataframe["intensity"]
-        s_I_se = subtrahend.dataframe["intensity se"]
+        print(minuend.df)
+        m_I    = minuend.df["intensity"]
+        m_I_se = minuend.df["intensity se"]
+        s_I    = subtrahend.df["intensity"]
+        s_I_se = subtrahend.df["intensity se"]
         diff_I    = (m_I - s_I)
         diff_I_se = np.sqrt(m_I_se**2 +s_I_se**2)
         diff_I.name = "intensity"
         diff_I_se.name = "intensity se"
-        self.dataframe = pd.concat([diff_I, diff_I_se], axis=1)
+        self.df = pd.concat([diff_I, diff_I_se], axis=1)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
