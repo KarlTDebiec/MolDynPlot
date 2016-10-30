@@ -298,6 +298,7 @@ class SAXSFigureManager(FigureManager):
             y_lb = y - 1.96 * y_se
             y_ub = y + 1.96 * y_se
             subplot.fill_between(x, y_lb, y_ub, **fill_between_kw)
+            print(np.array(100*y_se/x, np.int))
 
         # Plot series
         if draw_plot:

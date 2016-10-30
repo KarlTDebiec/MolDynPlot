@@ -690,7 +690,9 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
 
         # Calculate mean and standard error
         if calc_mean:
-            block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
+#            block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
+#                            fit_exp=True, fit_sig=False)
+            block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=True,
                             fit_exp=True, fit_sig=False)
             block_kw.update(kwargs.get("block_kw", {}))
             self.mean_df, self.block_averager = self.calc_mean(
