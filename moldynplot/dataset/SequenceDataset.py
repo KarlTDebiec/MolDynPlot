@@ -453,11 +453,11 @@ class ChemicalShiftDataset(SequenceDataset):
                         "Height":      np.float32,
                         "Volume":      np.float32},
                       usecols = [
-                        "Position F1",
-                        "Position F2",
-                        "Assign F1",
-                        "Height",
-                        "Volume"],
+                        str("Position F1"),
+                        str("Position F2"),
+                        str("Assign F1"),
+                        str("Height"),
+                        str("Volume")],
                       converters = {
                         "Assign F1": convert_name})
                     read_csv_kw.update(kwargs.get("read_csv_kw", {}))

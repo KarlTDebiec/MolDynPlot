@@ -182,6 +182,16 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           column:    "pre"
           column_se: "pre se"
+      deltacs:
+        class: content
+        help: Format subplot for chemical shift change
+        draw_subplot:
+          ylabel: "$\\\\Delta \\\\delta$"
+          ylabel_kw:
+            rotation: vertical
+          yticks: [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+        draw_dataset:
+          column: "delta cs"
       relax_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
