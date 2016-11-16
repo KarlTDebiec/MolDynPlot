@@ -168,8 +168,8 @@ def test_dssp():
 
 if __name__ == "__main__":
     test_sequence()
-    test_rmsd()
-    test_radgyr()
-    test_perresrmsd()
-    test_dssp()
-    test_hsqc()
+#    test_rmsd()
+#    test_radgyr()
+#    test_perresrmsd()
+#    test_dssp()
+#    test_hsqc()

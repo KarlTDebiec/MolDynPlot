@@ -5,6 +5,9 @@
     <orderEntry type="jdk" jdkName="Python 2.7.11 (~/software/anaconda/bin/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyDocumentationSettings">
+    <option name="myDocStringFormat" value="Google" />
+  </component>
   <component name="ReSTService">
     <option name="workdir" value="$MODULE_DIR$/doc" />
     <option name="DOC_DIR" value="$MODULE_DIR$/doc" />
