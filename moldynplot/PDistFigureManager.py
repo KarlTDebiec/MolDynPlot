@@ -9,7 +9,7 @@
 #   BSD license. See the LICENSE file for details.
 """
 Generates one or more probability distribution figures to specifications
-in a YAML file. 
+in a YAML file.
 """
 ################################### MODULES ###################################
 from __future__ import absolute_import,division,print_function,unicode_literals
@@ -343,10 +343,10 @@ class PDistFigureManager(FigureManager):
             passed to
             :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
           draw_pdist (bool): Draw probability distribution
-          pdist_kw (dict): Keyword arguments using to configure call to 
+          pdist_kw (dict): Keyword arguments using to configure call to
             :meth:`plot<matplotlib.axes.Axes.plot>`
           draw_mean (bool): Draw point at mean value
-          mean_kw (dict): Keyword arguments used to configure call to 
+          mean_kw (dict): Keyword arguments used to configure call to
             :meth:`plot<matplotlib.axes.Axes.plot>`
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
