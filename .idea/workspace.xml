@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2229ebae-6e82-46c3-af70-c9a676c6c8e0" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/myplotspec" afterPath="$PROJECT_DIR$/moldynplot/myplotspec" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/test/test_Dataset.py" afterPath="$PROJECT_DIR$/moldynplot/test/test_Dataset.py" />
     </list>
     <ignored path="MolDynPlot.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -28,10 +27,9 @@
           <file leaf-file-name="Dataset.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="180">
-                  <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
+                <state relative-caret-position="-150">
+                  <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
                   <folding>
-                    <element signature="n#!!doc" expanded="false" />
                     <element signature="e#350#429#0" expanded="true" />
                     <element signature="e#1076#1900#0" expanded="false" />
                     <element signature="e#1076#1536#1" expanded="true" />
@@ -70,10 +68,9 @@
           <file leaf-file-name="Dataset.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="150">
-                  <caret line="90" column="28" selection-start-line="90" selection-start-column="28" selection-end-line="90" selection-end-column="28" />
+                <state relative-caret-position="270">
+                  <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
                   <folding>
-                    <element signature="n#!!doc" expanded="false" />
                     <element signature="e#350#429#0" expanded="true" />
                     <element signature="e#1076#1900#0" expanded="false" />
                     <element signature="e#1076#1536#1" expanded="true" />
@@ -105,20 +102,20 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="PDistFigureManager.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/moldynplot/PDistFigureManager.py">
+          <file leaf-file-name="test_Dataset.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/moldynplot/test/test_Dataset.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="420">
-                  <caret line="317" column="77" selection-start-line="317" selection-start-column="77" selection-end-line="317" selection-end-column="77" />
+                <state relative-caret-position="442">
+                  <caret line="175" column="0" selection-start-line="175" selection-start-column="0" selection-end-line="175" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="workspace.xml" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+          <file leaf-file-name="test_FigureManager.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/moldynplot/test/test_FigureManager.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
+                <state relative-caret-position="-293">
                   <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
                   <folding />
                 </state>
@@ -140,9 +137,10 @@
         <option value="$PROJECT_DIR$/moldynplot/myplotspec/YSpecDataset.py" />
         <option value="$PROJECT_DIR$/build/lib/moldynplot/myplotspec/Dataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py" />
-        <option value="$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/PDistFigureManager.py" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
+        <option value="$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py" />
+        <option value="$PROJECT_DIR$/moldynplot/test/test_Dataset.py" />
       </list>
     </option>
   </component>
@@ -259,6 +257,24 @@
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
             <PATH_ELEMENT USER_OBJECT="moldynplot">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="MolDynPlot">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="moldynplot">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="test">
               <option name="myItemId" value="" />
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
@@ -381,6 +397,30 @@
       <option name="params" value="" />
       <option name="USE_PARAM" value="false" />
       <option name="USE_KEYWORD" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="py.test in test_hsqc" type="tests" factoryName="py.test" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="MolDynPlot" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="testToRun" value="$PROJECT_DIR$/moldynplot/test/test_Dataset.py" />
+      <option name="keywords" value="test_hsqc" />
+      <option name="params" value="" />
+      <option name="USE_PARAM" value="false" />
+      <option name="USE_KEYWORD" value="true" />
       <method />
     </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
@@ -517,12 +557,14 @@
       <option name="USE_KEYWORD" value="false" />
       <method />
     </configuration>
-    <list size="1">
+    <list size="2">
       <item index="0" class="java.lang.String" itemvalue="Python tests.py.test in test" />
+      <item index="1" class="java.lang.String" itemvalue="Python tests.py.test in test_hsqc" />
     </list>
     <recent_temporary>
-      <list size="1">
+      <list size="2">
         <item index="0" class="java.lang.String" itemvalue="Python tests.py.test in test" />
+        <item index="1" class="java.lang.String" itemvalue="Python tests.py.test in test_hsqc" />
       </list>
     </recent_temporary>
   </component>
@@ -554,7 +596,14 @@
       <option name="project" value="LOCAL" />
       <updated>1479591636768</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Trying out PyCharm">
+      <created>1479591685311</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1479591685311</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -569,6 +618,21 @@
     </history-entry>
     <history-entry file="py_test_in_test - 2016.11.19 at 15h 34m 52s.xml">
       <configuration name="py.test in test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="py_test_in_test - 2016.11.19 at 15h 44m 22s.xml">
+      <configuration name="py.test in test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="py_test_in_test - 2016.11.19 at 15h 46m 17s.xml">
+      <configuration name="py.test in test" configurationId="tests" />
+    </history-entry>
+    <history-entry file="py_test_in_test_hsqc - 2016.11.19 at 15h 44m 44s.xml">
+      <configuration name="py.test in test_hsqc" configurationId="tests" />
+    </history-entry>
+    <history-entry file="py_test_in_test_hsqc - 2016.11.19 at 15h 45m 20s.xml">
+      <configuration name="py.test in test_hsqc" configurationId="tests" />
+    </history-entry>
+    <history-entry file="py_test_in_test_hsqc - 2016.11.19 at 15h 45m 54s.xml">
+      <configuration name="py.test in test_hsqc" configurationId="tests" />
     </history-entry>
   </component>
   <component name="TodoView">
@@ -589,7 +653,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32942554" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32771084" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32771084" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32771084" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32771084" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1438646" sideWeight="0.50537634" order="5" side_tool="true" content_ui="tabs" />
@@ -669,7 +733,6 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="n#!!doc" expanded="false" />
             <element signature="e#350#429#0" expanded="true" />
             <element signature="e#1076#1900#0" expanded="false" />
             <element signature="e#1076#1536#1" expanded="true" />
@@ -705,7 +768,6 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="n#!!doc" expanded="false" />
             <element signature="e#350#429#0" expanded="true" />
             <element signature="e#1076#1900#0" expanded="false" />
             <element signature="e#1076#1536#1" expanded="true" />
@@ -741,7 +803,6 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="n#!!doc" expanded="false" />
             <element signature="e#350#429#0" expanded="true" />
             <element signature="e#1076#1900#0" expanded="false" />
             <element signature="e#1076#1536#1" expanded="true" />
@@ -777,7 +838,6 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="n#!!doc" expanded="false" />
             <element signature="e#350#429#0" expanded="true" />
             <element signature="e#1076#1900#0" expanded="false" />
             <element signature="e#1076#1536#1" expanded="true" />
@@ -813,7 +873,6 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="n#!!doc" expanded="false" />
             <element signature="e#350#429#0" expanded="true" />
             <element signature="e#1076#1900#0" expanded="false" />
             <element signature="e#1076#1536#1" expanded="true" />
@@ -849,7 +908,6 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="n#!!doc" expanded="false" />
             <element signature="e#350#429#0" expanded="true" />
             <element signature="e#1076#1900#0" expanded="false" />
             <element signature="e#1076#1536#1" expanded="true" />
@@ -993,12 +1051,43 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/PDistFigureManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="317" column="77" selection-start-line="317" selection-start-column="77" selection-end-line="317" selection-end-column="77" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/test.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="90" column="28" selection-start-line="90" selection-start-column="28" selection-end-line="90" selection-end-column="28" />
+        <state relative-caret-position="270">
+          <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
           <folding>
-            <element signature="n#!!doc" expanded="false" />
             <element signature="e#350#429#0" expanded="true" />
             <element signature="e#1076#1900#0" expanded="false" />
             <element signature="e#1076#1536#1" expanded="true" />
@@ -1029,18 +1118,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/PDistFigureManager.py">
+    <entry file="file://$PROJECT_DIR$/moldynplot/test/test_FigureManager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="317" column="77" selection-start-line="317" selection-start-column="77" selection-end-line="317" selection-end-column="77" />
+        <state relative-caret-position="-293">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+    <entry file="file://$PROJECT_DIR$/moldynplot/test/test_Dataset.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="442">
+          <caret line="175" column="0" selection-start-line="175" selection-start-column="0" selection-end-line="175" selection-end-column="0" />
           <folding />
         </state>
       </provider>
