@@ -29,25 +29,25 @@ def run(input_pdb, input_data, output_pdb, field, verbose=1, **kwargs):
 
     def iter_func():
         with open(input_pdb, "r") as open_file:
-            next(open_file)
             for line in open_file:
                 if line.startswith("TER") or line.startswith("ENDMDL"):
                     break
                 if not line.startswith("ATOM"):
                     continue
-                yield(line[6:11])   # Atom number
-                yield(line[11:16])  # Atom name
-                yield(line[16:20])  # Residue name
-                yield(line[20:21])  # Conformation
-                yield(line[21:22])  # Chain
-                yield(line[22:26])  # Residue number
-                yield(line[26:38])  # X
-                yield(line[38:46])  # Y
-                yield(line[46:54])  # Z
-                yield(line[54:60])  # Beta
-                yield(line[60:66])  # Occupancy
-                yield(line[66:])    # Element
+                yield(line[6:11])           # Atom number
+                yield(line[11:16])          # Atom name
+                yield(line[16:20])          # Residue name
+                yield(line[20:21])          # Conformation
+                yield(line[21:22])          # Chain
+                yield(line[22:26])          # Residue number
+                yield(line[26:38])          # X
+                yield(line[38:46])          # Y
+                yield(line[46:54])          # Z
+                yield(line[54:60])          # Beta
+                yield(line[60:66])          # Occupancy
+                yield(line[66:].strip())    # Element
 
+    # Load input pdb
     if verbose >= 1:
         print("Loading input pdb file '{0}'".format(input_pdb))
     pdb_np = np.fromiter(iter_func(), dtype="S12").reshape((-1, 12))
@@ -60,23 +60,23 @@ def run(input_pdb, input_data, output_pdb, field, verbose=1, **kwargs):
     if verbose >= 2:
         print(pdb)
 
+    # Load input data
     if verbose >= 1:
         print("Loading input data file '{0}'".format(input_data))
     data = pd.read_csv(input_data, index_col=0, delimiter=r"\s\s+")
     if verbose >= 2:
         print(data)
 
+    # Store data in pdb field
     if verbose >= 1:
         print("Storing data in '{0}'".format(field))
     pdb[field] = pd.to_numeric(pdb[field])
     pdb[field] = 0
     for residue, row in data.iterrows():
         residue = int(residue.split(":")[1])
-        pdb[field][pdb["residue_number"].astype(int) == residue] = \
-          0.5 + (row["pre"] / 2)
-    pdb[field][np.isnan(pdb[field])] = 0
-    pdb[field][pdb[field] >= 1] = 1
-    print(pdb[field])
+        pdb[field][pdb["residue_number"].astype(int) == residue] = row["pre"]/2
+    pdb[field][pdb[field] >= 0.5] = 0.5
+    pdb[field][np.isnan(pdb[field])] = 0.75
 
     if verbose >= 1:
         print("Writing output pdb file '{0}'".format(output_pdb))
