@@ -74,8 +74,11 @@ def run(input_pdb, input_data, output_pdb, field, verbose=1, **kwargs):
     pdb[field] = 0
     for residue, row in data.iterrows():
         residue = int(residue.split(":")[1])
-        pdb[field][pdb["residue_number"].astype(int) == residue] = row["pre"]/2
+        pdb[field][pdb["residue_number"].astype(int) == residue] = \
+        0.5 - row["delta cs"]/0.6
+#        row["pre"]/2
     pdb[field][pdb[field] >= 0.5] = 0.5
+    pdb[field][pdb[field] <= 0.0] = 0.0
     pdb[field][np.isnan(pdb[field])] = 0.75
 
     if verbose >= 1:
