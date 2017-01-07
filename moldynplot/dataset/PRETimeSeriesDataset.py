@@ -11,7 +11,9 @@
 Represents paramagnetic relaxation enhancement timeseries data
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
@@ -23,6 +25,8 @@ from ..myplotspec.Dataset import Dataset
 from ..myplotspec import sformat, wiprint
 from .SequenceDataset import RelaxDataset
 from .TimeSeriesDataset import TimeSeriesDataset
+
+
 ################################### CLASSES ###################################
 class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
     """
@@ -55,13 +59,10 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "pre",
-              description = help_message,
-              help        = help_message)
+            parser = parser_or_subparsers.add_parser(name="pre",
+                description=help_message, help=help_message)
         elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
+            parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
         if parser.get_default("cls") is None:
@@ -74,18 +75,27 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
 
         return parser
 
+    def __init__(self, **kwargs):
+        """
+
+        Args:
+            **kwargs (dict):
+        """
+        super(PRETimeSeriesDataset, self).__init__(**kwargs)
+
+
 #################################### MAIN #####################################
 def main():
     import argparse
 
     # Prepare argument parser
-    parser = argparse.ArgumentParser(
-      description = __doc__)
+    parser = argparse.ArgumentParser(description=__doc__)
 
     PRETimeSeriesDataset.construct_argparser(parser)
 
-    kwargs  = vars(parser.parse_args())
+    kwargs = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
+
 
 if __name__ == "__main__":
     main()

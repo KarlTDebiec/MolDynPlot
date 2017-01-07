@@ -13,7 +13,9 @@
   - Fix separation and ordering of argument groups: input, action, output
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
@@ -23,6 +25,8 @@ import numpy as np
 import pandas as pd
 from ..myplotspec.Dataset import Dataset
 from ..myplotspec import sformat, wiprint
+
+
 ################################### CLASSES ###################################
 class MDGXDataset(Dataset):
     """
@@ -58,29 +62,26 @@ class MDGXDataset(Dataset):
         super(MDGXDataset, self).__init__(infile=infile, **kwargs)
         dataframe = self.dataframe
         dataframe.index.name = "conformation"
-        dataframe["error"] = np.abs(dataframe["qm_energy"]
-          - dataframe["mm_energy"])
+        dataframe["error"] = np.abs(
+            dataframe["qm_energy"] - dataframe["mm_energy"])
 
         selection_dataframes = []
         if selections is not None:
             for selection in selections:
-                selection_dataframes.append(
-                  dataframe[dataframe["topology"].str.endswith(
-                  "/" + selection)])
+                selection_dataframes.append(dataframe[
+                    dataframe["topology"].str.endswith("/" + selection)])
         self.selections = selection_dataframes
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
     import argparse
 
     # Prepare argument parser
-    parser = argparse.ArgumentParser(
-      description = """Processes datasets""")
-    subparsers = parser.add_subparsers(
-      dest        = "mode",
-      description = "")
+    parser = argparse.ArgumentParser(description="""Processes datasets""")
+    subparsers = parser.add_subparsers(dest="mode", description="")
 
     MDGXDataset.construct_argparser(subparsers)
 
-    kwargs  = vars(parser.parse_args())
+    kwargs = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)

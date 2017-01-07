@@ -12,7 +12,9 @@
   - Fix separation and ordering of argument groups: input, action, output
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
@@ -22,6 +24,8 @@ import numpy as np
 import pandas as pd
 from ..myplotspec.Dataset import Dataset
 from ..myplotspec import sformat, wiprint
+
+
 ################################### CLASSES ###################################
 class HSQCDataset(Dataset):
     """
@@ -57,13 +61,10 @@ class HSQCDataset(Dataset):
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "hsqc",
-              description = help_message,
-              help        = help_message)
+            parser = parser_or_subparsers.add_parser(name="hsqc",
+                description=help_message, help=help_message)
         elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
+            parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
         if parser.get_default("cls") is None:
@@ -74,23 +75,15 @@ class HSQCDataset(Dataset):
 
         # Input arguments
         action_group = arg_groups.get("action",
-          parser.add_argument_group("action"))
+            parser.add_argument_group("action"))
         try:
-            action_group.add_argument(
-              "-hoffset",
-              required = False,
-              type     = float,
-              default  = 0,
-              help     = """Offset added to 1H dimension """)
+            action_group.add_argument("-hoffset", required=False, type=float,
+                default=0, help="""Offset added to 1H dimension """)
         except argparse.ArgumentError:
             pass
         try:
-            action_group.add_argument(
-              "-noffset",
-              required = False,
-              type     = float,
-              default  = 0,
-              help     = """Offset added to 15N dimension """)
+            action_group.add_argument("-noffset", required=False, type=float,
+                default=0, help="""Offset added to 15N dimension """)
         except argparse.ArgumentError:
             pass
 
@@ -99,8 +92,8 @@ class HSQCDataset(Dataset):
 
         return parser
 
-    def __init__(self, hoffset=0, noffset=0, outfile=None,
-        interactive=False, **kwargs):
+    def __init__(self, hoffset=0, noffset=0, outfile=None, interactive=False,
+            **kwargs):
         """
         Arguments:
           infile{s} (list): Path(s) to input file(s); may contain
@@ -126,8 +119,8 @@ class HSQCDataset(Dataset):
         nitrogen = np.array(self.hsqc_df.index.levels[1].values)
         hydrogen += float(hoffset)
         nitrogen += float(noffset)
-        self.hsqc_df.index = pd.MultiIndex.from_product(
-          [hydrogen, nitrogen], names=["1H", "15N"])
+        self.hsqc_df.index = pd.MultiIndex.from_product([hydrogen, nitrogen],
+            names=["1H", "15N"])
 
         # Output to screen
         if verbose >= 2:
@@ -168,15 +161,17 @@ class HSQCDataset(Dataset):
         if verbose >= 1:
             wiprint("""Reading DataFrame from '{0}' """.format(infile))
         parameters, intensity = nmrglue.pipe.read(infile)
-        hydrogen  = np.array(nmrglue.pipe.make_uc(parameters, intensity,
-                       dim=1).ppm_scale(), np.float32)
-        nitrogen  = np.array(nmrglue.pipe.make_uc(parameters, intensity,
-                        dim=0).ppm_scale(), np.float32)
+        hydrogen = np.array(
+            nmrglue.pipe.make_uc(parameters, intensity, dim=1).ppm_scale(),
+            np.float32)
+        nitrogen = np.array(
+            nmrglue.pipe.make_uc(parameters, intensity, dim=0).ppm_scale(),
+            np.float32)
 
         index = pd.MultiIndex.from_product([nitrogen, hydrogen],
-          names=["15N", "1H"])
+            names=["15N", "1H"])
         df = pd.DataFrame(data=intensity.flatten(), index=index,
-          columns=["intensity"])
+            columns=["intensity"])
         df = df.swaplevel(0, 1)
         df = df.sortlevel()
 
@@ -211,8 +206,8 @@ class HSQCDataset(Dataset):
         elif len(infiles) > 1:
             raise Exception("HSQCDataset only supports a single infile")
         re_h5 = re.compile(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          flags=re.UNICODE)
+            r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+            flags=re.UNICODE)
 
         # Load Data
         infile = infiles[0]
@@ -226,18 +221,16 @@ class HSQCDataset(Dataset):
 
         return df
 
+
 #################################### MAIN #####################################
 if __name__ == "__main__":
     import argparse
 
     # Prepare argument parser
-    parser = argparse.ArgumentParser(
-      description = """Processes datasets""")
-    subparsers = parser.add_subparsers(
-      dest        = "mode",
-      description = "")
+    parser = argparse.ArgumentParser(description="""Processes datasets""")
+    subparsers = parser.add_subparsers(dest="mode", description="")
 
     HSQCDataset.construct_argparser(subparsers)
 
-    kwargs  = vars(parser.parse_args())
+    kwargs = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)

@@ -13,7 +13,9 @@
   - Fix separation and ordering of argument groups: input, action, output
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
@@ -23,6 +25,8 @@ import numpy as np
 import pandas as pd
 from ..myplotspec.Dataset import Dataset
 from ..myplotspec import sformat, wiprint
+
+
 ################################### CLASSES ###################################
 class CorrDataset(Dataset):
     """
@@ -42,7 +46,7 @@ class CorrDataset(Dataset):
         x_cls = x_kw.get("cls", Dataset)
         if isinstance(x_cls, six.string_types):
             mod_name = ".".join(x_cls.split(".")[:-1])
-            x_cls_name   = x_cls.split(".")[-1]
+            x_cls_name = x_cls.split(".")[-1]
             mod = __import__(mod_name, fromlist=[x_cls_name])
             x_cls = getattr(mod, x_cls_name)
 
@@ -50,7 +54,7 @@ class CorrDataset(Dataset):
         y_cls = y_kw.get("cls", Dataset)
         if isinstance(y_cls, six.string_types):
             mod_name = ".".join(y_cls.split(".")[:-1])
-            y_cls_name   = y_cls.split(".")[-1]
+            y_cls_name = y_cls.split(".")[-1]
             mod = __import__(mod_name, fromlist=[y_cls_name])
             y_cls = getattr(mod, y_cls_name)
 
@@ -71,7 +75,7 @@ class CorrDataset(Dataset):
           dataset
         """
         return "Dataset previously loaded from '{0}' and '{1}'".format(
-          cache_key[1][1], cache_key[2][1])
+            cache_key[1][1], cache_key[2][1])
 
     def __init__(self, verbose=1, debug=0, **kwargs):
         """
@@ -88,9 +92,8 @@ class CorrDataset(Dataset):
         y_df = y_dataset.dataframe
 
         overlap_idx = x_df.index.intersection(y_df.index)
-        corr_cols = [c for c in y_df.columns.values
-                      if not c.endswith("_se")
-                      and c in x_df.columns.values]
+        corr_cols = [c for c in y_df.columns.values if
+            not c.endswith("_se") and c in x_df.columns.values]
 
         overlap_cols = []
         for c in corr_cols:
@@ -101,26 +104,26 @@ class CorrDataset(Dataset):
                 overlap_cols += [(c + "_se", "y")]
 
         corr = pd.DataFrame(0, index=overlap_idx,
-          columns=pd.MultiIndex.from_tuples(overlap_cols))
-        corr.iloc[:, corr.columns.get_level_values(1)=="x"] = x_df[
-          [a[0] for a in overlap_cols if a[1] == "x"]].loc[overlap_idx].values
-        corr.iloc[:, corr.columns.get_level_values(1)=="y"] = y_df[
-          [a[0] for a in overlap_cols if a[1] == "y"]].loc[overlap_idx].values
+            columns=pd.MultiIndex.from_tuples(overlap_cols))
+        corr.iloc[:, corr.columns.get_level_values(1) == "x"] = \
+        x_df[[a[0] for a in overlap_cols if a[1] == "x"]].loc[
+            overlap_idx].values
+        corr.iloc[:, corr.columns.get_level_values(1) == "y"] = \
+        y_df[[a[0] for a in overlap_cols if a[1] == "y"]].loc[
+            overlap_idx].values
 
         self.dataframe = corr
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
     import argparse
 
     # Prepare argument parser
-    parser = argparse.ArgumentParser(
-      description = """Processes datasets""")
-    subparsers = parser.add_subparsers(
-      dest        = "mode",
-      description = "")
+    parser = argparse.ArgumentParser(description="""Processes datasets""")
+    subparsers = parser.add_subparsers(dest="mode", description="")
 
     CorrDataset.construct_argparser(subparsers)
 
-    kwargs  = vars(parser.parse_args())
+    kwargs = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)

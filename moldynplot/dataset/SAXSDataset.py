@@ -17,7 +17,9 @@ specific for molecular dynamics simulation data.
   - Move SAXS parsing here
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
@@ -27,6 +29,8 @@ import numpy as np
 import pandas as pd
 from ..myplotspec.Dataset import Dataset
 from ..myplotspec import sformat, wiprint
+
+
 ################################### CLASSES ###################################
 class SAXSDataset(Dataset):
     """
@@ -57,20 +61,19 @@ class SAXSDataset(Dataset):
         verbose = kwargs.get("verbose", 1)
 
         # Scale by constant
-        if (isinstance(scale, float)
-        or (isinstance(scale, int) and not isinstance(scale, bool))):
+        if (isinstance(scale, float) or (
+            isinstance(scale, int) and not isinstance(scale, bool))):
             scale = float(scale)
         # Scale to match target
         elif isinstance(scale, six.string_types):
             if not isfile(expandvars(scale)):
                 if verbose >= 1:
-                   wiprint("scale target '{0}' ".format(scale) +
-                          "not found, not scaling.")
+                    wiprint("scale target '{0}' ".format(
+                        scale) + "not found, not scaling.")
                 return
 
             # Prepare target
-            target = self.load_dataset(infile=expandvars(scale),
-                       loose=True).df
+            target = self.load_dataset(infile=expandvars(scale), loose=True).df
             if "intensity se" in target.columns.values:
                 scale_se = True
             else:
@@ -82,33 +85,34 @@ class SAXSDataset(Dataset):
 
             # Prepare own values over x range of target
             template = self.df
-            template_q  = np.array(template.index.values, np.float64)
-            template_I  = np.array(template["intensity"].values, np.float64)
+            template_q = np.array(template.index.values, np.float64)
+            template_I = np.array(template["intensity"].values, np.float64)
             indexes = np.logical_and(template_q > target_q.min(),
-                                     template_q < target_q.max())
+                template_q < target_q.max())
             template_q = template_q[indexes]
             template_I = template_I[indexes]
 
             # Update target
             target_I = interp1d(target_q, target_I, kind="cubic")(template_q)
             if scale_se:
-                target_Ise = interp1d(target_q, target_Ise,
-                               kind="cubic")(template_q)
+                target_Ise = interp1d(target_q, target_Ise, kind="cubic")(
+                    template_q)
 
             def scale_I(_, a):
                 return a * template_I
-#            curve_fit_kw = dict(p0=(1), bounds=(0.0,0.35))
-            curve_fit_kw = dict(p0=(1))     # Not clear why bounds broke
+
+            #            curve_fit_kw = dict(p0=(1), bounds=(0.0,0.35))
+            curve_fit_kw = dict(p0=(1))  # Not clear why bounds broke
             curve_fit_kw.update(kwargs.get("curve_fit_kw", {}))
             if scale_se:
                 curve_fit_kw["sigma"] = target_Ise
-            scale = curve_fit(scale_I, template_q, target_I,
-                      **curve_fit_kw)[0][0]
+            scale = \
+            curve_fit(scale_I, template_q, target_I, **curve_fit_kw)[0][0]
         # 'scale' argument not understood
         else:
             if verbose >= 1:
-                wiprint("scale target '{0}' ".format(scale) +
-                      "not understood, not scaling.")
+                wiprint("scale target '{0}' ".format(
+                    scale) + "not understood, not scaling.")
             return
 
         if verbose >= 1:
@@ -149,29 +153,30 @@ class SAXSDiffDataset(SAXSDataset):
     Represents Small Angle X-ray Scattering difference data.
     """
 
-#    @classmethod
-#    def get_cache_key(cls, dataset_classes=None, *args, **kwargs):
-#        """
-#        Generates tuple of arguments to be used as key for dataset
-#        cache.
-#
-#        Arguments documented under :func:`__init__`.
-#        """
-#        from ..myplotspec import multi_get_copy
-#
-#        minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})
-#        minuend_class = dataset_classes[minuend_kw["kind"].lower()]
-#        key = [cls, mask_cutoff, minuend_class.get_cache_key(**minuend_kw)]
-#
-#        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"],
-#          kwargs, {})
-#        if isinstance(subtrahend_kw, dict):
-#            subtrahend_kw = [subtrahend_kw]
-#        for sh_kw in subtrahend_kw:
-#            sh_class = dataset_classes[sh_kw.pop("kind").lower()]
-#            key.append(sh_class.get_cache_key(**sh_kw))
-#
-#        return tuple(key)
+    #    @classmethod
+    #    def get_cache_key(cls, dataset_classes=None, *args, **kwargs):
+    #        """
+    #        Generates tuple of arguments to be used as key for dataset
+    #        cache.
+    #
+    #        Arguments documented under :func:`__init__`.
+    #        """
+    #        from ..myplotspec import multi_get_copy
+    #
+    #        minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})
+    #        minuend_class = dataset_classes[minuend_kw["kind"].lower()]
+    #        key = [cls, mask_cutoff, minuend_class.get_cache_key(
+    # **minuend_kw)]
+    #
+    #        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"],
+    #          kwargs, {})
+    #        if isinstance(subtrahend_kw, dict):
+    #            subtrahend_kw = [subtrahend_kw]
+    #        for sh_kw in subtrahend_kw:
+    #            sh_class = dataset_classes[sh_kw.pop("kind").lower()]
+    #            key.append(sh_class.get_cache_key(**sh_kw))
+    #
+    #        return tuple(key)
 
     def __init__(self, dataset_cache=None, **kwargs):
         """
@@ -181,36 +186,33 @@ class SAXSDiffDataset(SAXSDataset):
 
         self.dataset_cache = dataset_cache
 
-        minuend_kw    = multi_get_copy(["minuend", "minuend_kw"],
-                          kwargs, {})
-        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"],
-                          kwargs, {})
-        minuend    = self.load_dataset(loose=True, **minuend_kw)
+        minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})
+        subtrahend_kw = multi_get_copy(["subtrahend", "subtrahend_kw"], kwargs,
+            {})
+        minuend = self.load_dataset(loose=True, **minuend_kw)
         subtrahend = self.load_dataset(loose=True, **subtrahend_kw)
-        m_I    = minuend.df["intensity"]
+        m_I = minuend.df["intensity"]
         m_I_se = minuend.df["intensity se"]
-        s_I    = subtrahend.df["intensity"]
+        s_I = subtrahend.df["intensity"]
         s_I_se = subtrahend.df["intensity se"]
-        diff_I    = (m_I - s_I)
-        diff_I_se = np.sqrt(m_I_se**2 +s_I_se**2)
+        diff_I = (m_I - s_I)
+        diff_I_se = np.sqrt(m_I_se ** 2 + s_I_se ** 2)
         diff_I.name = "intensity"
         diff_I_se.name = "intensity se"
         self.df = pd.concat([diff_I, diff_I_se], axis=1)
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
     import argparse
 
     # Prepare argument parser
-    parser = argparse.ArgumentParser(
-      description = """Processes datasets""")
-    subparsers = parser.add_subparsers(
-      dest        = "mode",
-      description = "")
+    parser = argparse.ArgumentParser(description="""Processes datasets""")
+    subparsers = parser.add_subparsers(dest="mode", description="")
 
     SAXSDataset.construct_argparser(subparsers)
     SAXSExperimentDataset.construct_argparser(subparsers)
     SAXSDiffDataset.construct_argparser(subparsers)
 
-    kwargs  = vars(parser.parse_args())
+    kwargs = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)

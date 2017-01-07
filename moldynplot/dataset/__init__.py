@@ -10,13 +10,17 @@
 """
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
 import h5py
 import numpy as np
 from ..myplotspec.Dataset import Dataset
+
+
 ################################### CLASSES ###################################
 class H5Dataset(object):
     """
@@ -33,14 +37,14 @@ class H5Dataset(object):
           infile (str): Alternatively, single infile
         """
         self.default_address = kwargs.get("default_address", "")
-        self.default_key     = kwargs.get("default_key",     "key")
-        self.datasets        = {}
-        self.attrs           = {}
+        self.default_key = kwargs.get("default_key", "key")
+        self.datasets = {}
+        self.attrs = {}
 
-        if   "infiles" in kwargs:
-            self.load(infiles = kwargs.pop("infiles"))
-        elif "infile"  in kwargs:
-            self.load(infiles = [kwargs.pop("infile")])
+        if "infiles" in kwargs:
+            self.load(infiles=kwargs.pop("infiles"))
+        elif "infile" in kwargs:
+            self.load(infiles=[kwargs.pop("infile")])
 
     def load(self, infiles, **kwargs):
         """
@@ -54,13 +58,13 @@ class H5Dataset(object):
 
         for infile in infiles:
             if isinstance(infile, six.string_types):
-                path    = expandvars(infile)
+                path = expandvars(infile)
                 address = self.default_address
-                key     = self.default_key
+                key = self.default_key
             elif isinstance(infile, dict):
-                path    = expandvars(infile.pop("path"))
+                path = expandvars(infile.pop("path"))
                 address = infile.pop("address", self.default_address)
-                key     = infile.pop("key",     self.default_key)
+                key = infile.pop("key", self.default_key)
             elif isinstance(infile, list):
                 if len(infile) >= 1:
                     path = expandvars(infile[0])
@@ -71,19 +75,20 @@ class H5Dataset(object):
                 else:
                     address = self.default_address
                 if len(infile) >= 3:
-                    key     = infile[2]
+                    key = infile[2]
                 else:
-                    key     = self.default_key
+                    key = self.default_key
 
             if not isfile(path):
                 raise OSError("h5 file '{0}' does not exist".format(path))
 
             with h5py.File(path) as in_h5:
                 if address not in in_h5:
-                    raise KeyError("Dataset {0}[{1}] not found".format(path,
-                      address))
-                dataset            = in_h5[address]
+                    raise KeyError(
+                        "Dataset {0}[{1}] not found".format(path, address))
+                dataset = in_h5[address]
                 self.datasets[key] = np.array(dataset)
-                self.attrs[key]    = dict(dataset.attrs)
-            print("Loaded Dataset {0}[{1}]; Stored at {2}".format(
-              path, address, key))
+                self.attrs[key] = dict(dataset.attrs)
+            print(
+                "Loaded Dataset {0}[{1}]; Stored at {2}".format(path, address,
+                    key))

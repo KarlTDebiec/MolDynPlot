@@ -11,7 +11,9 @@
 Processes and represents data that is a function of time
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
@@ -19,6 +21,8 @@ from IPython import embed
 import numpy as np
 import pandas as pd
 from ..myplotspec.YSpecDataset import YSpecDataset
+
+
 ################################### CLASSES ###################################
 class TimeSeriesYSpecDataset(YSpecDataset):
     """
@@ -50,54 +54,41 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         help_groups = kwargs.get("help_groups")
         arg_groups = {ag.title: ag for ag in parser._action_groups}
         input_group = arg_groups.get("input",
-          parser.add_argument_group("input"))
+            parser.add_argument_group("input"))
         action_group = arg_groups.get("action",
-          parser.add_argument_group("action"))
+            parser.add_argument_group("action"))
         output_group = arg_groups.get("output",
-          parser.add_argument_group("output"))
+            parser.add_argument_group("output"))
 
         # Input arguments
-        class_.add_argument(input_group,
-          "-spec",
-          dest     = "source_spec",
-          metavar  = "SPEC",
-          type     = str,
-          help     = """file from which to load specification; see '--help
+        class_.add_argument(input_group, "-spec", dest="source_spec",
+            metavar="SPEC", type=str, help="""file from which to load
+            specification; see '--help
                      spec' for more information""")
 
         # Action arguments
-        class_.add_argument(action_group,
-          "-dt",
-          type     = float,
-          help     = "time between frames")
-        class_.add_argument(action_group,
-          "-toffset",
-          type     = float,
-          help     = "offset to add to index (time or frame number)")
-        class_.add_argument(action_group,
-          "-downsample",
-          type     = int,
-          help     = "factor by which to downsample data")
-        class_.add_argument(action_group,
-          "--pdist",
-          action   = "store_true",
-          dest     = "calc_pdist",
-          help     = "calculate probability distribution over timeseries")
-        class_.add_argument(action_group,
-          "--mean",
-          action   = "store_true",
-          dest     = "calc_mean",
-          help     = "calculate mean and standard error over timeseries")
+        class_.add_argument(action_group, "-dt", type=float,
+            help="time between frames")
+        class_.add_argument(action_group, "-toffset", type=float,
+            help="offset to add to index (time or frame number)")
+        class_.add_argument(action_group, "-downsample", type=int,
+            help="factor by which to downsample data")
+        class_.add_argument(action_group, "--pdist", action="store_true",
+            dest="calc_pdist",
+            help="calculate probability distribution over timeseries")
+        class_.add_argument(action_group, "--mean", action="store_true",
+            dest="calc_mean",
+            help="calculate mean and standard error over timeseries")
 
         # Arguments inherited from superclass
         super(TimeSeriesYSpecDataset, class_).construct_argparser(
-          parser=parser, **kwargs)
+            parser=parser, **kwargs)
 
         return parser
 
     def __init__(self, dt=None, toffset=None, downsample=None,
-        calc_pdist=False, calc_mean=False, outfile=None, interactive=False,
-        **kwargs):
+            calc_pdist=False, calc_mean=False, outfile=None, interactive=False,
+            **kwargs):
         """
         Arguments:
           infile{s} (list): Path(s) to input file(s); may contain
@@ -134,17 +125,17 @@ class TimeSeriesYSpecDataset(YSpecDataset):
 
         # Process data
         if dt:
-            self.timeseries_df.set_index(self.timeseries_df.index.values *
-              float(dt), inplace=True)
+            self.timeseries_df.set_index(
+                self.timeseries_df.index.values * float(dt), inplace=True)
             self.timeseries_df.index.name = "time"
         if toffset:
             index_name = self.timeseries_df.index.name
-            self.timeseries_df.set_index(self.timeseries_df.index.values +
-              float(toffset), inplace=True)
+            self.timeseries_df.set_index(
+                self.timeseries_df.index.values + float(toffset), inplace=True)
             self.timeseries_df.index.name = index_name
         if downsample:
             self.timeseries_df = self.downsample(df=self.timeseries_df,
-              downsample=downsample, **kwargs)
+                downsample=downsample, **kwargs)
 
         # Output data
         if verbose >= 2:
@@ -157,23 +148,23 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         if calc_pdist:
             pdist_kw = kwargs.get("pdist_kw", {})
             self.pdist_df = self.calc_pdist(df=self.timeseries_df,
-              verbose=verbose, **pdist_kw)
+                verbose=verbose, **pdist_kw)
             if verbose >= 2:
                 print("Processed pdist DataFrame:")
                 print(self.pdist_df)
-            # WRITE IF STRING
+                # WRITE IF STRING
 
         # Calculate mean and standard error
         if calc_mean:
             block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
-                            fit_exp=True, fit_sig=False)
+                fit_exp=True, fit_sig=False)
             block_kw.update(kwargs.get("block_kw", {}))
             self.mean_df, self.block_averager = self.calc_mean(
-              df=self.timeseries_df, verbose=verbose, **block_kw)
+                df=self.timeseries_df, verbose=verbose, **block_kw)
             if verbose >= 2:
                 print("Processed mean DataFrame:")
                 print(self.mean_df)
-            # WRITE IF STRING
+                # WRITE IF STRING
 
         # Interactive prompt
         if interactive:
@@ -198,29 +189,29 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         verbose = kwargs.get("verbose", 1)
 
         # Truncate dataset
-        reduced = df.values[:df.shape[0] - (df.shape[0] % downsample),:]
-        new_shape = (int(reduced.shape[0]/downsample), downsample,
-          reduced.shape[1])
-        index = np.reshape(df.index.values[
-          :df.shape[0]-(df.shape[0] % downsample)],
-          new_shape[:-1]).mean(axis=1)
+        reduced = df.values[:df.shape[0] - (df.shape[0] % downsample), :]
+        new_shape = (
+        int(reduced.shape[0] / downsample), downsample, reduced.shape[1])
+        index = np.reshape(
+            df.index.values[:df.shape[0] - (df.shape[0] % downsample)],
+            new_shape[:-1]).mean(axis=1)
         reduced = np.reshape(reduced, new_shape)
 
         # Downsample
         if downsample_mode == "mean":
             if verbose >= 1:
                 wrapprint("downsampling by factor of {0} using mean".format(
-                  downsample))
+                    downsample))
             reduced = np.squeeze(reduced.mean(axis=1))
         elif downsample_mode == "mode":
             if verbose >= 1:
                 wrapprint("downsampling by factor of {0} using mode".format(
-                  downsample))
+                    downsample))
             reduced = np.squeeze(mode(reduced, axis=1)[0])
 
         # Store downsampled time series
         reduced = pd.DataFrame(data=reduced, index=index,
-          columns=df.columns.values)
+            columns=df.columns.values)
         reduced.index.name = "time"
         df = reduced
 
@@ -256,7 +247,8 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         fit_exp = kwargs.get("fit_exp", True)
         fit_sig = kwargs.get("fit_sig", True)
         if verbose >= 1:
-            wrapprint("""Calculating mean and standard error over timeseries""")
+            wrapprint(
+                """Calculating mean and standard error over timeseries""")
 
         # Single-level columns
         if df.columns.nlevels == 1:
@@ -270,10 +262,10 @@ class TimeSeriesYSpecDataset(YSpecDataset):
                 errors = block_averager.parameters.loc[("exp", "a (se)")]
             else:
                 raise Exception()
-            errors.index = errors.index.values+" se"
+            errors.index = errors.index.values + " se"
             mean_df = pd.concat([mean_df, errors])
-            mean_df = mean_df[np.array([[c, c+" se"] for c in
-            df.columns.values]).flatten()]
+            mean_df = mean_df[np.array(
+                [[c, c + " se"] for c in df.columns.values]).flatten()]
             print("####################################")
             print(mean_df)
             print(df.columns.values)
@@ -289,10 +281,10 @@ class TimeSeriesYSpecDataset(YSpecDataset):
                 errors = block_averager.parameters.loc[("exp", "a (se)")]
             else:
                 raise Exception()
-            errors.index = pd.MultiIndex.from_tuples(map(eval,
-                             errors.index.values))
-            errors.index = errors.index.set_levels([c+" se" for c in
-                             errors.index.levels[1].values], level=1)
+            errors.index = pd.MultiIndex.from_tuples(
+                map(eval, errors.index.values))
+            errors.index = errors.index.set_levels(
+                [c + " se" for c in errors.index.levels[1].values], level=1)
             mean_df = mean_df.squeeze().unstack().join(errors.unstack)
             print("####################################")
             a = mean_df.squeeze().unstack()
@@ -305,11 +297,12 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         else:
             raise Exception()
 
-        #c = c[["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
-        #c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
-        #mean_df = c
+        # c = c[["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
+        # c = c.loc[sorted(c.index.values, key=lambda x: int(x.split(":")[1]))]
+        # mean_df = c
 
         return mean_df, block_averager
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

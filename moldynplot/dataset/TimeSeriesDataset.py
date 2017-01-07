@@ -14,10 +14,11 @@ Processes data that is a function of time
   - Fix separation and ordering of argument groups: input, action, output
   - Move in faster text loader from cpptraj2hdf5.py
   - Re-implement NatConTimeSeriesDataset
-  - Re-implement SAXSTimeSeriesDataset
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
@@ -25,10 +26,13 @@ from IPython import embed
 import h5py
 import numpy as np
 import pandas as pd
+import six
 from ..myplotspec.Dataset import Dataset
 from ..myplotspec import sformat, wiprint
 from .SequenceDataset import RelaxDataset, IREDDataset
 from .SAXSDataset import SAXSDataset
+
+
 ################################### CLASSES ###################################
 class TimeSeriesDataset(Dataset):
     """
@@ -64,13 +68,10 @@ class TimeSeriesDataset(Dataset):
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "timeseries",
-              description = help_message,
-              help        = help_message)
+            parser = parser_or_subparsers.add_parser(name="timeseries",
+                description=help_message, help=help_message)
         elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
+            parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
         if parser.get_default("cls") is None:
@@ -81,44 +82,32 @@ class TimeSeriesDataset(Dataset):
 
         # Action arguments
         action_group = arg_groups.get("action",
-          parser.add_argument_group("action"))
+            parser.add_argument_group("action"))
         try:
-            action_group.add_argument(
-              "-dt",
-              type     = float,
-              help     = """time between frames""")
+            action_group.add_argument("-dt", type=float, help="""time
+            between frames""")
         except argparse.ArgumentError:
             pass
         try:
-            action_group.add_argument(
-              "-toffset",
-              type     = float,
-              help     = """offset to add to index (time or frame number)""")
+            action_group.add_argument("-toffset", type=float, help="""offset
+            to add to index (time or frame number)""")
         except argparse.ArgumentError:
             pass
         try:
-            action_group.add_argument(
-              "-downsample",
-              type     = int,
-              help     = """factor by which to downsample data""")
+            action_group.add_argument("-downsample", type=int, help="""factor
+             by which to downsample data""")
         except argparse.ArgumentError:
             pass
         try:
-            action_group.add_argument(
-              "--pdist",
-              action   = "store_true",
-              dest     = "calc_pdist",
-              help     = """calculate probability distribution over timeseries
-                         """)
+            action_group.add_argument("--pdist", action="store_true",
+                dest="calc_pdist", help="""calculate probability
+                distribution over timeseries""")
         except argparse.ArgumentError:
             pass
         try:
-            action_group.add_argument(
-              "--mean",
-              action   = "store_true",
-              dest     = "calc_mean",
-              help     = """Calculate mean and standard error over timeseries
-                         """)
+            action_group.add_argument("--mean", action="store_true",
+                dest="calc_mean", help="""Calculate mean and standard error
+                over timeseries""")
         except argparse.ArgumentError:
             pass
 
@@ -128,8 +117,8 @@ class TimeSeriesDataset(Dataset):
         return parser
 
     def __init__(self, dt=None, toffset=None, downsample=None,
-        calc_pdist=False, calc_mean=False, outfile=None, interactive=False,
-        **kwargs):
+            calc_pdist=False, calc_mean=False, outfile=None, interactive=False,
+            **kwargs):
         """
         Arguments:
           infile{s} (list): Path(s) to input file(s); may contain
@@ -154,6 +143,9 @@ class TimeSeriesDataset(Dataset):
           .. todo:
             - Calculate pdist using histogram
             - Verbose pdist
+            - Check for pre-existance of dfs, only load if not already
+            loaded;  this may be useful for allowing subclasses to smoothly
+            call their parents' __init__ methods
         """
 
         # Process arguments
@@ -165,17 +157,17 @@ class TimeSeriesDataset(Dataset):
 
         # Process data
         if dt:
-            self.timeseries_df.set_index(self.timeseries_df.index.values *
-              float(dt), inplace=True)
+            self.timeseries_df.set_index(
+                self.timeseries_df.index.values * float(dt), inplace=True)
             self.timeseries_df.index.name = "time"
         if toffset:
             index_name = self.timeseries_df.index.name
-            self.timeseries_df.set_index(self.timeseries_df.index.values +
-              float(toffset), inplace=True)
+            self.timeseries_df.set_index(
+                self.timeseries_df.index.values + float(toffset), inplace=True)
             self.timeseries_df.index.name = index_name
         if downsample:
-            self.timeseries_df = self.downsample(df=self.timeseries_df, 
-              downsample=downsample, **kwargs)
+            self.timeseries_df = self.downsample(df=self.timeseries_df,
+                downsample=downsample, **kwargs)
 
         # Output data
         if verbose >= 2:
@@ -188,23 +180,25 @@ class TimeSeriesDataset(Dataset):
         if calc_pdist:
             pdist_kw = kwargs.get("pdist_kw", {})
             self.pdist_df = self.calc_pdist(df=self.timeseries_df,
-              verbose=verbose, **pdist_kw)
+                verbose=verbose, **pdist_kw)
             if verbose >= 2:
                 print("Processed pdist DataFrame:")
                 print(self.pdist_df)
-            # WRITE IF STRING
+            if isinstance(calc_mean, six.string_types):
+                self.write(df=self.pdist_df, outfile=calc_pdist, **kwargs)
 
         # Calculate mean and standard error
         if calc_mean:
             block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
-                            fit_exp=True, fit_sig=False)
+                fit_exp=True, fit_sig=False)
             block_kw.update(kwargs.get("block_kw", {}))
             self.mean_df, self.block_averager = self.calc_mean(
-              df=self.timeseries_df, verbose=verbose, **block_kw)
+                df=self.timeseries_df, verbose=verbose, **block_kw)
             if verbose >= 2:
                 print("Processed mean DataFrame:")
                 print(self.mean_df)
-            # WRITE IF STRING
+            if isinstance(calc_mean, six.string_types):
+                self.write(df=self.mean_df, outfile=calc_mean, **kwargs)
 
         # Interactive prompt
         if interactive:
@@ -229,29 +223,29 @@ class TimeSeriesDataset(Dataset):
         verbose = kwargs.get("verbose", 1)
 
         # Truncate dataset
-        reduced = df.values[:df.shape[0] - (df.shape[0] % downsample),:]
-        new_shape = (int(reduced.shape[0]/downsample), downsample,
-          reduced.shape[1])
-        index = np.reshape(df.index.values[
-          :df.shape[0]-(df.shape[0] % downsample)],
-          new_shape[:-1]).mean(axis=1)
+        reduced = df.values[:df.shape[0] - (df.shape[0] % downsample), :]
+        new_shape = (
+            int(reduced.shape[0] / downsample), downsample, reduced.shape[1])
+        index = np.reshape(
+            df.index.values[:df.shape[0] - (df.shape[0] % downsample)],
+            new_shape[:-1]).mean(axis=1)
         reduced = np.reshape(reduced, new_shape)
 
         # Downsample
         if downsample_mode == "mean":
             if verbose >= 1:
                 wiprint("downsampling by factor of {0} using mean".format(
-                  downsample))
+                    downsample))
             reduced = np.squeeze(reduced.mean(axis=1))
         elif downsample_mode == "mode":
             if verbose >= 1:
                 wiprint("downsampling by factor of {0} using mode".format(
-                  downsample))
+                    downsample))
             reduced = np.squeeze(mode(reduced, axis=1)[0])
 
         # Store downsampled time series
         reduced = pd.DataFrame(data=reduced, index=index,
-          columns=df.columns.values)
+            columns=df.columns.values)
         reduced.index.name = "time"
         df = reduced
 
@@ -316,15 +310,15 @@ class TimeSeriesDataset(Dataset):
                 errors = block_averager.parameters.loc[("exp", "a (se)")]
             else:
                 raise Exception()
-            errors.index = pd.MultiIndex.from_tuples(map(eval,
-                             errors.index.values))
-            errors.index = errors.index.set_levels([c+" se" for c in
-                             errors.index.levels[1].values], level=1)
+            errors.index = pd.MultiIndex.from_tuples(
+                map(eval, errors.index.values))
+            errors.index = errors.index.set_levels(
+                [c + " se" for c in errors.index.levels[1].values], level=1)
             mean_df = mean_df.squeeze().unstack().join(errors.unstack())
-            mean_df = mean_df[["r1", "r1 se", "r2", "r2 se",
-                               "noe", "noe se", "s2", "s2 se"]]
+            mean_df = mean_df[
+                ["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
             mean_df = mean_df.loc[sorted(mean_df.index.values,
-              key=lambda x: int(x.split(":")[1]))]
+                key=lambda x: int(x.split(":")[1]))]
         else:
             raise Exception("Additional MultiIndex Levels not tested")
 
@@ -362,13 +356,10 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "ired",
-              description = help_message,
-              help        = help_message)
+            parser = parser_or_subparsers.add_parser(name="ired",
+                description=help_message, help=help_message)
         elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
+            parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
         if parser.get_default("cls") is None:
@@ -384,7 +375,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
 
     @staticmethod
     def concatenate_timeseries(timeseries_dfs=None, relax_dfs=None,
-        order_dfs=None, **kwargs):
+            order_dfs=None, **kwargs):
         """
         Concatenates a series of iRED datasets.
 
@@ -418,7 +409,7 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
                 wiprint("""Concatenating timeseries from {0} relaxation
                         infiles""".format(len(relax_dfs)))
             relax_df = pd.concat([rdf.stack() for rdf in relax_dfs],
-                         axis=1).transpose()
+                axis=1).transpose()
         else:
             relax_df = None
 
@@ -428,16 +419,16 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
                 wiprint("""Concatenating timeseries from {0} order parameter
                         infiles""".format(len(order_dfs)))
             order_df = pd.concat([odf.stack() for odf in order_dfs],
-                         axis=1).transpose()
+                axis=1).transpose()
         else:
             order_df = None
 
         # Merge and sort relaxation and order parameters
         if relax_df is not None and order_df is not None:
             df = pd.merge(relax_df, order_df, how="outer", left_index=True,
-                           right_index=True)
+                right_index=True)
             df = df[sorted(list(set(df.columns.get_level_values(0))),
-                   key=lambda x: int(x.split(":")[1]))]
+                key=lambda x: int(x.split(":")[1]))]
         elif relax_df is None and order_df is not None:
             df = order_df
         elif order_df is None and relax_df is not None:
@@ -468,8 +459,8 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
             raise Exception(sformat("""No infiles found matching
             '{0}'""".format(infile_args)))
         re_h5 = re.compile(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          flags=re.UNICODE)
+            r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+            flags=re.UNICODE)
 
         # Load data
         timeseries_dfs = []
@@ -489,8 +480,10 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
                     relax_dfs.append(df)
                 if "s2" in columns:
                     order_dfs.append(df)
-                if not (("r1" in columns and "r2" in columns
-                and "noe" in columns) or ("s2" in columns)):
+                if not ((
+                                    "r1" in columns and "r2" in columns and
+                                "noe" in columns) or (
+                            "s2" in columns)):
                     raise Exception(sformat("""DataFrame loaded from '{0}' does
                       not appear to contain either relaxation ('r1', 'r2',
                       'noe') or order parameter ('s2')
@@ -533,9 +526,9 @@ class NatConTimeSeriesDataset(TimeSeriesDataset):
 
         # Convert minimum distances to percent native contacts
         cutoff = kwargs.get("cutoff", 5.5)
-        percent = pd.DataFrame(data=(dataframe.values <= cutoff).sum(axis=1)
-          / dataframe.shape[1], index=dataframe.index,
-          columns=["percent_native_contacts"])
+        percent = pd.DataFrame(
+            data=(dataframe.values <= cutoff).sum(axis=1) / dataframe.shape[1],
+            index=dataframe.index, columns=["percent_native_contacts"])
         dataframe = self.dataframe = percent
 
         # Downsample; flag included in function definition to prevent
@@ -545,19 +538,19 @@ class NatConTimeSeriesDataset(TimeSeriesDataset):
 
             if verbose >= 1:
                 print("downsampling by factor of {0} using mode".format(
-                  downsample))
+                    downsample))
 
             reduced = dataframe.values[
-              :dataframe.shape[0]-(dataframe.shape[0] % downsample),:]
-            new_shape=(int(reduced.shape[0]/ downsample),
-                downsample, reduced.shape[1])
+            :dataframe.shape[0] - (dataframe.shape[0] % downsample), :]
+            new_shape = (
+            int(reduced.shape[0] / downsample), downsample, reduced.shape[1])
             index = np.reshape(dataframe.index.values[
-              :dataframe.shape[0]-(dataframe.shape[0] % downsample)],
-              new_shape[:-1]).mean(axis=1)
+            :dataframe.shape[0] - (dataframe.shape[0] % downsample)],
+                new_shape[:-1]).mean(axis=1)
             reduced = np.reshape(reduced, new_shape)
             reduced = np.squeeze(mode(reduced, axis=1)[0])
             reduced = pd.DataFrame(data=reduced, index=index,
-              columns=dataframe.columns.values)
+                columns=dataframe.columns.values)
             reduced.index.name = "time"
             dataframe = self.dataframe = reduced
 
@@ -565,13 +558,13 @@ class NatConTimeSeriesDataset(TimeSeriesDataset):
         if calc_pdist:
             if verbose >= 1:
                 print("calculating probability distribution using histogram")
-            bins = np.linspace(0-((1/n_contacts)/2), 1+((1/n_contacts)/2),
-              n_contacts+1)
+            bins = np.linspace(0 - ((1 / n_contacts) / 2),
+                1 + ((1 / n_contacts) / 2), n_contacts + 1)
             pdist, _ = np.histogram(self.dataframe.values, bins)
-            pdist    =  np.array(pdist, np.float) / pdist.sum()
-            pdist_x = np.zeros(bins.size*2)
-            pdist_y = np.zeros(bins.size*2)
-            pdist_x[::2]    = pdist_x[1::2]   = bins
+            pdist = np.array(pdist, np.float) / pdist.sum()
+            pdist_x = np.zeros(bins.size * 2)
+            pdist_y = np.zeros(bins.size * 2)
+            pdist_x[::2] = pdist_x[1::2] = bins
             pdist_y[1:-1:2] = pdist_y[2:-1:2] = pdist
             self.pdist_x = pdist_x
             self.pdist_y = pdist_y
@@ -585,8 +578,9 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
     """
 
     def __init__(self, infile, address="saxs", dt=None, toffset=None,
-        downsample=None, calc_mean=False, calc_error=True, error_method="std",
-        scale=False, outfile=None, interactive=False, **kwargs):
+            downsample=None, calc_mean=False, calc_error=True,
+            error_method="std", scale=False, outfile=None, interactive=False,
+            **kwargs):
         """
         Arguments:
           infile (str): Path to input file, may contain environment
@@ -612,20 +606,21 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
 
         # Read data
         with h5py.File(expandvars(infile)) as h5_file:
-            q = ["{0:5.3f}".format(a) for a in np.array(h5_file[address+"/q"])]
+            q = ["{0:5.3f}".format(a) for a in
+                np.array(h5_file[address + "/q"])]
         self.timeseries_df = self.read(
-          infile=infile+":/"+address+"/intensity",
-          dataframe_kw=dict(columns=q), **kwargs)
+            infile=infile + ":/" + address + "/intensity",
+            dataframe_kw=dict(columns=q), **kwargs)
 
         # Process data
         if dt:
-            self.timeseries_df.set_index(self.timeseries_df.index.values *
-              float(dt), inplace=True)
+            self.timeseries_df.set_index(
+                self.timeseries_df.index.values * float(dt), inplace=True)
             self.timeseries_df.index.name = "time"
         if toffset:
             index_name = self.timeseries_df.index.name
-            self.timeseries_df.set_index(self.timeseries_df.index.values +
-              float(toffset), inplace=True)
+            self.timeseries_df.set_index(
+                self.timeseries_df.index.values + float(toffset), inplace=True)
             self.timeseries_df.index.name = index_name
         if downsample:
             self.downsample(downsample, downsample_mode="mean", **kwargs)
@@ -640,12 +635,13 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         # Calculate mean and standard error
         if calc_mean:
             block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
-                            fit_exp=True, fit_sig=False)
-#            block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=True,
-#                            fit_exp=True, fit_sig=False)
+                fit_exp=True, fit_sig=False)
+            #            block_kw = dict(min_n_blocks=2, max_cut=0.1,
+            # all_factors=True,
+            #                            fit_exp=True, fit_sig=False)
             block_kw.update(kwargs.get("block_kw", {}))
             self.mean_df, self.block_averager = self.calc_mean(
-              df=self.timeseries_df, verbose=verbose, **block_kw)
+                df=self.timeseries_df, verbose=verbose, **block_kw)
             if verbose >= 2:
                 print("Processed mean DataFrame:")
                 print(self.mean_df)
@@ -656,25 +652,21 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         if scale:
             self.scale(scale, **kwargs)
 
+
 #################################### MAIN #####################################
 def main():
     import argparse
 
     # Prepare argument parser
-    parser = argparse.ArgumentParser(
-      description = __doc__)
-    subparsers = parser.add_subparsers(
-      dest        = "mode",
-      description = "")
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="mode", description="")
 
     TimeSeriesDataset.construct_argparser(subparsers)
     IREDTimeSeriesDataset.construct_argparser(subparsers)
-    PRETimeSeriesDataset.construct_argparser(subparsers)
-#    NatConTimeSeriesDataset.construct_argparser(subparsers)
-#    SAXSTimeSeriesDataset.construct_argparser(subparsers)
 
-    kwargs  = vars(parser.parse_args())
+    kwargs = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
+
 
 if __name__ == "__main__":
     main()

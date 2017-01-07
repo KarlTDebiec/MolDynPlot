@@ -17,7 +17,9 @@ Processes data that is a function of amino acid sequence
   - Move relaxation pre ratio here
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
@@ -27,6 +29,8 @@ import numpy as np
 import pandas as pd
 from ..myplotspec.Dataset import Dataset
 from ..myplotspec import sformat, wiprint
+
+
 ################################### CLASSES ###################################
 class SequenceDataset(Dataset):
     """
@@ -48,11 +52,8 @@ class SequenceDataset(Dataset):
     """
 
     default_hdf5_address = "/"
-    default_hdf5_kw = dict(
-      chunks      = True,
-      compression = "gzip",
-      dtype       = np.float32,
-      scaleoffset = 5)
+    default_hdf5_kw = dict(chunks=True, compression="gzip", dtype=np.float32,
+        scaleoffset=5)
 
     @staticmethod
     def construct_argparser(parser_or_subparsers=None, **kwargs):
@@ -78,13 +79,10 @@ class SequenceDataset(Dataset):
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "sequence",
-              description = help_message,
-              help        = help_message)
+            parser = parser_or_subparsers.add_parser(name="sequence",
+                description=help_message, help=help_message)
         elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
+            parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
         if parser.get_default("cls") is None:
@@ -94,14 +92,11 @@ class SequenceDataset(Dataset):
         arg_groups = {ag.title: ag for ag in parser._action_groups}
 
         # Input arguments
-        input_group  = arg_groups.get("input",
-          parser.add_argument_group("input"))
+        input_group = arg_groups.get("input",
+            parser.add_argument_group("input"))
         try:
-            input_group.add_argument(
-              "-indexfile",
-              required = False,
-              type     = str,
-              help     = """text file from which to load residue names; should
+            input_group.add_argument("-indexfile", required=False, type=str,
+                help="""text file from which to load residue names; should
                          list amino acids in the form 'XAA:#' separated by
                          whitespace; if omitted will be taken from rows of
                          first infile; may contain environment variables""")
@@ -143,8 +138,8 @@ class SequenceDataset(Dataset):
             read_csv_kw.append((key, value))
         return (cls, tuple(infiles), use_indexes, tuple(read_csv_kw))
 
-    def __init__(self, calc_pdist=False, outfile=None,
-        interactive=False, **kwargs):
+    def __init__(self, calc_pdist=False, outfile=None, interactive=False,
+            **kwargs):
         """
         Arguments:
           infile{s} (list): Path(s) to input file(s); may contain
@@ -172,9 +167,10 @@ class SequenceDataset(Dataset):
         # Process data
         if "use_indexes" in kwargs:
             use_indexes = np.array(kwargs.pop("use_indexes"), np.int)
-            res_index = np.array([int(i.split(":")[1])
-              for i in self.sequence_df.index.values])
-            self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
+            res_index = np.array(
+                [int(i.split(":")[1]) for i in self.sequence_df.index.values])
+            self.sequence_df = self.sequence_df[
+                np.in1d(res_index, use_indexes)]
 
         # Output data
         if verbose >= 2:
@@ -187,7 +183,7 @@ class SequenceDataset(Dataset):
         if calc_pdist:
             pdist_kw = kwargs.get("pdist_kw", {})
             self.pdist_df = self.calc_pdist(df=self.sequence_df,
-              verbose=verbose, **pdist_kw)
+                verbose=verbose, **pdist_kw)
             if verbose >= 2:
                 print("Processed pdist DataFrame:")
                 print(self.pdist_df)
@@ -225,8 +221,9 @@ class SequenceDataset(Dataset):
             res_index = np.loadtxt(indexfile, dtype=np.str).flatten()
             df.set_index(res_index, inplace=True)
             df.index.name = "residue"
-        elif (sum([1 for a in [re_res.match(str(b)) for b in df.index.values]
-              if a is not None]) == len(df.index.values)):
+        elif (sum(
+                [1 for a in [re_res.match(str(b)) for b in df.index.values] if
+                        a is not None]) == len(df.index.values)):
             df.index.name = "residue"
         else:
             df.index.name = "index"
@@ -248,8 +245,8 @@ class SequenceDataset(Dataset):
 
         # Sort
         if df.index.name == "residue":
-            df = df.loc[sorted(df.index.values,
-                   key=lambda x: int(x.split(":")[1]))]
+            df = df.loc[
+                sorted(df.index.values, key=lambda x: int(x.split(":")[1]))]
         else:
             df = df.loc[sorted(df.index.values)]
 
@@ -285,13 +282,10 @@ class ChemicalShiftDataset(SequenceDataset):
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "chemical_shift",
-              description = help_message,
-              help        = help_message)
+            parser = parser_or_subparsers.add_parser(name="chemical_shift",
+                description=help_message, help=help_message)
         elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
+            parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
         if parser.get_default("cls") is None:
@@ -301,16 +295,12 @@ class ChemicalShiftDataset(SequenceDataset):
         arg_groups = {ag.title: ag for ag in parser._action_groups}
 
         # Input arguments
-        input_group  = arg_groups.get("input",
-          parser.add_argument_group("input"))
+        input_group = arg_groups.get("input",
+            parser.add_argument_group("input"))
         try:
-            input_group.add_argument(
-              "-delays",
-              dest     = "delays",
-              metavar  = "DELAY",
-              nargs    = "+",
-              type     = float,
-              help     = """delays for each infile, if infiles represent a
+            input_group.add_argument("-delays", dest="delays", metavar="DELAY",
+                nargs="+", type=float, help="""delays for each infile,
+                if infiles represent a
                          series; number of delays must match number of
                          infiles""")
         except argparse.ArgumentError:
@@ -318,21 +308,15 @@ class ChemicalShiftDataset(SequenceDataset):
 
         # Action arguments
         action_group = arg_groups.get("action",
-          parser.add_argument_group("action"))
+            parser.add_argument_group("action"))
         try:
-            action_group.add_argument(
-              "-relax",
-              dest     = "calc_relax",
-              type     = str,
-              nargs    = "?",
-              default  = None,
-              const    = "r1",
-              help     = """Calculate relaxation rates and standard errors; may
+            action_group.add_argument("-relax", dest="calc_relax", type=str,
+                nargs="?", default=None, const="r1", help="""Calculate
+                relaxation rates and standard errors; may
                          additionally specify kind of relaxation being
                          measured (e.g. r1, r2)""")
         except argparse.ArgumentError:
             pass
-
 
         # Arguments inherited from superclass
         SequenceDataset.construct_argparser(parser)
@@ -340,7 +324,7 @@ class ChemicalShiftDataset(SequenceDataset):
         return parser
 
     def __init__(self, delays=None, calc_relax=False, calc_pdist=False,
-        outfile=None, interactive=False, **kwargs):
+            outfile=None, interactive=False, **kwargs):
         """
         Arguments:
           infile{s} (list): Path(s) to input file(s); may contain
@@ -363,23 +347,24 @@ class ChemicalShiftDataset(SequenceDataset):
 
         # Read data
         if delays is not None:
-            kwargs["infile_column_prefixes"] = ["{0:3.1f} ms".format(delay)
-              for delay in delays]
+            kwargs["infile_column_prefixes"] = ["{0:3.1f} ms".format(delay) for
+                delay in delays]
         self.sequence_df = self.read(**kwargs)
 
         # Cut data
         if "use_indexes" in kwargs:
             use_indexes = np.array(kwargs.pop("use_indexes"))
-            res_index = np.array([int(i.split(":")[1])
-              for i in self.sequence_df.index.values])
-            self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
+            res_index = np.array(
+                [int(i.split(":")[1]) for i in self.sequence_df.index.values])
+            self.sequence_df = self.sequence_df[
+                np.in1d(res_index, use_indexes)]
 
         # Calculate relaxation
         if calc_relax:
             relax_kw = kwargs.pop("relax_kw", {})
             relax_kw["kind"] = calc_relax
             self.sequence_df = self.calc_relax(df=self.sequence_df,
-              relax_kw=relax_kw, **kwargs)
+                relax_kw=relax_kw, **kwargs)
 
         # Calculate probability distribution
         if calc_pdist:
@@ -415,7 +400,7 @@ class ChemicalShiftDataset(SequenceDataset):
 
         # Functions
         def convert_name(name):
-            return "{0}:{1}".format(name[-4:-1].upper(),name[2:-4])
+            return "{0}:{1}".format(name[-4:-1].upper(), name[2:-4])
 
         # Process arguments
         infile_args = multi_pop_merged(["infile", "infiles"], kwargs)
@@ -424,10 +409,10 @@ class ChemicalShiftDataset(SequenceDataset):
             raise Exception(sformat("""No infiles found matching
             '{0}'""".format(infile_args)))
         re_h5 = re.compile(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          flags=re.UNICODE)
+            r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+            flags=re.UNICODE)
         infile_column_prefixes = kwargs.get("infile_column_prefixes",
-          range(len(infiles)))
+            range(len(infiles)))
 
         # Load Data
         dfs = []
@@ -436,30 +421,21 @@ class ChemicalShiftDataset(SequenceDataset):
                 df = self._read_hdf5(infile, **kwargs)
             else:
                 with open(devnull, "w") as fnull:
-                    header = " ".join(Popen("head -n 1 {0}".format(infile),
-                      stdout=PIPE, stderr=fnull, shell=True
-                      ).stdout.read().strip().split("\t"))
+                    header = " ".join(
+                        Popen("head -n 1 {0}".format(infile), stdout=PIPE,
+                            stderr=fnull,
+                            shell=True).stdout.read().strip().split("\t"))
                 ccpnmr_header = sformat("""Number # Position F1 Position F2
                     Assign F1 Assign F2 Height Volume Line Width F1 (Hz) Line
                     Width F2 (Hz) Merit Details Fit Method Vol. Method""")
                 if (header == ccpnmr_header):
-                    read_csv_kw = dict(
-                      index_col = None,
-                      delimiter = "\t",
-                      dtype = {
-                        "Position F1": np.float32,
-                        "Position F2": np.float32,
-                        "Assign F1":   np.str,
-                        "Height":      np.float32,
-                        "Volume":      np.float32},
-                      usecols = [
-                        str("Position F1"),
-                        str("Position F2"),
-                        str("Assign F1"),
-                        str("Height"),
-                        str("Volume")],
-                      converters = {
-                        "Assign F1": convert_name})
+                    read_csv_kw = dict(index_col=None, delimiter="\t",
+                        dtype={"Position F1": np.float32,
+                            "Position F2": np.float32, "Assign F1": np.str,
+                            "Height": np.float32, "Volume": np.float32},
+                        usecols=[str("Position F1"), str("Position F2"),
+                            str("Assign F1"), str("Height"), str("Volume")],
+                        converters={"Assign F1": convert_name})
                     read_csv_kw.update(kwargs.get("read_csv_kw", {}))
                     kwargs["read_csv_kw"] = read_csv_kw
                     df = self._read_text(infile, **kwargs)
@@ -482,8 +458,8 @@ class ChemicalShiftDataset(SequenceDataset):
 
         # Sort
         if df.index.name == "residue":
-            df = df.loc[sorted(df.index.values,
-                   key=lambda x: int(x.split(":")[1]))]
+            df = df.loc[
+                sorted(df.index.values, key=lambda x: int(x.split(":")[1]))]
         else:
             df = df.loc[sorted(df.index.values)]
 
@@ -517,24 +493,25 @@ class ChemicalShiftDataset(SequenceDataset):
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
-        df      = kwargs.get("df")
+        df = kwargs.get("df")
         if df is None:
             if hasattr(self, "sequence_df"):
                 df = self.sequence_df
             else:
-                raise()
+                raise ()
         relax_kw = kwargs.get("relax_kw", {})
-        kind             = relax_kw.get("kind",             "r1")
+        kind = relax_kw.get("kind", "r1")
         intensity_method = relax_kw.get("intensity_method", "height")
-        error_method     = relax_kw.get("error_method",     "mae")
+        error_method = relax_kw.get("error_method", "mae")
         n_synth_datasets = relax_kw.get("n_synth_datasets", 1000)
 
         # Calculate relaxation rates
-        re_column = re.compile("^(?P<delay>\d+\.?\d*?) ms {0}".format(
-          intensity_method))
+        re_column = re.compile(
+            "^(?P<delay>\d+\.?\d*?) ms {0}".format(intensity_method))
         columns = [c for c in df.columns.values if re_column.match(c)]
-        delays = np.array([re.match(re_column, c).groupdict()["delay"]
-                   for c in columns], np.float) / 1000
+        delays = np.array(
+            [re.match(re_column, c).groupdict()["delay"] for c in columns],
+            np.float) / 1000
 
         def calc_relax_rate(residue, **kwargs):
             """
@@ -542,8 +519,9 @@ class ChemicalShiftDataset(SequenceDataset):
             from . import multiprocess_map
 
             if verbose >= 1:
-                wiprint("""Calculating {0} relaxation rate for {1}""".format(
-                kind, residue.name))
+                wiprint(
+                    """Calculating {0} relaxation rate for {1}""".format(kind,
+                        residue.name))
 
             def model_function(delay, intensity, relaxation):
                 return intensity * np.exp(-1 * delay * relaxation)
@@ -553,20 +531,23 @@ class ChemicalShiftDataset(SequenceDataset):
 
             # Calculate error
             if error_method == "rmse":
-                error = np.sqrt(np.mean((I-model_function(delays, I0, R))**2))
+                error = np.sqrt(
+                    np.mean((I - model_function(delays, I0, R)) ** 2))
             elif error_method == "mae":
-                error = np.mean(np.sqrt((I-model_function(delays, I0, R))**2))
+                error = np.mean(
+                    np.sqrt((I - model_function(delays, I0, R)) ** 2))
 
             # Construct synthetic relaxation profiles
             synth_datasets = np.zeros((n_synth_datasets, I.size))
             for i, I_mean in enumerate(model_function(delays, I0, R)):
                 synth_datasets[:, i] = np.random.normal(I_mean, error,
-                                         n_synth_datasets)
+                    n_synth_datasets)
 
             def synth_fit_decay(synth_intensity):
                 try:
-                    synth_I0, synth_R = curve_fit(model_function, delays,
-                      synth_intensity, p0=(I0, R))[0]
+                    synth_I0, synth_R = \
+                    curve_fit(model_function, delays, synth_intensity,
+                        p0=(I0, R))[0]
                     return synth_R
                 except RuntimeError:
                     if verbose >= 1:
@@ -618,13 +599,10 @@ class RelaxDataset(SequenceDataset):
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "relax",
-              description = help_message,
-              help        = help_message)
+            parser = parser_or_subparsers.add_parser(name="relax",
+                description=help_message, help=help_message)
         elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
+            parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
         if parser.get_default("cls") is None:
@@ -638,7 +616,7 @@ class RelaxDataset(SequenceDataset):
         return parser
 
     def __init__(self, calc_pdist=False, outfile=None, interactive=False,
-        **kwargs):
+            **kwargs):
         """
         Arguments:
           infile{s} (list): Path(s) to input file(s); may contain
@@ -663,23 +641,28 @@ class RelaxDataset(SequenceDataset):
         # Cut data
         if "use_indexes" in kwargs:
             use_indexes = np.array(kwargs.pop("use_indexes"), np.int)
-            res_index = np.array([int(i.split(":")[1])
-              for i in self.sequence_df.index.values])
-            self.sequence_df = self.sequence_df[np.in1d(res_index,use_indexes)]
+            res_index = np.array(
+                [int(i.split(":")[1]) for i in self.sequence_df.index.values])
+            self.sequence_df = self.sequence_df[
+                np.in1d(res_index, use_indexes)]
 
         # Calculate r2/r1 ratio
         if "r1" in self.sequence_df and "r2" in self.sequence_df:
             self.sequence_df["r2/r1"] = self.sequence_df["r2"] / \
                                         self.sequence_df["r1"]
-            self.sequence_df["r2/r1 se"] = np.sqrt((self.sequence_df["r2 se"] /
-              self.sequence_df["r2"]) ** 2 + (self.sequence_df["r1 se"] /
-              self.sequence_df["r1"]) ** 2) * self.sequence_df["r2/r1"]
+            self.sequence_df["r2/r1 se"] = np.sqrt(
+                (self.sequence_df["r2 se"] / self.sequence_df["r2"]) ** 2 + (
+                                                                            self.sequence_df[
+                                                                                "r1 se"] /
+                                                                            self.sequence_df[
+                                                                                "r1"]) ** 2) * \
+                                           self.sequence_df["r2/r1"]
 
         # Calculate probability distribution
         if calc_pdist:
             pdist_kw = kwargs.get("pdist_kw", {})
             self.pdist_df = self.calc_pdist(df=self.sequence_df,
-              verbose=verbose, **pdist_kw)
+                verbose=verbose, **pdist_kw)
             if verbose >= 2:
                 print("Processed pdist DataFrame:")
                 print(self.pdist_df)
@@ -711,12 +694,11 @@ class RelaxDataset(SequenceDataset):
             if hasattr(self, "sequence_df"):
                 df = self.sequence_df
             else:
-                raise()
+                raise ()
         outfile = expandvars(outfile)
-        res_index = np.array([int(i.split(":")[1])
-          for i in df.index.values])
-        res_code = np.array([three_one(i.split(":")[0])
-          for i in df.index.values])
+        res_index = np.array([int(i.split(":")[1]) for i in df.index.values])
+        res_code = np.array(
+            [three_one(i.split(":")[0]) for i in df.index.values])
 
         df["index"] = res_index
         df["code"] = res_code
@@ -725,12 +707,15 @@ class RelaxDataset(SequenceDataset):
             with open(outfile + "r2", "w") as r2_file:
                 with open(outfile + "noe", "w") as noe_file:
                     for _, row in df.iterrows():
-                        r1_file.write("{0}\t{1}\t{2}\t{3}\n".format(
-                          row["code"],row["index"],row["r1"],row["r1 se"]))
-                        r2_file.write("{0}\t{1}\t{2}\t{3}\n".format(
-                          row["code"],row["index"],row["r2"],row["r2 se"]))
-                        noe_file.write("{0}\t{1}\t{2}\t{3}\n".format(
-                          row["code"],row["index"],row["noe"],row["noe se"]))
+                        r1_file.write(
+                            "{0}\t{1}\t{2}\t{3}\n".format(row["code"],
+                                row["index"], row["r1"], row["r1 se"]))
+                        r2_file.write(
+                            "{0}\t{1}\t{2}\t{3}\n".format(row["code"],
+                                row["index"], row["r2"], row["r2 se"]))
+                        noe_file.write(
+                            "{0}\t{1}\t{2}\t{3}\n".format(row["code"],
+                                row["index"], row["noe"], row["noe se"]))
 
 
 class IREDDataset(RelaxDataset):
@@ -764,13 +749,10 @@ class IREDDataset(RelaxDataset):
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "ired",
-              description = help_message,
-              help        = help_message)
+            parser = parser_or_subparsers.add_parser(name="ired",
+                description=help_message, help=help_message)
         elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
+            parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
         if parser.get_default("cls") is None:
@@ -781,16 +763,11 @@ class IREDDataset(RelaxDataset):
 
         # Input arguments
         input_group = arg_groups.get("input",
-          parser.add_argument_group("input"))
+            parser.add_argument_group("input"))
         try:
-            input_group.add_argument(
-              "-infiles",
-              required = True,
-              dest     = "infiles",
-              metavar  = "INFILE",
-              nargs    = "+",
-              type     = str,
-              help     = """File(s) from which to load data; may be text or
+            input_group.add_argument("-infiles", required=True, dest="infiles",
+                metavar="INFILE", nargs="+", type=str, help="""File(s) from
+                which to load data; may be text or
                          hdf5; if text, may be pandas-formatted DataFrames, or
                          may be cpptraj-formatted iRED output; may contain
                          environment variables and wildcards""")
@@ -826,29 +803,28 @@ class IREDDataset(RelaxDataset):
             if verbose >= 1:
                 wiprint("""Single relaxation infile provided; skipping error
                         calculation""")
-            df["r1"]         = relax_dfs[0]["r1"]
+            df["r1"] = relax_dfs[0]["r1"]
             if "r1 se" in relax_dfs[0]:
-                df["r1 se"]  = relax_dfs[0]["r1 se"]
-            df["r2"]         = relax_dfs[0]["r2"]
+                df["r1 se"] = relax_dfs[0]["r1 se"]
+            df["r2"] = relax_dfs[0]["r2"]
             if "r2 se" in relax_dfs[0]:
-                df["r2 se"]  = relax_dfs[0]["r2 se"]
-            df["noe"]        = relax_dfs[0]["noe"]
+                df["r2 se"] = relax_dfs[0]["r2 se"]
+            df["noe"] = relax_dfs[0]["noe"]
             if "noe se" in relax_dfs[0]:
                 df["noe se"] = relax_dfs[0]["noe se"]
         elif len(relax_dfs) >= 2:
             if verbose >= 1:
                 wiprint("""Calculating mean and standard error of {0}
                         relaxation infiles""".format(len(relax_dfs)))
-            n_relax_dfs  = len(relax_dfs)
-            relax_dfs    = pd.concat(relax_dfs)
-            relax_mean   = relax_dfs.groupby(level=0).mean()
-            relax_se     = relax_dfs.groupby(level=0).std() / \
-                             np.sqrt(n_relax_dfs)
-            df["r1"]     = relax_mean["r1"]
-            df["r1 se"]  = relax_se["r1"]
-            df["r2"]     = relax_mean["r2"]
-            df["r2 se"]  = relax_se["r2"]
-            df["noe"]    = relax_mean["noe"]
+            n_relax_dfs = len(relax_dfs)
+            relax_dfs = pd.concat(relax_dfs)
+            relax_mean = relax_dfs.groupby(level=0).mean()
+            relax_se = relax_dfs.groupby(level=0).std() / np.sqrt(n_relax_dfs)
+            df["r1"] = relax_mean["r1"]
+            df["r1 se"] = relax_se["r1"]
+            df["r2"] = relax_mean["r2"]
+            df["r2 se"] = relax_se["r2"]
+            df["noe"] = relax_mean["noe"]
             df["noe se"] = relax_se["noe"]
 
         # Process order parameters
@@ -864,17 +840,16 @@ class IREDDataset(RelaxDataset):
                 wiprint("""Calculating mean and standard error of {0} order
                         parameter infiles""".format(len(order_dfs)))
             n_order_dfs = len(order_dfs)
-            order_dfs   = pd.concat(order_dfs)
-            order_mean  = order_dfs.groupby(level=0).mean()
-            order_se    = order_dfs.groupby(level=0).std() / \
-                          np.sqrt(n_order_dfs)
-            df["s2"]    = order_mean["s2"]
+            order_dfs = pd.concat(order_dfs)
+            order_mean = order_dfs.groupby(level=0).mean()
+            order_se = order_dfs.groupby(level=0).std() / np.sqrt(n_order_dfs)
+            df["s2"] = order_mean["s2"]
             df["s2 se"] = order_se["s2"]
 
         # Sort by index
         if df.index.name == "residue":
-            df = df.loc[sorted(df.index.values,
-                   key=lambda x: int(x.split(":")[1]))]
+            df = df.loc[
+                sorted(df.index.values, key=lambda x: int(x.split(":")[1]))]
         else:
             df = df.loc[sorted(df.index.values)]
 
@@ -902,17 +877,16 @@ class IREDDataset(RelaxDataset):
         from subprocess import Popen, PIPE
 
         re_t1t2noe = re.compile(
-          r"^#Vec\s+[\w_]+\[T1\]\s+[\w_]+\[\T2\]\s+[\w_]+\[NOE\]$",
-          flags=re.UNICODE)
-        re_order = re.compile(
-          r"^#Vec\s+[\w_]+\[S2\]$", flags=re.UNICODE)
+            r"^#Vec\s+[\w_]+\[T1\]\s+[\w_]+\[\T2\]\s+[\w_]+\[NOE\]$",
+            flags=re.UNICODE)
+        re_order = re.compile(r"^#Vec\s+[\w_]+\[S2\]$", flags=re.UNICODE)
         re_h5 = re.compile(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          flags=re.UNICODE)
+            r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+            flags=re.UNICODE)
 
         with open(devnull, "w") as fnull:
-            header = Popen("head -n 1 {0}".format(infile),
-              stdout=PIPE, stderr=fnull, shell=True).stdout.read().strip()
+            header = Popen("head -n 1 {0}".format(infile), stdout=PIPE,
+                stderr=fnull, shell=True).stdout.read().strip()
             if six.PY3:
                 header = str(header, "utf-8")
 
@@ -947,21 +921,21 @@ class IREDDataset(RelaxDataset):
         infile = expandvars(infile)
         kind = IREDDataset._identify_infile(infile)
 
-        if kind == "ired_relax":                    # Parse relaxation
+        if kind == "ired_relax":  # Parse relaxation
             if verbose >= 1:
                 wiprint("""Loading iRED relaxation data from '{0}'
                         """.format(infile))
             df = pd.read_csv(infile, delim_whitespace=True, header=0,
-              index_col=0, names=["r1","r2","noe"])
+                index_col=0, names=["r1", "r2", "noe"])
             df["r1"] = 1 / df["r1"]
             df["r2"] = 1 / df["r2"]
-        elif kind == "ired_order":                  # Parse order parameters
+        elif kind == "ired_order":  # Parse order parameters
             if verbose >= 1:
                 wiprint("""Loading iRED order parameter data from '{0}'
                         """.format(infile))
             df = pd.read_csv(infile, delim_whitespace=True, header=0,
-              index_col=0, names=["s2"])
-        else:                                       # Parse other
+                index_col=0, names=["s2"])
+        else:  # Parse other
             df = super(IREDDataset, self)._read_text(infile, **kwargs)
         df = self._read_index(df, **kwargs)
 
@@ -1008,8 +982,8 @@ class IREDDataset(RelaxDataset):
             raise Exception(sformat("""No infiles found matching
             '{0}'""".format(infile_args)))
         re_h5 = re.compile(
-          r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
-          flags=re.UNICODE)
+            r"^(?P<path>(.+)\.(h5|hdf5))((:)?(/)?(?P<address>.+))?$",
+            flags=re.UNICODE)
 
         # Load data
         relax_dfs = []
@@ -1024,8 +998,9 @@ class IREDDataset(RelaxDataset):
                 relax_dfs.append(df)
             if "s2" in columns:
                 order_dfs.append(df)
-            if not (("r1" in columns and "r2" in columns and "noe" in columns)
-            or      ("s2" in columns)):
+            if not (
+                ("r1" in columns and "r2" in columns and "noe" in columns) or (
+                "s2" in columns)):
                 raise Exception(sformat("""DataFrame loaded from '{0}' does not
                   appear to contain either relaxation ('r1', 'r2', 'noe') or
                   order parameter ('s2') columns""".format(infile)))
@@ -1041,19 +1016,17 @@ def main():
     import argparse
 
     # Prepare argument parser
-    parser = argparse.ArgumentParser(
-      description = __doc__)
-    subparsers = parser.add_subparsers(
-      dest        = "mode",
-      description = "")
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="mode", description="")
 
     SequenceDataset.construct_argparser(subparsers)
     ChemicalShiftDataset.construct_argparser(subparsers)
     RelaxDataset.construct_argparser(subparsers)
     IREDDataset.construct_argparser(subparsers)
 
-    kwargs  = vars(parser.parse_args())
+    kwargs = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
+
 
 if __name__ == "__main__":
     main()
