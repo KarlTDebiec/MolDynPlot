@@ -579,57 +579,6 @@ class NatConTimeSeriesDataset(TimeSeriesDataset):
         self.timeseries = dataframe
 
 
-class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
-    """
-    Represents paramagnetic relaxation enhancement data as a function of time
-    and residue number.
-    """
-
-    @staticmethod
-    def construct_argparser(parser_or_subparsers=None, **kwargs):
-        """
-        Adds arguments to an existing argument parser, constructs a
-        subparser, or constructs a new parser
-
-        Arguments:
-          parser_or_subparsers (ArgumentParser, _SubParsersAction,
-            optional): If ArgumentParser, existing parser to which
-            arguments will be added; if _SubParsersAction, collection of
-            subparsers to which a new argument parser will be added; if
-            None, a new argument parser will be generated
-          kwargs (dict): Additional keyword arguments
-
-        Returns:
-          ArgumentParser: Argument parser or subparser
-        """
-        import argparse
-
-        # Process arguments
-        help_message = """Process NMR paramagnetic relaxation enhancement
-                       data"""
-        if isinstance(parser_or_subparsers, argparse.ArgumentParser):
-            parser = parser_or_subparsers
-        elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
-            parser = parser_or_subparsers.add_parser(
-              name        = "pre",
-              description = help_message,
-              help        = help_message)
-        elif parser is None:
-            parser = argparse.ArgumentParser(
-              description = help_message)
-
-        # Defaults
-        if parser.get_default("cls") is None:
-            parser.set_defaults(cls=PRETimeSeriesDataset)
-
-        # Arguments unique to this class
-
-        # Arguments inherited from superclass
-        TimeSeriesDataset.construct_argparser(parser)
-
-        return parser
-
-
 class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
     """
     Manages Small Angle X-ray Scattering time series datasets.
