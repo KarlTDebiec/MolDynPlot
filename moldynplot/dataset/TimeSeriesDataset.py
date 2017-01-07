@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #   moldynplot.dataset.TimeSeriesDataset.py
 #
-#   Copyright (C) 2015-2016 Karl T Debiec
+#   Copyright (C) 2015-2017 Karl T Debiec
 #   All rights reserved.
 #
 #   This software may be modified and distributed under the terms of the
@@ -21,7 +21,6 @@ from __future__ import (absolute_import, division, print_function,
 
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
-    import moldynplot.dataset
 from IPython import embed
 import h5py
 import numpy as np
@@ -29,7 +28,7 @@ import pandas as pd
 import six
 from ..myplotspec.Dataset import Dataset
 from ..myplotspec import sformat, wiprint
-from .SequenceDataset import RelaxDataset, IREDDataset
+from .SequenceDataset import IREDDataset
 from .SAXSDataset import SAXSDataset
 
 
@@ -123,6 +122,8 @@ class TimeSeriesDataset(Dataset):
         Arguments:
           infile{s} (list): Path(s) to input file(s); may contain
             environment variables and wildcards
+          outfile (): Path to output file; may contain enviroment variables
+            and wildcards
           dt (float): Time interval between points; units unspecified
           toffset (float): Time offset to be added to all points (i.e.
             time of first point)
@@ -153,7 +154,8 @@ class TimeSeriesDataset(Dataset):
         self.dataset_cache = kwargs.get("dataset_cache", None)
 
         # Read data
-        self.timeseries_df = self.read(**kwargs)
+        if not hasattr(self, "timeseries_df"):
+            self.timeseries_df = self.df = self.read(**kwargs)
 
         # Process data
         if dt:
@@ -181,6 +183,8 @@ class TimeSeriesDataset(Dataset):
             pdist_kw = kwargs.get("pdist_kw", {})
             self.pdist_df = self.calc_pdist(df=self.timeseries_df,
                 verbose=verbose, **pdist_kw)
+
+            # Output data
             if verbose >= 2:
                 print("Processed pdist DataFrame:")
                 print(self.pdist_df)
@@ -194,6 +198,8 @@ class TimeSeriesDataset(Dataset):
             block_kw.update(kwargs.get("block_kw", {}))
             self.mean_df, self.block_averager = self.calc_mean(
                 df=self.timeseries_df, verbose=verbose, **block_kw)
+
+            # Output data
             if verbose >= 2:
                 print("Processed mean DataFrame:")
                 print(self.mean_df)
@@ -542,8 +548,8 @@ class NatConTimeSeriesDataset(TimeSeriesDataset):
 
             reduced = dataframe.values[
             :dataframe.shape[0] - (dataframe.shape[0] % downsample), :]
-            new_shape = (
-            int(reduced.shape[0] / downsample), downsample, reduced.shape[1])
+            new_shape = (int(reduced.shape[0] / downsample), downsample,
+            reduced.shape[1])
             index = np.reshape(dataframe.index.values[
             :dataframe.shape[0] - (dataframe.shape[0] % downsample)],
                 new_shape[:-1]).mean(axis=1)

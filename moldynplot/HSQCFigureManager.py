@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #   moldynplot.HSQCFigureManager.py
 #
-#   Copyright (C) 2015 Karl T Debiec
+#   Copyright (C) 2015-2017 Karl T Debiec
 #   All rights reserved.
 #
 #   This software may be modified and distributed under the terms of the
