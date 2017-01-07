@@ -71,6 +71,7 @@ class SAXSFigureManager(FigureManager):
             b: True
             color: [0.8,0.8,0.8]
             linestyle: '-'
+            zorder: 10
           label_kw:
             zorder: 10
             horizontalalignment: right
