@@ -187,7 +187,6 @@ class SAXSDiffDataset(SAXSDataset):
                           kwargs, {})
         minuend    = self.load_dataset(loose=True, **minuend_kw)
         subtrahend = self.load_dataset(loose=True, **subtrahend_kw)
-        print(minuend.df)
         m_I    = minuend.df["intensity"]
         m_I_se = minuend.df["intensity se"]
         s_I    = subtrahend.df["intensity"]
