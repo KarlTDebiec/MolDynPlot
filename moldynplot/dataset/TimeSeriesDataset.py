@@ -98,14 +98,15 @@ class TimeSeriesDataset(Dataset):
         except argparse.ArgumentError:
             pass
         try:
-            action_group.add_argument("--pdist", action="store_true",
-                dest="calc_pdist", help="""calculate probability
+            action_group.add_argument("--pdist", nargs="?", default=False,
+                const=True, dest="calc_pdist", help="""calculate probability
                 distribution over timeseries""")
         except argparse.ArgumentError:
             pass
         try:
-            action_group.add_argument("--mean", action="store_true",
-                dest="calc_mean", help="""Calculate mean and standard error
+            action_group.add_argument("--mean", nargs="?", default=False,
+                const=True, dest="calc_mean", help="""Calculate mean and
+                standard error
                 over timeseries""")
         except argparse.ArgumentError:
             pass
@@ -548,8 +549,8 @@ class NatConTimeSeriesDataset(TimeSeriesDataset):
 
             reduced = dataframe.values[
             :dataframe.shape[0] - (dataframe.shape[0] % downsample), :]
-            new_shape = (int(reduced.shape[0] / downsample), downsample,
-            reduced.shape[1])
+            new_shape = (
+            int(reduced.shape[0] / downsample), downsample, reduced.shape[1])
             index = np.reshape(dataframe.index.values[
             :dataframe.shape[0] - (dataframe.shape[0] % downsample)],
                 new_shape[:-1]).mean(axis=1)

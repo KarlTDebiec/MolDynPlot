@@ -12,13 +12,16 @@ Generates one or more 2D time series figures to specifications in a YAML
 file.
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot")
-    import moldynplot
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
+
+
 ################################### CLASSES ###################################
 class TimeSeries2DFigureManager(FigureManager):
     """
@@ -159,7 +162,8 @@ class TimeSeries2DFigureManager(FigureManager):
         draw_subplot:
           ylabel:      "q ($Å^{-1}$)"
           yticks:      [0.00,0.05,0.10,0.15,0.20,0.25,0.30,0.35]
-          yticklabels: ["0.00","0.05","0.10","0.15","0.20","0.25","0.30","0.35"]
+          yticklabels: ["0.00","0.05","0.10","0.15","0.20","0.25","0.30",
+          "0.35"]
           grid_kw:
             color: [0.5,0.5,0.5]
         draw_dataset:
@@ -362,11 +366,9 @@ class TimeSeries2DFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, label=None,
-        handles=None, logz=False,
-        draw_heatmap=False, draw_colorbar=False, draw_contour=False,
-        draw_legend=False, draw_label=True, 
-        verbose=1, debug=0, **kwargs):
+    def draw_dataset(self, subplot, label=None, handles=None, logz=False,
+            draw_heatmap=False, draw_colorbar=False, draw_contour=False,
+            draw_legend=False, draw_label=True, verbose=1, debug=0, **kwargs):
         import numpy as np
         import six
         from .myplotspec import get_colors, multi_get_copy
@@ -398,8 +400,8 @@ class TimeSeries2DFigureManager(FigureManager):
                 if not hasattr(subplot, "_mps_partner_subplot"):
                     from .myplotspec.axes import add_partner_subplot
 
-                    add_partner_subplot(subplot, verbose=verbose,
-                      debug=debug, **kwargs)
+                    add_partner_subplot(subplot, verbose=verbose, debug=debug,
+                        **kwargs)
 
                 set_colorbar(subplot, pcolormesh, **kwargs)
 
@@ -409,7 +411,7 @@ class TimeSeries2DFigureManager(FigureManager):
             get_colors(contour_kw)
             if "levels" not in contour_kw:
                 contour_kw["levels"] = range(0,
-                  int(np.ceil(np.nanmax(timeseries_df.values))))
+                    int(np.ceil(np.nanmax(timeseries_df.values))))
             ct_x = timeseries_df.index.values
             try:
                 ct_y = np.array(timeseries_df.columns, np.float)
@@ -425,15 +427,16 @@ class TimeSeries2DFigureManager(FigureManager):
             from .myplotspec.text import set_text
 
             label_kw = multi_get_copy("label_kw", kwargs, {})
-            if (isinstance(label, six.string_types)
-            and isinstance(label_kw, dict)):
+            if (isinstance(label, six.string_types) and isinstance(label_kw,
+                dict)):
                 set_text(subplot, s=label, **label_kw)
-            elif (isinstance(label, list) and isinstance(label_kw, list)
-            and len(label) == len(label_kw)):
+            elif (isinstance(label, list) and isinstance(label_kw,
+                    list) and len(label) == len(label_kw)):
                 for l, kw in zip(label, label_kw):
                     set_text(subplot, s=l, **kw)
             else:
                 raise Exception("bad label arguments")
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

@@ -117,13 +117,12 @@ def three_one(three):
     Returns:
       str: Corresponding one-letter amino acid code
     """
-    return \
-    {"ALA": "A", "ARG": "R", "ASN": "N", "ASP": "D", "ASH": "D", "CYS": "C",
-        "CYM": "C", "CYX": "C", "GLN": "Q", "GLU": "E", "GLH": "E", "GLY": "G",
-        "HIS": "H", "HID": "H", "HIE": "H", "HIP": "H", "HSD": "H", "HSE": "H",
-        "HSP": "H", "ILE": "I", "LEU": "L", "LYS": "K", "LYN": "K", "MET": "M",
-        "PHE": "F", "PRO": "P", "SER": "S", "THR": "T", "TRP": "W", "TYR": "Y",
-        "VAL": "V"}[three.upper()]
+    return {"ALA": "A", "ARG": "R", "ASN": "N", "ASP": "D", "ASH": "D",
+        "CYS": "C", "CYM": "C", "CYX": "C", "GLN": "Q", "GLU": "E", "GLH": "E",
+        "GLY": "G", "HIS": "H", "HID": "H", "HIE": "H", "HIP": "H", "HSD": "H",
+        "HSE": "H", "HSP": "H", "ILE": "I", "LEU": "L", "LYS": "K", "LYN": "K",
+        "MET": "M", "PHE": "F", "PRO": "P", "SER": "S", "THR": "T", "TRP": "W",
+        "TYR": "Y", "VAL": "V"}[three.upper()]
 
 
 def multiprocess_map(function, arguments, n_processes=1):

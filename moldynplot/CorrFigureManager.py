@@ -11,13 +11,16 @@
 Generates one or more correlation figures to specifications in a YAML file.
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot")
-    import moldynplot
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
+
+
 ################################### CLASSES ###################################
 class CorrFigureManager(FigureManager):
     """
@@ -234,26 +237,21 @@ class CorrFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot,
-        xkey=None, ykey=None, xsekey=None, ysekey=None, label=None,
-        handles=None,
-        draw_corr_line=True, draw_errorbar=True, draw_plot=True,
-        draw_handle=False, draw_label=False,
-        verbose=1, debug=0, **kwargs):
+    def draw_dataset(self, subplot, xkey=None, ykey=None, xsekey=None,
+            ysekey=None, label=None, handles=None, draw_corr_line=True,
+            draw_errorbar=True, draw_plot=True, draw_handle=False,
+            draw_label=False, verbose=1, debug=0, **kwargs):
         """
         Draws dataset
         """
-        from os.path import expandvars
         from warnings import warn
-        import numpy as np
-        import pandas as pd
         from .myplotspec import get_colors, multi_get_copy
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "cls" in dataset_kw and dataset_kw["cls"] is not None:
             dataset = self.load_dataset(verbose=verbose, debug=debug,
-              **dataset_kw)
+                **dataset_kw)
             dataframe = dataset.dataframe
         else:
             dataset = dataframe = None
@@ -268,8 +266,8 @@ class CorrFigureManager(FigureManager):
             get_colors(corr_line_kw)
             # Must pass 'x' and 'y' as positional arguments
             subplot._mps_corr_line = subplot.plot(
-              corr_line_kw.pop("x", [0,10]), corr_line_kw.pop("y", [0,10]),
-              **corr_line_kw)
+                corr_line_kw.pop("x", [0, 10]), corr_line_kw.pop("y", [0, 10]),
+                **corr_line_kw)
 
         # Plot error bar
         if draw_errorbar:
@@ -291,7 +289,7 @@ class CorrFigureManager(FigureManager):
                     errorbar_kw["xerr"] = kwargs.pop("xse") * 1.96
                 elif xsekey is not None and (xsekey, "x") in dataframe:
                     errorbar_kw["xerr"] = errorbar_kw.get("xse",
-                      dataframe[xsekey, "x"]) * 1.96
+                        dataframe[xsekey, "x"]) * 1.96
             if "yerr" not in errorbar_kw:
                 if "yse" in errorbar_kw:
                     errorbar_kw["yerr"] = errorbar_kw.pop("yse") * 1.96
@@ -299,7 +297,7 @@ class CorrFigureManager(FigureManager):
                     errorbar_kw["yerr"] = kwargs.pop("yse") * 1.96
                 elif ysekey is not None and (ysekey, "y") in dataframe:
                     errorbar_kw["yerr"] = errorbar_kw.get("yse",
-                      dataframe[ysekey, "y"]) * 1.96
+                        dataframe[ysekey, "y"]) * 1.96
             subplot.errorbar(eb_x, eb_y, **errorbar_kw)
 
         # Plot legend handles
@@ -310,9 +308,8 @@ class CorrFigureManager(FigureManager):
             else:
                 handle_kw = multi_get_copy("handle_kw", kwargs, {})
                 get_colors(handle_kw, plot_kw)
-                handle = subplot.plot(
-                  handle_kw.pop("x", [-10,-10]), handle_kw.pop("y", [-10,-10]),
-                  **handle_kw)[0]
+                handle = subplot.plot(handle_kw.pop("x", [-10, -10]),
+                    handle_kw.pop("y", [-10, -10]), **handle_kw)[0]
                 if handles is not None:
                     handles[label] = handle
 
@@ -322,6 +319,7 @@ class CorrFigureManager(FigureManager):
 
             label_kw = multi_get_copy("label_kw", kwargs, {})
             set_text(subplot, **label_kw)
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

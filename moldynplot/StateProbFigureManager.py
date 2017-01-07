@@ -12,13 +12,16 @@ Generates one or more state probability figures to specifications in a
 YAML file.
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot")
-    import moldynplot
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
+
+
 ################################### CLASSES ###################################
 class StateProbFigureManager(FigureManager):
     """
@@ -185,7 +188,7 @@ class StateProbFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, experiment=None, x=None, label="",
-        handles=None, bar=True, verbose=1, debug=0, **kwargs):
+            handles=None, bar=True, verbose=1, debug=0, **kwargs):
         """
         Draws a dataset.
 
@@ -207,21 +210,21 @@ class StateProbFigureManager(FigureManager):
         handle_kw = multi_get_copy("handle_kw", kwargs, {})
         if experiment is not None:
             subplot.axhspan(experiment[0], experiment[1], lw=2,
-              color=[0.7, 0.7, 0.7])
-            handles["Experiment"] = subplot.plot([-10, -10], [-10, -10],
-              mfc=[0.7, 0.7, 0.7], **handle_kw)[0]
+                color=[0.7, 0.7, 0.7])
+            handles["Experiment"] = \
+            subplot.plot([-10, -10], [-10, -10], mfc=[0.7, 0.7, 0.7],
+                **handle_kw)[0]
             return
         if "infile" not in kwargs:
             if "P unbound" not in kwargs or "P unbound se" not in kwargs:
                 return
             else:
-                y    = 1.0 - kwargs.pop("P unbound")
+                y = 1.0 - kwargs.pop("P unbound")
                 yerr = kwargs.pop("P unbound se") * 1.96
         else:
-            dataset = H5Dataset(
-                        default_address="assign/stateprobs",
-                        default_key="pbound", **kwargs)
-            y    = 1.0 - dataset.datasets["pbound"]["P unbound"][0]
+            dataset = H5Dataset(default_address="assign/stateprobs",
+                default_key="pbound", **kwargs)
+            y = 1.0 - dataset.datasets["pbound"]["P unbound"][0]
             yerr = dataset.datasets["pbound"]["P unbound se"][0] * 1.96
 
         # Configure plot settings
@@ -239,6 +242,7 @@ class StateProbFigureManager(FigureManager):
             handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
         if handles is not None and label is not None:
             handles[label] = handle
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

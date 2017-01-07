@@ -11,13 +11,16 @@
 Generates one or more sequence figures to specifications in a YAML file.
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot")
-    import moldynplot
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
+
+
 ################################### CLASSES ###################################
 class SequenceFigureManager(FigureManager):
     """
@@ -361,12 +364,10 @@ class SequenceFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot,
-        column=None, column_se=None, label=None,
-        handles=None,
-        draw_fill_between=False, draw_errorbar=True, draw_plot=False,
-        draw_handle=True, draw_label=False,
-        verbose=1, debug=0, **kwargs):
+    def draw_dataset(self, subplot, column=None, column_se=None, label=None,
+            handles=None, draw_fill_between=False, draw_errorbar=True,
+            draw_plot=False, draw_handle=True, draw_label=False, verbose=1,
+            debug=0, **kwargs):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
@@ -375,9 +376,9 @@ class SequenceFigureManager(FigureManager):
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataframe = self.load_dataset(verbose=verbose, debug=debug,
-          **dataset_kw).sequence_df
-        x = np.array([filter(lambda x: x in '0123456789.', s)
-              for s in dataframe.index.values], np.int)
+            **dataset_kw).sequence_df
+        x = np.array([filter(lambda x: x in '0123456789.', s) for s in
+            dataframe.index.values], np.int)
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -389,10 +390,10 @@ class SequenceFigureManager(FigureManager):
             get_colors(fill_between_kw, plot_kw)
             fb_x, fb_lb, fb_ub = [], [], []
             yse_min = kwargs.get("yse_min")
-            for residue in range(x.min(), x.max()+1):
+            for residue in range(x.min(), x.max() + 1):
                 if residue in x:
-                    fb_x.extend([residue-0.5, residue+0.5])
-                    index = np.argmax(x==residue)
+                    fb_x.extend([residue - 0.5, residue + 0.5])
+                    index = np.argmax(x == residue)
                     if column_se is not None:
                         yse = dataframe[column_se][index]
                         if yse_min is not None and yse < yse_min:
@@ -401,20 +402,18 @@ class SequenceFigureManager(FigureManager):
                         yse = yse_min
                     else:
                         yse = 0
-                    fb_lb.extend([
-                      dataframe[column][index] - yse * 1.96,
-                      dataframe[column][index] - yse * 1.96])
-                    fb_ub.extend([
-                      dataframe[column][index] + yse * 1.96,
-                      dataframe[column][index] + yse * 1.96])
+                    fb_lb.extend([dataframe[column][index] - yse * 1.96,
+                        dataframe[column][index] - yse * 1.96])
+                    fb_ub.extend([dataframe[column][index] + yse * 1.96,
+                        dataframe[column][index] + yse * 1.96])
                 else:
                     fb_x.append(None)
                     fb_lb.append(None)
                     fb_ub.append(None)
-            fb_x  = np.array(fb_x, np.float)
+            fb_x = np.array(fb_x, np.float)
             fb_lb = np.array(fb_lb, np.float)
             fb_ub = np.array(fb_ub, np.float)
-                
+
             subplot.fill_between(fb_x, fb_lb, fb_ub, **fill_between_kw)
 
         # Plot error bar
@@ -422,18 +421,17 @@ class SequenceFigureManager(FigureManager):
             errorbar_kw = multi_get_copy("errorbar_kw", kwargs, {})
             get_colors(errorbar_kw, plot_kw)
             subplot.errorbar(x, y=dataframe[column],
-              yerr=dataframe[column_se]*1.96,
-              **errorbar_kw)
+                yerr=dataframe[column_se] * 1.96, **errorbar_kw)
 
         # Plot series
         if draw_plot:
             p_x, p_y = [], []
-            for residue in range(x.min(), x.max()+1):
+            for residue in range(x.min(), x.max() + 1):
                 if residue in x:
-                    p_x.extend([residue-0.5, residue+0.5])
-                    index = np.argmax(x==residue)
-                    p_y.extend([dataframe[column][index],
-                                dataframe[column][index]])
+                    p_x.extend([residue - 0.5, residue + 0.5])
+                    index = np.argmax(x == residue)
+                    p_y.extend(
+                        [dataframe[column][index], dataframe[column][index]])
                 else:
                     p_x.append(None)
                     p_y.append(None)
@@ -452,6 +450,7 @@ class SequenceFigureManager(FigureManager):
             handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
             if handles is not None and label is not None:
                 handles[label] = handle
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

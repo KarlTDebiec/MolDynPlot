@@ -22,9 +22,7 @@ from __future__ import (absolute_import, division, print_function,
 
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
-    import moldynplot.dataset
 from IPython import embed
-import h5py
 import numpy as np
 import pandas as pd
 from ..myplotspec.Dataset import Dataset
@@ -546,8 +544,8 @@ class ChemicalShiftDataset(SequenceDataset):
             def synth_fit_decay(synth_intensity):
                 try:
                     synth_I0, synth_R = \
-                    curve_fit(model_function, delays, synth_intensity,
-                        p0=(I0, R))[0]
+                        curve_fit(model_function, delays, synth_intensity,
+                            p0=(I0, R))[0]
                     return synth_R
                 except RuntimeError:
                     if verbose >= 1:
@@ -652,10 +650,10 @@ class RelaxDataset(SequenceDataset):
                                         self.sequence_df["r1"]
             self.sequence_df["r2/r1 se"] = np.sqrt(
                 (self.sequence_df["r2 se"] / self.sequence_df["r2"]) ** 2 + (
-                                                                            self.sequence_df[
-                                                                                "r1 se"] /
-                                                                            self.sequence_df[
-                                                                                "r1"]) ** 2) * \
+                                                                                self.sequence_df[
+                                                                                    "r1 se"] /
+                                                                                self.sequence_df[
+                                                                                    "r1"]) ** 2) * \
                                            self.sequence_df["r2/r1"]
 
         # Calculate probability distribution
@@ -998,9 +996,10 @@ class IREDDataset(RelaxDataset):
                 relax_dfs.append(df)
             if "s2" in columns:
                 order_dfs.append(df)
-            if not (
-                ("r1" in columns and "r2" in columns and "noe" in columns) or (
-                "s2" in columns)):
+            if not ((
+                        "r1" in columns and "r2" in columns and "noe" in
+                        columns) or (
+                        "s2" in columns)):
                 raise Exception(sformat("""DataFrame loaded from '{0}' does not
                   appear to contain either relaxation ('r1', 'r2', 'noe') or
                   order parameter ('s2') columns""".format(infile)))

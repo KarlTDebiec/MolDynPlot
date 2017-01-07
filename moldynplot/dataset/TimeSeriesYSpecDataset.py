@@ -16,7 +16,6 @@ from __future__ import (absolute_import, division, print_function,
 
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
-    import moldynplot.dataset
 from IPython import embed
 import numpy as np
 import pandas as pd
@@ -191,7 +190,7 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         # Truncate dataset
         reduced = df.values[:df.shape[0] - (df.shape[0] % downsample), :]
         new_shape = (
-        int(reduced.shape[0] / downsample), downsample, reduced.shape[1])
+            int(reduced.shape[0] / downsample), downsample, reduced.shape[1])
         index = np.reshape(
             df.index.values[:df.shape[0] - (df.shape[0] % downsample)],
             new_shape[:-1]).mean(axis=1)

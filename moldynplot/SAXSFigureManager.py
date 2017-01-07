@@ -12,13 +12,16 @@ Generates one or more time series figures to specifications in a YAML
 file.
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot")
-    import moldynplot
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
+
+
 ################################### CLASSES ###################################
 class SAXSFigureManager(FigureManager):
     """
@@ -55,7 +58,8 @@ class SAXSFigureManager(FigureManager):
             verticalalignment: bottom
           xlabel:      "q ($Å^{-1}$)"
           xticks:      [ 0.00,  0.05,  0.10,  0.15,  0.20,  0.25,  0.30,  0.35]
-          xticklabels: ["0.00","0.05","0.10","0.15","0.20","0.25","0.30","0.35"]
+          xticklabels: ["0.00","0.05","0.10","0.15","0.20","0.25","0.30",
+          "0.35"]
           ylabel:      "Intensity"
           yticks:      [ 0.00,  0.02,  0.04,  0.06,  0.08,  0.10,  0.12]
           yticklabels: ["0.00","0.02","0.04","0.06","0.08","0.10","0.12"]
@@ -264,10 +268,9 @@ class SAXSFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None, handles=None, logx=False,
-        logy=False, kratky=False, draw_fill_between=False, draw_plot=True,
-        draw_handle=True, draw_label=True, verbose=1, debug=0, **kwargs):
+            logy=False, kratky=False, draw_fill_between=False, draw_plot=True,
+            draw_handle=True, draw_label=True, verbose=1, debug=0, **kwargs):
         import numpy as np
-        import pandas as pd
         from .myplotspec import get_colors, multi_get_copy
 
         # Load data
@@ -292,10 +295,10 @@ class SAXSFigureManager(FigureManager):
             y_se = df["intensity se"]
             if logy:
                 y_se = (y_se / (y * np.log(10)))
-                y    = np.log10(y)
+                y = np.log10(y)
             elif kratky:
-                y_se = y_se*x*x
-                y    = y*x*x
+                y_se = y_se * x * x
+                y = y * x * x
             y_lb = y - 1.96 * y_se
             y_ub = y + 1.96 * y_se
             subplot.fill_between(x, y_lb, y_ub, **fill_between_kw)
@@ -309,7 +312,7 @@ class SAXSFigureManager(FigureManager):
             if logy:
                 y = np.log10(y)
             elif kratky:
-                y = y*x*x
+                y = y * x * x
             subplot.plot(x, y, **plot_kw)[0]
 
         if draw_handle:
@@ -318,6 +321,7 @@ class SAXSFigureManager(FigureManager):
             handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
             if handles is not None and label is not None:
                 handles[label] = handle
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

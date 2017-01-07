@@ -12,13 +12,16 @@ Generates one or more time series figures to specifications in a YAML
 file.
 """
 ################################### MODULES ###################################
-from __future__ import absolute_import,division,print_function,unicode_literals
+from __future__ import (absolute_import, division, print_function,
+    unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot")
-    import moldynplot
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
+
+
 ################################### CLASSES ###################################
 class TimeSeriesFigureManager(FigureManager):
     """
@@ -333,8 +336,8 @@ class TimeSeriesFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None, column=None, handles=None,
-        draw_pdist=False, draw_fill_between=False, draw_mean=False,
-        draw_plot=True, **kwargs):
+            draw_pdist=False, draw_fill_between=False, draw_mean=False,
+            draw_plot=True, **kwargs):
         """
         Draws a dataset on a subplot.
 
@@ -373,9 +376,9 @@ class TimeSeriesFigureManager(FigureManager):
             print(column)
             if hasattr(dataset, "timeseries_df"):
                 print("mean  {0}: {1:6.3f}".format(column,
-                  dataset.timeseries_df[column].mean()))
+                    dataset.timeseries_df[column].mean()))
                 print("stdev {0}: {1:6.3f}".format(column,
-                  dataset.timeseries_df[column].std()))
+                    dataset.timeseries_df[column].std()))
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -394,10 +397,10 @@ class TimeSeriesFigureManager(FigureManager):
                 fb_ylb = fill_between_kw.pop("ylb")
             elif "fill_between_lb_key" in fill_between_kw:
                 fill_between_lb_key = fill_between_kw.pop(
-                  "fill_between_lb_key")
+                    "fill_between_lb_key")
                 fb_ylb = dataset.timeseries_df[fill_between_lb_key]
             elif "fill_between_lb_key" in kwargs:
-                fill_between_lb_key = kwargs.get( "fill_between_lb_key")
+                fill_between_lb_key = kwargs.get("fill_between_lb_key")
                 fb_ylb = dataset.timeseries_df[fill_between_lb_key]
             else:
                 warn("inappropriate fill_between settings")
@@ -405,10 +408,10 @@ class TimeSeriesFigureManager(FigureManager):
                 fb_yub = fill_between_kw.pop("yub")
             elif "fill_between_ub_key" in fill_between_kw:
                 fill_between_ub_key = fill_between_kw.pop(
-                  "fill_between_ub_key")
+                    "fill_between_ub_key")
                 fb_yub = dataset.timeseries_df[fill_between_ub_key]
             elif "fill_between_ub_key" in kwargs:
-                fill_between_ub_key = kwargs.get( "fill_between_ub_key")
+                fill_between_ub_key = kwargs.get("fill_between_ub_key")
                 fb_yub = dataset.timeseries_df[fill_between_ub_key]
             else:
                 warn("inappropriate fill_between settings")
@@ -421,7 +424,7 @@ class TimeSeriesFigureManager(FigureManager):
                      "necessary attribute 'timeseries_df', skipping.")
             else:
                 plot = subplot.plot(dataset.timeseries_df.index.values,
-                  dataset.timeseries_df[column], **plot_kw)[0]
+                    dataset.timeseries_df[column], **plot_kw)[0]
                 handle_kw = multi_get_copy("handle_kw", kwargs, {})
                 handle_kw["mfc"] = plot.get_color()
                 handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
@@ -453,25 +456,28 @@ class TimeSeriesFigureManager(FigureManager):
                 if pdist_rescale:
                     pdist_max = pd_y.max()
                     x_max = subplot._mps_partner_subplot.get_xbound()[1]
-                    if (pdist_max > x_max / 1.25
-                    or not hasattr(subplot, "_mps_rescaled")):
+                    if (pdist_max > x_max / 1.25 or not hasattr(subplot,
+                        "_mps_rescaled")):
                         subplot._mps_partner_subplot.set_xbound(0,
-                        pdist_max*1.25)
-                        xticks = [0, pdist_max*0.25, pdist_max*0.50,
-                          pdist_max*0.75, pdist_max, pdist_max*1.25]
+                            pdist_max * 1.25)
+                        xticks = [0, pdist_max * 0.25, pdist_max * 0.50,
+                            pdist_max * 0.75, pdist_max, pdist_max * 1.25]
                         subplot._mps_partner_subplot.set_xticks(xticks)
                         subplot._mps_rescaled = True
                     if draw_mean:
                         mean_kw = plot_kw.copy()
                         mean_kw.update(kwargs.get("mean_kw", {}))
-                        mean = np.sum(np.array(pd_x, np.float64)
-                                     *np.array(pd_y, np.float64))
+                        mean = np.sum(
+                            np.array(pd_x, np.float64) * np.array(pd_y,
+                                np.float64))
                         subplot._mps_partner_subplot.plot(
-                          pd_y[np.abs(pd_x - mean).argmin()], mean, **mean_kw)
+                            pd_y[np.abs(pd_x - mean).argmin()], mean,
+                            **mean_kw)
 
             if draw_fill_between:
-                subplot._mps_partner_subplot.fill_between(fb_x, fb_ylb,
-                  fb_yub, **fill_between_kw)
+                subplot._mps_partner_subplot.fill_between(fb_x, fb_ylb, fb_yub,
+                    **fill_between_kw)
+
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

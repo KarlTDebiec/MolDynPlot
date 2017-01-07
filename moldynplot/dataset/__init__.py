@@ -18,7 +18,6 @@ if __name__ == "__main__":
     import moldynplot.dataset
 import h5py
 import numpy as np
-from ..myplotspec.Dataset import Dataset
 
 
 ################################### CLASSES ###################################

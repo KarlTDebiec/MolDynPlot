@@ -79,7 +79,7 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
         """
 
         Args:
-            **kwargs (dict):
+            kwargs (dict):
         """
         super(PRETimeSeriesDataset, self).__init__(**kwargs)
 
