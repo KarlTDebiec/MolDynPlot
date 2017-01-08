@@ -4,9 +4,7 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2229ebae-6e82-46c3-af70-c9a676c6c8e0" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="2229ebae-6e82-46c3-af70-c9a676c6c8e0" name="Default" comment="" />
     <ignored path="MolDynPlot.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,13 +22,51 @@
     <favorites_list name="MolDynPlot" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="SAXSFigureManager.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/moldynplot/SAXSFigureManager.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-860">
+              <caret line="93" column="27" lean-forward="false" selection-start-line="93" selection-start-column="27" selection-end-line="93" selection-end-column="27" />
+              <folding>
+                <element signature="e#915#976#1" expanded="true" />
+                <element signature="e#8221#10023#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SAXSDataset.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="350">
+              <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SAXSDiffDataset.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSDiffDataset.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="532">
+              <caret line="38" column="13" lean-forward="false" selection-start-line="38" selection-start-column="13" selection-end-line="38" selection-end-column="13" />
+              <folding>
+                <element signature="e#279#338#1" expanded="true" />
+                <element signature="e#848#927#1" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
       <find>PRE</find>
       <find>super</find>
       <find>cls</find>
+      <find>class_</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -74,12 +110,10 @@
         <option value="$PROJECT_DIR$/moldynplot/dataset/MDGXDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/CorrDataset.py" />
-        <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSDiffDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSExperimentDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/__init__.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/NatConTimeSeriesDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSTimeSeriesDataset.py" />
-        <option value="$PROJECT_DIR$/moldynplot/SAXSFigureManager.py" />
         <option value="$PROJECT_DIR$/moldynplot/SequenceFigureManager.py" />
         <option value="$PROJECT_DIR$/moldynplot/TimeSeriesFigureManager.py" />
         <option value="$PROJECT_DIR$/moldynplot/TimeSeries2DFigureManager.py" />
@@ -92,6 +126,8 @@
         <option value="$PROJECT_DIR$/moldynplot/dataset/PRETimeSeriesDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/RelaxDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py" />
+        <option value="$PROJECT_DIR$/moldynplot/SAXSFigureManager.py" />
+        <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSDiffDataset.py" />
       </list>
     </option>
   </component>
@@ -294,6 +330,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="moldynplot" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MolDynPlot" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MolDynPlot" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="moldynplot" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dataset" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -602,7 +656,14 @@
       <option name="project" value="LOCAL" />
       <updated>1483892923005</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Went back from class_ to cls&#10;&#10;- PyCharm fills this in automatically when a classmethod is declared, so 'cls' is easier">
+      <created>1483894589404</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1483894589404</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -648,7 +709,7 @@
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22569445" sideWeight="0.48534584" order="3" side_tool="false" content_ui="combo" x="722" y="251" width="202" height="410" />
+      <window_info id="Project" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22569445" sideWeight="0.48534584" order="3" side_tool="false" content_ui="combo" x="722" y="251" width="202" height="410" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5028612" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32992035" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -703,7 +764,8 @@
     <MESSAGE value="Fixed dataset bug and made code clearer" />
     <MESSAGE value="Refactoring dataset classes&#10;&#10;- Moved datasets' &quot;main&quot; to Dataset base class&#10;- Renamed &quot;cls&quot; arguments to &quot;class_&quot;" />
     <MESSAGE value="Fixed command-line interfaces" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed command-line interfaces" />
+    <MESSAGE value="Went back from class_ to cls&#10;&#10;- PyCharm fills this in automatically when a classmethod is declared, so 'cls' is easier" />
+    <option name="LAST_COMMIT_MESSAGE" value="Went back from class_ to cls&#10;&#10;- PyCharm fills this in automatically when a classmethod is declared, so 'cls' is easier" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -798,7 +860,6 @@
           <folding>
             <element signature="e#588#676#0" expanded="false" />
             <element signature="e#5597#6789#0" expanded="false" />
-            <element signature="e#10628#12854#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -926,16 +987,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/SAXSFigureManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1431">
-          <caret line="120" column="60" lean-forward="false" selection-start-line="120" selection-start-column="60" selection-end-line="120" selection-end-column="60" />
-          <folding>
-            <element signature="e#992#2782#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/moldynplot/TimeSeries2DFigureManager.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2128">
@@ -999,86 +1050,86 @@
           <folding>
             <element signature="n#!!doc" expanded="false" />
             <element signature="e#471#524#0" expanded="false" />
-            <element signature="e#1161#1621#1" expanded="false" />
-            <element signature="e#1815#1924#0" expanded="false" />
-            <element signature="e#2341#4502#1" expanded="false" />
-            <element signature="e#4834#4930#0" expanded="false" />
-            <element signature="e#4844#4930#0" expanded="false" />
-            <element signature="e#5055#7417#0" expanded="false" />
-            <element signature="e#5126#5177#0" expanded="false" />
-            <element signature="e#5241#5297#0" expanded="false" />
-            <element signature="e#5494#5809#0" expanded="false" />
-            <element signature="e#5870#5911#0" expanded="false" />
-            <element signature="e#6001#6052#0" expanded="false" />
-            <element signature="e#6187#6563#0" expanded="false" />
-            <element signature="e#6429#6549#0" expanded="false" />
-            <element signature="e#6742#7417#0" expanded="false" />
-            <element signature="e#6815#6970#0" expanded="false" />
-            <element signature="e#6823#6931#0" expanded="false" />
-            <element signature="e#7444#7565#0" expanded="false" />
-            <element signature="e#7468#7563#0" expanded="false" />
-            <element signature="e#7681#8294#1" expanded="false" />
-            <element signature="e#8589#8701#0" expanded="false" />
-            <element signature="e#9052#9072#0" expanded="false" />
-            <element signature="e#9759#9846#0" expanded="false" />
-            <element signature="e#9872#10063#0" expanded="false" />
-            <element signature="e#9960#10062#0" expanded="false" />
-            <element signature="e#10145#10301#0" expanded="false" />
-            <element signature="e#10383#10551#0" expanded="false" />
-            <element signature="e#10466#10550#0" expanded="false" />
-            <element signature="e#10633#10818#0" expanded="false" />
-            <element signature="e#10716#10817#0" expanded="false" />
-            <element signature="e#11019#11321#0" expanded="false" />
-            <element signature="e#11145#11320#0" expanded="false" />
-            <element signature="e#11526#11738#0" expanded="false" />
-            <element signature="e#11609#11737#0" expanded="false" />
-            <element signature="e#11888#12136#1" expanded="false" />
-            <element signature="e#12215#12529#1" expanded="false" />
-            <element signature="e#12553#12605#0" expanded="false" />
-            <element signature="e#12690#13104#1" expanded="false" />
-            <element signature="e#13525#14021#0" expanded="false" />
-            <element signature="e#13565#13880#0" expanded="false" />
-            <element signature="e#13794#13880#0" expanded="false" />
-            <element signature="e#14141#15093#1" expanded="false" />
-            <element signature="e#15436#17635#0" expanded="false" />
-            <element signature="e#15505#16910#0" expanded="false" />
-            <element signature="e#15581#16859#0" expanded="false" />
-            <element signature="e#15718#16859#0" expanded="false" />
-            <element signature="e#15882#16095#0" expanded="false" />
-            <element signature="e#16330#16413#0" expanded="false" />
-            <element signature="e#16945#17635#0" expanded="false" />
-            <element signature="e#17521#17635#0" expanded="false" />
-            <element signature="e#17689#18240#1" expanded="false" />
-            <element signature="e#18791#21655#0" expanded="false" />
-            <element signature="e#18859#19186#0" expanded="false" />
-            <element signature="e#19232#19320#0" expanded="false" />
-            <element signature="e#19461#19547#0" expanded="false" />
-            <element signature="e#19633#20098#0" expanded="false" />
-            <element signature="e#19812#19905#0" expanded="false" />
-            <element signature="e#20162#20217#0" expanded="false" />
-            <element signature="e#20775#21180#0" expanded="false" />
-            <element signature="e#21236#21393#0" expanded="false" />
-            <element signature="e#21428#21655#0" expanded="false" />
-            <element signature="e#21728#22144#1" expanded="false" />
-            <element signature="e#22904#23464#1" expanded="false" />
-            <element signature="e#23732#23882#0" expanded="false" />
-            <element signature="e#24595#26470#0" expanded="false" />
-            <element signature="e#24776#24964#0" expanded="false" />
-            <element signature="e#25359#25495#0" expanded="false" />
-            <element signature="e#25359#25415#0" expanded="false" />
-            <element signature="e#25586#26116#0" expanded="false" />
-            <element signature="e#25586#25638#0" expanded="false" />
-            <element signature="e#25775#26078#0" expanded="false" />
-            <element signature="e#25852#26020#0" expanded="false" />
-            <element signature="e#26387#26470#0" expanded="false" />
-            <element signature="e#26526#26962#1" expanded="false" />
-            <element signature="e#27193#27302#0" expanded="false" />
-            <element signature="e#27741#28205#1" expanded="false" />
-            <element signature="e#28437#30425#1" expanded="false" />
-            <element signature="e#30699#30794#0" expanded="false" />
-            <element signature="e#30723#30772#0" expanded="false" />
-            <element signature="e#31000#31178#0" expanded="false" />
-            <element signature="e#31491#32865#1" expanded="false" />
+            <element signature="e#1158#1618#1" expanded="false" />
+            <element signature="e#1812#1921#0" expanded="false" />
+            <element signature="e#2326#4487#1" expanded="false" />
+            <element signature="e#4819#4915#0" expanded="false" />
+            <element signature="e#4829#4915#0" expanded="false" />
+            <element signature="e#5040#7402#0" expanded="false" />
+            <element signature="e#5111#5162#0" expanded="false" />
+            <element signature="e#5226#5282#0" expanded="false" />
+            <element signature="e#5479#5794#0" expanded="false" />
+            <element signature="e#5855#5896#0" expanded="false" />
+            <element signature="e#5986#6037#0" expanded="false" />
+            <element signature="e#6172#6548#0" expanded="false" />
+            <element signature="e#6414#6534#0" expanded="false" />
+            <element signature="e#6727#7402#0" expanded="false" />
+            <element signature="e#6800#6955#0" expanded="false" />
+            <element signature="e#6808#6916#0" expanded="false" />
+            <element signature="e#7429#7550#0" expanded="false" />
+            <element signature="e#7453#7548#0" expanded="false" />
+            <element signature="e#7666#8279#1" expanded="false" />
+            <element signature="e#8574#8686#0" expanded="false" />
+            <element signature="e#9031#9051#0" expanded="false" />
+            <element signature="e#9738#9825#0" expanded="false" />
+            <element signature="e#9851#10042#0" expanded="false" />
+            <element signature="e#9939#10041#0" expanded="false" />
+            <element signature="e#10124#10280#0" expanded="false" />
+            <element signature="e#10362#10530#0" expanded="false" />
+            <element signature="e#10445#10529#0" expanded="false" />
+            <element signature="e#10612#10797#0" expanded="false" />
+            <element signature="e#10695#10796#0" expanded="false" />
+            <element signature="e#10998#11300#0" expanded="false" />
+            <element signature="e#11124#11299#0" expanded="false" />
+            <element signature="e#11505#11717#0" expanded="false" />
+            <element signature="e#11588#11716#0" expanded="false" />
+            <element signature="e#11867#12115#1" expanded="false" />
+            <element signature="e#12194#12508#1" expanded="false" />
+            <element signature="e#12532#12584#0" expanded="false" />
+            <element signature="e#12669#13083#1" expanded="false" />
+            <element signature="e#13504#14000#0" expanded="false" />
+            <element signature="e#13544#13859#0" expanded="false" />
+            <element signature="e#13773#13859#0" expanded="false" />
+            <element signature="e#14120#15072#1" expanded="false" />
+            <element signature="e#15415#17614#0" expanded="false" />
+            <element signature="e#15484#16889#0" expanded="false" />
+            <element signature="e#15560#16838#0" expanded="false" />
+            <element signature="e#15697#16838#0" expanded="false" />
+            <element signature="e#15861#16074#0" expanded="false" />
+            <element signature="e#16309#16392#0" expanded="false" />
+            <element signature="e#16924#17614#0" expanded="false" />
+            <element signature="e#17500#17614#0" expanded="false" />
+            <element signature="e#17668#18219#1" expanded="false" />
+            <element signature="e#18770#21634#0" expanded="false" />
+            <element signature="e#18838#19165#0" expanded="false" />
+            <element signature="e#19211#19299#0" expanded="false" />
+            <element signature="e#19440#19526#0" expanded="false" />
+            <element signature="e#19612#20077#0" expanded="false" />
+            <element signature="e#19791#19884#0" expanded="false" />
+            <element signature="e#20141#20196#0" expanded="false" />
+            <element signature="e#20754#21159#0" expanded="false" />
+            <element signature="e#21215#21372#0" expanded="false" />
+            <element signature="e#21407#21634#0" expanded="false" />
+            <element signature="e#21707#22123#1" expanded="false" />
+            <element signature="e#22883#23443#1" expanded="false" />
+            <element signature="e#23711#23861#0" expanded="false" />
+            <element signature="e#24574#26449#0" expanded="false" />
+            <element signature="e#24755#24943#0" expanded="false" />
+            <element signature="e#25338#25474#0" expanded="false" />
+            <element signature="e#25338#25394#0" expanded="false" />
+            <element signature="e#25565#26095#0" expanded="false" />
+            <element signature="e#25565#25617#0" expanded="false" />
+            <element signature="e#25754#26057#0" expanded="false" />
+            <element signature="e#25831#25999#0" expanded="false" />
+            <element signature="e#26366#26449#0" expanded="false" />
+            <element signature="e#26505#26941#1" expanded="false" />
+            <element signature="e#27172#27281#0" expanded="false" />
+            <element signature="e#27717#28175#1" expanded="false" />
+            <element signature="e#28395#30383#1" expanded="false" />
+            <element signature="e#30657#30752#0" expanded="false" />
+            <element signature="e#30681#30730#0" expanded="false" />
+            <element signature="e#30958#31136#0" expanded="false" />
+            <element signature="e#31449#32823#1" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1158,7 +1209,7 @@
           <folding>
             <element signature="e#284#354#1" expanded="true" />
             <element signature="e#861#939#1" expanded="true" />
-            <element signature="e#2578#4023#0" expanded="true" />
+            <element signature="e#2572#4017#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1170,25 +1221,25 @@
           <folding>
             <element signature="e#279#344#1" expanded="true" />
             <element signature="e#882#1639#1" expanded="true" />
-            <element signature="e#1864#3925#0" expanded="true" />
+            <element signature="e#1864#3919#0" expanded="true" />
             <element signature="e#1864#2477#1" expanded="false" />
             <element signature="e#2781#2897#0" expanded="false" />
-            <element signature="e#3391#3755#0" expanded="false" />
-            <element signature="e#3475#3754#0" expanded="false" />
-            <element signature="e#3993#4262#1" expanded="false" />
-            <element signature="e#4769#4878#0" expanded="false" />
-            <element signature="e#5052#5804#1" expanded="false" />
-            <element signature="e#6080#6346#0" expanded="false" />
-            <element signature="e#6407#6483#0" expanded="false" />
-            <element signature="e#6668#6941#0" expanded="false" />
-            <element signature="e#6859#6931#0" expanded="false" />
-            <element signature="e#7072#7477#1" expanded="false" />
-            <element signature="e#7703#8032#0" expanded="false" />
-            <element signature="e#7782#7874#0" expanded="false" />
-            <element signature="e#7790#7855#0" expanded="false" />
-            <element signature="e#8062#8157#0" expanded="false" />
-            <element signature="e#8331#8524#1" expanded="false" />
-            <element signature="e#8750#8839#0" expanded="false" />
+            <element signature="e#3385#3749#0" expanded="false" />
+            <element signature="e#3469#3748#0" expanded="false" />
+            <element signature="e#3984#4253#1" expanded="false" />
+            <element signature="e#4760#4869#0" expanded="false" />
+            <element signature="e#5040#5792#1" expanded="false" />
+            <element signature="e#6068#6334#0" expanded="false" />
+            <element signature="e#6395#6471#0" expanded="false" />
+            <element signature="e#6656#6929#0" expanded="false" />
+            <element signature="e#6847#6919#0" expanded="false" />
+            <element signature="e#7060#7465#1" expanded="false" />
+            <element signature="e#7691#8020#0" expanded="false" />
+            <element signature="e#7770#7862#0" expanded="false" />
+            <element signature="e#7778#7843#0" expanded="false" />
+            <element signature="e#8050#8145#0" expanded="false" />
+            <element signature="e#8319#8512#1" expanded="false" />
+            <element signature="e#8738#8827#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1199,26 +1250,6 @@
           <caret line="63" column="33" lean-forward="false" selection-start-line="63" selection-start-column="33" selection-end-line="63" selection-end-column="33" />
           <folding>
             <element signature="e#276#465#1" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="25" column="79" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="79" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSDiffDataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="728">
-          <caret line="52" column="0" lean-forward="true" selection-start-line="52" selection-start-column="0" selection-end-line="56" selection-end-column="26" />
-          <folding>
-            <element signature="e#279#338#1" expanded="true" />
-            <element signature="e#841#920#1" expanded="true" />
-            <element signature="e#984#1776#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1248,6 +1279,36 @@
         <state relative-caret-position="70">
           <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/SAXSFigureManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-860">
+          <caret line="93" column="27" lean-forward="false" selection-start-line="93" selection-start-column="27" selection-end-line="93" selection-end-column="27" />
+          <folding>
+            <element signature="e#915#976#1" expanded="true" />
+            <element signature="e#8221#10023#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSDiffDataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="532">
+          <caret line="38" column="13" lean-forward="false" selection-start-line="38" selection-start-column="13" selection-end-line="38" selection-end-column="13" />
+          <folding>
+            <element signature="e#279#338#1" expanded="true" />
+            <element signature="e#848#927#1" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
