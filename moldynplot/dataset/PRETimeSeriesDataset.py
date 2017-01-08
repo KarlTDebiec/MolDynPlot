@@ -17,12 +17,6 @@ from __future__ import (absolute_import, division, print_function,
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
-from IPython import embed
-import h5py
-import numpy as np
-import pandas as pd
-from ..myplotspec.Dataset import Dataset
-from ..myplotspec import sformat, wiprint
 from .SequenceDataset import RelaxDataset
 from .TimeSeriesDataset import TimeSeriesDataset
 
@@ -75,24 +69,64 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
 
         return parser
 
-    def __init__(self, **kwargs):
+    def __init__(self, dt=None, **kwargs):
         """
 
         Args:
-            kwargs (dict):
+            verbose (int): Level of verbose output
+            kwargs (dict): Additional Keyword Arguments
         """
-        super(PRETimeSeriesDataset, self).__init__(**kwargs)
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        self.dataset_cache = kwargs.get("dataset_cache", None)
+
+        # Read data
+        if not hasattr(self, "timeseries_df"):
+            self.timeseries_df = self.df = self.read(**kwargs)
+        if dt:
+            self.timeseries_df.set_index(
+                self.timeseries_df.index.values * float(dt), inplace=True)
+            self.timeseries_df.index.name = "time"
+
+        import pandas as pd
+        import numpy as np
+        pd.set_option('display.max_rows', 500)
+        # print(self.timeseries_df)
+        mean_df = pd.DataFrame(data=self.timeseries_df.mean(axis=0),
+            dtype=np.double)
+        print(mean_df)
+
+        k = 0.0123  # Å^6 ns-2
+        tc = 4  # ns
+        v = 8e-7  # ns-1
+        mean_df = 1 / (mean_df ** 6)  # Å-6
+        print(mean_df)
+        mean_df = k * mean_df  # ns-2
+        print(mean_df)
+        mean_df = mean_df * 1e9 * 1e9  # s-2
+        print(mean_df)
+        const = (4 * 4e-9 + ((3 * 4e-9) / (1 + (800 * (4e-9 ** 2)))))  # s
+        print(const)
+        mean_df = mean_df * const  # s-1
+        print(mean_df)
+        mean_df = 1 / mean_df  # s
+        # mean_df = mean_df * 1e-9
+        # print(mean_df)
+
+
+
+        # embed()
+        # Allow superclass to handle other actions
+        # super(PRETimeSeriesDataset, self).__init__(**kwargs)
 
 
 #################################### MAIN #####################################
 def main():
     import argparse
 
-    # Prepare argument parser
     parser = argparse.ArgumentParser(description=__doc__)
-
     PRETimeSeriesDataset.construct_argparser(parser)
-
     kwargs = vars(parser.parse_args())
     kwargs.pop("cls")(**kwargs)
 

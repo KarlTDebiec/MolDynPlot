@@ -21,6 +21,7 @@ from __future__ import (absolute_import, division, print_function,
 
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
+    import moldynplot.dataset
 from IPython import embed
 import h5py
 import numpy as np
@@ -152,7 +153,8 @@ class TimeSeriesDataset(Dataset):
 
         # Process arguments
         verbose = kwargs.get("verbose", 1)
-        self.dataset_cache = kwargs.get("dataset_cache", None)
+        if not hasattr(self, "dataset_cache") or self.dataset_cache is None:
+            self.dataset_cache = kwargs.get("dataset_cache", None)
 
         # Read data
         if not hasattr(self, "timeseries_df"):
