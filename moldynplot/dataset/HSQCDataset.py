@@ -62,7 +62,7 @@ class HSQCDataset(Dataset):
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
             parser = parser_or_subparsers.add_parser(name="hsqc",
                 description=help_message, help=help_message)
-        elif parser is None:
+        elif parser_or_subparsers is None:
             parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
