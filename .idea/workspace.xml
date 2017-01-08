@@ -4,35 +4,8 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2229ebae-6e82-46c3-af70-c9a676c6c8e0" name="Default" comment="Fixed dataset bug and made code clearer">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moldynplot/dataset/ChemicalShiftSequenceDataset.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moldynplot/dataset/IREDDataset.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moldynplot/dataset/IREDTimeSeriesDataset.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moldynplot/dataset/NatConTimeSeriesDataset.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moldynplot/dataset/RelaxDataset.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moldynplot/dataset/SAXSDiffDataset.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moldynplot/dataset/SAXSExperimentDataset.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/moldynplot/dataset/SAXSTimeSeriesDataset.py" />
+    <list default="true" id="2229ebae-6e82-46c3-af70-c9a676c6c8e0" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/CorrFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/CorrFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/HSQCFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/HSQCFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/MDGXFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/MDGXFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/PDistFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/PDistFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/SAXSFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/SAXSFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/SequenceFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/SequenceFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/TimeSeries2DFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/TimeSeries2DFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/TimeSeriesFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/TimeSeriesFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/CorrDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/CorrDataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/HSQCDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/HSQCDataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/MDGXDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/MDGXDataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/PRETimeSeriesDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/PRETimeSeriesDataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/SequenceDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/SequenceDataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/__init__.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py" afterPath="$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/myplotspec/__init__.py" afterPath="$PROJECT_DIR$/moldynplot/myplotspec/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/myplotspec/error.py" afterPath="$PROJECT_DIR$/moldynplot/myplotspec/error.py" />
     </list>
     <ignored path="MolDynPlot.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -644,7 +617,14 @@
       <option name="project" value="LOCAL" />
       <updated>1483856744775</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Refactoring dataset classes&#10;&#10;- Moved datasets' &quot;main&quot; to Dataset base class&#10;- Renamed &quot;cls&quot; arguments to &quot;class_&quot;">
+      <created>1483891802703</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1483891802703</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -743,7 +723,8 @@
     <MESSAGE value="Trying out PyCharm" />
     <MESSAGE value="Reformatted using PyCharm" />
     <MESSAGE value="Fixed dataset bug and made code clearer" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed dataset bug and made code clearer" />
+    <MESSAGE value="Refactoring dataset classes&#10;&#10;- Moved datasets' &quot;main&quot; to Dataset base class&#10;- Renamed &quot;cls&quot; arguments to &quot;class_&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactoring dataset classes&#10;&#10;- Moved datasets' &quot;main&quot; to Dataset base class&#10;- Renamed &quot;cls&quot; arguments to &quot;class_&quot;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
