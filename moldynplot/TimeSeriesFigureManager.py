@@ -18,6 +18,7 @@ from __future__ import (absolute_import, division, print_function,
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
+
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
@@ -136,7 +137,7 @@ class TimeSeriesFigureManager(FigureManager):
         draw_dataset:
           column: percent_native_contacts
           dataset_kw:
-            class_: moldynplot.dataset.NatConTimeSeriesDataset.NatConTimeSeriesDataset
+            cls: moldynplot.dataset.NatConTimeSeriesDataset.NatConTimeSeriesDataset
             downsample_mode: mean
           partner_kw:
             yticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
@@ -153,7 +154,7 @@ class TimeSeriesFigureManager(FigureManager):
           partner_kw:
             yticks: [0,2,4,6,8,10]
           dataset_kw:
-            class_: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
               bandwidth: 0.1
@@ -172,7 +173,7 @@ class TimeSeriesFigureManager(FigureManager):
           partner_kw:
             yticks: [0,5,10,15,20,25,30]
           dataset_kw:
-            class_: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
               bandwidth: 0.1
@@ -192,7 +193,7 @@ class TimeSeriesFigureManager(FigureManager):
           partner_kw:
             yticks: [0,5,10,15]
           dataset_kw:
-            class_: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
               bandwidth:

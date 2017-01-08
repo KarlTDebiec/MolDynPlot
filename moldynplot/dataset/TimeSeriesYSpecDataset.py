@@ -36,7 +36,7 @@ class TimeSeriesYSpecDataset(YSpecDataset):
     help_groups = ["spec"]
 
     @classmethod
-    def construct_argparser(class_, **kwargs):
+    def construct_argparser(cls, **kwargs):
         """
         Adds arguments to a nascent argument parser
 
@@ -48,9 +48,9 @@ class TimeSeriesYSpecDataset(YSpecDataset):
         """
 
         # Process arguments
-        parser = class_.get_argparser(grouped_help=True, **kwargs)
-        if parser.get_default("class_") is None:
-            parser.set_defaults(class_=class_)
+        parser = cls.get_argparser(grouped_help=True, **kwargs)
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=cls)
         help_groups = kwargs.get("help_groups")
         arg_groups = {ag.title: ag for ag in parser._action_groups}
         input_group = arg_groups.get("input",
@@ -61,27 +61,27 @@ class TimeSeriesYSpecDataset(YSpecDataset):
             parser.add_argument_group("output"))
 
         # Input arguments
-        class_.add_argument(input_group, "-spec", dest="source_spec",
+        cls.add_argument(input_group, "-spec", dest="source_spec",
             metavar="SPEC", type=str, help="""file from which to load
             specification; see '--help
                      spec' for more information""")
 
         # Action arguments
-        class_.add_argument(action_group, "-dt", type=float,
+        cls.add_argument(action_group, "-dt", type=float,
             help="time between frames")
-        class_.add_argument(action_group, "-toffset", type=float,
+        cls.add_argument(action_group, "-toffset", type=float,
             help="offset to add to index (time or frame number)")
-        class_.add_argument(action_group, "-downsample", type=int,
+        cls.add_argument(action_group, "-downsample", type=int,
             help="factor by which to downsample data")
-        class_.add_argument(action_group, "--pdist", action="store_true",
+        cls.add_argument(action_group, "--pdist", action="store_true",
             dest="calc_pdist",
             help="calculate probability distribution over timeseries")
-        class_.add_argument(action_group, "--mean", action="store_true",
+        cls.add_argument(action_group, "--mean", action="store_true",
             dest="calc_mean",
             help="calculate mean and standard error over timeseries")
 
         # Arguments inherited from superclass
-        super(TimeSeriesYSpecDataset, class_).construct_argparser(
+        super(TimeSeriesYSpecDataset, cls).construct_argparser(
             parser=parser, **kwargs)
 
         return parser

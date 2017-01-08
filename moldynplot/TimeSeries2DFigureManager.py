@@ -18,6 +18,7 @@ from __future__ import (absolute_import, division, print_function,
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
+
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
@@ -130,7 +131,7 @@ class TimeSeries2DFigureManager(FigureManager):
           ylabel: Residue
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             downsample_mode: mode
           heatmap_kw:
             cmap: !!python/object/apply:moldynplot.dssp_cmap []
@@ -145,7 +146,7 @@ class TimeSeries2DFigureManager(FigureManager):
           ylabel: Residue
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             downsample_mode: mean
           heatmap_kw:
             cmap: afmhot_r
@@ -169,7 +170,7 @@ class TimeSeries2DFigureManager(FigureManager):
             color: [0.5,0.5,0.5]
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.SAXSTimeSeriesDataset.SAXSTimeSeriesDataset
+            cls: moldynplot.dataset.SAXSTimeSeriesDataset.SAXSTimeSeriesDataset
           heatmap_kw:
             cmap: bone
             vmin: 0

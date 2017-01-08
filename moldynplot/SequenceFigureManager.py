@@ -17,6 +17,7 @@ from __future__ import (absolute_import, division, print_function,
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
+
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
@@ -81,7 +82,7 @@ class SequenceFigureManager(FigureManager):
             verticalalignment: top
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.SequenceDataset.SequenceDataset
+            cls: moldynplot.dataset.SequenceDataset.SequenceDataset
             read_csv_kw:
               delimiter: "\\\\s\\\\s+"
               index_col: 0
@@ -113,7 +114,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [0,1,2,3,4,5]
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.RelaxDataset.RelaxDataset
+            cls: moldynplot.dataset.RelaxDataset.RelaxDataset
           column:    "r1"
           column_se: "r1 se"
       r2:
@@ -124,7 +125,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [0,2,4,6,8,10,12,14,16,18,20]
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.RelaxDataset.RelaxDataset
+            cls: moldynplot.dataset.RelaxDataset.RelaxDataset
           column:    "r2"
           column_se: "r2 se"
       r2/r1:
@@ -136,7 +137,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [3,4,5,6,7,8,9,10,11]
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.RelaxDataset.RelaxDataset
+            cls: moldynplot.dataset.RelaxDataset.RelaxDataset
           column:    "r2/r1"
           column_se: "r2/r1 se"
       hetnoe:
@@ -147,7 +148,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.RelaxDataset.RelaxDataset
+            cls: moldynplot.dataset.RelaxDataset.RelaxDataset
           column:    "noe"
           column_se: "noe se"
       s2:
@@ -158,7 +159,7 @@ class SequenceFigureManager(FigureManager):
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.RelaxDataset.RelaxDataset
+            cls: moldynplot.dataset.RelaxDataset.RelaxDataset
           column:    "s2"
           column_se: "s2 se"
       error:

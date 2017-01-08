@@ -8,16 +8,16 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Generates one or more HSQC figures to specifications provided in a YAML
-file.
+Generates one or more HSQC figures to specifications provided in a YAML file.
 """
 ################################### MODULES ###################################
 from __future__ import (absolute_import, division, print_function,
     unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
-    import moldynplot
+
 import numpy as np
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
@@ -90,7 +90,7 @@ class HSQCFigureManager(FigureManager):
             frameon: True
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.HSQCDataset.HSQCDataset
+            cls: moldynplot.dataset.HSQCDataset.HSQCDataset
           cutoff: 0.970
           plot_kw:
             zorder: 10

@@ -66,8 +66,8 @@ class IREDTimeSeriesDataset(TimeSeriesDataset, IREDDataset):
             parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
-        if parser.get_default("class_") is None:
-            parser.set_defaults(class_=IREDTimeSeriesDataset)
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=IREDTimeSeriesDataset)
 
         # Arguments unique to this class
 

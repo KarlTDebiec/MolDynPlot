@@ -32,7 +32,7 @@ class MDGXDataset(Dataset):
     """
 
     @classmethod
-    def get_cache_key(class_, infile, selections=None, *args, **kwargs):
+    def get_cache_key(cls, infile, selections=None, *args, **kwargs):
         """
         Generates tuple of arguments to be used as key for dataset
         cache.
@@ -50,7 +50,7 @@ class MDGXDataset(Dataset):
                 value = tuple(value)
             read_csv_kw.append((key, value))
         return (
-            class_, expandvars(infile), tuple(selections), tuple(read_csv_kw))
+            cls, expandvars(infile), tuple(selections), tuple(read_csv_kw))
 
     def __init__(self, infile, selections=None, **kwargs):
         """

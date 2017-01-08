@@ -20,7 +20,7 @@ if __name__ == "__main__":
 import numpy as np
 import pandas as pd
 from .SAXSDataset import SAXSDataset
-from ..myplotspec import wiprint
+from ..myplotspec import multi_get_copy
 
 
 ################################### CLASSES ###################################
@@ -32,8 +32,6 @@ class SAXSDiffDataset(SAXSDataset):
     def __init__(self, dataset_cache=None, **kwargs):
         """
         """
-        from ..myplotspec import multi_get_copy
-
         self.dataset_cache = dataset_cache
 
         minuend_kw = multi_get_copy(["minuend", "minuend_kw"], kwargs, {})

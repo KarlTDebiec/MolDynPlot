@@ -14,10 +14,11 @@ in a YAML file.
 ################################### MODULES ###################################
 from __future__ import (absolute_import, division, print_function,
     unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
-    import moldynplot
+
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
@@ -100,7 +101,7 @@ class PDistFigureManager(FigureManager):
         draw_dataset:
           column: rg
           dataset_kw:
-            class_: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
               bandwidth: 0.1
@@ -120,7 +121,7 @@ class PDistFigureManager(FigureManager):
         draw_dataset:
           column: rmsd
           dataset_kw:
-            class_: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
                 bandwidth: 0.1

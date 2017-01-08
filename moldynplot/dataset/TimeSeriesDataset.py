@@ -71,8 +71,8 @@ class TimeSeriesDataset(Dataset):
             parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
-        if parser.get_default("class_") is None:
-            parser.set_defaults(class_=TimeSeriesDataset)
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=TimeSeriesDataset)
 
         # Arguments unique to this class
         arg_groups = {ag.title: ag for ag in parser._action_groups}

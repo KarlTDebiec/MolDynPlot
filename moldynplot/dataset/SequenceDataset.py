@@ -78,8 +78,8 @@ class SequenceDataset(Dataset):
             parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
-        if parser.get_default("class_") is None:
-            parser.set_defaults(class_=SequenceDataset)
+        if parser.get_default("cls") is None:
+            parser.set_defaults(cls=SequenceDataset)
 
         # Arguments unique to this class
         arg_groups = {ag.title: ag for ag in parser._action_groups}
@@ -102,7 +102,7 @@ class SequenceDataset(Dataset):
         return parser
 
     @classmethod
-    def get_cache_key(class_, **kwargs):
+    def get_cache_key(cls, **kwargs):
         """
         Generates key for dataset cache.
 
@@ -129,7 +129,7 @@ class SequenceDataset(Dataset):
             if isinstance(value, list):
                 value = tuple(value)
             read_csv_kw.append((key, value))
-        return (class_, tuple(infiles), use_indexes, tuple(read_csv_kw))
+        return (cls, tuple(infiles), use_indexes, tuple(read_csv_kw))
 
     def __init__(self, calc_pdist=False, outfile=None, interactive=False,
       **kwargs):

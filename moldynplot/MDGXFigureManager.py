@@ -14,10 +14,11 @@ file.
 ################################### MODULES ###################################
 from __future__ import (absolute_import, division, print_function,
     unicode_literals)
+
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
-    import moldynplot
+
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
@@ -75,7 +76,7 @@ class MDGXFigureManager(FigureManager):
             linestyle: '-'
         draw_dataset:
           dataset_kw:
-            class_: moldynplot.dataset.MDGXDataset.MDGXDataset
+            cls: moldynplot.dataset.MDGXDataset.MDGXDataset
             read_csv_kw:
               delim_whitespace: True
               names: [topology, restart, qm_energy, mm_energy]

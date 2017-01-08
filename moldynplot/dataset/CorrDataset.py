@@ -34,7 +34,7 @@ class CorrDataset(Dataset):
     """
 
     @classmethod
-    def get_cache_key(class_, *args, **kwargs):
+    def get_cache_key(cls, *args, **kwargs):
         """
         Generates tuple of arguments to be used as key for dataset
         cache.
@@ -43,22 +43,22 @@ class CorrDataset(Dataset):
         from ..myplotspec import multi_get_copy
 
         x_kw = multi_get_copy(["x", "x_kw"], kwargs, {})
-        x_class = x_kw.get("class_", Dataset)
+        x_class = x_kw.get("cls", Dataset)
         if isinstance(x_class, six.string_types):
             mod_name = ".".join(x_class.split(".")[:-1])
-            x_class_name = x_class.split(".")[-1]
-            mod = __import__(mod_name, fromlist=[x_class_name])
-            x_class = getattr(mod, x_class_name)
+            x_clsname = x_class.split(".")[-1]
+            mod = __import__(mod_name, fromlist=[x_clsname])
+            x_class = getattr(mod, x_clsname)
 
         y_kw = multi_get_copy(["y", "y_kw"], kwargs, {})
-        y_class = y_kw.get("class_", Dataset)
+        y_class = y_kw.get("cls", Dataset)
         if isinstance(y_class, six.string_types):
             mod_name = ".".join(y_class.split(".")[:-1])
-            y_class_name = y_class.split(".")[-1]
-            mod = __import__(mod_name, fromlist=[y_class_name])
-            y_class = getattr(mod, y_class_name)
+            y_clsname = y_class.split(".")[-1]
+            mod = __import__(mod_name, fromlist=[y_clsname])
+            y_class = getattr(mod, y_clsname)
 
-        return (class_, x_class.get_cache_key(**x_kw),
+        return (cls, x_class.get_cache_key(**x_kw),
         y_class.get_cache_key(**y_kw))
 
     @staticmethod
