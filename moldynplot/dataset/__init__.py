@@ -84,10 +84,10 @@ class H5Dataset(object):
             with h5py.File(path) as in_h5:
                 if address not in in_h5:
                     raise KeyError(
-                        "Dataset {0}[{1}] not found".format(path, address))
+                      "Dataset {0}[{1}] not found".format(path, address))
                 dataset = in_h5[address]
                 self.datasets[key] = np.array(dataset)
                 self.attrs[key] = dict(dataset.attrs)
             print(
-                "Loaded Dataset {0}[{1}]; Stored at {2}".format(path, address,
-                    key))
+              "Loaded Dataset {0}[{1}]; Stored at {2}".format(path, address,
+                key))

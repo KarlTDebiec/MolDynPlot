@@ -34,7 +34,7 @@ class CorrDataset(Dataset):
     """
 
     @classmethod
-    def get_cache_key(cls, *args, **kwargs):
+    def get_cache_key(class_, *args, **kwargs):
         """
         Generates tuple of arguments to be used as key for dataset
         cache.
@@ -43,22 +43,23 @@ class CorrDataset(Dataset):
         from ..myplotspec import multi_get_copy
 
         x_kw = multi_get_copy(["x", "x_kw"], kwargs, {})
-        x_cls = x_kw.get("cls", Dataset)
-        if isinstance(x_cls, six.string_types):
-            mod_name = ".".join(x_cls.split(".")[:-1])
-            x_cls_name = x_cls.split(".")[-1]
-            mod = __import__(mod_name, fromlist=[x_cls_name])
-            x_cls = getattr(mod, x_cls_name)
+        x_class = x_kw.get("class_", Dataset)
+        if isinstance(x_class, six.string_types):
+            mod_name = ".".join(x_class.split(".")[:-1])
+            x_class_name = x_class.split(".")[-1]
+            mod = __import__(mod_name, fromlist=[x_class_name])
+            x_class = getattr(mod, x_class_name)
 
         y_kw = multi_get_copy(["y", "y_kw"], kwargs, {})
-        y_cls = y_kw.get("cls", Dataset)
-        if isinstance(y_cls, six.string_types):
-            mod_name = ".".join(y_cls.split(".")[:-1])
-            y_cls_name = y_cls.split(".")[-1]
-            mod = __import__(mod_name, fromlist=[y_cls_name])
-            y_cls = getattr(mod, y_cls_name)
+        y_class = y_kw.get("class_", Dataset)
+        if isinstance(y_class, six.string_types):
+            mod_name = ".".join(y_class.split(".")[:-1])
+            y_class_name = y_class.split(".")[-1]
+            mod = __import__(mod_name, fromlist=[y_class_name])
+            y_class = getattr(mod, y_class_name)
 
-        return (cls, x_cls.get_cache_key(**x_kw), y_cls.get_cache_key(**y_kw))
+        return (class_, x_class.get_cache_key(**x_kw),
+        y_class.get_cache_key(**y_kw))
 
     @staticmethod
     def get_cache_message(cache_key):
@@ -75,7 +76,7 @@ class CorrDataset(Dataset):
           dataset
         """
         return "Dataset previously loaded from '{0}' and '{1}'".format(
-            cache_key[1][1], cache_key[2][1])
+          cache_key[1][1], cache_key[2][1])
 
     def __init__(self, verbose=1, debug=0, **kwargs):
         """
@@ -104,26 +105,17 @@ class CorrDataset(Dataset):
                 overlap_cols += [(c + "_se", "y")]
 
         corr = pd.DataFrame(0, index=overlap_idx,
-            columns=pd.MultiIndex.from_tuples(overlap_cols))
+          columns=pd.MultiIndex.from_tuples(overlap_cols))
         corr.iloc[:, corr.columns.get_level_values(1) == "x"] = \
-        x_df[[a[0] for a in overlap_cols if a[1] == "x"]].loc[
-            overlap_idx].values
+            x_df[[a[0] for a in overlap_cols if a[1] == "x"]].loc[
+                overlap_idx].values
         corr.iloc[:, corr.columns.get_level_values(1) == "y"] = \
-        y_df[[a[0] for a in overlap_cols if a[1] == "y"]].loc[
-            overlap_idx].values
+            y_df[[a[0] for a in overlap_cols if a[1] == "y"]].loc[
+                overlap_idx].values
 
         self.dataframe = corr
 
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
-    import argparse
-
-    # Prepare argument parser
-    parser = argparse.ArgumentParser(description="""Processes datasets""")
-    subparsers = parser.add_subparsers(dest="mode", description="")
-
-    CorrDataset.construct_argparser(subparsers)
-
-    kwargs = vars(parser.parse_args())
-    kwargs.pop("cls")(**kwargs)
+    CorrDataset.main()

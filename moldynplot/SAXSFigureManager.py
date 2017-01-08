@@ -96,7 +96,7 @@ class SAXSFigureManager(FigureManager):
         help: Data from simulation (saxs_md, crysol, foxs)
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.dataset.TimeSeriesDataset.SAXSTimeSeriesDataset
+            class_: moldynplot.dataset.SAXSTimeSeriesDataset.SAXSTimeSeriesDataset
             calc_mean: True
             calc_error: True
       experiment:
@@ -104,7 +104,7 @@ class SAXSFigureManager(FigureManager):
         help: Data from experiment
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.dataset.SAXSDataset.SAXSExperimentDataset
+            class_: moldynplot.dataset.SAXSExperimentDataset.SAXSExperimentDataset
             read_csv_kw:
               engine: python
               skiprows: 2
@@ -118,7 +118,7 @@ class SAXSFigureManager(FigureManager):
         help: Data back-calculated from molecular envelope
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.dataset.SAXSDataset.SAXSExperimentDataset
+            class_: moldynplot.dataset.SAXSExperimentDataset.SAXSExperimentDataset
             read_csv_kw:
               engine: python
               skiprows: 1
@@ -171,7 +171,7 @@ class SAXSFigureManager(FigureManager):
                          "0.005", "0.010", "0.015", "0.020"]
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.dataset.SAXSDataset.SAXSDiffDataset
+            class_: moldynplot.dataset.SAXSDataset.SAXSDiffDataset
       presentation:
         class: target
         inherits: presentation
@@ -269,8 +269,8 @@ class SAXSFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None, handles=None, logx=False,
-            logy=False, kratky=False, draw_fill_between=False, draw_plot=True,
-            draw_handle=True, draw_label=True, verbose=1, debug=0, **kwargs):
+      logy=False, kratky=False, draw_fill_between=False, draw_plot=True,
+      draw_handle=True, draw_label=True, verbose=1, debug=0, **kwargs):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 

@@ -64,7 +64,7 @@ class CorrFigureManager(FigureManager):
             linestyle: '-'
         draw_dataset:
           dataset_kw:
-            cls: moldynplot.dataset.CorrDataset.CorrDataset
+            class_: moldynplot.dataset.CorrDataset.CorrDataset
             x_kw:
               read_csv_kw:
                 delim_whitespace: True
@@ -250,7 +250,7 @@ class CorrFigureManager(FigureManager):
 
         # Load data
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
-        if "cls" in dataset_kw and dataset_kw["cls"] is not None:
+        if "class_" in dataset_kw and dataset_kw["class_"] is not None:
             dataset = self.load_dataset(verbose=verbose, debug=debug,
                 **dataset_kw)
             dataframe = dataset.dataframe

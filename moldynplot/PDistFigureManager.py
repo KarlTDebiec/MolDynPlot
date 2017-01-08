@@ -100,7 +100,7 @@ class PDistFigureManager(FigureManager):
         draw_dataset:
           column: rg
           dataset_kw:
-            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+            class_: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
               bandwidth: 0.1
@@ -120,7 +120,7 @@ class PDistFigureManager(FigureManager):
         draw_dataset:
           column: rmsd
           dataset_kw:
-            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
+            class_: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             calc_pdist: True
             pdist_kw:
                 bandwidth: 0.1

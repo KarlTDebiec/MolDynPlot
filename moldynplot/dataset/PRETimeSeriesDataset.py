@@ -17,15 +17,14 @@ from __future__ import (absolute_import, division, print_function,
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
-from .SequenceDataset import RelaxDataset
+from .RelaxDataset import RelaxDataset
 from .TimeSeriesDataset import TimeSeriesDataset
 
 
 ################################### CLASSES ###################################
 class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
     """
-    Represents paramagnetic relaxation enhancement data as a function of time
-    and residue number.
+    Represents paramagnetic relaxation enhancement timeseries data
     """
 
     @staticmethod
@@ -54,13 +53,13 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
             parser = parser_or_subparsers.add_parser(name="pre",
-                description=help_message, help=help_message)
+              description=help_message, help=help_message)
         elif parser is None:
             parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
-        if parser.get_default("cls") is None:
-            parser.set_defaults(cls=PRETimeSeriesDataset)
+        if parser.get_default("class_") is None:
+            parser.set_defaults(class_=PRETimeSeriesDataset)
 
         # Arguments unique to this class
 
@@ -86,7 +85,7 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
             self.timeseries_df = self.df = self.read(**kwargs)
         if dt:
             self.timeseries_df.set_index(
-                self.timeseries_df.index.values * float(dt), inplace=True)
+              self.timeseries_df.index.values * float(dt), inplace=True)
             self.timeseries_df.index.name = "time"
 
         import pandas as pd
@@ -94,7 +93,7 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
         pd.set_option('display.max_rows', 500)
         # print(self.timeseries_df)
         mean_df = pd.DataFrame(data=self.timeseries_df.mean(axis=0),
-            dtype=np.double)
+          dtype=np.double)
         print(mean_df)
 
         k = 0.0123  # Å^6 ns-2
@@ -119,14 +118,5 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
 
 
 #################################### MAIN #####################################
-def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description=__doc__)
-    PRETimeSeriesDataset.construct_argparser(parser)
-    kwargs = vars(parser.parse_args())
-    kwargs.pop("cls")(**kwargs)
-
-
 if __name__ == "__main__":
-    main()
+    PRETimeSeriesDataset.main()

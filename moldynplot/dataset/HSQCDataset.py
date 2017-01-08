@@ -66,8 +66,8 @@ class HSQCDataset(Dataset):
             parser = argparse.ArgumentParser(description=help_message)
 
         # Defaults
-        if parser.get_default("cls") is None:
-            parser.set_defaults(cls=HSQCDataset)
+        if parser.get_default("class_") is None:
+            parser.set_defaults(class_=HSQCDataset)
 
         # Arguments unique to this class
         arg_groups = {ag.title: ag for ag in parser._action_groups}
@@ -223,13 +223,4 @@ class HSQCDataset(Dataset):
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
-    import argparse
-
-    # Prepare argument parser
-    parser = argparse.ArgumentParser(description="""Processes datasets""")
-    subparsers = parser.add_subparsers(dest="mode", description="")
-
-    HSQCDataset.construct_argparser(subparsers)
-
-    kwargs = vars(parser.parse_args())
-    kwargs.pop("cls")(**kwargs)
+    HSQCDataset.main()
