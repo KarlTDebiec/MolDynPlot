@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2229ebae-6e82-46c3-af70-c9a676c6c8e0" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/myplotspec" afterPath="$PROJECT_DIR$/moldynplot/myplotspec" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/SAXSFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/SAXSFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/PRETimeSeriesDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/PRETimeSeriesDataset.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py" afterPath="$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py" />
     </list>
     <ignored path="MolDynPlot.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -32,7 +29,7 @@
       <file leaf-file-name="Dataset.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="753">
+            <state relative-caret-position="4634">
               <caret line="812" column="0" lean-forward="true" selection-start-line="812" selection-start-column="0" selection-end-line="812" selection-end-column="0" />
               <folding>
                 <element signature="e#350#438#0" expanded="true" />
@@ -621,7 +618,14 @@
       <option name="project" value="LOCAL" />
       <updated>1483828248441</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Fixed dataset bug and made code clearer">
+      <created>1483856501432</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1483856501433</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -719,7 +723,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Trying out PyCharm" />
     <MESSAGE value="Reformatted using PyCharm" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reformatted using PyCharm" />
+    <MESSAGE value="Fixed dataset bug and made code clearer" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed dataset bug and made code clearer" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -760,6 +765,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="294">
           <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1149,7 +1155,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="753">
+        <state relative-caret-position="4634">
           <caret line="812" column="0" lean-forward="true" selection-start-line="812" selection-start-column="0" selection-end-line="812" selection-end-column="0" />
           <folding>
             <element signature="e#350#438#0" expanded="true" />
