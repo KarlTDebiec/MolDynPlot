@@ -111,9 +111,6 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
         mean_df = mean_df * const  # s-1
         print(mean_df)
         mean_df = 1 / mean_df  # s
-        # mean_df = mean_df * 1e-9
-        # print(mean_df)
-
 
 
         # embed()
