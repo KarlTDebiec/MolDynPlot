@@ -480,12 +480,12 @@ def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
       (relax, para_relax[["para I0", "para I0 se", "para r2", "para r2 se"]]),
       axis=1)
 
-    relax["I / I0"] = relax["para I0"] / relax["dia I0"]
-    relax["I / I0 se"] = np.sqrt(relax["I / I0"] ** 2 * \
+    relax["I/I0"] = relax["para I0"] / relax["dia I0"]
+    relax["I/I0 se"] = np.sqrt(relax["I/I0"] ** 2 * \
       ((relax["para I0 se"] / relax["para I0"]) ** 2 + \
        (relax["dia I0 se"] / relax[ "dia I0"]) ** 2))
-    relax["r20 / r2"] = relax["dia r2"] / relax["para r2"]
-    relax["r20 / r2 se"] = np.sqrt(relax["r20 / r2"] ** 2 * \
+    relax["r20/r2"] = relax["dia r2"] / relax["para r2"]
+    relax["r20/r2 se"] = np.sqrt(relax["r20/r2"] ** 2 * \
       ((relax["dia r2 se"] / relax["dia r2"]) ** 2 + \
        (relax["para r2 se"] / relax[ "para r2"]) ** 2))
     relax["rho2"] = relax["para r2"] - relax["dia r2"]
@@ -516,8 +516,8 @@ def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
               row["1H"], row["15N"], int(row["dia I0"]), int(row["dia I0 se"]),
               row["dia r2"], row["dia r2 se"], int(row["para I0"]),
               int(row["para I0 se"]), row["para r2"], row["para r2 se"],
-              row["I / I0"], row["I / I0 se"], row["r20 / r2"],
-              row["r20 / r2 se"], row["rho2"], row["rho2 se"]))
+              row["I/I0"], row["I/I0 se"], row["r20/r2"], row["r20/r2 se"],
+              row["rho2"], row["rho2 se"]))
 
 
 

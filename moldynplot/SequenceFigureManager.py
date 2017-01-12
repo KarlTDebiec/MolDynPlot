@@ -174,19 +174,33 @@ class SequenceFigureManager(FigureManager):
           draw_fill_between: False
           draw_errorbar:     False
           draw_plot:         True
-      pre:
+      pre_r20_r2:
         class: content
-        help: Format subplot for Paramagnetic Relaxation Enhancement
+        help: Format subplot for Paramagnetic Relaxation Enhancement r20 / r2
         draw_subplot:
-          ylabel: "$\\\\frac{diamagnetic}{paramagnetic}$"
-          ylabel_fp: 12b
-          ylabel_kw:
-            rotation: vertical
-            labelpad: 12
+          ylabel: "$\\\\frac{r_{2,0}}{r_2}$"
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          column:    "pre"
-          column_se: "pre se"
+          column:    "r20/r2"
+          column_se: "r20/r2 se"
+      pre_I_I0:
+        class: content
+        help: Format subplot for Paramagnetic Relaxation Enhancement I/I0
+        draw_subplot:
+          ylabel: "$\\\\frac{I}{I_0}$"
+          yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
+        draw_dataset:
+          column:    "I/I0"
+          column_se: "I/I0 se"
+      pre_rho2:
+        class: content
+        help: Format subplot for Paramagnetic Relaxation Enhancement Γ2
+        draw_subplot:
+          ylabel: "$Γ_2$"
+          yticks: [0,10,20,30,40,50,60]
+        draw_dataset:
+          column:    "rho2"
+          column_se: "rho2 se"
       deltacs:
         class: content
         help: Format subplot for chemical shift change
