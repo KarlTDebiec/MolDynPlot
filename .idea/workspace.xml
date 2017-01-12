@@ -4,9 +4,9 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2229ebae-6e82-46c3-af70-c9a676c6c8e0" name="Default" comment="Went back from class_ to cls&#10;&#10;- PyCharm fills this in automatically when a classmethod is declared, so 'cls' is easier">
+    <list default="true" id="2229ebae-6e82-46c3-af70-c9a676c6c8e0" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/ChemicalShiftSequenceDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/ChemicalShiftSequenceDataset.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/relaxation.py" afterPath="$PROJECT_DIR$/moldynplot/relaxation.py" />
     </list>
     <list id="7c80e3b1-6002-438d-a462-018232eb5ccb" name="New changelist" comment="" />
@@ -27,65 +27,44 @@
     <favorites_list name="MolDynPlot" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
-      <split-first>
-        <leaf>
-          <file leaf-file-name="ChemicalShiftSequenceDataset.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/moldynplot/dataset/ChemicalShiftSequenceDataset.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="319">
-                  <caret line="266" column="22" lean-forward="true" selection-start-line="266" selection-start-column="22" selection-end-line="266" selection-end-column="22" />
-                  <folding>
-                    <element signature="e#1031#3481#0" expanded="true" />
-                    <element signature="e#12518#12993#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/moldynplot/__init__.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="336">
-                  <caret line="127" column="57" lean-forward="false" selection-start-line="127" selection-start-column="57" selection-end-line="127" selection-end-column="57" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="relaxation.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/moldynplot/relaxation.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="459">
-                  <caret line="473" column="47" lean-forward="true" selection-start-line="473" selection-start-column="47" selection-end-line="473" selection-end-column="47" />
-                  <folding>
-                    <element signature="e#266#315#1" expanded="true" />
-                    <element signature="e#592#853#0" expanded="true" />
-                    <element signature="e#639#828#0" expanded="true" />
-                    <element signature="e#918#2395#0" expanded="true" />
-                    <element signature="e#2464#5777#0" expanded="true" />
-                    <element signature="e#5848#10481#0" expanded="true" />
-                    <element signature="e#10619#14486#0" expanded="true" />
-                    <element signature="e#11228#11284#0" expanded="true" />
-                    <element signature="e#11922#12081#0" expanded="true" />
-                    <element signature="e#12287#13804#0" expanded="true" />
-                    <element signature="e#12445#12495#0" expanded="true" />
-                    <element signature="e#13232#13632#0" expanded="true" />
-                    <element signature="e#14571#17208#0" expanded="true" />
-                    <element signature="e#15129#15185#0" expanded="true" />
-                    <element signature="e#15433#15584#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf>
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/moldynplot/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="336">
+              <caret line="127" column="57" lean-forward="false" selection-start-line="127" selection-start-column="57" selection-end-line="127" selection-end-column="57" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="relaxation.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/moldynplot/relaxation.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="431">
+              <caret line="514" column="36" lean-forward="true" selection-start-line="514" selection-start-column="36" selection-end-line="514" selection-end-column="36" />
+              <folding>
+                <element signature="e#266#315#1" expanded="true" />
+                <element signature="e#592#853#0" expanded="true" />
+                <element signature="e#639#828#0" expanded="true" />
+                <element signature="e#918#2395#0" expanded="true" />
+                <element signature="e#2464#5777#0" expanded="true" />
+                <element signature="e#5848#10433#0" expanded="true" />
+                <element signature="e#10571#14438#0" expanded="true" />
+                <element signature="e#11180#11236#0" expanded="true" />
+                <element signature="e#11874#12033#0" expanded="true" />
+                <element signature="e#12239#13756#0" expanded="true" />
+                <element signature="e#12397#12447#0" expanded="true" />
+                <element signature="e#13184#13584#0" expanded="true" />
+                <element signature="e#14523#17160#0" expanded="true" />
+                <element signature="e#15081#15137#0" expanded="true" />
+                <element signature="e#15385#15536#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -95,9 +74,12 @@
       <find>cls</find>
       <find>noe_se</find>
       <find>multiprocess_map</find>
+      <find />
     </findStrings>
     <replaceStrings>
       <replace>noe se</replace>
+      <replace>&quot;] [&quot;</replace>
+      <replace>&quot;,&quot;</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -387,7 +369,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.editor" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="full.screen.before.presentation.mode" value="true" />
     <property name="ToolWindowFavorites.ShowToolbar" value="false" />
@@ -711,7 +693,14 @@
       <option name="project" value="LOCAL" />
       <updated>1483894589404</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Add error in initial intensity to relaxation calculation as implemented in ChemicalShiftSequenceDataset">
+      <created>1484185568481</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1484185568481</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -758,15 +747,15 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22569445" sideWeight="0.48534584" order="3" side_tool="false" content_ui="combo" x="722" y="251" width="202" height="410" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5028612" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32764506" sideWeight="0.49427754" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32764506" sideWeight="0.49427754" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3261391" sideWeight="0.49713877" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18055555" sideWeight="0.51465416" order="0" side_tool="false" content_ui="tabs" x="1" y="258" width="207" height="432" />
-      <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5763889" sideWeight="0.49713877" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5763889" sideWeight="0.49713877" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.10902778" sideWeight="0.5036145" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -816,7 +805,8 @@
     <MESSAGE value="Refactoring dataset classes&#10;&#10;- Moved datasets' &quot;main&quot; to Dataset base class&#10;- Renamed &quot;cls&quot; arguments to &quot;class_&quot;" />
     <MESSAGE value="Fixed command-line interfaces" />
     <MESSAGE value="Went back from class_ to cls&#10;&#10;- PyCharm fills this in automatically when a classmethod is declared, so 'cls' is easier" />
-    <option name="LAST_COMMIT_MESSAGE" value="Went back from class_ to cls&#10;&#10;- PyCharm fills this in automatically when a classmethod is declared, so 'cls' is easier" />
+    <MESSAGE value="Add error in initial intensity to relaxation calculation as implemented in ChemicalShiftSequenceDataset" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add error in initial intensity to relaxation calculation as implemented in ChemicalShiftSequenceDataset" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1278,30 +1268,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/relaxation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="473" column="47" lean-forward="true" selection-start-line="473" selection-start-column="47" selection-end-line="473" selection-end-column="47" />
-          <folding>
-            <element signature="e#266#315#1" expanded="true" />
-            <element signature="e#592#853#0" expanded="true" />
-            <element signature="e#639#828#0" expanded="true" />
-            <element signature="e#918#2395#0" expanded="true" />
-            <element signature="e#2464#5777#0" expanded="true" />
-            <element signature="e#5848#10481#0" expanded="true" />
-            <element signature="e#10619#14486#0" expanded="true" />
-            <element signature="e#11228#11284#0" expanded="true" />
-            <element signature="e#11922#12081#0" expanded="true" />
-            <element signature="e#12287#13804#0" expanded="true" />
-            <element signature="e#12445#12495#0" expanded="true" />
-            <element signature="e#13232#13632#0" expanded="true" />
-            <element signature="e#14571#17208#0" expanded="true" />
-            <element signature="e#15129#15185#0" expanded="true" />
-            <element signature="e#15433#15584#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/moldynplot/dataset/ChemicalShiftSequenceDataset.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="319">
@@ -1309,6 +1275,30 @@
           <folding>
             <element signature="e#1031#3481#0" expanded="true" />
             <element signature="e#12518#12993#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/relaxation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="431">
+          <caret line="514" column="36" lean-forward="true" selection-start-line="514" selection-start-column="36" selection-end-line="514" selection-end-column="36" />
+          <folding>
+            <element signature="e#266#315#1" expanded="true" />
+            <element signature="e#592#853#0" expanded="true" />
+            <element signature="e#639#828#0" expanded="true" />
+            <element signature="e#918#2395#0" expanded="true" />
+            <element signature="e#2464#5777#0" expanded="true" />
+            <element signature="e#5848#10433#0" expanded="true" />
+            <element signature="e#10571#14438#0" expanded="true" />
+            <element signature="e#11180#11236#0" expanded="true" />
+            <element signature="e#11874#12033#0" expanded="true" />
+            <element signature="e#12239#13756#0" expanded="true" />
+            <element signature="e#12397#12447#0" expanded="true" />
+            <element signature="e#13184#13584#0" expanded="true" />
+            <element signature="e#14523#17160#0" expanded="true" />
+            <element signature="e#15081#15137#0" expanded="true" />
+            <element signature="e#15385#15536#0" expanded="true" />
           </folding>
         </state>
       </provider>

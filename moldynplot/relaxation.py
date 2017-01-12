@@ -189,8 +189,7 @@ def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
         err_cols = [c for c in sim.columns.values if
             not c.endswith(" se") and c in exp.columns.values]
         err_se_cols = [c + " se" for c in err_cols if
-            c + " se" in sim.columns.values and c + " se" in
-                                                exp.columns.values]
+            c + " se" in sim.columns.values and c + " se" in exp.columns.values]
         print("   Files share fields {0} and {1} for {2} residues".format(
           str(map(str, err_cols)).replace("'", ""),
           str(map(str, err_se_cols)).replace("'", ""), len(overlap)))
@@ -462,24 +461,36 @@ def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
           "Loading diamagnetic relaxation rates from '{0}'".format(dia_infile))
     dia_relax = pd.read_csv(dia_infile, index_col=0, delimiter=r"\s\s+")
     dia_relax.index.name = "residue"
+    dia_relax.rename(
+      columns={"I0": "dia I0", "I0 se": "dia I0 se", "r2": "dia r2",
+          "r2 se": "dia r2 se", }, inplace=True)
+
     if verbose >= 1:
         print("Loading paramagnetic relaxation rates from '{0}'".format(
           para_infile))
     para_relax = pd.read_csv(para_infile, index_col=0, delimiter=r"\s\s+")
     para_relax.index.name = "residue"
+    para_relax.rename(
+      columns={"I0": "para I0", "I0 se": "para I0 se", "r2": "para r2",
+          "r2 se": "para r2 se", }, inplace=True)
 
-    relax = dia_relax[["1H", "15N", "dia", "dia se"]]
-    relax = pd.concat((relax, para_relax[["para", "para se"]]), axis=1)
+    relax = dia_relax[
+        ["1H", "15N", "dia I0", "dia I0 se", "dia r2", "dia r2 se"]]
+    relax = pd.concat(
+      (relax, para_relax[["para I0", "para I0 se", "para r2", "para r2 se"]]),
+      axis=1)
 
-    relax["pre"] = relax["dia"] / relax["para"]
-    relax["pre se"] = np.sqrt((relax["dia se"] / relax["dia"]) ** 2 + (relax[
-                                                                           "para se"] /
-                                                                       relax[
-                                                                           "para"]) ** 2) * \
-                      relax["pre"]
-    relax["pre"][np.isinf(relax["pre"])] = 0
-    relax["pre se"][np.isnan(relax["pre se"])] = 0
-    print(relax)
+    relax["I / I0"] = relax["para I0"] / relax["dia I0"]
+    relax["I / I0 se"] = np.sqrt(relax["I / I0"] ** 2 * \
+      ((relax["para I0 se"] / relax["para I0"]) ** 2 + \
+       (relax["dia I0 se"] / relax[ "dia I0"]) ** 2))
+    relax["r20 / r2"] = relax["dia r2"] / relax["para r2"]
+    relax["r20 / r2 se"] = np.sqrt(relax["r20 / r2"] ** 2 * \
+      ((relax["dia r2 se"] / relax["dia r2"]) ** 2 + \
+       (relax["para r2 se"] / relax[ "para r2"]) ** 2))
+    relax["rho2"] = relax["para r2"] - relax["dia r2"]
+    relax["rho2 se"] = np.sqrt(
+      relax["para r2 se"] ** 2 + relax["dia r2 se"] ** 2)
 
     # Write outfile
     if verbose >= 1:
@@ -488,9 +499,26 @@ def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
     header = "{0:<11s}".format(columns.pop(0))
     for column in columns:
         header += "{0:>12s}".format(column)
-    fmt = ["%12s"] + ["%11.4f"] * 8
-    np.savetxt(outfile, np.column_stack((relax.index.values, relax.values)),
-      fmt=fmt, header=header, comments='#')
+    with open(outfile, "w") as out:
+        relax["dia I0"][np.isnan(relax["dia I0"])] = 0
+        relax["dia I0 se"][np.isnan(relax["dia I0 se"])] = 0
+        relax["para I0"][np.isnan(relax["para I0"])] = 0
+        relax["para I0 se"][np.isnan(relax["para I0 se"])] = 0
+        out.write("#" + header + "\n")
+        for residue in relax.index:
+            # This is an abonomination. Why is this the least painfil way to
+            # write a decent text file.
+            row = relax.loc[residue]
+            out.write("{0:12s} {1:11.2f} {2:11.1f} {3:11d} {4:11d} "
+                      "{5:11.2f} {6:11.2f} {7:11d} {8:11d} {9:11.2f} "
+                      "{10:11.2f} {11:11.3f} {12:11.3f} {13:11.3f} "
+                      "{14:11.3f} {15:11.2f} {16:11.2f}\n".format(residue,
+              row["1H"], row["15N"], int(row["dia I0"]), int(row["dia I0 se"]),
+              row["dia r2"], row["dia r2 se"], int(row["para I0"]),
+              int(row["para I0 se"]), row["para r2"], row["para r2 se"],
+              row["I / I0"], row["I / I0 se"], row["r20 / r2"],
+              row["r20 / r2 se"], row["rho2"], row["rho2 se"]))
+
 
 
 #################################### MAIN #####################################
@@ -512,30 +540,29 @@ if __name__ == "__main__":
     input_group.add_argument("-infile", required=True, dest="infiles",
       nargs="+", type=str, help="""cpptraj output file(s) from which to load
       datasets; may be plain text or compressed""")
-    input_group.add_argument("-indexfile", required=False, type=str,
-      help="""Text file from which to load residue names; if omitted will be
+    input_group.add_argument("-indexfile", required=False, type=str, help="""Text file from which to load residue names; if omitted will be
       taken from columns of first infile""")
     output_group.add_argument("-outfile", required=True, type=str,
       help="Text file to which processed data will be output")
 
     # Prepare error subparser
     error_subparser = subparsers.add_parser(name="error",
-      help="Calculates error of simulated relaxation relative to " +
-           "experiment",
+      help="""Calculates error of simulated relaxation relative to
+      experiment""",
       description="""Calculates error of simulated relaxation relative to
       experiment. The intended use case is to break down errors relative to
-      experimental data collected at multiple magnetic fields or by
-      multiple groups, error(residue, measurement, magnet/group), into a
-      form that is easier to visualize and communicate, error(residue,
-      measurement). Reads in a series of input files containing simulated
-      data and a series of files containing corresponding experimental data.
-      These files are treated in pairs and the error between all data points
-      present in both(e.g. row 'GLN:2', column 'r1') calculated. Columns
-      ending in '_se' are treated as uncertainties, and are propogated into
-      uncertainties in the resulting errors rather than being averaged. Take
-      caution when processing datasets uncertainties alongside those that
-      do (experimental uncertainties are not always reported), as the
-      resulting uncertainties in the residuals will be incorrect.""")
+      experimental data collected at multiple magnetic fields or by multiple
+      groups, error(residue, measurement, magnet/group), into a form that is
+      easier to visualize and communicate, error(residue, measurement). Reads
+      in a series of input files containing simulated data and a series of
+      files containing corresponding experimental data. These files are treated
+      in pairs and the error between all data points present in both(e.g. row
+      'GLN:2', column 'r1') calculated. Columns ending in '_se' are treated as
+      uncertainties, and are propogated into uncertainties in the resulting
+      errors rather than being averaged. Take caution when processing datasets
+      uncertainties alongside those that do (experimental uncertainties are not
+      always reported), as the resulting uncertainties in the residuals will be
+      incorrect.""")
     error_subparser.set_defaults(function=process_error)
     input_group = error_subparser.add_argument_group("input")
     action_group = error_subparser.add_argument_group("action")

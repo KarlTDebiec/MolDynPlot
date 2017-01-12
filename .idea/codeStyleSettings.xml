@@ -19,7 +19,7 @@
           <option name="KEEP_LINE_BREAKS" value="false" />
           <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
           <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="false" />
-          <option name="WRAP_LONG_LINES" value="true" />
+          <option name="WRAP_ON_TYPING" value="1" />
           <indentOptions>
             <option name="CONTINUATION_INDENT_SIZE" value="2" />
           </indentOptions>
@@ -33,6 +33,5 @@
       </value>
     </option>
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />
-    <option name="PREFERRED_PROJECT_CODE_STYLE" value="MolDynPlot" />
   </component>
 </project>
