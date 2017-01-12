@@ -91,7 +91,7 @@ def process_ired(infiles, outfile, indexfile=None, **kwargs):
             fields = Popen("head -n 1 {0}".format(infile), stdout=PIPE,
               stderr=fnull, shell=True).stdout.read().strip()
         re_t1t2noe = re.compile(
-          "^#Vec\s+[\w_]+\[T1\]\s+[\w_]+\[\T2\]\s+[\w_]+\[NOE\]$")
+          "^#Vec\s+[\w_]+\[T1\]\s+[\w_]+\[T2\]\s+[\w_]+\[NOE\]$")
         re_s2 = re.compile("^#Vec\s+[\w_]+\[S2\]$")
         if re.match(re_t1t2noe, fields):
             raw_data = np.loadtxt(infile, dtype=np.float32)
@@ -165,11 +165,10 @@ def process_error(sim_infiles, exp_infiles, outfile, **kwargs):
     import numpy as np
 
     if len(sim_infiles) != len(exp_infiles):
-        raise ValueError(
-          "Number of simulation input files must match number " + "of "
-                                                                  "experimental input files, as they are treated " + "pairwise. {0} simulation ".format(
-            len(sim_infiles)) + "input file(s) and {0} ".format(
-            len(exp_infiles)) + "experiment input file(s) provided.")
+        raise ValueError("""Number of simulation input files must match
+        number of experimental input files, as they are treated pairwise.
+        {0} simulation input file(s) and {1} experiment input file(s)
+        provided.""".format(len(sim_infiles), len(exp_infiles)))
 
     # Work through each pair of infiles
     errs = []
@@ -511,17 +510,11 @@ if __name__ == "__main__":
     action_group = ired_subparser.add_argument_group("action")
     output_group = ired_subparser.add_argument_group("output")
     input_group.add_argument("-infile", required=True, dest="infiles",
-      nargs="+", type=str,
-      help="cpptraj output file(s) from which to load datasets; " + "may "
-                                                                    "be "
-                                                                    "plain "
-                                                                    "text "
-                                                                    "or "
-                                                                    "compressed")
+      nargs="+", type=str, help="""cpptraj output file(s) from which to load
+      datasets; may be plain text or compressed""")
     input_group.add_argument("-indexfile", required=False, type=str,
-      help="Text file from which to load residue names; if omitted " + "will "
-                                                                       "be "
-                                                                       "taken from columns of first infile")
+      help="""Text file from which to load residue names; if omitted will be
+      taken from columns of first infile""")
     output_group.add_argument("-outfile", required=True, type=str,
       help="Text file to which processed data will be output")
 
@@ -529,21 +522,20 @@ if __name__ == "__main__":
     error_subparser = subparsers.add_parser(name="error",
       help="Calculates error of simulated relaxation relative to " +
            "experiment",
-      description="Calculates error of simulated relaxation relative to " +
-                  "experiment. The intended use case is to break down " +
-                  "errors relative to experimental data collected at " +
-                  "multiple magnetic fields or by multiple groups, "
-                                                                                                                                                                                           "" + "error(residue, measurement, magnet/group), into a "
-                                                                                                                                                                                                "form " + "that is easier to visualize and "
-                                                                                                                                                                                                          "communicate, " + "error(residue, "
-                                                                                                                                                                                                                            "measurement). " + "Reads in a series of input files containing simulated " + "data and a series of files containing corresponding " + "experimental data. These files are treated in pairs " + "and the error between all data points present in both "
-                                                                                                                                                                                                                                                                                                                                                                                                                            "" + "(e.g. row 'GLN:2', column 'r1') calculated. " + "Columns ending in '_se' are treated as uncertainties, "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  "" + "and are propogated into uncertainties in the "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       "resulting " + "errors rather than being averaged. "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      "Take caution when " + "processing "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "datasets "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "that omit "
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "uncertainties alongside " + "those that do (experimental uncertainties are not " + "always reported), as the resulting uncertainties in " + "the residuals will be incorrect.")
+      description="""Calculates error of simulated relaxation relative to
+      experiment. The intended use case is to break down errors relative to
+      experimental data collected at multiple magnetic fields or by
+      multiple groups, error(residue, measurement, magnet/group), into a
+      form that is easier to visualize and communicate, error(residue,
+      measurement). Reads in a series of input files containing simulated
+      data and a series of files containing corresponding experimental data.
+      These files are treated in pairs and the error between all data points
+      present in both(e.g. row 'GLN:2', column 'r1') calculated. Columns
+      ending in '_se' are treated as uncertainties, and are propogated into
+      uncertainties in the resulting errors rather than being averaged. Take
+      caution when processing datasets uncertainties alongside those that
+      do (experimental uncertainties are not always reported), as the
+      resulting uncertainties in the residuals will be incorrect.""")
     error_subparser.set_defaults(function=process_error)
     input_group = error_subparser.add_argument_group("input")
     action_group = error_subparser.add_argument_group("action")

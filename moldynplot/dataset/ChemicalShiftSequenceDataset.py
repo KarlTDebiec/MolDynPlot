@@ -72,9 +72,8 @@ class ChemicalShiftDataset(SequenceDataset):
         try:
             input_group.add_argument("-delays", dest="delays", metavar="DELAY",
               nargs="+", type=float, help="""delays for each infile,
-                if infiles represent a
-                         series; number of delays must match number of
-                         infiles""")
+              if infiles represent a series; number of delays must match
+              number of infiles""")
         except argparse.ArgumentError:
             pass
 
@@ -84,9 +83,8 @@ class ChemicalShiftDataset(SequenceDataset):
         try:
             action_group.add_argument("-relax", dest="calc_relax", type=str,
               nargs="?", default=None, const="r1", help="""Calculate
-                relaxation rates and standard errors; may
-                         additionally specify kind of relaxation being
-                         measured (e.g. r1, r2)""")
+                relaxation rates and standard errors; may additionally
+                specify type of relaxation being measured (e.g. r1, r2)""")
         except argparse.ArgumentError:
             pass
 
@@ -288,7 +286,7 @@ class ChemicalShiftDataset(SequenceDataset):
         def calc_relax_rate(residue, **kwargs):
             """
             """
-            from . import multiprocess_map
+            from .. import multiprocess_map
 
             if verbose >= 1:
                 wiprint(
@@ -320,24 +318,26 @@ class ChemicalShiftDataset(SequenceDataset):
                     synth_I0, synth_R = \
                         curve_fit(model_function, delays, synth_intensity,
                           p0=(I0, R))[0]
-                    return synth_R
+                    return synth_I0, synth_R
                 except RuntimeError:
                     if verbose >= 1:
                         wiprint("""Unable to calculate standard error for {0}
                                 """.format(residue.name))
-                    return np.nan
+                    return (np.nan, np.nan)
 
             # Calculate standard error
-            synth_Rs = multiprocess_map(synth_fit_decay, synth_datasets, 16)
-            R_se = np.std(synth_Rs)
+            synth_I0_Rs = np.array(multiprocess_map(synth_fit_decay,
+              synth_datasets, 16))
+            I0_se = np.std(synth_I0_Rs[:,0])
+            R_se = np.std(synth_I0_Rs[:,1])
 
-            return pd.Series([I0, R, R_se])
+            return pd.Series([I0, I0_se, R, R_se])
 
         # Calculate relaxation rates and standard errors
         fit = df.apply(calc_relax_rate, axis=1)
 
         # Format and return
-        fit.columns = ["I0", kind, kind + " se"]
+        fit.columns = ["I0", "I0 se", kind, kind + " se"]
         df = df.join(fit)
         return df
 
