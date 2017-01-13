@@ -68,7 +68,7 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
 
         return parser
 
-    def __init__(self, dt=None, **kwargs):
+    def __init__(self, dt=None, downsample=None, **kwargs):
         """
 
         Args:
@@ -87,34 +87,46 @@ class PRETimeSeriesDataset(TimeSeriesDataset, RelaxDataset):
             self.timeseries_df.set_index(
               self.timeseries_df.index.values * float(dt), inplace=True)
             self.timeseries_df.index.name = "time"
+        if downsample:
+            self.timeseries_df = self.downsample(df=self.timeseries_df,
+              downsample=downsample, **kwargs)
 
         import pandas as pd
+        pd.set_option('display.width', 200)
         import numpy as np
-        pd.set_option('display.max_rows', 500)
-        # print(self.timeseries_df)
-        mean_df = pd.DataFrame(data=self.timeseries_df.mean(axis=0),
-          dtype=np.double)
+
+        distance_df = pd.DataFrame(data=self.timeseries_df.values,
+          dtype=np.double, columns=self.timeseries_df.columns)
+
+        rho2_df  = 0.0123 / (distance_df ** 6)  *1e9 * 1e9
+        rho2_df *= (4 * 4e-9 + ((3 * 4e-9) / (1 + (800 * (4e-9 ** 2)))))
+        I_I0_df = (13 * np.exp(-1 * rho2_df * 0.5e-3)) / (13 + rho2_df)
+
+        block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
+          fit_exp=True, fit_sig=False)
+        block_kw.update(kwargs.get("block_kw", {}))
+
+        distance_mean_df, block_averager = self.calc_mean(df = distance_df,
+          verbose=verbose, **block_kw)
+        distance_mean_df.columns = ["distance", "distance se"]
+        rho2_mean_df, block_averager = self.calc_mean(df = rho2_df,
+          verbose=verbose, **block_kw)
+        rho2_mean_df.columns = ["rho2", "rho2 se"]
+        I_I0_mean_df, block_averager = self.calc_mean(df = I_I0_df,
+          verbose=verbose, **block_kw)
+        I_I0_mean_df.columns = ["I/I0", "I/I0 se"]
+        mean_df = distance_mean_df.join(I_I0_mean_df).join(rho2_mean_df)
+        mean_df = self._read_index(df = mean_df,
+        indexfile="/Volumes/KDebiecSSD/AMBER15IPQ/protein/MOCVNHLYSM/ff15ipq10.3_spceb_T_tau_10.0ps/analysis/MOCVNHLYSM_index.dat")
         print(mean_df)
 
-        k = 0.0123  # Å^6 ns-2
-        tc = 4  # ns
-        v = 8e-7  # ns-1
-        mean_df = 1 / (mean_df ** 6)  # Å-6
-        print(mean_df)
-        mean_df = k * mean_df  # ns-2
-        print(mean_df)
-        mean_df = mean_df * 1e9 * 1e9  # s-2
-        print(mean_df)
-        const = (4 * 4e-9 + ((3 * 4e-9) / (1 + (800 * (4e-9 ** 2)))))  # s
-        print(const)
-        mean_df = mean_df * const  # s-1
-        print(mean_df)
-        mean_df = 1 / mean_df  # s
-
-
-        # embed()
-        # Allow superclass to handle other actions
-        # super(PRETimeSeriesDataset, self).__init__(**kwargs)
+        with open("pre.dat", "w") as out:
+            out.write("#residue        distance distance se        I/I0     I/I0 se        rho2     rho2 se\n")
+            for residue in mean_df.index:
+                row = mean_df.loc[residue]
+                out.write("{0:12s} {1:11.3f} {2:11.3f} {3:11.3f} {4:11.3f} {5:11.2f} {6:11.2f}\n".format(residue,
+                          row["distance"], row["distance se"], row["I/I0"],
+                          row["I/I0 se"], row["rho2"], row["rho2 se"]))
 
 
 #################################### MAIN #####################################
