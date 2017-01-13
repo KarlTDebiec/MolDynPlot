@@ -483,11 +483,11 @@ def process_pre(dia_infile, para_infile, outfile, verbose=1, debug=0,
     relax["I/I0"] = relax["para I0"] / relax["dia I0"]
     relax["I/I0 se"] = np.sqrt(relax["I/I0"] ** 2 * \
       ((relax["para I0 se"] / relax["para I0"]) ** 2 + \
-       (relax["dia I0 se"] / relax[ "dia I0"]) ** 2))
+       (relax["dia I0 se"] / relax["dia I0"]) ** 2))
     relax["r20/r2"] = relax["dia r2"] / relax["para r2"]
     relax["r20/r2 se"] = np.sqrt(relax["r20/r2"] ** 2 * \
       ((relax["dia r2 se"] / relax["dia r2"]) ** 2 + \
-       (relax["para r2 se"] / relax[ "para r2"]) ** 2))
+       (relax["para r2 se"] / relax["para r2"]) ** 2))
     relax["rho2"] = relax["para r2"] - relax["dia r2"]
     relax["rho2 se"] = np.sqrt(
       relax["para r2 se"] ** 2 + relax["dia r2 se"] ** 2)
