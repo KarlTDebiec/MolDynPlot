@@ -197,7 +197,7 @@ class SequenceFigureManager(FigureManager):
         help: Format subplot for Paramagnetic Relaxation Enhancement Γ2
         draw_subplot:
           ylabel: "$Γ_2$"
-          yticks: [0,10,20,30,40,50,60]
+          yticks: [0,20,40,60,80,100]
         draw_dataset:
           column:    "rho2"
           column_se: "rho2 se"

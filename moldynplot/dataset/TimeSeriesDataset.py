@@ -8,7 +8,7 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Represents data as a function of time
+Represents timeseries data
 
 .. todo:
   - Fix separation and ordering of argument groups: input, action, output
@@ -33,26 +33,26 @@ from ..myplotspec import wiprint
 ################################### CLASSES ###################################
 class TimeSeriesDataset(Dataset):
     """
-    Represents data as a function of time
+    Represents timeseries data
 
     Attributes:
-      timeseries_df (DataFrame): DataFrame whose index corresponds to
-        time as represented by frame number or chemical time and whose
-        columns are a series of quantities as a function of time.
+      timeseries_df (DataFrame): DataFrame whose index corresponds
+        to time as represented by frame number or chemical time and
+        whose columns are a series of quantities as a function of time.
     """
 
     @staticmethod
     def construct_argparser(parser_or_subparsers=None, **kwargs):
         """
-        Adds arguments to an existing argument parser, constructs a
-        subparser, or constructs a new parser
+        Adds arguments to an existing argument parser,
+        constructs a subparser, or constructs a new parser
 
         Arguments:
           parser_or_subparsers (ArgumentParser, _SubParsersAction,
             optional): If ArgumentParser, existing parser to which
-            arguments will be added; if _SubParsersAction, collection of
-            subparsers to which a new argument parser will be added; if
-            None, a new argument parser will be generated
+            arguments will be added; if _SubParsersAction, collection
+            of subparsers to which a new argument parser will be
+            added; if None, a new argument parser will be generated
           kwargs (dict): Additional keyword arguments
 
         Returns:
@@ -61,7 +61,7 @@ class TimeSeriesDataset(Dataset):
         import argparse
 
         # Process arguments
-        help_message = """Process standard data"""
+        help_message = """Process timeseries data"""
         if isinstance(parser_or_subparsers, argparse.ArgumentParser):
             parser = parser_or_subparsers
         elif isinstance(parser_or_subparsers, argparse._SubParsersAction):
@@ -82,17 +82,17 @@ class TimeSeriesDataset(Dataset):
           parser.add_argument_group("action"))
         try:
             action_group.add_argument("-dt", type=float, help="""time
-            between frames""")
+              between frames""")
         except argparse.ArgumentError:
             pass
         try:
             action_group.add_argument("-toffset", type=float, help="""offset
-            to add to index (time or frame number)""")
+              to add to index (time or frame number)""")
         except argparse.ArgumentError:
             pass
         try:
             action_group.add_argument("-downsample", type=int, help="""factor
-             by which to downsample data""")
+               by which to downsample data""")
         except argparse.ArgumentError:
             pass
         try:

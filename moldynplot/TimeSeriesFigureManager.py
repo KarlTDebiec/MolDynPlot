@@ -372,6 +372,7 @@ class TimeSeriesFigureManager(FigureManager):
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, **dataset_kw)
+        print(dataset)
 
         # Verbose output
         if verbose >= 2:
