@@ -59,7 +59,7 @@ class PRETimeSeriesDataset(TimeSeriesDataset, SequenceDataset):
 
         # Defaults
         if parser.get_default("cls") is None:
-            parser.set_defaults(cls=TimeSeriesDataset)
+            parser.set_defaults(cls=PRETimeSeriesDataset)
 
         # Arguments inherited from superclass
         TimeSeriesDataset.construct_argparser(parser)
@@ -69,7 +69,6 @@ class PRETimeSeriesDataset(TimeSeriesDataset, SequenceDataset):
 
     def __init__(self, dt=None, downsample=None, outfile=None, **kwargs):
         """
-
         Args:
             verbose (int): Level of verbose output
             kwargs (dict): Additional Keyword Arguments
@@ -97,10 +96,15 @@ class PRETimeSeriesDataset(TimeSeriesDataset, SequenceDataset):
         distance_df = pd.DataFrame(data=self.timeseries_df.values,
           dtype=np.double, columns=self.timeseries_df.columns)
 
-        rho2_df = 0.0123 / (distance_df ** 6) * 1e9 * 1e9
-        rho2_df *= (4 * 4e-9 + ((3 * 4e-9) / (1 + (800 * (4e-9 ** 2)))))
-        rho2_df *= 0.1
-        I_I0_df = (13 * np.exp(-1 * rho2_df * 10e-3)) / (13 + rho2_df)
+        k = 0.0123 # Å6 ns-2
+        w = 800e6 # s-1
+        tc = 4e-9 # s
+        r2 = 13 # s
+        t = 0.0005 # s
+
+        rho2_df = k / (distance_df ** 6) * 1e9 * 1e9 # s-2
+        rho2_df *= (4*tc + ((3*tc) / (1 + (w*(tc**2)))))
+        I_I0_df = (r2 * np.exp(-1 * rho2_df * t)) / (r2 + rho2_df)
 
         block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
           fit_exp=True, fit_sig=False)
