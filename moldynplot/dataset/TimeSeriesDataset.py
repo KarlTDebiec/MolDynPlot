@@ -258,77 +258,102 @@ class TimeSeriesDataset(Dataset):
         return df
 
     @staticmethod
-    def calc_mean(df, **kwargs):
+    def calc_mean(df, mode="percentile", **kwargs):
         """
-        Calculates the mean and standard error over a timeseries.
+        Calculates the mean over a timeseries
 
         Arguments:
           df (DataFrame): Timeseries DataFrame over which to calculate mean and
             standard error of each column over rows
+          mode (string): If 'se', calculate mean and standard error; if
+            'percentile', calculate mean, 2.5th percentile, and 97.5th
+            percentile (i.e. range encompassing 95% of data)
           all_factors (bool): Use all factors by which the
-            dataset is divisible rather than only factors of two
+            dataset is divisible rather than only factors of two (standard
+            error only)
           min_n_blocks (int): Minimum number of blocks after
-            transformation
+            transformation (standard error only)
           max_cut (float): Maximum proportion of dataset of
-            omit in transformation
-          fit_exp (bool): Fit exponential curve
-          fit_sig (bool): Fit sigmoid curve
+            omit in transformation (standard error only)
+          fit_exp (bool): Fit exponential curve (standard error only)
+          fit_sig (bool): Fit sigmoid curve (standard error only)
           verbose (int): Level of verbose output
           kwargs (dict): Additional keyword arguments
 
         Returns:
           DataFrame: DataFrame including mean and standard error for each
-          column in *timeseries_df*
+          column
         """
-        from ..fpblockaverager.FPBlockAverager import FPBlockAverager
-
         # Process arguments
         verbose = kwargs.get("verbose", 1)
-        fit_exp = kwargs.get("fit_exp", True)
-        fit_sig = kwargs.get("fit_sig", True)
-        if verbose >= 1:
-            wiprint("""Calculating mean and standard error over timeseries""")
 
-        # Single-level columns
-        if df.columns.nlevels == 1:
-            mean_df = pd.DataFrame(data=df.mean(axis=0))
-            block_averager = FPBlockAverager(df, **kwargs)
-            if fit_exp and not fit_sig:
-                errors = block_averager.parameters.loc[("exp", "a (se)")]
-            elif fit_sig and not fit_exp:
-                errors = block_averager.parameters.loc[("sig", "b (se)")]
-            elif fit_exp and fit_sig:
-                errors = block_averager.parameters.loc[("exp", "a (se)")]
+        if mode == "se":
+            from ..fpblockaverager.FPBlockAverager import FPBlockAverager
+
+            # Process arguments
+            fit_exp = kwargs.get("fit_exp", True)
+            fit_sig = kwargs.get("fit_sig", True)
+            if verbose >= 1:
+                wiprint(
+                  """Calculating mean and standard error over timeseries""")
+
+            # Single-level columns
+            if df.columns.nlevels == 1:
+                mean_df = pd.DataFrame(data=df.mean(axis=0))
+                block_averager = FPBlockAverager(df, **kwargs)
+                if fit_exp and not fit_sig:
+                    errors = block_averager.parameters.loc[("exp", "a (se)")]
+                elif fit_sig and not fit_exp:
+                    errors = block_averager.parameters.loc[("sig", "b (se)")]
+                elif fit_exp and fit_sig:
+                    errors = block_averager.parameters.loc[("exp", "a (se)")]
+                else:
+                    raise Exception()
+                mean_df = mean_df.join(errors)
+                mean_df.index.name = "q"
+                mean_df.columns = ["intensity", "intensity se"]
+            # Double-level columns
+            elif df.columns.nlevels == 2:
+                mean_df = pd.DataFrame(data=df.mean(axis=0))
+                block_averager = FPBlockAverager(df, **kwargs)
+                if fit_exp and not fit_sig:
+                    errors = block_averager.parameters.loc[("exp", "a (se)")]
+                elif fit_sig and not fit_exp:
+                    errors = block_averager.parameters.loc[("sig", "b (se)")]
+                elif fit_exp and fit_sig:
+                    errors = block_averager.parameters.loc[("exp", "a (se)")]
+                else:
+                    raise Exception()
+                errors.index = pd.MultiIndex.from_tuples(
+                  map(eval, errors.index.values))
+                errors.index = errors.index.set_levels(
+                  [c + " se" for c in errors.index.levels[1].values], level=1)
+                mean_df = mean_df.squeeze().unstack().join(errors.unstack())
+                mean_df = mean_df[
+                    ["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2",
+                        "s2 se"]]
+                mean_df = mean_df.loc[sorted(mean_df.index.values,
+                  key=lambda x: int(x.split(":")[1]))]
             else:
-                raise Exception()
-            mean_df = mean_df.join(errors)
-            mean_df.index.name = "q"
-            mean_df.columns = ["intensity", "intensity se"]
-        # Double-level columns
-        elif df.columns.nlevels == 2:
-            mean_df = pd.DataFrame(data=df.mean(axis=0))
-            block_averager = FPBlockAverager(df, **kwargs)
-            if fit_exp and not fit_sig:
-                errors = block_averager.parameters.loc[("exp", "a (se)")]
-            elif fit_sig and not fit_exp:
-                errors = block_averager.parameters.loc[("sig", "b (se)")]
-            elif fit_exp and fit_sig:
-                errors = block_averager.parameters.loc[("exp", "a (se)")]
-            else:
-                raise Exception()
-            errors.index = pd.MultiIndex.from_tuples(
-              map(eval, errors.index.values))
-            errors.index = errors.index.set_levels(
-              [c + " se" for c in errors.index.levels[1].values], level=1)
-            mean_df = mean_df.squeeze().unstack().join(errors.unstack())
-            mean_df = mean_df[
-                ["r1", "r1 se", "r2", "r2 se", "noe", "noe se", "s2", "s2 se"]]
-            mean_df = mean_df.loc[sorted(mean_df.index.values,
-              key=lambda x: int(x.split(":")[1]))]
+                raise Exception("Additional MultiIndex Levels not tested")
+
+            return mean_df, block_averager
+        elif mode == "percentile":
+            if verbose >= 1:
+                wiprint("""Calculating mean and range encompassing 95% of data
+                over timeseries""")
+            mean_df = df.mean().to_frame().reset_index(drop=True)
+            percentile_df = pd.DataFrame(
+              np.percentile(df.values, [2.5, 97.5, 5, 95],
+                axis=0).transpose())
+            mean_df = pd.concat([mean_df, percentile_df], axis=1,
+              ignore_index=True)
+            mean_df.index = df.columns.values
+            mean_df.columns = ["mean", "2.5th percentile", "97.5th percentile",
+                "5th percentile", "95th percentile"]
+            return mean_df, None
         else:
-            raise Exception("Additional MultiIndex Levels not tested")
-
-        return mean_df, block_averager
+            raise Exception()
 
 
 #################################### MAIN #####################################
