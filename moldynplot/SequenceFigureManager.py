@@ -379,7 +379,7 @@ class SequenceFigureManager(FigureManager):
     def draw_dataset(self, subplot, y_key=None, yse_key=None, yse_min=None,
       ylb_key=None, yub_key=None, label=None, handles=None,
       draw_fill_between=False, draw_errorbar=False, draw_plot=False,
-      draw_handle=False, **kwargs):
+      draw_handle=True, **kwargs):
         """
         Draws a dataset on a subplot
 
@@ -467,8 +467,8 @@ class SequenceFigureManager(FigureManager):
                         else:
                             if yse_key is not None:
                                 yse = df[yse_key][index]
-                            if yse_min is not None and yse < yse_min:
-                                yse = yse_min
+                                if yse_min is not None and yse < yse_min:
+                                    yse = yse_min
                             elif yse_min is not None:
                                 yse = yse_min
                             else:
