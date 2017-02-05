@@ -281,8 +281,6 @@ class SequenceFigureManager(FigureManager):
           ylabel_kw:
             rotation: horizontal
             labelpad: 3
-          grid_kw:
-            alpha: 0.3
           draw_label: True
           label_kw:
             border_lw: 1

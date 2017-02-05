@@ -258,7 +258,7 @@ class TimeSeriesDataset(Dataset):
         return df
 
     @staticmethod
-    def calc_mean(df, mode="percentile", **kwargs):
+    def calc_mean(df, mode="se", **kwargs):
         """
         Calculates the mean over a timeseries
 
@@ -310,8 +310,7 @@ class TimeSeriesDataset(Dataset):
                 else:
                     raise Exception()
                 mean_df = mean_df.join(errors)
-                mean_df.index.name = "q"
-                mean_df.columns = ["intensity", "intensity se"]
+
             # Double-level columns
             elif df.columns.nlevels == 2:
                 mean_df = pd.DataFrame(data=df.mean(axis=0))

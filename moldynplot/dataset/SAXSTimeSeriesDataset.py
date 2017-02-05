@@ -96,12 +96,15 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
             #                            fit_exp=True, fit_sig=False)
             block_kw.update(kwargs.get("block_kw", {}))
             self.mean_df, self.block_averager = self.calc_mean(
-              df=self.timeseries_df, verbose=verbose, **block_kw)
+              df=self.timeseries_df, mode="se", verbose=verbose, **block_kw)
+            self.mean_df.index.name = "q"
+            self.mean_df.columns = ["intensity", "intensity se"]
             if verbose >= 2:
                 print("Processed mean DataFrame:")
                 print(self.mean_df)
+            if isinstance(calc_mean, six.string_types):
+                self.write(df=self.mean_df, outfile=calc_mean, **kwargs)
             self.df = self.mean_df
-            # WRITE IF STRING
 
         # Scale
         if scale:

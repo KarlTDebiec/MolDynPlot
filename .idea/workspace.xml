@@ -7,8 +7,9 @@
     <list default="true" id="2229ebae-6e82-46c3-af70-c9a676c6c8e0" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/SequenceFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/SequenceFigureManager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/TimeSeriesFigureManager.py" afterPath="$PROJECT_DIR$/moldynplot/TimeSeriesFigureManager.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/PRETimeSeriesDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/PRETimeSeriesDataset.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/SAXSTimeSeriesDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/SAXSTimeSeriesDataset.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py" afterPath="$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py" />
     </list>
     <list id="7c80e3b1-6002-438d-a462-018232eb5ccb" name="New changelist" comment="" />
     <ignored path="MolDynPlot.iws" />
@@ -28,68 +29,41 @@
     <favorites_list name="MolDynPlot" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="SequenceFigureManager.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/moldynplot/SequenceFigureManager.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="600">
-                  <caret line="531" column="23" lean-forward="true" selection-start-line="531" selection-start-column="23" selection-end-line="531" selection-end-column="23" />
-                  <folding>
-                    <element signature="e#10501#11769#1" expanded="false" />
-                    <element signature="e#12253#12337#0" expanded="true" />
-                    <element signature="e#12840#12961#0" expanded="true" />
-                    <element signature="e#13136#13318#0" expanded="true" />
-                    <element signature="e#14689#14783#0" expanded="true" />
-                    <element signature="e#14826#14920#0" expanded="true" />
-                    <element signature="e#15464#15581#0" expanded="true" />
-                    <element signature="e#15638#15773#0" expanded="true" />
-                    <element signature="e#16117#16230#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file leaf-file-name="SequenceFigureManager.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/moldynplot/SequenceFigureManager.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="283">
-                  <caret line="88" column="26" lean-forward="false" selection-start-line="88" selection-start-column="26" selection-end-line="88" selection-end-column="26" />
-                  <folding>
-                    <element signature="e#2654#10198#0" expanded="true" />
-                    <element signature="e#10501#17315#0" expanded="true" />
-                    <element signature="e#12253#12337#0" expanded="true" />
-                    <element signature="e#10501#17315#0" expanded="true" />
-                    <element signature="e#12840#12961#0" expanded="true" />
-                    <element signature="e#13136#13318#0" expanded="true" />
-                    <element signature="e#14689#14783#0" expanded="true" />
-                    <element signature="e#14826#14920#0" expanded="true" />
-                    <element signature="e#15464#15581#0" expanded="true" />
-                    <element signature="e#15638#15773#0" expanded="true" />
-                    <element signature="e#16117#16230#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="text.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/text.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="644">
-                  <caret line="218" column="0" lean-forward="true" selection-start-line="218" selection-start-column="0" selection-end-line="218" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="axes.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/axes.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="627">
+              <caret line="444" column="59" lean-forward="false" selection-start-line="444" selection-start-column="59" selection-end-line="444" selection-end-column="59" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SAXSFigureManager.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/moldynplot/SAXSFigureManager.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="390">
+              <caret line="305" column="65" lean-forward="false" selection-start-line="305" selection-start-column="50" selection-end-line="305" selection-end-column="65" />
+              <folding>
+                <element signature="e#993#2783#0" expanded="true" />
+                <element signature="e#2809#7940#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FigureManager.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/FigureManager.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="325">
+              <caret line="880" column="59" lean-forward="false" selection-start-line="880" selection-start-column="59" selection-end-line="880" selection-end-column="59" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -106,6 +80,10 @@
       <find>y2</find>
       <find>fill_b</find>
       <find>lw</find>
+      <find>grid_kw</find>
+      <find>print</find>
+      <find>fill</find>
+      <find>fill_between_kw</find>
     </findStrings>
     <replaceStrings>
       <replace>noe se</replace>
@@ -115,7 +93,7 @@
   </component>
   <component name="Git.Settings">
     <option name="ROOT_SYNC" value="SYNC" />
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/moldynplot/myplotspec" />
     <option name="RECENT_COMMON_BRANCH" value="master" />
   </component>
   <component name="IdeDocumentHistory">
@@ -125,9 +103,7 @@
         <option value="$PROJECT_DIR$/moldynplot/dataset/TimeSeriesYSpecDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/test/test_Dataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/test/test_FigureManager.py" />
-        <option value="$PROJECT_DIR$/moldynplot/myplotspec/axes.py" />
         <option value="$PROJECT_DIR$/moldynplot/myplotspec/debug.py" />
-        <option value="$PROJECT_DIR$/moldynplot/myplotspec/FigureManager.py" />
         <option value="$PROJECT_DIR$/moldynplot/myplotspec/legend.py" />
         <option value="$PROJECT_DIR$/moldynplot/myplotspec/manage_defaults_presets.py" />
         <option value="$PROJECT_DIR$/moldynplot/myplotspec/manage_kwargs.py" />
@@ -139,12 +115,10 @@
         <option value="$PROJECT_DIR$/moldynplot/myplotspec/plugins/MPSPresetsPlugin.py" />
         <option value="$PROJECT_DIR$/moldynplot/myplotspec/error.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/MDGXDataset.py" />
-        <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/CorrDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSExperimentDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/__init__.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/NatConTimeSeriesDataset.py" />
-        <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSTimeSeriesDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/TimeSeries2DFigureManager.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/SequenceDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/myplotspec/Dataset.py" />
@@ -168,10 +142,14 @@
         <option value="$PROJECT_DIR$/moldynplot/dataset/ChemicalShiftSequenceDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/relaxation.py" />
         <option value="$PROJECT_DIR$/moldynplot/dataset/PRETimeSeriesDataset.py" />
-        <option value="$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py" />
         <option value="$PROJECT_DIR$/moldynplot/TimeSeriesFigureManager.py" />
         <option value="$PROJECT_DIR$/moldynplot/myplotspec/text.py" />
+        <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py" />
+        <option value="$PROJECT_DIR$/moldynplot/dataset/SAXSTimeSeriesDataset.py" />
+        <option value="$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py" />
+        <option value="$PROJECT_DIR$/moldynplot/myplotspec/axes.py" />
         <option value="$PROJECT_DIR$/moldynplot/SequenceFigureManager.py" />
+        <option value="$PROJECT_DIR$/moldynplot/myplotspec/FigureManager.py" />
       </list>
     </option>
   </component>
@@ -738,7 +716,14 @@
       <option name="project" value="LOCAL" />
       <updated>1486232086327</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Added fill_between to SequenceFigureManager">
+      <created>1486253359523</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1486253359523</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -787,13 +772,12 @@
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22569445" sideWeight="0.48534584" order="3" side_tool="false" content_ui="combo" x="722" y="251" width="202" height="410" />
+      <window_info id="Project" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22569445" sideWeight="0.48534584" order="3" side_tool="false" content_ui="combo" x="722" y="251" width="202" height="410" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5028612" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32992035" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32764506" sideWeight="0.49427754" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3261391" sideWeight="0.49713877" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18055555" sideWeight="0.51465416" order="0" side_tool="false" content_ui="tabs" x="1" y="258" width="207" height="432" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18055555" sideWeight="0.51465416" order="0" side_tool="false" content_ui="tabs" x="1" y="258" width="207" height="432" />
       <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5763889" sideWeight="0.49713877" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.10902778" sideWeight="0.5036145" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -803,6 +787,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.51877135" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.6233918" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32992035" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
@@ -845,25 +830,19 @@
     <MESSAGE value="Went back from class_ to cls&#10;&#10;- PyCharm fills this in automatically when a classmethod is declared, so 'cls' is easier" />
     <MESSAGE value="Add error in initial intensity to relaxation calculation as implemented in ChemicalShiftSequenceDataset" />
     <MESSAGE value="Add percentile mode to TimeSeriesDataset" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add percentile mode to TimeSeriesDataset" />
+    <MESSAGE value="Added fill_between to SequenceFigureManager" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added fill_between to SequenceFigureManager" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="46" />
+      <option name="time" value="47" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/doc/figure_manager.rst">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/doc/decorators.rst">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -896,13 +875,6 @@
     <entry file="file://$PROJECT_DIR$/moldynplot/cpptraj2hdf5.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/HSQCFigureManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1501">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
@@ -984,13 +956,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSTimeSeriesDataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="25" column="48" lean-forward="false" selection-start-line="25" selection-start-column="48" selection-end-line="25" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/moldynplot/dataset/NatConTimeSeriesDataset.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="70">
@@ -1002,20 +967,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="266">
           <caret line="19" column="18" lean-forward="true" selection-start-line="19" selection-start-column="18" selection-end-line="19" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/SAXSFigureManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14">
-          <caret line="93" column="27" lean-forward="false" selection-start-line="93" selection-start-column="27" selection-end-line="93" selection-end-column="27" />
         </state>
       </provider>
     </entry>
@@ -1142,11 +1093,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="67">
           <caret line="81" column="46" lean-forward="false" selection-start-line="81" selection-start-column="46" selection-end-line="81" selection-end-column="46" />
-          <folding>
-            <element signature="e#284#360#1" expanded="false" />
-            <element signature="e#876#960#1" expanded="false" />
-            <element signature="e#1744#1829#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1160,26 +1106,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3721">
-          <caret line="341" column="28" lean-forward="true" selection-start-line="341" selection-start-column="28" selection-end-line="341" selection-end-column="28" />
-          <folding>
-            <element signature="e#1365#4102#0" expanded="true" />
-            <element signature="e#3844#3931#0" expanded="true" />
-            <element signature="e#4266#8146#0" expanded="true" />
-            <element signature="e#13282#13368#0" expanded="true" />
-            <element signature="e#13717#13806#0" expanded="true" />
-            <element signature="e#14187#14289#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/moldynplot/TimeSeries2DFigureManager.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="417">
           <caret line="142" column="20" lean-forward="true" selection-start-line="142" selection-start-column="20" selection-end-line="142" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1187,27 +1117,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="451">
           <caret line="496" column="19" lean-forward="true" selection-start-line="496" selection-start-column="19" selection-end-line="496" selection-end-column="19" />
-          <folding>
-            <element signature="e#918#2395#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/TimeSeriesFigureManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="408" column="40" lean-forward="false" selection-start-line="408" selection-start-column="40" selection-end-line="408" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/FigureManager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="121" column="4" lean-forward="false" selection-start-line="121" selection-start-column="4" selection-end-line="121" selection-end-column="4" />
-          <folding>
-            <element signature="e#5177#8673#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1215,40 +1124,99 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="554">
           <caret line="307" column="22" lean-forward="true" selection-start-line="307" selection-start-column="22" selection-end-line="307" selection-end-column="22" />
-          <folding>
-            <element signature="e#274#370#1" expanded="false" />
-            <element signature="e#928#1003#1" expanded="false" />
-            <element signature="e#1020#2493#0" expanded="false" />
-            <element signature="e#8782#13185#0" expanded="false" />
-            <element signature="e#11805#11926#0" expanded="false" />
-            <element signature="e#12607#12711#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/text.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="644">
-          <caret line="218" column="0" lean-forward="true" selection-start-line="218" selection-start-column="0" selection-end-line="218" selection-end-column="0" />
+          <caret line="218" column="0" lean-forward="false" selection-start-line="218" selection-start-column="0" selection-end-line="218" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/HSQCFigureManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="274">
+          <caret line="77" column="17" lean-forward="false" selection-start-line="77" selection-start-column="10" selection-end-line="77" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSDataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="740">
+          <caret line="110" column="61" lean-forward="false" selection-start-line="110" selection-start-column="61" selection-end-line="110" selection-end-column="61" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/moldynplot/SequenceFigureManager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="531" column="23" lean-forward="true" selection-start-line="531" selection-start-column="23" selection-end-line="531" selection-end-column="23" />
+        <state relative-caret-position="400">
+          <caret line="282" column="23" lean-forward="false" selection-start-line="282" selection-start-column="23" selection-end-line="282" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/TimeSeriesDataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3346">
+          <caret line="300" column="39" lean-forward="false" selection-start-line="300" selection-start-column="39" selection-end-line="300" selection-end-column="39" />
           <folding>
-            <element signature="e#10501#11769#1" expanded="false" />
-            <element signature="e#12253#12337#0" expanded="true" />
-            <element signature="e#12840#12961#0" expanded="true" />
-            <element signature="e#13136#13318#0" expanded="true" />
-            <element signature="e#14689#14783#0" expanded="true" />
-            <element signature="e#14826#14920#0" expanded="true" />
-            <element signature="e#15464#15581#0" expanded="true" />
-            <element signature="e#15638#15773#0" expanded="true" />
-            <element signature="e#16117#16230#0" expanded="true" />
+            <element signature="e#1365#4102#0" expanded="true" />
+            <element signature="e#3844#3931#0" expanded="true" />
+            <element signature="e#4266#8146#0" expanded="true" />
+            <element signature="e#13170#13256#0" expanded="true" />
+            <element signature="e#13605#13694#0" expanded="true" />
+            <element signature="e#14075#14177#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/dataset/SAXSTimeSeriesDataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="362">
+          <caret line="84" column="17" lean-forward="false" selection-start-line="84" selection-start-column="12" selection-end-line="84" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/TimeSeriesFigureManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="446" column="33" lean-forward="true" selection-start-line="446" selection-start-column="20" selection-end-line="446" selection-end-column="39" />
+          <folding>
+            <element signature="e#1278#3257#0" expanded="true" />
+            <element signature="e#3283#8985#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/axes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="627">
+          <caret line="444" column="59" lean-forward="false" selection-start-line="444" selection-start-column="59" selection-end-line="444" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/SAXSFigureManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="305" column="65" lean-forward="false" selection-start-line="305" selection-start-column="50" selection-end-line="305" selection-end-column="65" />
+          <folding>
+            <element signature="e#993#2783#0" expanded="true" />
+            <element signature="e#2809#7940#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/moldynplot/myplotspec/FigureManager.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="325">
+          <caret line="880" column="59" lean-forward="false" selection-start-line="880" selection-start-column="59" selection-end-line="880" selection-end-column="59" />
+          <folding />
         </state>
       </provider>
     </entry>
