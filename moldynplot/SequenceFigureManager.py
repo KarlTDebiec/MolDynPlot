@@ -87,7 +87,8 @@ class SequenceFigureManager(FigureManager):
               delimiter: "\\\\s\\\\s+"
               index_col: 0
           fill_between_kw:
-            zorder: 9
+            lw: 0
+            zorder: 1
           errorbar_kw:
             ls: None
             zorder: 10
@@ -104,8 +105,7 @@ class SequenceFigureManager(FigureManager):
           ylabel: "% α Helix"
           yticks: [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
         draw_dataset:
-          kind: ss
-          column: Alpha
+          y_key: Alpha
       r1:
         class: content
         help: Format subplot for R1 relaxation
@@ -115,8 +115,8 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           dataset_kw:
             cls: moldynplot.dataset.RelaxDataset.RelaxDataset
-          column:    "r1"
-          column_se: "r1 se"
+          y_key:    "r1"
+          yse_key: "r1 se"
       r2:
         class: content
         help: Format subplot for R2 relaxation
@@ -126,8 +126,8 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           dataset_kw:
             cls: moldynplot.dataset.RelaxDataset.RelaxDataset
-          column:    "r2"
-          column_se: "r2 se"
+          y_key:    "r2"
+          yse_key: "r2 se"
       r2/r1:
         class: content
         help: Format subplot for R2/R1 relaxation
@@ -138,8 +138,8 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           dataset_kw:
             cls: moldynplot.dataset.RelaxDataset.RelaxDataset
-          column:    "r2/r1"
-          column_se: "r2/r1 se"
+          y_key:    "r2/r1"
+          yse_key: "r2/r1 se"
       hetnoe:
         class: content
         help: Format subplot for Heteronuclear NOE relaxation
@@ -149,8 +149,8 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           dataset_kw:
             cls: moldynplot.dataset.RelaxDataset.RelaxDataset
-          column:    "noe"
-          column_se: "noe se"
+          y_key:    "noe"
+          yse_key: "noe se"
       s2:
         class: content
         help: Format subplot for S2 order parameter
@@ -160,8 +160,8 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           dataset_kw:
             cls: moldynplot.dataset.RelaxDataset.RelaxDataset
-          column:    "s2"
-          column_se: "s2 se"
+          y_key:    "s2"
+          yse_key: "s2 se"
       error:
         class: content
         help: Format subplot for normalized error
@@ -176,41 +176,41 @@ class SequenceFigureManager(FigureManager):
           draw_plot:         True
       pre_r20_r2:
         class: content
-        help: Format subplot for Paramagnetic Relaxation Enhancement r20 / r2
+        help: Format subplot for paramagnetic relaxation enhancement r20 / r2
         draw_subplot:
           ylabel: "$\\\\frac{r_{2,0}}{r_2}$"
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          column:    "r20/r2"
-          column_se: "r20/r2 se"
+          y_key:    "r20/r2"
+          yse_key: "r20/r2 se"
       pre_I_I0:
         class: content
-        help: Format subplot for Paramagnetic Relaxation Enhancement I/I0
+        help: Format subplot for paramagnetic relaxation enhancement I/I0
         draw_subplot:
           ylabel: "$\\\\frac{I}{I_0}$"
           yticks: [0.0,0.2,0.4,0.6,0.8,1.0]
         draw_dataset:
-          column:    "I/I0"
-          column_se: "I/I0 se"
+          y_key:    "I/I0"
+          yse_key: "I/I0 se"
       pre_rho2:
         class: content
-        help: Format subplot for Paramagnetic Relaxation Enhancement Γ2
+        help: Format subplot for paramagnetic relaxation enhancement Γ2
         draw_subplot:
           ylabel: "$Γ_2$"
           yticks: [0,20,40,60,80,100]
         draw_dataset:
-          column:    "rho2"
-          column_se: "rho2 se"
+          y_key:    "rho2"
+          yse_key: "rho2 se"
       deltacs:
         class: content
-        help: Format subplot for chemical shift change
+        help: Format subplot for chemical shift difference
         draw_subplot:
           ylabel: "$\\\\Delta \\\\delta$"
           ylabel_kw:
             rotation: vertical
           yticks: [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
         draw_dataset:
-          column: "delta cs"
+          y_key: "delta cs"
       relax_3:
         class: content
         help: Three stacked plots including R1, R2, and HetNOE
@@ -289,8 +289,6 @@ class SequenceFigureManager(FigureManager):
             xabs:  0.02
             yabs: -0.03
         draw_dataset:
-          fill_between_kw:
-            lw: 1
           errorbar_kw:
             capsize: 0
             elinewidth: 1.5
@@ -380,21 +378,60 @@ class SequenceFigureManager(FigureManager):
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, column=None, column_se=None, label=None,
-            handles=None, draw_fill_between=False, draw_errorbar=True,
-            draw_plot=False, draw_handle=True, draw_label=False, verbose=1,
-            debug=0, **kwargs):
+    def draw_dataset(self, subplot, y_key=None, yse_key=None, yse_min=None,
+      ylb_key=None, yub_key=None, label=None, handles=None,
+      draw_fill_between=False, draw_errorbar=False, draw_plot=False,
+      draw_handle=False, **kwargs):
+        """
+        Draws a dataset on a subplot
+
+        Loaded datasets should have attribue `sequence_df`
+
+        Args:
+            subplot (Axes): :class:`Axes<matplotlib.axes.Axes>` on
+              which to draw
+            dataset_kw (dict): Keyword arguments passed to
+              :meth:`load_dataset
+              <myplotspec.FigureManager.FigureManager.load_dataset>`
+            plot_kw (dict): Keyword arguments passed to methods of
+              :class:`Axes<matplotlib.axes.Axes>`
+            y_key (string): Name of column containing y
+            yse_key (string): Name of column containing y standard error
+            yse_min (float): Minimum y standard error (fill_between only);
+              useful for making sure filled area does not become too narrow
+              to see clearly
+            label (string): Label of dataset
+            handles (OrderedDcit): Nascent OrderedDict of handles
+            draw_fill_between (bool): Draw fill_between element
+            draw_errorbar (bool): Draw errorbar element
+            draw_plot (bool): Draw plot element
+            draw_handle (bool): Draw additional handle on plot for legend
+            verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+        """
+        from warnings import warn
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
-        # Load data
+        # Process arguments and load data
+        verbose = kwargs.get("verbose", 1)
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataframe = self.load_dataset(verbose=verbose, debug=debug,
-            **dataset_kw).sequence_df
-        x = np.array([filter(lambda x: x in '0123456789.', s) for s in
-            dataframe.index.values], np.int)
+        dataset = self.load_dataset(verbose=verbose, **dataset_kw)
+        if not hasattr(dataset, "sequence_df"):
+            warn("""Dataset does not have necessary attribute 'sequence_df',
+            skipping.""")
+            return
+        df = dataset.sequence_df
+        x = np.array(
+          [filter(lambda x: x in "0123456789.", s) for s in df.index.values],
+          np.int)
+
+        # Verbose output
+        if verbose >= 2:
+            print(df)
+            print(x)
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -402,30 +439,51 @@ class SequenceFigureManager(FigureManager):
 
         # Plot fill_between
         if draw_fill_between:
-            fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
-            get_colors(fill_between_kw, plot_kw)
-            fb_x, fb_lb, fb_ub = [], [], []
-            yse_min = kwargs.get("yse_min")
-            for residue in range(x.min(), x.max() + 1):
-                if residue in x:
-                    fb_x.extend([residue - 0.5, residue + 0.5])
-                    index = np.argmax(x == residue)
-                    if column_se is not None:
-                        yse = dataframe[column_se][index]
-                        if yse_min is not None and yse < yse_min:
-                            yse = yse_min
-                    elif yse_min is not None:
-                        yse = yse_min
+            if y_key is None:
+                warn("""'draw_fill_between' is enabled but the necessary
+                parameter 'y_key' has not been provided, skipping.""")
+            # //@formatter:off
+            elif ((ylb_key is None or yub_key is None)
+            and yse_key is None
+            and yse_min is None):
+                warn("""'draw_fill_between' is enabled but the necessary
+                parameters ('ylb_key' and 'yub_key'), 'yse_key', or 'ymin_key'
+                has not been provided, skipping.""")
+            # //@formatter:on
+            else:
+                fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
+                get_colors(fill_between_kw, plot_kw)
+                fb_x, fb_lb, fb_ub = [], [], []
+
+                for residue in range(x.min(), x.max() + 1):
+                    if residue in x:
+                        index = np.argmax(x == residue)
+                        fb_x.extend([residue - 0.5, residue + 0.5])
+                        # Priority given to explicit upper and lower bounds
+                        if ylb_key is not None and yub_key is not None:
+                            fb_lb.extend(
+                              [df[ylb_key][index], df[ylb_key][index]])
+                            fb_ub.extend(
+                              [df[yub_key][index], df[yub_key][index]])
+                        # Otherwise try for 95% CI using standard error
+                        else:
+                            if yse_key is not None:
+                                yse = df[yse_key][index]
+                            if yse_min is not None and yse < yse_min:
+                                yse = yse_min
+                            elif yse_min is not None:
+                                yse = yse_min
+                            else:
+                                yse = 0
+                            fb_lb.extend([df[y_key][index] - yse * 1.96,
+                                df[y_key][index] - yse * 1.96])
+                            fb_ub.extend([df[y_key][index] + yse * 1.96,
+                                df[y_key][index] + yse * 1.96])
+                    # Add explicit gaps in sequence if no data is available
                     else:
-                        yse = 0
-                    fb_lb.extend([dataframe[column][index] - yse * 1.96,
-                        dataframe[column][index] - yse * 1.96])
-                    fb_ub.extend([dataframe[column][index] + yse * 1.96,
-                        dataframe[column][index] + yse * 1.96])
-                else:
-                    fb_x.append(None)
-                    fb_lb.append(None)
-                    fb_ub.append(None)
+                        fb_x.append(None)
+                        fb_lb.append(None)
+                        fb_ub.append(None)
             fb_x = np.array(fb_x, np.float)
             fb_lb = np.array(fb_lb, np.float)
             fb_ub = np.array(fb_ub, np.float)
@@ -434,30 +492,41 @@ class SequenceFigureManager(FigureManager):
 
         # Plot error bar
         if draw_errorbar:
-            errorbar_kw = multi_get_copy("errorbar_kw", kwargs, {})
-            get_colors(errorbar_kw, plot_kw)
-            subplot.errorbar(x, y=dataframe[column],
-                yerr=dataframe[column_se] * 1.96, **errorbar_kw)
+            if y_key is None:
+                warn("""'draw_errorbar' is enabled but the necessary
+                parameter 'y_key' has not been provided, skipping.""")
+            elif yse_key is None:
+                warn("""'draw_errorbar' is enabled but the necessary
+                parameter 'yse_key' has not been provided,
+                skipping.""")
+            else:
+                errorbar_kw = multi_get_copy("errorbar_kw", kwargs, {})
+                get_colors(errorbar_kw, plot_kw)
+                subplot.errorbar(x, y=df[y_key], yerr=df[yse_key] * 1.96,
+                  **errorbar_kw)
 
         # Plot series
         if draw_plot:
-            p_x, p_y = [], []
-            for residue in range(x.min(), x.max() + 1):
-                if residue in x:
-                    p_x.extend([residue - 0.5, residue + 0.5])
-                    index = np.argmax(x == residue)
-                    p_y.extend(
-                        [dataframe[column][index], dataframe[column][index]])
-                else:
-                    p_x.append(None)
-                    p_y.append(None)
-            p_x = np.array(p_x, np.float)
-            p_y = np.array(p_y, np.float)
-            plot = subplot.plot(p_x, p_y, **plot_kw)[0]
-            if verbose >= 2:
-                print(column, np.nanmean(p_y))
-                print(p_x)
-                print(p_y)
+            if y_key is None:
+                warn("""'draw_plot' is enabled but the necessary
+                parameter 'y_key' has not been provided, skipping.""")
+            else:
+                p_x, p_y = [], []
+                for residue in range(x.min(), x.max() + 1):
+                    if residue in x:
+                        p_x.extend([residue - 0.5, residue + 0.5])
+                        index = np.argmax(x == residue)
+                        p_y.extend([df[y_key][index], df[y_key][index]])
+                    else:
+                        p_x.append(None)
+                        p_y.append(None)
+                p_x = np.array(p_x, np.float)
+                p_y = np.array(p_y, np.float)
+                plot = subplot.plot(p_x, p_y, **plot_kw)[0]
+                if verbose >= 2:
+                    print(y_key, np.nanmean(p_y))
+                    print(p_x)
+                    print(p_y)
 
         # Plot handle
         if draw_handle:

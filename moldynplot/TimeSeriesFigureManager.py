@@ -341,7 +341,7 @@ class TimeSeriesFigureManager(FigureManager):
             draw_pdist=False, draw_fill_between=False, draw_mean=False,
             draw_plot=True, **kwargs):
         """
-        Draws a dataset on a subplot.
+        Draws a dataset on a subplot
 
         Loaded dataset should have attribute `timeseries_df`
 
@@ -366,13 +366,12 @@ class TimeSeriesFigureManager(FigureManager):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
-        # Process arguments
+        # Process arguments and load data
         verbose = kwargs.get("verbose", 1)
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, **dataset_kw)
-        print(dataset)
 
         # Verbose output
         if verbose >= 2:
@@ -398,24 +397,24 @@ class TimeSeriesFigureManager(FigureManager):
                 fb_x = dataset.timeseries_df.index.values
             if "ylb" in fill_between_kw:
                 fb_ylb = fill_between_kw.pop("ylb")
-            elif "fill_between_lb_key" in fill_between_kw:
-                fill_between_lb_key = fill_between_kw.pop(
-                    "fill_between_lb_key")
-                fb_ylb = dataset.timeseries_df[fill_between_lb_key]
-            elif "fill_between_lb_key" in kwargs:
-                fill_between_lb_key = kwargs.get("fill_between_lb_key")
-                fb_ylb = dataset.timeseries_df[fill_between_lb_key]
+            elif "ylb_key" in fill_between_kw:
+                ylb_key = fill_between_kw.pop(
+                    "ylb_key")
+                fb_ylb = dataset.timeseries_df[ylb_key]
+            elif "ylb_key" in kwargs:
+                ylb_key = kwargs.get("ylb_key")
+                fb_ylb = dataset.timeseries_df[ylb_key]
             else:
                 warn("inappropriate fill_between settings")
             if "yub" in fill_between_kw:
                 fb_yub = fill_between_kw.pop("yub")
-            elif "fill_between_ub_key" in fill_between_kw:
-                fill_between_ub_key = fill_between_kw.pop(
-                    "fill_between_ub_key")
-                fb_yub = dataset.timeseries_df[fill_between_ub_key]
-            elif "fill_between_ub_key" in kwargs:
-                fill_between_ub_key = kwargs.get("fill_between_ub_key")
-                fb_yub = dataset.timeseries_df[fill_between_ub_key]
+            elif "yub_key" in fill_between_kw:
+                yub_key = fill_between_kw.pop(
+                    "yub_key")
+                fb_yub = dataset.timeseries_df[yub_key]
+            elif "yub_key" in kwargs:
+                yub_key = kwargs.get("yub_key")
+                fb_yub = dataset.timeseries_df[yub_key]
             else:
                 warn("inappropriate fill_between settings")
             subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
