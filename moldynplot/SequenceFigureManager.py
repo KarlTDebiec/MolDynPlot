@@ -511,6 +511,7 @@ class SequenceFigureManager(FigureManager):
             else:
                 p_x, p_y = [], []
                 stepline = kwargs.get("stepline", True)
+                gapline = kwargs.get("gapline", False)
                 for residue in range(x.min(), x.max() + 1):
                     if residue in x:
                         index = np.argmax(x == residue)
@@ -520,6 +521,9 @@ class SequenceFigureManager(FigureManager):
                         else:
                             p_x.append(residue)
                             p_y.append(df[y_key][index])
+                        if gapline:
+                            p_x.append(None)
+                            p_y.append(None)
                     else:
                         p_x.append(None)
                         p_y.append(None)
