@@ -417,6 +417,8 @@ class PDistFigureManager(FigureManager):
                     mean_kw.update(kwargs.get("mean_kw", {}))
                     mean = np.sum(np.array(pd_x, np.float64)
                                  *np.array(pd_y, np.float64))
+                    if verbose >= 1:
+                        print("mean: {0:6.3f}".format(mean))
                     subplot.plot(mean, pd_y[np.abs(pd_x - mean).argmin()],
                       **mean_kw)
 
