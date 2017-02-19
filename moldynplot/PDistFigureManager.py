@@ -318,7 +318,8 @@ class PDistFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, column=None,
-        draw_pdist=True, draw_fill_between=False, draw_mean=False, **kwargs):
+        draw_pdist=True, draw_fill_between=False, draw_mean=False,
+        draw_plot=False, **kwargs):
         """
         Loads a dataset and draws it on a subplot.
 
@@ -368,7 +369,6 @@ class PDistFigureManager(FigureManager):
             pdist_df = dataset.pdist_df
         else:
             pdist_df = None
-
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
@@ -421,6 +421,10 @@ class PDistFigureManager(FigureManager):
                         print("mean: {0:6.3f}".format(mean))
                     subplot.plot(mean, pd_y[np.abs(pd_x - mean).argmin()],
                       **mean_kw)
+        if draw_plot:
+            if "x" in kwargs:
+                x = kwargs.get("x")
+                subplot.plot([x, x], [0,1], **plot_kw)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
