@@ -96,14 +96,14 @@ class PRETimeSeriesDataset(TimeSeriesDataset, SequenceDataset):
         distance_df = pd.DataFrame(data=self.timeseries_df.values,
           dtype=np.double, columns=self.timeseries_df.columns)
 
-        k = 0.0123  # Å6 ns-2
-        w = 800e6  # s-1
-        tc = 4e-9  # s
-        r2 = 13  # s
-        t = 0.0005  # s
+        k   = 0.0123    # Å6 ns-2
+        w   = 800e6     # s-1
+        tc  =  9.3e-9   # s
+        r2  = 12.4      # s
+        t   = 0.01      # s
 
         rho2_df = k / (distance_df ** 6) * 1e9 * 1e9  # s-2
-        rho2_df *= (4 * tc + ((3 * tc) / (1 + (w * (tc ** 2)))))
+        rho2_df *= (4 * tc + ((3 * tc) / (1 + (w * tc ) ** 2)))
         I_I0_df = (r2 * np.exp(-1 * rho2_df * t)) / (r2 + rho2_df)
 
         block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
