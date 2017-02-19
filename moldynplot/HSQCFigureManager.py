@@ -22,6 +22,8 @@ import numpy as np
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
+
+
 ################################### CLASSES ###################################
 class HSQCFigureManager(FigureManager):
     """
@@ -98,6 +100,12 @@ class HSQCFigureManager(FigureManager):
             ls: none
             marker: s
             mec: black
+          label_kw:
+            border_lw: 0.25
+            text_kw:
+              horizontalalignment: center
+              verticalalignment: center
+              zorder: 20
     """
     available_presets = """
       letter:
@@ -137,6 +145,8 @@ class HSQCFigureManager(FigureManager):
             linewidths: 0.5
           handle_kw:
             ms: 5
+          label_kw:
+            fp: 3r
       presentation:
         class: target
         inherits: presentation
@@ -178,14 +188,14 @@ class HSQCFigureManager(FigureManager):
         except IndexError:
             min_index = collection.size
         try:
-            max_index = max(np.where(collection > upper_bound)[0][-1],0)
+            max_index = max(np.where(collection > upper_bound)[0][-1], 0)
         except IndexError:
             max_index = 0
         return slice(max_index, min_index, 1)
 
     @staticmethod
     def get_contour_levels(I, cutoff=0.9875, n_levels=10, min_level=None,
-        max_level=None, **kwargs):
+      max_level=None, **kwargs):
         """
         Generates contour levels.
 
@@ -204,21 +214,22 @@ class HSQCFigureManager(FigureManager):
             - Support negative contour levels
         """
 
-        I_flat    = np.sort(I.flatten())
+        I_flat = np.sort(I.flatten())
         if min_level is None:
             min_level = I_flat[int(I_flat.size * cutoff)]
         if max_level is None:
             max_level = I_flat[-1]
-        exp_int = ((max_level ** (1 / (n_levels - 1))) /
-                   (min_level ** (1 / (n_levels - 1))))
-        levels = np.array([min_level * exp_int ** a
-                      for a in range(0, n_levels, 1)][:-1], dtype = np.int)
+        exp_int = ((max_level ** (1 / (n_levels - 1))) / (
+            min_level ** (1 / (n_levels - 1))))
+        levels = np.array(
+          [min_level * exp_int ** a for a in range(0, n_levels, 1)][:-1],
+          dtype=np.int)
         return levels
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, draw_contour=True, label=None,
-        handles=None, **kwargs):
+    def draw_dataset(self, subplot, draw_contour=True, draw_peaks=False,
+      label=None, handles=None, **kwargs):
         """
         Draws a dataset on a subplot.
 
@@ -267,8 +278,10 @@ class HSQCFigureManager(FigureManager):
             dataset_kw["infile"] = kwargs["infile"]
         dataset = self.load_dataset(verbose=verbose, **dataset_kw)
         if dataset is not None:
-            if hasattr(dataset, "hsqc_df"): hsqc_df = dataset.hsqc_df
-            else:                           hsqc_df = None
+            if hasattr(dataset, "hsqc_df"):
+                hsqc_df = dataset.hsqc_df
+            else:
+                hsqc_df = None
         else:
             hsqc = None
 
@@ -284,13 +297,12 @@ class HSQCFigureManager(FigureManager):
             hsqc_df.index.levels[0].size
             ct_H = hsqc_df.index.levels[0]
             ct_N = hsqc_df.index.levels[1]
-            ct_I = hsqc_df.values.reshape((hsqc_df.index.levels[0].size,
-                     hsqc_df.index.levels[1].size)).T
+            ct_I = hsqc_df.values.reshape(
+              (hsqc_df.index.levels[0].size, hsqc_df.index.levels[1].size)).T
             if "levels" not in contour_kw:
-                contour_kw["levels"] = self.get_contour_levels(ct_I,
-                  **kwargs)
+                contour_kw["levels"] = self.get_contour_levels(ct_I, **kwargs)
             if "cmap" not in contour_kw:
-                if "color"in contour_kw:
+                if "color" in contour_kw:
                     contour_kw["cmap"] = get_cmap(contour_kw.pop("color"))
             draw_contour_fill = contour_kw.pop("fill", False)
             if draw_contour_fill:
@@ -308,12 +320,24 @@ class HSQCFigureManager(FigureManager):
                             except IndexError:
                                 continue
 
+        if draw_peaks:
+            import pandas as pd
+            from . import three_one
+            from .myplotspec.text import set_text
+            peaklist = pd.read_csv(kwargs.get("peak_infile"), sep="\s\s+")
+            label_kw = multi_get_copy("label_kw", kwargs, {})
+            for i, peak in peaklist.iterrows():
+                set_text(subplot, x=peak["1H"], y=peak["15N"],
+                  text="{0}{1}".format(three_one(peak.name[0:3]),
+                    peak.name[4:]), **label_kw)
         # Draw handle
         if handles is not None and label is not None:
             handle_kw = plot_kw.copy()
             handle_kw.update(kwargs.get("handle_kw", {}))
-            handles[label] = subplot.plot([0,0], [0,0], **handle_kw)[0]
+            handles[label] = subplot.plot([0, 0], [0, 0], **handle_kw)[0]
+
 
 #################################### MAIN #####################################
+
 if __name__ == "__main__":
     HSQCFigureManager().main()
