@@ -398,8 +398,7 @@ class TimeSeriesFigureManager(FigureManager):
             if "ylb" in fill_between_kw:
                 fb_ylb = fill_between_kw.pop("ylb")
             elif "ylb_key" in fill_between_kw:
-                ylb_key = fill_between_kw.pop(
-                    "ylb_key")
+                ylb_key = fill_between_kw.pop("ylb_key")
                 fb_ylb = dataset.timeseries_df[ylb_key]
             elif "ylb_key" in kwargs:
                 ylb_key = kwargs.get("ylb_key")
@@ -409,8 +408,7 @@ class TimeSeriesFigureManager(FigureManager):
             if "yub" in fill_between_kw:
                 fb_yub = fill_between_kw.pop("yub")
             elif "yub_key" in fill_between_kw:
-                yub_key = fill_between_kw.pop(
-                    "yub_key")
+                yub_key = fill_between_kw.pop("yub_key")
                 fb_yub = dataset.timeseries_df[yub_key]
             elif "yub_key" in kwargs:
                 yub_key = kwargs.get("yub_key")
@@ -421,17 +419,18 @@ class TimeSeriesFigureManager(FigureManager):
 
         # Draw plot
         if draw_plot:
-            if not hasattr(dataset, "timeseries_df"):
-                warn("'draw_plot' is enabled but dataset does not have the "
-                     "necessary attribute 'timeseries_df', skipping.")
+            if "x" in plot_kw and "y" in plot_kw:
+                p_x = plot_kw.pop("x")
+                p_y = plot_kw.pop("y")
             else:
-                plot = subplot.plot(dataset.timeseries_df.index.values,
-                    dataset.timeseries_df[column], **plot_kw)[0]
-                handle_kw = multi_get_copy("handle_kw", kwargs, {})
-                handle_kw["mfc"] = plot.get_color()
-                handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
-                if handles is not None and label is not None:
-                    handles[label] = handle
+                p_x = dataset.timeseries_df.index.values
+                p_y = dataset.timeseries_df[column]
+            plot = subplot.plot(p_x, p_y, **plot_kw)[0]
+            handle_kw = multi_get_copy("handle_kw", kwargs, {})
+            handle_kw["mfc"] = plot.get_color()
+            handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
+            if handles is not None and label is not None:
+                handles[label] = handle
 
         # Draw pdist
         if draw_pdist:
@@ -479,6 +478,8 @@ class TimeSeriesFigureManager(FigureManager):
             if draw_fill_between:
                 subplot._mps_partner_subplot.fill_between(fb_x, fb_ylb, fb_yub,
                     **fill_between_kw)
+            if draw_plot and len(p_x) == 2 and len(p_y) == 2:
+                subplot._mps_partner_subplot.plot(p_x, p_y, **plot_kw)
 
 
 #################################### MAIN #####################################
