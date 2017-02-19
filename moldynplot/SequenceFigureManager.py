@@ -510,11 +510,16 @@ class SequenceFigureManager(FigureManager):
                 parameter 'y_key' has not been provided, skipping.""")
             else:
                 p_x, p_y = [], []
+                stepline = kwargs.get("stepline", True)
                 for residue in range(x.min(), x.max() + 1):
                     if residue in x:
-                        p_x.extend([residue - 0.5, residue + 0.5])
                         index = np.argmax(x == residue)
-                        p_y.extend([df[y_key][index], df[y_key][index]])
+                        if stepline:
+                            p_x.extend([residue - 0.5, residue + 0.5])
+                            p_y.extend([df[y_key][index], df[y_key][index]])
+                        else:
+                            p_x.append(residue)
+                            p_y.append(df[y_key][index])
                     else:
                         p_x.append(None)
                         p_y.append(None)
