@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#   moldynplot.PDistFigureManager.py
+#   moldynplot.PDist2DFigureManager.py
 #
 #   Copyright (C) 2015-2017 Karl T Debiec
 #   All rights reserved.
@@ -8,24 +8,22 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Generates one or more probability distribution figures to specifications
-in a YAML file.
+Generates 2D probability distribution figures to specifications
 """
 ################################### MODULES ###################################
 from __future__ import (absolute_import, division, print_function,
     unicode_literals)
-
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
-
+from IPython import embed
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
 ################################### CLASSES ###################################
-class PDistFigureManager(FigureManager):
+class PDist2DFigureManager(FigureManager):
     """
-    Manages the generation of probability distribution figures.
+    Manages the generation of 2D probability distribution figures.
     """
 
     defaults = """
@@ -37,24 +35,11 @@ class PDistFigureManager(FigureManager):
             right: off
             bottom: on
             top: off
-          shared_legend: True
-          shared_legend_kw:
-            spines: False
-            handle_kw:
-              ls: none
-              marker: s
-              mec: black
-            legend_kw:
-              frameon: False
-              loc: 9
-              numpoints: 1
-              handletextpad: 0
-              borderaxespad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
-          ylabel:      "Probability Distribution"
-          yticklabels: []
+          xlabel: Residue
+          ylabel: Distance
           tick_params:
             direction: out
             left: on
@@ -71,189 +56,44 @@ class PDistFigureManager(FigureManager):
             horizontalalignment: left
             verticalalignment: top
         draw_dataset:
-          plot_kw:
-            zorder: 10
-          fill_between_kw:
-            color: [0.7, 0.7, 0.7]
-            lw: 0
-            ylb: 0
-            yub: 1
-            zorder: 1
-          handle_kw:
-            ls: none
-            marker: s
-            mec: black
-          mean_kw:
-            ls: none
-            marker: o
-            mec: black
-            zorder: 11
+          draw_heatmap: True
+          heatmap_kw:
+            edgecolors: none
+            rasterized: True
+            zorder: 0.1
     """
     available_presets = """
-      radgyr:
+      distance:
         class: content
-        help: Radius of Gyration (Rg)
+        help: Plot inter-atomic distance in terms of probability
         draw_figure:
-          multi_xticklabels: [0,5,10,15,20,25,30]
+          multi_yticklabels: [0,10,20,30,40,50,60,70]
         draw_subplot:
-          xlabel: $R_g$ (Å)
-          xticks: [0,5,10,15,20,25,30]
+          yticks: [0,10,20,30,40,50,60,70]
         draw_dataset:
-          column: rg
-          dataset_kw:
-            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
-            calc_pdist: True
-            pdist_kw:
-              bandwidth: 0.1
-              grid: !!python/object/apply:numpy.linspace [0,30,1000]
-            read_csv_kw:
-              delim_whitespace: True
-              header: 0
-              names: [frame, rg, rgmax]
-      rmsd:
+          draw_heatmap: True
+          min_cutoff: 0.000001
+          heatmap_kw:
+            cmap: afmhot
+            vmin: 0.000
+            vmax: 0.05
+          draw_colorbar: True
+          colorbar_kw:
+            zticks: [0.00,0.01,0.02,0.03,0.04,0.05]
+            zticklabels: []
+            zlabel: Probability
+      distance_free_energy:
         class: content
-        help: Root Mean Standard Deviation (RMSD)
-        draw_figure:
-          multi_xticklabels: [0,1,2,3,4,5]
-        draw_subplot:
-          xlabel: RMSD (Å)
-          xticks: [0,1,2,3,4,5]
+        help: Plot inter-atomic distance in terms of free energy
+        extends: distance
         draw_dataset:
-          column: rmsd
-          dataset_kw:
-            cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
-            calc_pdist: True
-            pdist_kw:
-                bandwidth: 0.1
-                grid: !!python/object/apply:numpy.linspace [0,5,1000]
-            read_csv_kw:
-              delim_whitespace: True
-              header: 0
-              names: [frame, rmsd]
-      r1:
-        class: content
-        help: Format subplot for R1 relaxation
-        draw_subplot:
-          xlabel:      "$R_1$"
-          xticks:      [0.0,0.5,1.0,1.5,2.0,2.5,3.0]
-        draw_dataset:
-          dataset_kw:
-            pdist_kw:
-              bandwidth: 0.02
-          column: r1
-      r2:
-        class: content
-        help: Format subplot for R2 relaxation
-        draw_subplot:
-          xlabel: "$R_2$"
-          xticks: [0,2,4,6,8,10,12,14,16,18,20]
-        draw_dataset:
-          dataset_kw:
-            pdist_kw:
-              bandwidth: 0.3
-          column: r2
-      r2/r1:
-        class: content
-        help: Format subplot for R2/R1 relaxation
-        draw_subplot:
-          xlabel: "$R_2$/$R_1$"
-          xticks: [3,4,5,6,7,8,9,10,11]
-        draw_dataset:
-          dataset_kw:
-            pdist_kw:
-              bandwidth:
-                r2/r1: 0.1
-          column: r2/r1
-      hetnoe:
-        class: content
-        help: Format subplot for Heteronuclear NOE relaxation
-        draw_subplot:
-          xlabel: "Heteronuclear NOE"
-          xticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
-        draw_dataset:
-          column: noe
-          dataset_kw:
-            pdist_kw:
-              bandwidth: 0.03
-      rotdif:
-        class: content
-        help: Format subplot for rotational diffusion
-        draw_subplot:
-          xlabel: "$τ_c$ (ns)"
-          xticks: [5,6,7,8,9,10,11,12,13,14]
-        draw_dataset:
-          column: rotdif
-          dataset_kw:
-            pdist_kw:
-              bandwidth: 0.2
-      relaxation_3:
-        class: content
-        help: Three stacked plots including R1, R2, and HetNOE
-        draw_figure:
-          nrows: 3
-          shared_ylabel: "Probability Distribution"
-          subplots:
-            0:
-              preset: r1
-              ylabel: null
-            1:
-              preset: r2
-              ylabel: null
-            2:
-              preset: hetnoe
-              ylabel: null
-      relaxation_4:
-        class: content
-        help: Four stacked plots including R1, R2, R2/R1, and HetNOE
-        draw_figure:
-          nrows: 4
-          shared_ylabel: "Probability Distribution"
-          subplots:
-            0:
-              preset: r1
-              ylabel: null
-            1:
-              preset: r2
-              ylabel: null
-            2:
-              preset: r2/r1
-              ylabel: null
-            3:
-              preset: hetnoe
-              ylabel: null
-      rotdif_2:
-        class: content
-        help: Two stacked plots including R2/R1 rotdif
-        draw_figure:
-          nrows: 2
-          shared_ylabel: "Probability Distribution"
-          subplots:
-            0:
-              preset: r2/r1
-              ylabel: null
-            1:
-              preset: rotdif
-              ylabel: null
-      rotdif_4:
-        class: content
-        help: Two stacked plots including R2/R1 rotdif
-        draw_figure:
-          nrows: 2
-          ncols: 2
-          shared_ylabel: "Probability Distribution"
-          subplots:
-            0:
-              preset: r2/r1
-              ylabel: null
-            1:
-              preset: r2/r1
-              ylabel: null
-            2:
-              preset: rotdif
-              ylabel: null
-            3:
-              preset: rotdif
-              ylabel: null
+          logz: True
+          heatmap_kw:
+            vmin: 0
+            vmax: 5
+          colorbar_kw:
+            zticks: [0,1,2,3,4,5]
+            zlabel: ΔG (kcal/mol)
       manuscript:
         class: target
         inherits: manuscript
@@ -295,71 +135,24 @@ class PDistFigureManager(FigureManager):
             yabs: -0.025
         draw_dataset:
           partner_kw:
-            wspace:    0.10
-            sub_width: 0.80
-            title_fp: 8b
-            xlabel_kw:
-              labelpad: 8.5
-            label_fp: 8b
-            tick_fp: 6r
-            tick_params:
-              length: 2
-              pad: 3
-              width: 1
-          plot_kw:
-            lw: 1
-          mean_kw:
-            ms: 2
-          handle_kw:
-            ms: 6
-            mew: 1
+            position: right
+            wspace:    0.05
+            sub_width: 0.05
+          colorbar_kw:
+            ztick_fp:  6r
+            zlabel_fp: 8b
+            zlabel_kw:
+              labelpad: 2
     """
 
     @manage_defaults_presets()
     @manage_kwargs()
-    def draw_dataset(self, subplot, column=None,
-        draw_pdist=True, draw_fill_between=False, draw_mean=False,
-        draw_plot=False, **kwargs):
-        """
-        Loads a dataset and draws it on a subplot.
-
-        Loaded dataset should have attribute `pdist_df`.
-
-        Arguments:
-          subplot (Axes): :class:`Axes<matplotlib.axes.Axes>` on
-            which to draw
-          dataset_kw (dict): Keyword arguments passed to
-            :meth:`load_dataset
-            <myplotspec.FigureManager.FigureManager.load_dataset>`
-          plot_kw (dict): Keyword arguments passed to methods of
-            :class:`Axes<matplotlib.axes.Axes>`
-          column (str): Column within `pdist_df` to use
-          draw_fill_between (bool): Fill between specified region
-          fill_between_kw (dict): Keyword arguments used to configure
-            call to
-            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
-          fill_between_kw[x] (list, ndarray): x values passed to
-            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
-          fill_between_kw[ylb] (list, ndarray): y lower bound values
-            passed to
-            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
-          fill_between_kw[yub] (list, ndarray): y upper bound values
-            passed to
-            :meth:`fill_between<matplotlib.axes.Axes.fill_between>`
-          draw_pdist (bool): Draw probability distribution
-          pdist_kw (dict): Keyword arguments using to configure call to
-            :meth:`plot<matplotlib.axes.Axes.plot>`
-          draw_mean (bool): Draw point at mean value
-          mean_kw (dict): Keyword arguments used to configure call to
-            :meth:`plot<matplotlib.axes.Axes.plot>`
-          verbose (int): Level of verbose output
-          kwargs (dict): Additional keyword arguments
-        """
-        from warnings import warn
+    def draw_dataset(self, subplot, min_cutoff=None, logz=False,
+        draw_heatmap=True, draw_colorbar=True, **kwargs):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
-        # Process arguments
+        # Process arguments and load data
         verbose = kwargs.get("verbose", 1)
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
@@ -368,64 +161,43 @@ class PDistFigureManager(FigureManager):
         if dataset is not None and hasattr(dataset, "pdist_df"):
             pdist_df = dataset.pdist_df
         else:
-            pdist_df = None
+            pdist_df = dataset.dataframe
+        x = np.array( [filter(lambda x: x in "0123456789.", s)
+              for s in pdist_df.columns.values], np.int)
 
         # Configure plot settings
         plot_kw = multi_get_copy("plot_kw", kwargs, {})
         get_colors(plot_kw, kwargs)
 
-        # Draw fill_between
-        if draw_fill_between:
-            fill_between_kw = multi_get_copy("fill_between_kw", kwargs, {})
-            get_colors(fill_between_kw, plot_kw)
+        # Draw heatmap
+        if draw_heatmap:
+            heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
+            hm_x = np.arange(x.min(), x.max()+2, 1, np.int)
+            hm_y = pdist_df.index.values
+            hm_z = np.zeros((hm_x.size, hm_y.size))
+            for index_within_pdist, residue in enumerate(x):
+                pdist_of_residue = pdist_df.values[:, index_within_pdist]
+                index_within_hm = np.argmax(hm_x == residue)
+                hm_z[index_within_hm] = pdist_of_residue
+                print(
+                  "Residue {0} is at x[{1}](={2}) and hm_x[{3}](={4})".format(
+                  residue, index_within_pdist, x[index_within_pdist],
+                  index_within_hm, hm_x[index_within_hm]))
+            hm_z = hm_z.T
+            if min_cutoff is not None:
+                hm_z[hm_z < min_cutoff] = np.inf
+            if logz:
+                hm_z = -1 * np.log10(hm_z)
+            pcolormesh = subplot.pcolor(hm_x - 0.5, hm_y, hm_z, **heatmap_kw)
 
-            if "x" in fill_between_kw:
-                fb_x = fill_between_kw.pop("x")
-            if "ylb" in fill_between_kw:
-                fb_ylb = fill_between_kw.pop("ylb")
-            if "yub" in fill_between_kw:
-                fb_yub = fill_between_kw.pop("yub")
-            subplot.fill_between(fb_x, fb_ylb, fb_yub, **fill_between_kw)
-
-        # Draw pdist
-        if draw_pdist:
-            if not hasattr(dataset, "pdist_df"):
-                warn("'draw_pdist' is enabled but dataset does not have the "
-                     "necessary attribute 'pdist_df', skipping.")
-            else:
-                pdist = pdist_df[column]
-                pdist_kw = plot_kw.copy()
-                pdist_kw.update(kwargs.get("pdist_kw", {}))
-
-                pd_x = pdist.index.values
-                pd_y = np.squeeze(pdist.values)
-
-                subplot.plot(pd_x, pd_y, **pdist_kw)
-                pdist_rescale = True
-                if pdist_rescale:
-                    pdist_max = pd_y.max()
-                    y_max = subplot.get_ybound()[1]
-                    if (pdist_max > y_max / 1.25
-                    or not hasattr(subplot, "_mps_rescaled")):
-                        subplot.set_ybound(0, pdist_max*1.25)
-                        yticks = [0, pdist_max*0.25, pdist_max*0.50,
-                          pdist_max*0.75, pdist_max, pdist_max*1.25]
-                        subplot.set_yticks(yticks)
-                        subplot._mps_rescaled = True
-                if draw_mean:
-                    mean_kw = plot_kw.copy()
-                    mean_kw.update(kwargs.get("mean_kw", {}))
-                    mean = np.sum(np.array(pd_x, np.float64)
-                                 *np.array(pd_y, np.float64))
-                    if verbose >= 1:
-                        print("mean: {0:6.3f}".format(mean))
-                    subplot.plot(mean, pd_y[np.abs(pd_x - mean).argmin()],
-                      **mean_kw)
-        if draw_plot:
-            if "x" in kwargs:
-                x = kwargs.get("x")
-                subplot.plot([x, x], [0,1], **plot_kw)
+            # Draw colorbar
+            if draw_colorbar:
+                from .myplotspec.axes import set_colorbar
+                if not hasattr(subplot, "_mps_partner_subplot"):
+                    from .myplotspec.axes import add_partner_subplot
+                    add_partner_subplot(subplot, **kwargs)
+                set_colorbar(subplot, pcolormesh, **kwargs)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
-    PDistFigureManager().main()
+    PDist2DFigureManager().main()

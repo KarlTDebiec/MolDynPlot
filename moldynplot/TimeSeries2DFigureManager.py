@@ -8,22 +8,17 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Generates one or more 2D time series figures to specifications in a YAML
-file.
+Generates 2D time series figures to specifications
 """
 ################################### MODULES ###################################
 from __future__ import (absolute_import, division, print_function,
     unicode_literals)
-
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
-
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
-
-
 ################################### CLASSES ###################################
 class TimeSeries2DFigureManager(FigureManager):
     """
@@ -370,16 +365,17 @@ class TimeSeries2DFigureManager(FigureManager):
     @manage_kwargs()
     def draw_dataset(self, subplot, label=None, handles=None, logz=False,
             draw_heatmap=False, draw_colorbar=False, draw_contour=False,
-            draw_legend=False, draw_label=True, verbose=1, debug=0, **kwargs):
+            draw_legend=False, draw_label=True, **kwargs):
         import numpy as np
         import six
         from .myplotspec import get_colors, multi_get_copy
 
-        # Load data
+        # Process arguments and load data
+        verbose = kwargs.get("verbose", 1)
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
-        dataset = self.load_dataset(verbose=verbose, debug=debug, **dataset_kw)
+        dataset = self.load_dataset(verbose=verbose, **dataset_kw)
         timeseries_df = dataset.timeseries_df
 
         # Draw heatmap
@@ -398,13 +394,9 @@ class TimeSeries2DFigureManager(FigureManager):
             # Draw colorbar
             if draw_colorbar:
                 from .myplotspec.axes import set_colorbar
-
                 if not hasattr(subplot, "_mps_partner_subplot"):
                     from .myplotspec.axes import add_partner_subplot
-
-                    add_partner_subplot(subplot, verbose=verbose, debug=debug,
-                        **kwargs)
-
+                    add_partner_subplot(subplot, verbose=verbose, **kwargs)
                 set_colorbar(subplot, pcolormesh, **kwargs)
 
         # Draw contour

@@ -8,22 +8,17 @@
 #   This software may be modified and distributed under the terms of the
 #   BSD license. See the LICENSE file for details.
 """
-Generates one or more time series figures to specifications in a YAML
-file.
+Generates time series figures to specifications
 """
 ################################### MODULES ###################################
 from __future__ import (absolute_import, division, print_function,
     unicode_literals)
-
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
-
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
-
-
 ################################### CLASSES ###################################
 class TimeSeriesFigureManager(FigureManager):
     """
