@@ -17,19 +17,16 @@ Represents timeseries data
 ################################### MODULES ###################################
 from __future__ import (absolute_import, division, print_function,
     unicode_literals)
-
 if __name__ == "__main__":
     __package__ = str("moldynplot.dataset")
     import moldynplot.dataset
-from IPython import embed
 import h5py
 import numpy as np
 import pandas as pd
 import six
+from IPython import embed
 from ..myplotspec.Dataset import Dataset
-from ..myplotspec import wiprint
-
-
+from ..myplotspec import wiprint, sformat
 ################################### CLASSES ###################################
 class TimeSeriesDataset(Dataset):
     """
@@ -59,6 +56,7 @@ class TimeSeriesDataset(Dataset):
           ArgumentParser: Argument parser or subparser
         """
         import argparse
+        add_argument = Dataset.add_argument
 
         # Process arguments
         help_message = """Process timeseries data"""
@@ -80,34 +78,27 @@ class TimeSeriesDataset(Dataset):
         # Action arguments
         action_group = arg_groups.get("action",
           parser.add_argument_group("action"))
-        try:
-            action_group.add_argument("-dt", type=float, help="""time
-              between frames""")
-        except argparse.ArgumentError:
-            pass
-        try:
-            action_group.add_argument("-toffset", type=float, help="""offset
-              to add to index (time or frame number)""")
-        except argparse.ArgumentError:
-            pass
-        try:
-            action_group.add_argument("-downsample", type=int, help="""factor
-               by which to downsample data""")
-        except argparse.ArgumentError:
-            pass
-        try:
-            action_group.add_argument("--pdist", nargs="?", default=False,
-              const=True, dest="calc_pdist", help="""calculate probability
-                distribution over timeseries""")
-        except argparse.ArgumentError:
-            pass
-        try:
-            action_group.add_argument("--mean", nargs="?", default=False,
-              const=True, dest="calc_mean", help="""Calculate mean and
-                standard error
-                over timeseries""")
-        except argparse.ArgumentError:
-            pass
+        add_argument(action_group, "-dt", type=float,
+          help="""time between frames""")
+        add_argument(action_group, "-toffset", type=float,
+          help="""add offset to index (time or frame number)""")
+        add_argument(action_group, "-downsample", metavar="N_FRAMES", type=int,
+          help="""downsample data""")
+        add_argument(action_group, "--pdist", const=True, default=False,
+          dest="calc_pdist", nargs="?",
+          help="""calculate probability distribution over timeseries""")
+        add_argument(action_group, "--pdist_bandwidth",
+          default=argparse.SUPPRESS, dest="pdist_bandwidth",
+          metavar="BANDWIDTH", type=float,
+          help="""kernel bandwidth to be used in probability distribution
+          calculation""")
+        add_argument(action_group, "--pdist_grid", default=argparse.SUPPRESS,
+          dest="pdist_grid", nargs=3, type=float,
+          help="""grid to be used in probability distribution calculation; min,
+          max, and interval passed to numpy.arange""")
+        add_argument(action_group, "--mean", const=True, default=False,
+          dest="calc_mean", nargs="?",
+          help="""calculate mean and standard error over timeseries""")
 
         # Arguments inherited from superclass
         Dataset.construct_argparser(parser)
@@ -181,6 +172,11 @@ class TimeSeriesDataset(Dataset):
         # Calculate probability distibution
         if calc_pdist:
             pdist_kw = kwargs.get("pdist_kw", {})
+            if "pdist_bandwidth" in kwargs:
+                pdist_kw["bandwidth"] = kwargs["pdist_bandwidth"]
+            if "pdist_grid" in kwargs:
+                pdist_kw["grid"] = np.arange(kwargs["pdist_grid"][0],
+                  kwargs["pdist_grid"][1], kwargs["pdist_grid"][2])
             self.pdist_df = self.calc_pdist(df=self.timeseries_df,
               verbose=verbose, **pdist_kw)
 
@@ -188,7 +184,7 @@ class TimeSeriesDataset(Dataset):
             if verbose >= 2:
                 print("Processed pdist DataFrame:")
                 print(self.pdist_df)
-            if isinstance(calc_mean, six.string_types):
+            if isinstance(calc_pdist, six.string_types):
                 self.write(df=self.pdist_df, outfile=calc_pdist, **kwargs)
 
         # Calculate mean and standard error
@@ -343,8 +339,7 @@ class TimeSeriesDataset(Dataset):
                 over timeseries""")
             mean_df = df.mean().to_frame().reset_index(drop=True)
             percentile_df = pd.DataFrame(
-              np.percentile(df.values, [2.5, 97.5, 5, 95],
-                axis=0).transpose())
+              np.percentile(df.values, [2.5, 97.5, 5, 95], axis=0).transpose())
             mean_df = pd.concat([mean_df, percentile_df], axis=1,
               ignore_index=True)
             mean_df.index = df.columns.values
@@ -354,6 +349,90 @@ class TimeSeriesDataset(Dataset):
         else:
             raise Exception()
 
+    @staticmethod
+    def calc_pdist(df, columns=None, mode="kde", bandwidth=None, grid=None,
+      **kwargs):
+        """
+        Calcualtes probability distribution over DataFrame.
+
+        Arguments:
+          df (DataFrame): DataFrame over which to calculate probability
+            distribution of each column over rows
+          columns (list): Columns for which to calculate probability
+            distribution
+          mode (ndarray, str, optional): Method of calculating
+            probability distribution; eventually will support 'hist' for
+            histogram and 'kde' for kernel density estimate, though
+            presently only 'kde' is implemented
+          bandwidth (float, dict, str, optional): Bandwidth to use for
+            kernel density estimates; may be a single float that will be
+            applied to all columns or a dictionary whose keys are column
+            names and values are floats corresponding to the bandwidth
+            for each column; for any column for which *bandwidth* is not
+            specified, the standard deviation will be used
+          grid (list, ndarray, dict, optional): Grid on which to
+            calculate kernel density estimate; may be a single ndarray
+            that will be applied to all columns or a dictionary whose
+            keys are column names and values are ndarrays corresponding
+            to the grid for each column; for any column for which *grid*
+            is not specified, a grid of 1000 points between the minimum
+            value minus three times the standard deviation and the
+            maximum value plots three times the standard deviation will
+            be used
+          kde_kw (dict, optional): Keyword arguments passed to
+            :function:`sklearn.neighbors.KernelDensity`
+          verbose (int): Level of verbose output
+          kwargs (dict): Additional keyword arguments
+
+        Returns:
+          OrderedDict: Dictionary whose keys are columns in *df* and
+          values are DataFrames whose indexes are the *grid* for that
+          column and contain a single column 'probability' containing
+          the normalized probability at each grid point
+
+        .. todo:
+            - Implement flag to return single dataframe with single grid
+        """
+        from sklearn.neighbors import KernelDensity
+
+        # Process arguments
+        verbose = kwargs.get("verbose", 1)
+        if verbose >= 1:
+            wiprint("""Calculating probability distribution over DataFrame""")
+
+        if mode == "kde":
+
+            # Prepare bandwidths
+            if bandwidth is None:
+                bandwidth = df.values.std()
+
+            # Prepare grids
+            if grid is None:
+                grid = np.linspace(df.values.min() - 3 * bandwidth,
+                  df.values.max() + 3 * bandwidth, 1000)
+            elif isinstance(grid, list):
+                grid = np.array(grid)
+
+            # Calculate probability distributions
+            kde_kw = kwargs.get("kde_kw", {})
+            pdist = np.zeros((grid.size, df.columns.size))
+            for i, column in enumerate(df.columns.values):
+                series = df[column]
+                if verbose >= 1:
+                    wiprint("calculating probability distribution of "
+                            "{0} using a kernel density estimate".format(
+                      column))
+                kde = KernelDensity(bandwidth=bandwidth, **kde_kw)
+                kde.fit(series.dropna()[:, np.newaxis])
+                pdf = np.exp(kde.score_samples(grid[:, np.newaxis]))
+                pdf /= pdf.sum()
+                pdist[:,i] = pdf
+            pdist = pd.DataFrame(pdist, index=grid, columns=df.columns)
+        else:
+            raise Exception(sformat("""only kernel density estimation is
+                                    currently supported"""))
+
+        return pdist
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
