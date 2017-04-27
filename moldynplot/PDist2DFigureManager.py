@@ -16,7 +16,6 @@ from __future__ import (absolute_import, division, print_function,
 if __name__ == "__main__":
     __package__ = str("moldynplot")
     import moldynplot
-from IPython import embed
 from .myplotspec.FigureManager import FigureManager
 from .myplotspec.manage_defaults_presets import manage_defaults_presets
 from .myplotspec.manage_kwargs import manage_kwargs
@@ -39,18 +38,24 @@ class PDist2DFigureManager(FigureManager):
           title_kw:
             verticalalignment: bottom
           xlabel: Residue
-          ylabel: Distance
           tick_params:
             direction: out
-            left: on
-            right: off
             bottom: on
             top: off
+            left: on
+            right: off
           grid: True
           grid_kw:
             b: True
-            color: [0.8,0.8,0.8]
+            color: [0.8, 0.8, 0.8]
             linestyle: '-'
+            lw: 0.5
+            alpha: 0.3
+          vline_kw:
+            zorder: 9
+            lw: 1
+            color: [0.0, 0.0, 0.0]
+            zorder: 9
           label_kw:
             zorder: 10
             horizontalalignment: left
@@ -61,6 +66,13 @@ class PDist2DFigureManager(FigureManager):
             edgecolors: none
             rasterized: True
             zorder: 0.1
+          colorbar_kw:
+            tick_params:
+              left: off
+              right: off
+              bottom: off
+              top: off
+            
     """
     available_presets = """
       distance:
@@ -142,7 +154,7 @@ class PDist2DFigureManager(FigureManager):
             ztick_fp:  6r
             zlabel_fp: 8b
             zlabel_kw:
-              labelpad: 2
+              labelpad: 0
     """
 
     @manage_defaults_presets()
@@ -179,10 +191,10 @@ class PDist2DFigureManager(FigureManager):
                 pdist_of_residue = pdist_df.values[:, index_within_pdist]
                 index_within_hm = np.argmax(hm_x == residue)
                 hm_z[index_within_hm] = pdist_of_residue
-                print(
-                  "Residue {0} is at x[{1}](={2}) and hm_x[{3}](={4})".format(
-                  residue, index_within_pdist, x[index_within_pdist],
-                  index_within_hm, hm_x[index_within_hm]))
+#                print(
+#                  "Residue {0} is at x[{1}](={2}) and hm_x[{3}](={4})".format(
+#                  residue, index_within_pdist, x[index_within_pdist],
+#                  index_within_hm, hm_x[index_within_hm]))
             hm_z = hm_z.T
             if min_cutoff is not None:
                 hm_z[hm_z < min_cutoff] = np.inf

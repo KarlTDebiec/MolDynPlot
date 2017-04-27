@@ -44,10 +44,10 @@ class TimeSeries2DFigureManager(FigureManager):
           subplot_kw:
             autoscale_on: False
           multi_tick_params:
-            left:   on
-            right:  off
+            left: on
+            right: off
             bottom: on
-            top:    off
+            top: off
           shared_legend_kw:
             spines: False
             handle_kw:
@@ -66,9 +66,9 @@ class TimeSeries2DFigureManager(FigureManager):
           tick_params:
             direction: out
             bottom: on
-            top:    off
-            right:  off
-            left:   on
+            top: off
+            left: on
+            right: off
           grid: True
           grid_kw:
             b: True
