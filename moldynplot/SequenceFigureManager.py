@@ -192,7 +192,7 @@ class SequenceFigureManager(FigureManager):
         draw_dataset:
           y_key:    "I/I0"
           yse_key: "I/I0 se"
-      pre_rho2:
+      pre_gamma2:
         class: content
         help: Format subplot for paramagnetic relaxation enhancement Γ2
         draw_subplot:

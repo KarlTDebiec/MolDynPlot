@@ -50,7 +50,7 @@ class PDist2DFigureManager(FigureManager):
             color: [0.8, 0.8, 0.8]
             linestyle: '-'
             lw: 0.5
-            alpha: 0.3
+#            alpha: 0.3
           vline_kw:
             zorder: 9
             lw: 1
@@ -66,13 +66,21 @@ class PDist2DFigureManager(FigureManager):
             edgecolors: none
             rasterized: True
             zorder: 0.1
+            vmin: 0
+            vmax: 100000
           colorbar_kw:
             tick_params:
               left: off
               right: off
               bottom: off
               top: off
-            
+          mask_kw:
+            cmap: Greys_r
+            edgecolors: none
+            rasterized: True
+            vmin: 0
+            vmax: 1
+            zorder: 0.3
     """
     available_presets = """
       distance:
@@ -84,14 +92,14 @@ class PDist2DFigureManager(FigureManager):
           yticks: [0,10,20,30,40,50,60,70]
         draw_dataset:
           draw_heatmap: True
-          min_cutoff: 0.000001
+          min_cutoff: 0.00001
           heatmap_kw:
-            cmap: afmhot
-            vmin: 0.000
-            vmax: 0.05
+            cmap: magma_r
+            vmin: 0.00
+            vmax: 0.04
           draw_colorbar: True
           colorbar_kw:
-            zticks: [0.00,0.01,0.02,0.03,0.04,0.05]
+            zticks: [0.00,0.01,0.02,0.03,0.04]
             zticklabels: []
             zlabel: Probability
       distance_free_energy:
@@ -106,6 +114,27 @@ class PDist2DFigureManager(FigureManager):
           colorbar_kw:
             zticks: [0,1,2,3,4,5]
             zlabel: ΔG (kcal/mol)
+      gamma2:
+        class: content
+        help: Plot Γ2
+        draw_figure:
+          multi_yticklabels: [0,10,20,30,40,50,60,70]
+        draw_subplot:
+          yticks: [0,10,20,30,40,50,60,70]
+        draw_dataset:
+          draw_heatmap: True
+          heatmap_kw:
+            cmap: afmhot_r
+            vmin: 0.00
+            vmax: 1.00
+          gamma2_z: True
+          draw_mask: True
+          min_cutoff: 0.00001
+          draw_colorbar: True
+          colorbar_kw:
+            zticks: [0.2,0.4,0.6,0.8,1.0]
+            zticklabels: []
+            zlabel: Contribution to $Γ_2$
       manuscript:
         class: target
         inherits: manuscript
@@ -160,7 +189,7 @@ class PDist2DFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, min_cutoff=None, logz=False,
-        draw_heatmap=True, draw_colorbar=True, **kwargs):
+        draw_heatmap=True, draw_mask=True, draw_colorbar=True, **kwargs):
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
@@ -186,21 +215,88 @@ class PDist2DFigureManager(FigureManager):
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
             hm_x = np.arange(x.min(), x.max()+2, 1, np.int)
             hm_y = pdist_df.index.values
-            hm_z = np.zeros((hm_x.size, hm_y.size))
-            for index_within_pdist, residue in enumerate(x):
-                pdist_of_residue = pdist_df.values[:, index_within_pdist]
+            hm_z = np.zeros((hm_x.size, hm_y.size)) * np.nan
+
+            gamma2_z = kwargs.get("gamma2_z", False)
+            if gamma2_z:
+                k   = 0.0123    # Å6 ns-2
+                w   = 800e6     # s-1
+                tc  = 6.72e-9 # CVNH: 8.7e-9; LysM: 6.72e-9   # s
+                gamma2 = k / (hm_y ** 6) * 1e9 * 1e9
+                gamma2 *= (4 * tc + ((3 * tc) / (1 + (w * tc ) ** 2)))
+
+            subensemble_pop = kwargs.get("subensemble_pop", None)
+            draw_outline = kwargs.get("draw_outline", True)
+            if draw_outline:
+                ol_x = []
+                ol_ylb = []
+                ol_yub = []
+
+            for residue in range(x.min(), x.max() + 1):
                 index_within_hm = np.argmax(hm_x == residue)
+                try:
+                    index_within_pdist = np.where(x == residue)[0][0]
+                except IndexError:
+                    hm_z[index_within_hm][:] = np.nan
+                    if draw_outline:
+                        ol_x.append(None)
+                        ol_ylb.append(None)
+                        ol_yub.append(None)
+                    continue
+                    
+                pdist_of_residue = pdist_df.values[:, index_within_pdist]
+
+                # Normalize, optionally scale by extected sum
+                pdist_of_residue /= np.nansum(pdist_of_residue)
+                if subensemble_pop is not None:
+                    pdist_of_residue *= subensemble_pop
+
+                # Set grid points below selected weight to 0
+                if min_cutoff is not None:
+                    pdist_of_residue[pdist_of_residue < min_cutoff] = np.nan
+
+                # Normalize again, and optionally scale again
+                pdist_of_residue /= np.nansum(pdist_of_residue)
+                if subensemble_pop is not None:
+                    pdist_of_residue *= subensemble_pop
+
+                # Convert from population to population-weighted Γ2
+                if gamma2_z:
+                    # Skip selected residues that have distance but for which
+                    #   Γ2 cannot be back-calculated
+                    if (residue in [55,56,57,58,59,60,61,
+                                    111,112,113,114,115,116,117]
+                    or (np.isnan(pdist_of_residue).all())):
+                        hm_z[index_within_hm][:] = np.nan
+                        if draw_outline:
+                            ol_x.append(None)
+                            ol_ylb.append(None)
+                            ol_yub.append(None)
+                        continue
+                    pdist_of_residue *= gamma2
+                    #print("{0:>4d} {1:>8.2f} {2:>8.2f}".format(residue,
+                    #  np.nansum(pdist_of_residue), np.nanmax(pdist_of_residue)))
+                if draw_outline:
+                    ol_x.extend([residue - 0.5, residue + 0.5])
+                    nonzero = np.where(np.logical_not(np.isnan(pdist_of_residue)))[0]
+                    ol_ylb.extend([hm_y[nonzero[0]], hm_y[nonzero[0]]])
+                    ol_yub.extend([hm_y[nonzero[-1]], hm_y[nonzero[-1]]])
+
                 hm_z[index_within_hm] = pdist_of_residue
-#                print(
-#                  "Residue {0} is at x[{1}](={2}) and hm_x[{3}](={4})".format(
-#                  residue, index_within_pdist, x[index_within_pdist],
-#                  index_within_hm, hm_x[index_within_hm]))
             hm_z = hm_z.T
-            if min_cutoff is not None:
-                hm_z[hm_z < min_cutoff] = np.inf
             if logz:
                 hm_z = -1 * np.log10(hm_z)
             pcolormesh = subplot.pcolor(hm_x - 0.5, hm_y, hm_z, **heatmap_kw)
+            if draw_mask:
+                mask_kw = multi_get_copy("mask_kw", kwargs, {})
+                mask_z = np.ma.masked_where(
+                  np.logical_not(np.isnan(hm_z)),
+                  np.ones_like(hm_z))
+                subplot.pcolormesh(hm_x - 0.5, hm_y, mask_z, **mask_kw)
+            if draw_outline:
+                outline_kw = kwargs.get("outline_kw", {})
+                subplot.plot(ol_x, ol_ylb, **outline_kw)
+                subplot.plot(ol_x, ol_yub, **outline_kw)
 
             # Draw colorbar
             if draw_colorbar:
