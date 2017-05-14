@@ -42,11 +42,11 @@ class PDistFigureManager(FigureManager):
               marker: s
               mec: black
             legend_kw:
+              borderaxespad: 0
               frameon: False
+              handletextpad: 0
               loc: 9
               numpoints: 1
-              handletextpad: 0
-              borderaxespad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -266,6 +266,8 @@ class PDistFigureManager(FigureManager):
           top:        0.25
           title_kw:
             top: -0.1
+          shared_xlabel_kw:
+            bottom: -0.24
           shared_legend_kw:
             left:       0.50
             sub_width:  2.50
@@ -276,7 +278,6 @@ class PDistFigureManager(FigureManager):
               mew: 0.5
             legend_kw:
               labelspacing: 0.5
-              legend_fp: 7r
               ncol: 6
         draw_subplot:
           xlabel_kw:
