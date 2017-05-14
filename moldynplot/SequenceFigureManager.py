@@ -42,9 +42,9 @@ class SequenceFigureManager(FigureManager):
           subplot_kw:
             autoscale_on: True
           multi_tick_params:
+            bottom: on
             left: on
             right: off
-            bottom: on
             top: off
           shared_legend: True
           shared_legend_kw:
@@ -54,11 +54,11 @@ class SequenceFigureManager(FigureManager):
               marker: s
               mec: black
             legend_kw:
+              borderaxespad: 0
               frameon: False
+              handletextpad: 0
               loc: 9
               numpoints: 1
-              handletextpad: 0
-              borderaxespad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -67,19 +67,20 @@ class SequenceFigureManager(FigureManager):
             va: center
           tick_params:
             bottom: on
-            top: off
-            right: off
-            left: on
             direction: out
+            left: on
+            right: off
+            top: off
           grid: True
           grid_kw:
             b: True
+            color: [0.7,0.7,0.7]
             linestyle: '-'
-            color: [0.8,0.8,0.8]
+            linewidth: 0.5
           label_kw:
-            zorder: 10
             horizontalalignment: left
             verticalalignment: top
+            zorder: 10
         draw_dataset:
           dataset_kw:
             cls: moldynplot.dataset.SequenceDataset.SequenceDataset
@@ -293,6 +294,9 @@ class SequenceFigureManager(FigureManager):
             marker: 'o'
             mew: 0
             ms: 4
+          handle_kw:
+            mew: 0.5
+            ms: 5
       manuscript_tight:
         class: target
         extends: manuscript

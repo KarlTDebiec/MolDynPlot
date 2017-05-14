@@ -71,31 +71,30 @@ class HSQCFigureManager(FigureManager):
           xticks: [5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,10.5,11.0,11.5]
           yticks: [100,105,110,115,120,125,130,135]
           tick_params:
-            direction: out
             bottom: on
-            top: off
-            right: off
+            direction: out
             left: on
+            right: off
+            top: off
           grid: True
           grid_kw:
             b: True
-            color: [0.8,0.8,0.8]
+            color: [0.7,0.7,0.7]
             linestyle: '-'
+            linewidth: 0.5
           label_kw:
-            zorder: 10
             horizontalalignment: left
             verticalalignment: top
+            zorder: 10
           legend_kw:
-            loc: 2
-            handletextpad: 0.0
-            numpoints: 1
             frameon: True
+            handletextpad: 0.0
+            loc: 2
+            numpoints: 1
         draw_dataset:
+          cutoff: 0.970
           dataset_kw:
             cls: moldynplot.dataset.HSQCDataset.HSQCDataset
-          cutoff: 0.970
-          plot_kw:
-            zorder: 10
           handle_kw:
             ls: none
             marker: s
@@ -106,24 +105,10 @@ class HSQCFigureManager(FigureManager):
               horizontalalignment: center
               verticalalignment: center
               zorder: 20
+          plot_kw:
+            zorder: 10
     """
     available_presets = """
-      letter:
-        class: target
-        inherits: letter
-        draw_figure:
-          left:       0.9
-          sub_width:  7.8
-          bottom:     0.7
-          sub_height: 5.4
-        draw_subplot:
-          xticklabels: [5.0,'',6.0,'',7.0,'',8.0,'',9.0,'',10.0,'',11.0]
-          legend: True
-        draw_dataset:
-          contour_kw:
-            linewidths: 0.75
-          handle_kw:
-            ms: 8
       manuscript:
         class: target
         inherits: manuscript
@@ -144,6 +129,7 @@ class HSQCFigureManager(FigureManager):
           contour_kw:
             linewidths: 0.5
           handle_kw:
+            mew: 0.5
             ms: 5
           label_kw:
             fp: 3r

@@ -61,8 +61,9 @@ class PDistFigureManager(FigureManager):
           grid: True
           grid_kw:
             b: True
-            color: [0.8,0.8,0.8]
+            color: [0.7,0.7,0.7]
             linestyle: '-'
+            linewidth: 0.5
           label_kw:
             zorder: 10
             horizontalalignment: left
@@ -272,6 +273,7 @@ class PDistFigureManager(FigureManager):
             sub_height: 0.30
             handle_kw:
               ms: 5
+              mew: 0.5
             legend_kw:
               labelspacing: 0.5
               legend_fp: 7r
@@ -309,7 +311,7 @@ class PDistFigureManager(FigureManager):
             ms: 2
           handle_kw:
             ms: 6
-            mew: 1
+            mew: 0.5
     """
 
     @manage_defaults_presets()
