@@ -256,23 +256,23 @@ class PDistFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.50
-          sub_width:  2.50
+          left:       0.30
+          sub_width:  2.65
           wspace:     0.10
-          right:      0.20
-          bottom:     0.70
+          right:      0.10
+          bottom:     0.55
           sub_height: 1.00
           hspace:     0.10
-          top:        0.25
+          top:        0.10
           title_kw:
             top: -0.1
           shared_xlabel_kw:
             bottom: -0.24
           shared_legend_kw:
-            left:       0.50
-            sub_width:  2.50
+            left:       0.30
+            sub_width:  2.65
             bottom:     0.00
-            sub_height: 0.30
+            sub_height: 0.20
             handle_kw:
               ms: 5
               mew: 0.5
@@ -288,6 +288,8 @@ class PDistFigureManager(FigureManager):
           y2label_kw:
             rotation: 270
             verticalalignment: bottom
+          grid_kw:
+            linewidth: 0.5
           draw_label: True
           label_kw:
             border_lw: 1

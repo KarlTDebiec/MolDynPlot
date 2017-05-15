@@ -72,11 +72,6 @@ class SequenceFigureManager(FigureManager):
             right: off
             top: off
           grid: True
-          grid_kw:
-            b: True
-            color: [0.7,0.7,0.7]
-            linestyle: '-'
-            linewidth: 0.5
           label_kw:
             horizontalalignment: left
             verticalalignment: top
@@ -259,21 +254,21 @@ class SequenceFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.60
-          sub_width:  6.00
-          wspace:     0.05
-          right:      0.12
-          bottom:     0.70
+          left:       0.50
+          sub_width:  3.80
+          wspace:     0.10
+          right:      0.10
+          bottom:     0.55
           sub_height: 1.00
           hspace:     0.10
-          top:        0.25
+          top:        0.10
           title_kw:
-            top:     -0.125
+            top: -0.1
           shared_legend_kw:
-            left:       0.60
-            sub_width:  6.00
+            left:       0.50
+            sub_width:  3.80
             bottom:     0.00
-            sub_height: 0.30
+            sub_height: 0.20
             legend_kw:
               ncol: 5
         draw_subplot:
@@ -282,6 +277,8 @@ class SequenceFigureManager(FigureManager):
           ylabel_kw:
             rotation: horizontal
             labelpad: 3
+          grid_kw:
+            linewidth: 0.5
           draw_label: True
           label_kw:
             border_lw: 1

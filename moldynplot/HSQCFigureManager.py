@@ -115,16 +115,18 @@ class HSQCFigureManager(FigureManager):
         draw_figure:
           left:       0.50
           sub_width:  3.80
-          right:      0.20
-          bottom:     0.45
+          right:      0.10
+          bottom:     0.40
           sub_height: 2.65
-          top:        0.20
+          top:        0.10
         draw_subplot:
           xticklabels: [5.0,'',6.0,'',7.0,'',8.0,'',9.0,'',10.0,'',11.0]
           xlabel_kw:
             labelpad: 10
           ylabel_kw:
             labelpad: 10
+          grid_kw:
+            linewidth: 0.5
         draw_dataset:
           contour_kw:
             linewidths: 0.5

@@ -51,10 +51,11 @@ class SAXSFigureManager(FigureManager):
               marker: s
               mec: black
             legend_kw:
+              borderaxespad: 0
               frameon: False
+              handletextpad: 0
               loc: 9
               numpoints: 1
-              handletextpad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -75,7 +76,7 @@ class SAXSFigureManager(FigureManager):
           grid: True
           grid_kw:
             b: True
-            color: [0.8,0.8,0.8]
+            color: [0.7,0.7,0.7]
             linestyle: '-'
             zorder: 10
           label_kw:
@@ -201,26 +202,34 @@ class SAXSFigureManager(FigureManager):
         draw_figure:
           left:       0.50
           sub_width:  4.40
-          right:      0.20
-          bottom:     0.70
+          wspace:     0.10
+          right:      0.10
+          bottom:     0.55
           sub_height: 1.80
+          hspace:     0.10
           top:        0.25
           title_kw:
-            top: -0.125
+            top: -0.1
+          shared_xlabel_kw:
+            bottom: -0.24
           shared_legend_kw:
             left:       0.50
             sub_width:  4.40
             bottom:     0.00
-            sub_height: 0.30
+            sub_height: 0.20
+            handle_kw:
+              ms: 5
+              mew: 0.5
             legend_kw:
               labelspacing: 0.5
-              legend_fp: 7r
               ncol: 5
         draw_subplot:
           xlabel_kw:
             labelpad: 3
           ylabel_kw:
             labelpad: 6
+          grid_kw:
+            linewidth: 0.5
           draw_label: True
           label_kw:
             border_lw: 1
@@ -242,29 +251,8 @@ class SAXSFigureManager(FigureManager):
           plot_kw:
             lw: 1
           handle_kw:
-            ms: 6
-            mew: 1
-      notebook:
-        class: target
-        inherits: notebook
-        draw_figure:
-          left:       0.60
-          sub_width:  4.40
-          right:      0.20
-          bottom:     1.00
-          sub_height: 1.80
-          top:        0.30
-          shared_legend: True
-          shared_legend_kw:
-            left:       0.60
-            sub_width:  4.40
-            right:      0.20
-            bottom:     0.00
-            sub_height: 0.50
-            legend_kw:
-              labelspacing: 0.5
-              legend_fp: 8r
-              ncol: 2
+            mew: 0.5
+            ms: 5
     """
 
     @manage_defaults_presets()
