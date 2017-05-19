@@ -30,10 +30,23 @@ class PDist2DFigureManager(FigureManager):
           subplot_kw:
             autoscale_on: False
           multi_tick_params:
+            bottom: on
             left: on
             right: off
-            bottom: on
             top: off
+          shared_legend: False
+          shared_legend_kw:
+            spines: False
+            handle_kw:
+              ls: none
+              marker: s
+              mec: black
+            legend_kw:
+              borderaxespad: 0
+              frameon: False
+              handletextpad: 0
+              loc: 9
+              numpoints: 1
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -45,12 +58,6 @@ class PDist2DFigureManager(FigureManager):
             left: on
             right: off
           grid: True
-          grid_kw:
-            b: True
-            color: [0.8, 0.8, 0.8]
-            linestyle: '-'
-            lw: 0.5
-#            alpha: 0.3
           vline_kw:
             zorder: 9
             lw: 1
@@ -140,20 +147,22 @@ class PDist2DFigureManager(FigureManager):
         inherits: manuscript
         draw_figure:
           left:       0.50
-          sub_width:  2.50
+          sub_width:  3.80
           wspace:     0.10
-          right:      0.20
-          bottom:     0.70
+          right:      0.10
+          bottom:     0.35
           sub_height: 1.00
           hspace:     0.10
-          top:        0.25
+          top:        0.10
           title_kw:
             top: -0.1
+          shared_xlabel_kw:
+            bottom: -0.24
           shared_legend_kw:
             left:       0.50
-            sub_width:  2.50
+            sub_width:  3.80
             bottom:     0.00
-            sub_height: 0.30
+            sub_height: 0.20
             handle_kw:
               ms: 5
             legend_kw:

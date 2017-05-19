@@ -269,6 +269,9 @@ class SequenceFigureManager(FigureManager):
             sub_width:  3.80
             bottom:     0.00
             sub_height: 0.20
+            handle_kw:
+              mew: 0.5
+              ms: 5
             legend_kw:
               ncol: 5
         draw_subplot:
@@ -277,8 +280,6 @@ class SequenceFigureManager(FigureManager):
           ylabel_kw:
             rotation: horizontal
             labelpad: 3
-          grid_kw:
-            linewidth: 0.5
           draw_label: True
           label_kw:
             border_lw: 1

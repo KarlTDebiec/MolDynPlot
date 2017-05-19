@@ -44,9 +44,9 @@ class TimeSeries2DFigureManager(FigureManager):
           subplot_kw:
             autoscale_on: False
           multi_tick_params:
+            bottom: on
             left: on
             right: off
-            bottom: on
             top: off
           shared_legend_kw:
             spines: False
@@ -55,6 +55,7 @@ class TimeSeries2DFigureManager(FigureManager):
               marker: s
               mec: black
             legend_kw:
+              borderaxespad: 0
               frameon: False
               handletextpad: 0
               loc: 9
@@ -64,25 +65,21 @@ class TimeSeries2DFigureManager(FigureManager):
             verticalalignment: bottom
           xlabel: Time
           tick_params:
-            direction: out
             bottom: on
+            direction: out
             top: off
             left: on
             right: off
           grid: True
           grid_kw:
-            b: True
-            color: [0.2,0.2,0.2]
-            linestyle: '-'
-            lw: 0.5
+            color: [0.3, 0.3, 0.3]
           hline_kw:
-            color: [0.2,0.2,0.2]
-            linestyle: '-'
-            lw: 0.5
+            color: [0.0, 0.0, 0.0]
+            zorder: 11
           label_kw:
-            zorder: 10
             horizontalalignment: left
             verticalalignment: top
+            zorder: 10
         draw_dataset:
           draw_heatmap: True
           heatmap_kw:
@@ -199,15 +196,18 @@ class TimeSeries2DFigureManager(FigureManager):
           bottom:     0.80
           sub_height: 1.00
           hspace:     0.05
-          top:        0.25
+          top:        0.10
           title_kw:
             top: -0.1
+          shared_ylabel_kw:
+            left: -0.34
           shared_legend_kw:
             left:       0.50
             sub_width:  4.40
             bottom:     0.00
             sub_height: 0.40
             handle_kw:
+              mew: 0.5
               ms: 5
             legend_kw:
               ncol: 4
@@ -216,6 +216,8 @@ class TimeSeries2DFigureManager(FigureManager):
             labelpad: 3
           ylabel_kw:
             labelpad: 6
+          hline_kw:
+            lw: 1
           draw_label: True
           label_kw:
             border_lw: 1
@@ -257,6 +259,32 @@ class TimeSeries2DFigureManager(FigureManager):
             verticalalignment: center
           yticklabels: []
           ylabel_fp: 7r
+      manuscript_dssp_legend_right:
+        class: target
+        extends: manuscript
+        help: Stacked DSSP plot; per-residue RMSD plot to be generated
+              separately
+        draw_figure:
+          sub_width:  5.15
+          right:      1.35
+          bottom:     0.05
+          top:        0.25
+          title_kw:
+            top: -0.1
+          shared_legend_kw:
+            mode: partner
+            partner_kw:
+              position:   right
+              sub_width:  1.25
+              wspace:     0.05
+              sub_height: 1.15
+            legend_kw:
+              title:  "Secondary Structure"
+              ncol:   1
+        draw_subplot:
+          xlabel: null
+          tick_params:
+            bottom: off
       manuscript_dssp_perresrmsd:
         class: target
         extends: manuscript
@@ -382,10 +410,13 @@ class TimeSeries2DFigureManager(FigureManager):
         if draw_heatmap:
             heatmap_kw = multi_get_copy("heatmap_kw", kwargs, {})
             hm_x = timeseries_df.index.values
-            try:
-                hm_y = np.array(timeseries_df.columns, np.float)
-            except:
-                hm_y = np.array(range(1, timeseries_df.shape[1] + 2))
+            if "hm_y" in heatmap_kw:
+                hm_y = heatmap_kw.pop("hm_y")
+            else:
+                try:
+                    hm_y = np.array(timeseries_df.columns, np.float)
+                except:
+                    hm_y = np.array(range(1, timeseries_df.shape[1] + 2))
             hm_z = timeseries_df.values.T
             if logz:
                 hm_z = np.log10(hm_z)
