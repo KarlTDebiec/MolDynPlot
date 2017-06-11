@@ -75,7 +75,7 @@ class TimeSeriesFigureManager(FigureManager):
           grid: True
           grid_kw:
             b: True
-            color: [0.8,0.8,0.8]
+            color: [0.7,0.7,0.7]
             linestyle: '-'
           label_kw:
             zorder: 10
@@ -96,7 +96,7 @@ class TimeSeriesFigureManager(FigureManager):
             grid: True
             grid_kw:
               b: True
-              color: [0.8,0.8,0.8]
+              color: [0.7,0.7,0.7]
               linestyle: '-'
             xticks:
             tick_params:
@@ -231,32 +231,34 @@ class TimeSeriesFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.50
-          sub_width:  4.40
-          wspace:     0.10
-          right:      0.20
-          bottom:     0.70
-          sub_height: 1.80
+          bottom:     0.55
           hspace:     0.10
-          top:        0.25
+          left:       0.40
+          right:      0.10
+          sub_height: 1.000
+          sub_width:  2.575
+          top:        0.10
+          wspace:     0.10
           title_kw:
             top: -0.1
           shared_legend_kw:
-            left:       0.50
-            sub_width:  4.40
+            left:       0.40
+            sub_width:  2.575
             bottom:     0.00
-            sub_height: 0.30
+            sub_height: 0.20
             handle_kw:
+              mew: 0.5
               ms: 5
             legend_kw:
               labelspacing: 0.5
-              legend_fp: 7r
               ncol: 6
+          shared_ylabel_kw:
+            left: -0.27
         draw_subplot:
           xlabel_kw:
             labelpad: 3
           ylabel_kw:
-            labelpad: 6
+            labelpad: 3
           draw_label: True
           label_kw:
             border_lw: 1
@@ -264,12 +266,15 @@ class TimeSeriesFigureManager(FigureManager):
             yabs: -0.025
         draw_dataset:
           partner_kw:
+            grid_kw:
+              linewidth: 0.5
             wspace:    0.10
             sub_width: 0.80
             title_fp: 8b
             xlabel_kw:
               labelpad: 8.5
             label_fp: 8b
+            lw: 1
             tick_fp: 6r
             tick_params:
               length: 2
@@ -282,49 +287,14 @@ class TimeSeriesFigureManager(FigureManager):
             mew: 1
           mean_kw:
             ms: 2
-      notebook:
-        class: target
-        inherits: notebook
-        draw_figure:
-          left:       0.60
-          sub_width:  4.40
-          right:      0.20
-          bottom:     1.00
-          sub_height: 1.80
-          top:        0.30
-          shared_legend: True
-          shared_legend_kw:
-            left:       0.60
-            sub_width:  4.40
-            right:      0.20
-            bottom:     0.00
-            sub_height: 0.50
-            legend_kw:
-              labelspacing: 0.5
-              legend_fp: 8r
-              ncol: 2
-        draw_dataset:
-          plot_kw:
-            lw: 1.0
-          partner_kw:
-            sub_width: 0.8
-            title_fp: 10b
-            xlabel_kw:
-              labelpad:  12.5
-            label_fp: 10b
-            tick_fp: 8r
-            xticks:
-            tick_params:
-              length: 2
-              pad: 6
-              width: 1
+            mew: 0.5
       pdist:
         class: appearance
         help: Draw probability distribution on right side of plot
         draw_dataset:
           draw_pdist: True
           partner_kw:
-            xlabel:      Distribution
+            xlabel:      Probability
             xticks:      [0,0.000001]
             xticklabels: []
             yticklabels: []
@@ -448,27 +418,28 @@ class TimeSeriesFigureManager(FigureManager):
                 pd_y = np.squeeze(pdist.values)
 
                 subplot._mps_partner_subplot.plot(pd_y, pd_x, **pdist_kw)
-                pdist_rescale = True
+                pdist_rescale = kwargs.get("pdist_rescale", True)
                 if pdist_rescale:
                     pdist_max = pd_y.max()
                     x_max = subplot._mps_partner_subplot.get_xbound()[1]
                     if (pdist_max > x_max / 1.25 or not hasattr(subplot,
                         "_mps_rescaled")):
+                        print("\nPIDST MAX: {0}\n".format(pdist_max))
                         subplot._mps_partner_subplot.set_xbound(0,
                             pdist_max * 1.25)
                         xticks = [0, pdist_max * 0.25, pdist_max * 0.50,
                             pdist_max * 0.75, pdist_max, pdist_max * 1.25]
                         subplot._mps_partner_subplot.set_xticks(xticks)
                         subplot._mps_rescaled = True
-                    if draw_mean:
-                        mean_kw = plot_kw.copy()
-                        mean_kw.update(kwargs.get("mean_kw", {}))
-                        mean = np.sum(
-                            np.array(pd_x, np.float64) * np.array(pd_y,
-                                np.float64))
-                        subplot._mps_partner_subplot.plot(
-                            pd_y[np.abs(pd_x - mean).argmin()], mean,
-                            **mean_kw)
+                if draw_mean:
+                    mean_kw = plot_kw.copy()
+                    mean_kw.update(kwargs.get("mean_kw", {}))
+                    mean = np.sum(
+                        np.array(pd_x, np.float64) * np.array(pd_y,
+                            np.float64))
+                    subplot._mps_partner_subplot.plot(
+                        pd_y[np.abs(pd_x - mean).argmin()], mean,
+                        **mean_kw)
 
             if draw_fill_between:
                 subplot._mps_partner_subplot.fill_between(fb_x, fb_ylb, fb_yub,

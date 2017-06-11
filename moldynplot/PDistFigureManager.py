@@ -256,14 +256,14 @@ class PDistFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.30
-          sub_width:  2.65
-          wspace:     0.10
-          right:      0.10
           bottom:     0.55
-          sub_height: 1.00
           hspace:     0.10
+          left:       0.30
+          right:      0.10
+          sub_height: 1.00
+          sub_width:  2.65
           top:        0.10
+          wspace:     0.10
           title_kw:
             top: -0.1
           shared_xlabel_kw:
@@ -274,8 +274,8 @@ class PDistFigureManager(FigureManager):
             bottom:     0.00
             sub_height: 0.20
             handle_kw:
-              ms: 5
               mew: 0.5
+              ms: 5
             legend_kw:
               labelspacing: 0.5
               ncol: 6
@@ -296,22 +296,11 @@ class PDistFigureManager(FigureManager):
             xabs:  0.020
             yabs: -0.025
         draw_dataset:
-          partner_kw:
-            wspace:    0.10
-            sub_width: 0.80
-            title_fp: 8b
-            xlabel_kw:
-              labelpad: 8.5
-            label_fp: 8b
-            tick_fp: 6r
-            tick_params:
-              length: 2
-              pad: 3
-              width: 1
           plot_kw:
             lw: 1
           mean_kw:
             ms: 2
+            mew: 0.5
           handle_kw:
             ms: 6
             mew: 0.5
