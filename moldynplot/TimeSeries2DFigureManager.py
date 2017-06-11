@@ -48,6 +48,7 @@ class TimeSeries2DFigureManager(FigureManager):
             left: on
             right: off
             top: off
+          shared_legend: False
           shared_legend_kw:
             spines: False
             handle_kw:
@@ -61,36 +62,37 @@ class TimeSeries2DFigureManager(FigureManager):
               loc: 9
               numpoints: 1
         draw_subplot:
-          title_kw:
-            verticalalignment: bottom
-          xlabel: Time
+          grid: True
+          grid_kw:
+            color: [0.3, 0.3, 0.3]
+          hline_kw:
+            color: [0.0, 0.0, 0.0]
+            zorder: 9
+          label_kw:
+            horizontalalignment: left
+            verticalalignment: top
+            zorder: 10
           tick_params:
             bottom: on
             direction: out
             top: off
             left: on
             right: off
-          grid: True
-          grid_kw:
-            color: [0.3, 0.3, 0.3]
-          hline_kw:
-            color: [0.0, 0.0, 0.0]
-            zorder: 11
-          label_kw:
-            horizontalalignment: left
-            verticalalignment: top
-            zorder: 10
+          title_kw:
+            verticalalignment: bottom
+          xlabel: Time
         draw_dataset:
+          colorbar_kw:
+            ztick_params:
+              bottom: off
+              left: off
+              right: off
+              top: off
           draw_heatmap: True
           heatmap_kw:
             edgecolors: none
             rasterized: True
             zorder: 0.1
-          contour_kw:
-            colors: '0.25'
-            levels: [1, 2, 3, 4, 5]
-            linestyles: solid
-            zorder: 0.2
     """
 
     available_presets = """
@@ -140,14 +142,14 @@ class TimeSeries2DFigureManager(FigureManager):
           dataset_kw:
             cls: moldynplot.dataset.TimeSeriesDataset.TimeSeriesDataset
             downsample_mode: mean
+          draw_colorbar: True
           heatmap_kw:
             cmap: afmhot_r
-            vmin: 0
             vmax: 10
-          draw_colorbar: True
+            vmin: 0
           colorbar_kw:
-            zticks: [0,1,2,3,4,5,6,7,8,9,10]
             zlabel: Per-Residue Backbone RMSD (Å)
+            zticks: [0,1,2,3,4,5,6,7,8,9,10]
       saxs:
         class: content
         help: Small-angle X-ray scattering calculated by saxs_md
@@ -189,53 +191,51 @@ class TimeSeries2DFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.50
-          sub_width:  4.40
-          wspace:     0.05
-          right:      0.20
-          bottom:     0.80
-          sub_height: 1.00
-          hspace:     0.05
-          top:        0.10
-          title_kw:
-            top: -0.1
-          shared_ylabel_kw:
-            left: -0.34
+          bottom: 0.35
+          hspace: 0.10
+          left: 0.50
+          right: 0.10
           shared_legend_kw:
-            left:       0.50
-            sub_width:  4.40
-            bottom:     0.00
-            sub_height: 0.40
+            bottom: 0.00
             handle_kw:
               mew: 0.5
               ms: 5
+            left: 0.50
             legend_kw:
               ncol: 4
+            sub_height: 0.40
+            sub_width: 3.80
+          shared_ylabel_kw:
+            left: -0.34
+          sub_height: 1.00
+          sub_width:  3.80
+          title_kw:
+            top: -0.1
+          top:        0.10
+          wspace:     0.10
         draw_subplot:
-          xlabel_kw:
-            labelpad: 3
-          ylabel_kw:
-            labelpad: 6
-          hline_kw:
-            lw: 1
           draw_label: True
           label_kw:
             border_lw: 1
             xabs:  0.020
             yabs: -0.025
+          xlabel_kw:
+            labelpad: 3
+          ylabel_kw:
+            labelpad: 6
         draw_dataset:
-          partner_kw:
-            position: bottom
-            hspace:     0.42
-            sub_height: 0.05
-            left:       1.82
-            sub_width:  1.76
-            bottom:     0.30
           colorbar_kw:
-            ztick_fp:  6r
-            zlabel_fp: 8b
             zlabel_kw:
-              labelpad: 2
+              labelpad: 0
+            ztick_params:
+              pad: 0
+          partner_kw:
+            bottom:     0.30
+            hspace:     0.42
+            left:       1.82
+            position: bottom
+            sub_height: 0.05
+            sub_width:  1.76
       manuscript_stacked_dssp:
         class: target
         extends: manuscript
@@ -352,43 +352,6 @@ class TimeSeries2DFigureManager(FigureManager):
               rotation: 0
               labelpad: 5
             zticklabels: [0,"",2,"",4,"",6,"",8,"",10]
-      notebook:
-        class: target
-        inherits: notebook
-        draw_figure:
-          left:       0.60
-          sub_width:  5.00
-          wspace:     0.10
-          right:      0.25
-          bottom:     1.10
-          sub_height: 2.00
-          hspace:     0.10
-          top:        0.35
-          shared_legend_kw:
-            left:       0.50
-            sub_width:  5.00
-            right:      0.25
-            bottom:     0.10
-            sub_height: 0.50
-            legend_kw:
-              ncol: 4
-        draw_subplot:
-          ylabel_kw:
-            labelpad: 12
-        draw_dataset:
-          partner_kw:
-            position: bottom
-            left:       2.10
-            sub_width:  2.00
-            right:      1.75
-            bottom:     0.40
-            sub_height: 0.10
-            top:        0.50
-          colorbar_kw:
-            ztick_fp: 8r
-            zlabel_fp: 10b
-            zlabel_kw:
-              labelpad: 3
     """
 
     @manage_defaults_presets()
@@ -429,7 +392,7 @@ class TimeSeries2DFigureManager(FigureManager):
                 from .myplotspec.axes import set_colorbar
                 if not hasattr(subplot, "_mps_partner_subplot"):
                     from .myplotspec.axes import add_partner_subplot
-                    add_partner_subplot(subplot, verbose=verbose, **kwargs)
+                    add_partner_subplot(subplot, **kwargs)
                 set_colorbar(subplot, pcolormesh, **kwargs)
 
         # Draw contour

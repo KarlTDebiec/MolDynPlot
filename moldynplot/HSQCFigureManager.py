@@ -113,12 +113,14 @@ class HSQCFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.50
-          sub_width:  3.80
-          right:      0.10
           bottom:     0.40
+          hspace:     0.10
+          left:       0.50
+          right:      0.10
           sub_height: 2.65
+          sub_width:  3.80
           top:        0.10
+          wspace:     0.10
         draw_subplot:
           xticklabels: [5.0,'',6.0,'',7.0,'',8.0,'',9.0,'',10.0,'',11.0]
           xlabel_kw:

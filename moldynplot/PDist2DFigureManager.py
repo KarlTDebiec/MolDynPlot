@@ -48,39 +48,37 @@ class PDist2DFigureManager(FigureManager):
               loc: 9
               numpoints: 1
         draw_subplot:
-          title_kw:
-            verticalalignment: bottom
-          xlabel: Residue
+          grid: True
+          label_kw:
+            horizontalalignment: left
+            verticalalignment: top
+            zorder: 10
           tick_params:
-            direction: out
             bottom: on
+            direction: out
             top: off
             left: on
             right: off
-          grid: True
+          title_kw:
+            verticalalignment: bottom
+          xlabel: Residue
           vline_kw:
-            zorder: 9
-            lw: 1
             color: [0.0, 0.0, 0.0]
             zorder: 9
-          label_kw:
-            zorder: 10
-            horizontalalignment: left
-            verticalalignment: top
         draw_dataset:
+          colorbar_kw:
+            tick_params:
+              bottom: off
+              left: off
+              right: off
+              top: off
           draw_heatmap: True
           heatmap_kw:
             edgecolors: none
             rasterized: True
-            zorder: 0.1
-            vmin: 0
             vmax: 100000
-          colorbar_kw:
-            tick_params:
-              left: off
-              right: off
-              bottom: off
-              top: off
+            vmin: 0
+            zorder: 0.1
           mask_kw:
             cmap: Greys_r
             edgecolors: none
@@ -89,6 +87,7 @@ class PDist2DFigureManager(FigureManager):
             vmax: 1
             zorder: 0.3
     """
+
     available_presets = """
       distance:
         class: content
@@ -116,11 +115,11 @@ class PDist2DFigureManager(FigureManager):
         draw_dataset:
           logz: True
           heatmap_kw:
-            vmin: 0
             vmax: 5
+            vmin: 0
           colorbar_kw:
-            zticks: [0,1,2,3,4,5]
             zlabel: ΔG (kcal/mol)
+            zticks: [0,1,2,3,4,5]
       gamma2:
         class: content
         help: Plot Γ2
@@ -146,53 +145,36 @@ class PDist2DFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.50
-          sub_width:  3.80
-          wspace:     0.10
-          right:      0.10
-          bottom:     0.35
-          sub_height: 1.00
-          hspace:     0.10
-          top:        0.10
-          title_kw:
-            top: -0.1
+          bottom: 0.35
+          hspace: 0.10
+          left: 0.50
+          right: 0.10
           shared_xlabel_kw:
             bottom: -0.24
-          shared_legend_kw:
-            left:       0.50
-            sub_width:  3.80
-            bottom:     0.00
-            sub_height: 0.20
-            handle_kw:
-              ms: 5
-            legend_kw:
-              labelspacing: 0.5
-              legend_fp: 7r
-              ncol: 6
+          sub_height: 1.00
+          sub_width: 3.80
+          title_kw:
+            top: -0.1
+          top: 0.10
+          wspace: 0.10
         draw_subplot:
+          draw_label: True
+          label_kw:
+            border_lw: 1
+            xabs: 0.020
+            yabs: -0.025
           xlabel_kw:
             labelpad: 3
           ylabel_kw:
             labelpad: 6
-          y2ticks: []
-          y2label_kw:
-            rotation: 270
-            verticalalignment: bottom
-          draw_label: True
-          label_kw:
-            border_lw: 1
-            xabs:  0.020
-            yabs: -0.025
         draw_dataset:
-          partner_kw:
-            position: right
-            wspace:    0.05
-            sub_width: 0.05
           colorbar_kw:
-            ztick_fp:  6r
-            zlabel_fp: 8b
             zlabel_kw:
               labelpad: 0
+          partner_kw:
+            position: right
+            sub_width: 0.05
+            wspace:    0.05
     """
 
     @manage_defaults_presets()
