@@ -409,6 +409,7 @@ class PDistFigureManager(FigureManager):
                     y_max = subplot.get_ybound()[1]
                     if (pdist_max > y_max / 1.25
                     or not hasattr(subplot, "_mps_rescaled")):
+                        print("\nPIDST MAX: {0}\n".format(pdist_max))
                         subplot.set_ybound(0, pdist_max*1.25)
                         yticks = [0, pdist_max*0.25, pdist_max*0.50,
                           pdist_max*0.75, pdist_max, pdist_max*1.25]
