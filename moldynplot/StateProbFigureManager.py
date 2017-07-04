@@ -137,12 +137,12 @@ class StateProbFigureManager(FigureManager):
           right:      0.10
           top:        0.35
           sub_height: 1.50
-          bottom:     0.55
+          bottom:     0.45
           shared_legend: True
           shared_legend_kw:
             left:        0.40
             sub_width:   1.50
-            sub_height:  0.50
+            sub_height:  0.40
             bottom:      0.00
             handle_kw:
               mew: 0.5
@@ -150,7 +150,6 @@ class StateProbFigureManager(FigureManager):
             legend_kw:
               columnspacing: 0.5
               labelspacing: 0.5
-              legend_fp: 8r
               ncol: 4
         draw_dataset:
           bar_kw:
@@ -228,7 +227,6 @@ class StateProbFigureManager(FigureManager):
         if draw_plot:
             plot_kw = multi_get_copy("plot_kw", kwargs, {})
             get_colors(plot_kw)
-            print(x, y)
             subplot.plot(x, y, **plot_kw)
             
         if handles is not None and label is not None:

@@ -89,6 +89,5 @@ class H5Dataset(object):
                 dataset = in_h5[address]
                 self.datasets[key] = np.array(dataset)
                 self.attrs[key] = dict(dataset.attrs)
-            print(
-              "Loaded Dataset {0}[{1}]; Stored at {2}".format(path, address,
-                key))
+            print("Loaded Dataset {0}[{1}]; Stored at {2}".format(
+              path, address, key))

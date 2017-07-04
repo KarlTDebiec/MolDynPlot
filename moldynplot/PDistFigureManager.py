@@ -88,6 +88,25 @@ class PDistFigureManager(FigureManager):
             zorder: 11
     """
     available_presets = """
+      pmf:
+        class: content
+        help: Plot potential of mean force (PMF)
+        draw_figure:
+          multi_xticklabels: [2,3,4,5,6,7,8]
+          multi_yticklabels: [-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
+        draw_subplot:
+          xlabel: Minimum N-O distance
+          xticks: [2,3,4,5,6,7,8]
+          ybound: [-3.2,0.8]
+          ylabel: "Potential of Mean Force\\n(kcal/mol)"
+          yticks: [-3.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5]
+        draw_dataset:
+          column: pmf
+          dataset_kw:
+            cls: moldynplot.dataset.H5Dataset
+            default_address: /kde/pmf
+            default_key: pmf
+          draw_zero_line: True
       radgyr:
         class: content
         help: Radius of Gyration (Rg)
@@ -310,7 +329,7 @@ class PDistFigureManager(FigureManager):
     @manage_kwargs()
     def draw_dataset(self, subplot, column=None,
         draw_pdist=True, draw_fill_between=False, draw_mean=False,
-        draw_plot=False, **kwargs):
+        draw_plot=False, draw_zero_line=False, **kwargs):
         """
         Loads a dataset and draws it on a subplot.
 
@@ -347,6 +366,7 @@ class PDistFigureManager(FigureManager):
           kwargs (dict): Additional keyword arguments
         """
         from warnings import warn
+        import pandas as pd
         import numpy as np
         from .myplotspec import get_colors, multi_get_copy
 
@@ -355,9 +375,22 @@ class PDistFigureManager(FigureManager):
         dataset_kw = multi_get_copy("dataset_kw", kwargs, {})
         if "infile" in kwargs:
             dataset_kw["infile"] = kwargs["infile"]
+        print(dataset_kw)
         dataset = self.load_dataset(verbose=verbose, **dataset_kw)
         if dataset is not None and hasattr(dataset, "pdist_df"):
             pdist_df = dataset.pdist_df
+        elif dataset is not None and hasattr(dataset, "datasets"):
+            try:
+                pdist_df = dataset.pdist_df = pd.DataFrame(
+                    dataset.datasets["pmf"]["pmf"],
+                    index=dataset.datasets["pmf"]["x"],
+                    columns = ["pmf"])
+            except:
+                pdist_df = dataset.pdist_df = pd.DataFrame(
+                    dataset.datasets["pmf"]["pmf"],
+                    index=dataset.datasets["pmf"]["center"],
+                    columns = ["pmf"])
+            dataset.pdist_df.index.name = "x"
         else:
             pdist_df = None
 
@@ -417,6 +450,8 @@ class PDistFigureManager(FigureManager):
             if "x" in kwargs:
                 x = kwargs.get("x")
                 subplot.plot([x, x], [0,1], **plot_kw)
+        if draw_zero_line:
+            subplot.plot([0, 10], [0,0], linewidth=0.5, color="black")
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
