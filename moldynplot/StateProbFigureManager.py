@@ -193,11 +193,14 @@ class StateProbFigureManager(FigureManager):
                 **handle_kw)[0]
             return
         if "infile" not in kwargs:
-            if "P unbound" not in kwargs or "P unbound se" not in kwargs:
-                return
-            else:
+            if "P unbound" in kwargs and "P unbound se" in kwargs:
                 y = 1.0 - kwargs.pop("P unbound")
                 yerr = kwargs.pop("P unbound se") * 1.96
+            elif "y" in kwargs and "y se" in kwargs:
+                y = kwargs.pop("y")
+                yerr = kwargs.pop("y se") * 1.96
+            else:
+                return
         else:
             dataset = H5Dataset(default_address="assign/stateprobs",
                 default_key="pbound", **kwargs)
