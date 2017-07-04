@@ -34,34 +34,42 @@ class StateProbFigureManager(FigureManager):
         draw_figure:
           subplot_kw:
             autoscale_on: False
+            axisbg: none
           multi_tick_params:
+            bottom: off
             left: on
             right: off
-            bottom: off
             top: off
+          shared_legend: True
           shared_legend_kw:
+            spines: False
+            handle_kw:
+              ls: none
+              marker: s
+              mec: black
             legend_kw:
               frameon: False
               loc: 9
               numpoints: 1
               handletextpad: 0.0
+              borderaxespad: 0
         draw_subplot:
-          title_kw:
-            verticalalignment: bottom
-          xticklabels:  []
-          yticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
           tick_params:
+            bottom: off
+            direction: out
             left: on
             right: off
-            bottom: off
             top: off
-            direction: out
+          title_kw:
+            verticalalignment: bottom
           grid: True
           grid_kw:
             axis: y
             b: True
-            color: [0.8,0.8,0.8]
+            color: [0.7,0.7,0.7]
             linestyle: '-'
+          xticklabels:  []
+          yticks: [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
         draw_dataset:
           bar_kw:
             align: center
@@ -71,8 +79,8 @@ class StateProbFigureManager(FigureManager):
             error_kw:
               zorder: 4
           handle_kw:
-            marker: s
             ls: none
+            marker: s
             mec: black
     """
 
@@ -123,68 +131,35 @@ class StateProbFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.50
+          left:       0.40
           sub_width:  1.50
           wspace:     0.10
-          right:      0.20
-          top:        0.40
+          right:      0.10
+          top:        0.35
           sub_height: 1.50
-          bottom:     0.65
+          bottom:     0.55
           shared_legend: True
           shared_legend_kw:
-            left:        0.50
+            left:        0.40
             sub_width:   1.50
-            sub_height:  0.60
+            sub_height:  0.50
             bottom:      0.00
             legend_kw:
-              labelspacing: 0.5
-              legend_fp: 7r
-              ncol: 4
-        draw_dataset:
-          bar_kw:
-            lw: 1
-            error_kw:
-              capsize: 2
-              capthick: 1
-              elinewidth: 1
-          handle_kw:
-            ms: 6
-            mew: 1
-      notebook:
-        class: target
-        inherits: notebook
-        draw_figure:
-          left:       0.60
-          sub_width:  1.80
-          wspace:     0.10
-          right:      0.20
-          top:        0.50
-          sub_height: 1.80
-          bottom:     0.65
-          shared_legend: True
-          shared_legend_kw:
-            left:        0.60
-            sub_width:   1.80
-            sub_height:  0.60
-            bottom:      0.00
-            legend_kw:
+              columnspacing: 0.5
               labelspacing: 0.5
               legend_fp: 8r
-              loc: 9
               ncol: 4
-        draw_subplot:
-          tick_params:
-            width: 1
         draw_dataset:
           bar_kw:
-            lw: 1
             error_kw:
               capsize: 2
-              capthick: 1
-              elinewidth: 1
+              capthick: 0.5
+              elinewidth: 0.5
+            linewidth: 0.5
+            edgecolor: [0,0,0]
           handle_kw:
-            ms: 6
-            mew: 1
+            markeredgewidth: 0.5
+            markersize: 5
     """
 
     @manage_defaults_presets()
@@ -206,15 +181,15 @@ class StateProbFigureManager(FigureManager):
           kwargs (dict): Additional keyword arguments
         """
         from .myplotspec import get_color, multi_get_copy
-        from .H5Dataset import H5Dataset
+        from .dataset import H5Dataset
 
         # Handle missing input gracefully
         handle_kw = multi_get_copy("handle_kw", kwargs, {})
         if experiment is not None:
             subplot.axhspan(experiment[0], experiment[1], lw=2,
-                color=[0.7, 0.7, 0.7])
+                color=[0.6, 0.6, 0.6])
             handles["Experiment"] = \
-            subplot.plot([-10, -10], [-10, -10], mfc=[0.7, 0.7, 0.7],
+            subplot.plot([-10, -10], [-10, -10], mfc=[0.6, 0.6, 0.6],
                 **handle_kw)[0]
             return
         if "infile" not in kwargs:

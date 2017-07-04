@@ -45,9 +45,9 @@ class TimeSeriesFigureManager(FigureManager):
             autoscale_on: False
             axisbg: none
           multi_tick_params:
+            bottom: on
             left: on
             right: off
-            bottom: on
             top: off
           shared_legend: True
           shared_legend_kw:
@@ -63,24 +63,24 @@ class TimeSeriesFigureManager(FigureManager):
               handletextpad: 0
               borderaxespad: 0
         draw_subplot:
-          title_kw:
-            verticalalignment: bottom
-          xlabel: Time
           tick_params:
+            bottom: on
             direction: out
             left: on
             right: off
-            bottom: on
             top: off
+          title_kw:
+            verticalalignment: bottom
           grid: True
           grid_kw:
             b: True
             color: [0.7,0.7,0.7]
             linestyle: '-'
           label_kw:
-            zorder: 10
             horizontalalignment: left
             verticalalignment: top
+            zorder: 10
+          xlabel: Time
         draw_dataset:
           partner_kw:
             position: right
