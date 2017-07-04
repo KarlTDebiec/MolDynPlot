@@ -144,6 +144,9 @@ class StateProbFigureManager(FigureManager):
             sub_width:   1.50
             sub_height:  0.50
             bottom:      0.00
+            handle_kw:
+              mew: 0.5
+              ms: 5
             legend_kw:
               columnspacing: 0.5
               labelspacing: 0.5
@@ -165,7 +168,8 @@ class StateProbFigureManager(FigureManager):
     @manage_defaults_presets()
     @manage_kwargs()
     def draw_dataset(self, subplot, experiment=None, x=None, label="",
-            handles=None, bar=True, verbose=1, debug=0, **kwargs):
+            handles=None, draw_bar=True, draw_plot=False, verbose=1, debug=0,
+            **kwargs):
         """
         Draws a dataset.
 
@@ -180,7 +184,7 @@ class StateProbFigureManager(FigureManager):
             [labels]: handles on subplot
           kwargs (dict): Additional keyword arguments
         """
-        from .myplotspec import get_color, multi_get_copy
+        from .myplotspec import get_colors, multi_get_copy
         from .dataset import H5Dataset
 
         # Handle missing input gracefully
@@ -188,9 +192,10 @@ class StateProbFigureManager(FigureManager):
         if experiment is not None:
             subplot.axhspan(experiment[0], experiment[1], lw=2,
                 color=[0.6, 0.6, 0.6])
-            handles["Experiment"] = \
-            subplot.plot([-10, -10], [-10, -10], mfc=[0.6, 0.6, 0.6],
-                **handle_kw)[0]
+            if kwargs.get("draw_experiment_handle", True):
+                handles["Experiment"] = \
+                subplot.plot([-10, -10], [-10, -10], mfc=[0.6, 0.6, 0.6],
+                    **handle_kw)[0]
             return
         if "infile" not in kwargs:
             if "P unbound" in kwargs and "P unbound se" in kwargs:
@@ -199,6 +204,8 @@ class StateProbFigureManager(FigureManager):
             elif "y" in kwargs and "y se" in kwargs:
                 y = kwargs.pop("y")
                 yerr = kwargs.pop("y se") * 1.96
+            elif "P unbound" in kwargs and not draw_bar and draw_plot:
+                y = 1.0 - kwargs.pop("P unbound")
             else:
                 return
         else:
@@ -210,16 +217,20 @@ class StateProbFigureManager(FigureManager):
         # Configure plot settings
 
         # Plot
-        if bar:
+        if draw_bar:
             bar_kw = multi_get_copy("bar_kw", kwargs, {})
-            for color_key in ["color", "edgecolor", "facecolor", "ecolor"]:
-                if color_key in bar_kw:
-                    bar_kw[color_key] = get_color(bar_kw[color_key])
+            get_colors(bar_kw, kwargs)
             barplot = subplot.bar(x, y, yerr=yerr, **bar_kw)
 
             handle_kw = multi_get_copy("handle_kw", kwargs, {})
             handle_kw["mfc"] = barplot.patches[0].get_facecolor()
             handle = subplot.plot([-10, -10], [-10, -10], **handle_kw)[0]
+        if draw_plot:
+            plot_kw = multi_get_copy("plot_kw", kwargs, {})
+            get_colors(plot_kw)
+            print(x, y)
+            subplot.plot(x, y, **plot_kw)
+            
         if handles is not None and label is not None:
             handles[label] = handle
 
