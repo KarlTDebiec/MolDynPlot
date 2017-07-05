@@ -38,6 +38,7 @@ class MDGXFigureManager(FigureManager):
             right:  off
             bottom: off
             top:    off
+          shared_legend: True
           shared_legend_kw:
             spines: False
             handle_kw:
@@ -45,16 +46,16 @@ class MDGXFigureManager(FigureManager):
               marker: s
               mec: black
             legend_kw:
+              borderaxespad: 0.0
               frameon: False
-              handletextpad: 0
+              handletextpad: 0.0
               loc: 9
               numpoints: 1
-              title: Backbone torsion class
-              borderaxespad: 0
+              title: Backbone Torsion Class
             handles:
               - ["Neutral",            {color: green}]
-              - ["Negatively-charged", {color: red}]
-              - ["Positively-charged", {color: blue}]
+              - ["Negatively Charged", {color: red}]
+              - ["Positively Charged", {color: blue}]
               - ["Glycine",            {color: yellow}]
               - ["Proline",            {color: purple}]
         draw_subplot:
@@ -88,28 +89,28 @@ class MDGXFigureManager(FigureManager):
         class: target
         inherits: manuscript
         draw_figure:
-          left:       0.59
-          sub_width:  6.29
-          right:      0.12
-          bottom:     0.60
+          left:       0.50
+          sub_width:  5.50
+          right:      0.10
+          bottom:     0.50
           sub_height: 1.00
-          top:        0.20
+          top:        0.10
           shared_legend: True
           shared_legend_kw:
-            left:       0.59
-            sub_width:  6.29
+            left:       0.50
+            sub_width:  5.50
             bottom:     0.00
-            sub_height: 0.40
+            sub_height: 0.30
             handle_kw:
+              mew: 0.5
               ms: 5
             legend_kw:
-              legend_fp: 7r
               ncol: 5
         draw_subplot:
           xlabel_kw:
             labelpad: 3
           ylabel_kw:
-            labelpad: 8
+            labelpad: 6
           grid_kw:
             alpha: 0.3
         draw_dataset:
@@ -133,14 +134,16 @@ class MDGXFigureManager(FigureManager):
             marker: o
             ms: 2
             mfc: white
-            mew: 0
+            mec: black
+            mew: 0.5
             zorder: 12
           rmse_kw:
             linestyle: none
             marker: o
             ms: 2
             mfc: white
-            mew: 0
+            mec: black
+            mew: 0.5
             zorder: 12
           edge_kw:
             alpha: 1

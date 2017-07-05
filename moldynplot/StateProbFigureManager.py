@@ -48,11 +48,11 @@ class StateProbFigureManager(FigureManager):
               marker: s
               mec: black
             legend_kw:
+              borderaxespad: 0.0
               frameon: False
+              handletextpad: 0.0
               loc: 9
               numpoints: 1
-              handletextpad: 0.0
-              borderaxespad: 0
         draw_subplot:
           tick_params:
             bottom: off
