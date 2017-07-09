@@ -321,7 +321,7 @@ class PDistFigureManager(FigureManager):
             ms: 2
             mew: 0.5
           handle_kw:
-            ms: 6
+            ms: 5
             mew: 0.5
     """
 

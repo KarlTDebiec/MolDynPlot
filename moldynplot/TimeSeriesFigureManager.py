@@ -265,6 +265,9 @@ class TimeSeriesFigureManager(FigureManager):
             xabs:  0.020
             yabs: -0.025
         draw_dataset:
+          handle_kw:
+            mew: 0.5
+            ms: 5
           partner_kw:
             grid_kw:
               linewidth: 0.5
@@ -282,9 +285,6 @@ class TimeSeriesFigureManager(FigureManager):
               width: 1
           plot_kw:
             lw: 1
-          handle_kw:
-            ms: 6
-            mew: 1
           mean_kw:
             ms: 2
             mew: 0.5
