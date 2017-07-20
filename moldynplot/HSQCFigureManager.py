@@ -53,10 +53,11 @@ class HSQCFigureManager(FigureManager):
               marker: s
               mec: black
             legend_kw:
+              borderaxespad: 0
               frameon: False
+              handletextpad: 0
               loc: 9
               numpoints: 1
-              handletextpad: 0
         draw_subplot:
           title_kw:
             verticalalignment: bottom
@@ -154,6 +155,44 @@ class HSQCFigureManager(FigureManager):
         draw_dataset:
           plot_kw:
             linewidths: 1
+      presentation_wide:
+        class: target
+        inherits: presentation_wide
+        draw_figure:
+          bottom:     3.8
+          left:       1.5
+          right:      0.2
+          sub_width:  6.6
+          sub_height: 5.0
+          top:        0.2
+          shared_legend: True
+          shared_legend_kw:
+            left:        1.5
+            sub_width:   6.0
+            bottom:      0.0
+            sub_height:  2.6
+            handle_kw:
+              mew: 2.0
+              ms: 20
+            legend_kw:
+              labelspacing: 0.5
+              ncol: 1
+        draw_subplot:
+          xlabel_kw:
+            labelpad: 18
+          xticks: [6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0]
+          xticklabels: [6,'',7,'',8,'',9,'',10]
+          ylabel_kw:
+            labelpad: 28
+          yticks: [105,110,115,120,125,130]
+          yticklabels: [105,110,115,120,125,130]
+          legend: False
+        draw_dataset:
+          contour_kw:
+            linewidths: 2.0
+          handle_kw:
+            mew: 2.0
+            ms: 20
     """
 
     @staticmethod

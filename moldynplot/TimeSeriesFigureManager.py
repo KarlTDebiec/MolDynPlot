@@ -193,40 +193,6 @@ class TimeSeriesFigureManager(FigureManager):
             pdist_kw:
               bandwidth:
                 rotdif: 0.2
-      presentation:
-        class: target
-        inherits: presentation
-        draw_figure:
-          left:       1.20
-          sub_width:  7.00
-          bottom:     3.10
-          sub_height: 3.00
-          shared_legend: True
-          shared_legend_kw:
-            left:       1.20
-            sub_width:  7.00
-            bottom:     1.90
-            sub_height: 0.50
-            legend_kw:
-              labelspacing: 0.0
-              ncol: 5
-        draw_dataset:
-          partner_kw:
-            sub_width: 1.2
-            title_fp: 18r
-            xlabel_kw:
-              labelpad: 20
-            label_fp: 18r
-            tick_fp: 14r
-            xticks:
-            lw: 2
-            tick_params:
-              length: 3
-              pad: 6
-              width: 2
-          handle_kw:
-            ms: 12
-            mew: 2
       manuscript:
         class: target
         inherits: manuscript
@@ -288,6 +254,74 @@ class TimeSeriesFigureManager(FigureManager):
           mean_kw:
             ms: 2
             mew: 0.5
+      presentation:
+        class: target
+        inherits: presentation
+        draw_figure:
+          left:       1.20
+          sub_width:  7.00
+          bottom:     3.10
+          sub_height: 3.00
+          shared_legend: True
+          shared_legend_kw:
+            left:       1.20
+            sub_width:  7.00
+            bottom:     1.90
+            sub_height: 0.50
+            legend_kw:
+              labelspacing: 0.0
+              ncol: 5
+        draw_dataset:
+          partner_kw:
+            sub_width: 1.2
+            title_fp: 18r
+            xlabel_kw:
+              labelpad: 20
+            label_fp: 18r
+            tick_fp: 14r
+            xticks:
+            lw: 2
+            tick_params:
+              length: 3
+              pad: 6
+              width: 2
+          handle_kw:
+            ms: 12
+            mew: 2
+      presentation_wide:
+        class: target
+        inherits: presentatio_widen
+        draw_figure:
+          left:       1.20
+          sub_width:  7.00
+          bottom:     3.10
+          sub_height: 3.00
+          shared_legend: True
+          shared_legend_kw:
+            left:       1.20
+            sub_width:  7.00
+            bottom:     1.90
+            sub_height: 0.50
+            legend_kw:
+              labelspacing: 0.0
+              ncol: 5
+        draw_dataset:
+          partner_kw:
+            sub_width: 1.2
+            title_fp: 18r
+            xlabel_kw:
+              labelpad: 20
+            label_fp: 18r
+            tick_fp: 14r
+            xticks:
+            lw: 2
+            tick_params:
+              length: 3
+              pad: 6
+              width: 2
+          handle_kw:
+            ms: 12
+            mew: 2
       pdist:
         class: appearance
         help: Draw probability distribution on right side of plot

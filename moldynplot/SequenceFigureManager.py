@@ -357,6 +357,37 @@ class SequenceFigureManager(FigureManager):
           handle_kw:
             ms: 12
             mew: 2
+      presentation_wide:
+        class: target
+        inherits: presentation_wide
+        draw_figure:
+          bottom:     1.80
+          hspace:     0.20
+          left:       1.30
+          right:      0.80
+          sub_height: 3.00
+          sub_width: 14.00
+          top:        0.60
+          wspace:     0.20
+          shared_legend_kw:
+            left:        1.30
+            sub_width:  14.00
+            bottom:      0.00
+            sub_height:  0.60
+            handle_kw:
+              mew: 2.0
+              ms: 20
+            legend_kw:
+              labelspacing: 0.5
+              ncol: 6
+          shared_ylabel_kw:
+            left: -0.5
+          shared_xlabel_kw:
+            bottom: -0.9
+        draw_dataset:
+          handle_kw:
+            mew: 2.0
+            ms: 20
     """
 
     @manage_defaults_presets()
