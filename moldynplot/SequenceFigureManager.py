@@ -322,23 +322,6 @@ class SequenceFigureManager(FigureManager):
             marker: 'o'
             mew: 0
             ms: 2
-      notebook:
-        class: target
-        inherits: notebook
-        draw_figure:
-          left:       0.70
-          sub_width:  5.60
-          right:      0.20
-          bottom:     0.40
-          sub_height: 1.00
-          hspace:     0.00
-          top:        0.30
-        draw_subplot:
-          ylabel_kw:
-            labelpad: 15
-        draw_dataset:
-          bar_kw:
-            lw: 0.5
       presentation:
         class: target
         inherits: presentation

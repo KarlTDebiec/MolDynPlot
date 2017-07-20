@@ -283,10 +283,6 @@ class PDistFigureManager(FigureManager):
           sub_width:  2.65
           top:        0.10
           wspace:     0.10
-          title_kw:
-            top: -0.1
-          shared_xlabel_kw:
-            bottom: -0.24
           shared_legend_kw:
             left:       0.30
             sub_width:  2.65
@@ -298,6 +294,10 @@ class PDistFigureManager(FigureManager):
             legend_kw:
               labelspacing: 0.5
               ncol: 6
+          shared_xlabel_kw:
+            bottom: -0.24
+          title_kw:
+            top: -0.1
         draw_subplot:
           xlabel_kw:
             labelpad: 3
@@ -315,14 +315,52 @@ class PDistFigureManager(FigureManager):
             xabs:  0.020
             yabs: -0.025
         draw_dataset:
-          plot_kw:
-            lw: 1
           mean_kw:
+            mew: 0.5
             ms: 2
-            mew: 0.5
           handle_kw:
-            ms: 5
             mew: 0.5
+            ms: 5
+      presentation_wide:
+        class: target
+        inherits: presentation_wide
+        draw_figure:
+          bottom:     1.80
+          hspace:     0.20
+          left:       0.80
+          right:      0.80
+          sub_height: 2.00
+          sub_width:  4.00
+          top:        0.60
+          wspace:     0.20
+          shared_legend_kw:
+            left:        0.80
+            sub_width:  16.60
+            bottom:      0.00
+            sub_height:  0.60
+            handle_kw:
+              mew: 2.0
+              ms: 20
+            legend_kw:
+              labelspacing: 0.5
+              ncol: 6
+          shared_ylabel_kw:
+            left: -0.5
+          shared_xlabel_kw:
+            bottom: -0.9
+        draw_subplot:
+          y2ticks: []
+          y2label_kw:
+            labelpad: 10
+            rotation: 270
+            verticalalignment: bottom
+        draw_dataset:
+          mean_kw:
+            mew: 2.0
+            ms: 8
+          handle_kw:
+            mew: 1.0
+            ms: 20
     """
 
     @manage_defaults_presets()
@@ -430,7 +468,7 @@ class PDistFigureManager(FigureManager):
                     y_max = subplot.get_ybound()[1]
                     if (pdist_max > y_max / 1.25
                     or not hasattr(subplot, "_mps_rescaled")):
-                        print("\nPIDST MAX: {0}\n".format(pdist_max))
+#                        print("\nPIDST MAX: {0}\n".format(pdist_max))
                         subplot.set_ybound(0, pdist_max*1.25)
                         yticks = [0, pdist_max*0.25, pdist_max*0.50,
                           pdist_max*0.75, pdist_max, pdist_max*1.25]

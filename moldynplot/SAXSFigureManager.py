@@ -174,28 +174,6 @@ class SAXSFigureManager(FigureManager):
         draw_dataset:
           dataset_kw:
             cls: moldynplot.dataset.SAXSDiffDataset.SAXSDiffDataset
-      presentation:
-        class: target
-        inherits: presentation
-        draw_figure:
-          left:       1.25
-          sub_width:  7.00
-          bottom:     2.90
-          sub_height: 3.00
-          shared_legend: True
-          shared_legend_kw:
-            left:       8.35
-            sub_width:  2.00
-            bottom:     2.90
-            sub_height: 3.00
-            legend_kw:
-              labelspacing: 0.5
-              loc: 2
-              ncol: 1
-        draw_dataset:
-          handle_kw:
-            ms: 12
-            mew: 2
       manuscript:
         class: target
         inherits: manuscript
@@ -253,6 +231,43 @@ class SAXSFigureManager(FigureManager):
           handle_kw:
             mew: 0.5
             ms: 5
+      presentation_wide:
+        class: target
+        inherits: presentation_wide
+        draw_figure:
+          bottom:     1.80
+          hspace:     0.20
+          left:       0.80
+          right:      0.80
+          sub_height: 2.00
+          sub_width:  4.00
+          top:        0.60
+          wspace:     0.20
+          shared_legend_kw:
+            left:        0.80
+            sub_width:  16.60
+            bottom:      0.00
+            sub_height:  0.60
+            handle_kw:
+              mew: 2.0
+              ms: 20
+            legend_kw:
+              labelspacing: 0.5
+              ncol: 6
+          shared_ylabel_kw:
+            left: -0.5
+          shared_xlabel_kw:
+            bottom: -0.9
+        draw_subplot:
+          y2ticks: []
+          y2label_kw:
+            labelpad: 10
+            rotation: 270
+            verticalalignment: bottom
+        draw_dataset:
+          handle_kw:
+            mew: 1.0
+            ms: 20
     """
 
     @manage_defaults_presets()
