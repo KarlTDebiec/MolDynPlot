@@ -90,43 +90,40 @@ class StateProbFigureManager(FigureManager):
         draw_subplot:
           ylabel: $P_{bound}$
           yticklabels:  [0.0,"",0.2,"",0.4,"",0.6,"",0.8,"",1.0]
-      presentation:
+      presentation_wide:
         class: target
-        inherits: presentation
+        inherits: presentation_wide
         draw_figure:
-          left:       6.70
+          bottom:     1.70
+          left:       4.60
+          right:      4.60
           sub_width:  3.20
           sub_height: 3.20
-          bottom:     2.40
+          top:        1.00
+          wspace:     0.20
           shared_legend: True
           shared_legend_kw:
-            left:        6.80
-            sub_width:   3.00
-            sub_height:  2.38
+            left:        4.60
+            sub_width:   10.00
+            sub_height:  1.50
             bottom:      0.00
             legend_kw:
               columnspacing: 1
               labelspacing: 0.8
-              legend_fp: 12r
+              legend_fp: 20r
               loc: 9
-              ncol: 2
-        draw_subplot:
-          title_fp: 16b
-          label_fp: 16b
-          tick_fp:  12r
-          tick_params:
-            width: 2
+              ncol: 4
         draw_dataset:
           bar_kw:
-            lw: 2
-            capsize: 4
             error_kw:
-              capsize: 5
+              capsize: 4
               capthick: 2
               elinewidth: 2
+            linewidth: 2
+            edgecolor: [0,0,0]
           handle_kw:
-            ms: 10
-            mew: 2
+            ms: 20
+            mew: 2.0
       manuscript:
         class: target
         inherits: manuscript

@@ -364,10 +364,10 @@ class SequenceFigureManager(FigureManager):
           bottom:     1.80
           hspace:     0.20
           left:       1.30
-          right:      0.80
+          right:      0.20
           sub_height: 3.00
           sub_width: 14.00
-          top:        0.60
+          top:        0.20
           wspace:     0.20
           shared_legend_kw:
             left:        1.30
@@ -384,6 +384,9 @@ class SequenceFigureManager(FigureManager):
             left: -0.5
           shared_xlabel_kw:
             bottom: -0.9
+        draw_subplot:
+          ylabel_kw:
+            rotation: horizontal
         draw_dataset:
           handle_kw:
             mew: 2.0
