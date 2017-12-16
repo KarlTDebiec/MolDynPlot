@@ -192,8 +192,10 @@ class SequenceFigureManager(FigureManager):
         class: content
         help: Format subplot for paramagnetic relaxation enhancement Γ2
         draw_subplot:
-          ylabel: "$Γ_2$"
+          ylabel: "$^1H_N-Γ_2$"
           yticks: [0,20,40,60,80,100]
+          ylabel_kw:
+            rotation: vertical
         draw_dataset:
           y_key:    "rho2"
           yse_key: "rho2 se"

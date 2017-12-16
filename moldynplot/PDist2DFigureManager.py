@@ -140,7 +140,7 @@ class PDist2DFigureManager(FigureManager):
           colorbar_kw:
             zticks: [0.2,0.4,0.6,0.8,1.0]
             zticklabels: []
-            zlabel: Contribution to $Γ_2$
+            zlabel: "Contribution to $^1H_N-Γ_2$"
       manuscript:
         class: target
         inherits: manuscript
