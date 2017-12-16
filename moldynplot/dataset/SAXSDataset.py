@@ -115,6 +115,35 @@ class SAXSDataset(Dataset):
 
         return scale
 
+    def x2(self, x2, **kwargs):
+        from os.path import expandvars, isfile
+        from scipy.interpolate import interp1d
+
+        # Processs arguments
+        verbose = kwargs.get("verbose", 1)
+
+        # Prepare target
+        target = self.load_dataset(infile=expandvars(x2), loose=True).df
+        target_q = np.array(target.index.values, np.float64)
+        target_I = np.array(target["intensity"], np.float64)
+        target_Ise = np.array(target["intensity se"], np.float64)
+
+        # Prepare own values over x range of target
+        template = self.df
+        template_q = np.array(template.index.values, np.float64)
+        template_I = np.array(template["intensity"].values, np.float64)
+        indexes = np.logical_and(template_q > target_q.min(),
+          template_q < target_q.max())
+        template_q = template_q[indexes]
+        template_I = template_I[indexes]
+
+        # Update target
+        target_I = interp1d(target_q, target_I, kind="cubic")(template_q)
+        target_Ise = interp1d(target_q, target_Ise, kind="cubic")(template_q)
+
+        residual = ((template_I - target_I) / target_Ise) ** 2
+        x2 = residual.sum() / (residual.size - 1)
+        print(x2)
 
 #################################### MAIN #####################################
 if __name__ == "__main__":

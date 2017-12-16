@@ -34,8 +34,9 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
     """
 
     def __init__(self, infile, address="saxs", dt=None, toffset=None,
-      downsample=None, calc_mean=False, calc_error=True, error_method="std",
-      scale=False, outfile=None, interactive=False, **kwargs):
+      downsample=None, calc_mean=False, calc_error=True, calc_x2=False,
+      error_method="std", scale=False, outfile=None, interactive=False,
+      **kwargs):
         """
         Arguments:
           infile (str): Path to input file, may contain environment
@@ -80,13 +81,6 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
         if downsample:
             self.downsample(downsample, downsample_mode="mean", **kwargs)
 
-        # Output data
-        if verbose >= 2:
-            print("Processed timeseries DataFrame:")
-            print(self.timeseries_df)
-        if outfile is not None:
-            self.write(df=self.timeseries_df, outfile=outfile, **kwargs)
-
         # Calculate mean and standard error
         if calc_mean:
             block_kw = dict(min_n_blocks=2, max_cut=0.1, all_factors=False,
@@ -99,17 +93,32 @@ class SAXSTimeSeriesDataset(TimeSeriesDataset, SAXSDataset):
               df=self.timeseries_df, mode="se", verbose=verbose, **block_kw)
             self.mean_df.index.name = "q"
             self.mean_df.columns = ["intensity", "intensity se"]
-            if verbose >= 2:
-                print("Processed mean DataFrame:")
-                print(self.mean_df)
-            if isinstance(calc_mean, six.string_types):
-                self.write(df=self.mean_df, outfile=calc_mean, **kwargs)
             self.df = self.mean_df
 
         # Scale
         if scale:
             self.scale(scale, **kwargs)
 
+        # X2
+        if calc_x2 and isinstance(calc_x2, six.string_types):
+            self.x2(calc_x2, **kwargs)
+
+        # Output data
+        if verbose >= 2:
+            print("Processed timeseries DataFrame:")
+            print(self.timeseries_df)
+        if outfile is not None:
+            self.write(df=self.timeseries_df, outfile=outfile, **kwargs)
+        if calc_mean:
+            if verbose >= 2:
+                print("Processed mean DataFrame:")
+                print(self.mean_df)
+            if isinstance(calc_mean, six.string_types):
+                self.write(df=self.mean_df, outfile=calc_mean, **kwargs)
+
+        # Interactive prompt
+        if interactive:
+            embed()
 
 #################################### MAIN #####################################
 if __name__ == "__main__":
